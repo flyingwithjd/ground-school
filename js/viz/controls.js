@@ -1,8 +1,8 @@
 // Flight controls on their hinges. Drag the yoke pad (roll + pitch) and the pedal bar (yaw);
 // the 3D airplane moves its surfaces and responds gently about each axis. Secondary mode: trim and flaps.
-import { frame, chips, slider } from "./base.js?v=6bda16dded";
-import { planeStage } from "./planestage.js?v=6bda16dded";
-import { h, s, clamp, reduced } from "../core/util.js?v=6bda16dded";
+import { frame, chips, slider } from "./base.js?v=05f99f8a27";
+import { planeStage } from "./planestage.js?v=05f99f8a27";
+import { h, s, clamp, reduced } from "../core/util.js?v=05f99f8a27";
 // model signs: ail>0 = roll right; elev<0 = trailing edge up (nose up); rud>0 = right rudder; trim>0 = tab TE down (nose-up trim); steer>0 = nosewheel left
 function pad(parent, { label, w = 180, hgt = 180, axes = "xy", onmove }) {
   const box = h("div", { class: "pad", role: "slider", tabindex: "0", "aria-label": label, style: `width:${w}px;height:${hgt}px` });
@@ -34,8 +34,8 @@ export function mount(host, { mode = "primary" } = {}) {
     const words = () => { const p = []; if (Math.abs(st.ail) > 0.15) p.push(`Right aileron ${st.ail > 0 ? "up" : "down"}, left ${st.ail > 0 ? "down" : "up"}: roll ${st.ail > 0 ? "right" : "left"}`); if (Math.abs(st.elev) > 0.15) p.push(`Elevator trailing edge ${st.elev < 0 ? "up" : "down"}: nose ${st.elev < 0 ? "up" : "down"}`); if (Math.abs(st.rud) > 0.15) p.push(`Rudder ${st.rud > 0 ? "right" : "left"}: nose yaws ${st.rud > 0 ? "right" : "left"}`); return p; };
     let lastTint = "";   // blue fill on whichever surfaces are deflected
     let upd = () => { S.pose({ ail: st.ail * 28, elev: st.elev * 28, rud: st.rud * 28, steer: -st.rud * 10 }); const big = Math.abs(st.ail) > Math.max(Math.abs(st.elev), Math.abs(st.rud)) ? (st.ail > 0 ? "Roll right" : "Roll left") : Math.abs(st.elev) >= Math.abs(st.rud) && Math.abs(st.elev) > 0.15 ? (st.elev < 0 ? "Pitch up" : "Pitch down") : Math.abs(st.rud) > 0.15 ? (st.rud > 0 ? "Yaw right" : "Yaw left") : "Neutral"; F.caption(words()[0] ? "Control input" : "Hands off", big); const tn = [Math.abs(st.ail) > 0.15 && "ailerons", Math.abs(st.elev) > 0.15 && "elevator", Math.abs(st.rud) > 0.15 && "rudder"].filter(Boolean).join(); if (tn !== lastTint) { lastTint = tn; S.tint(tn ? tn.split(",") : []); }
-      F.explain(words().join(". ") + (words().length ? ". <span class=\"src\">Surface movement exaggerated for clarity.</span>" : "Drag the yoke pad left and right to roll, toward and away from you to pitch. Use the pedal bar for rudder.")); };
-    const yoke = pad(row, { label: "Yoke · pull = nose up", axes: "xy", onmove: (x, y) => { st.ail = x; st.elev = y; upd(); } });
+      F.explain(words().join(". ") + (words().length ? ". <span class=\"src\">Surface movement exaggerated for clarity.</span>" : "Drag the yoke pad left and right to roll, down (pull back) for nose up, up (push forward) for nose down. Use the pedal bar for rudder.")); };
+    const yoke = pad(row, { label: "Yoke · drag down (pull) = nose up", axes: "xy", onmove: (x, y) => { st.ail = x; st.elev = -y; upd(); } });
     const ped = pad(row, { label: "Rudder pedals", w: 220, hgt: 64, axes: "x", onmove: (x) => { st.rud = x; upd(); } });
     cleanup.push(() => yoke.destroy(), () => ped.destroy());
     // gentle attitude response so the surface-to-motion link is visible (illustrative rates)
