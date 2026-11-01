@@ -5,8 +5,8 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
-import { buildPlane } from "./c172-model.js?v=c2a8eeaf64";
-import { reduced, clamp } from "../core/util.js?v=c2a8eeaf64";
+import { buildPlane } from "./c172-model.js?v=6bda16dded";
+import { reduced, clamp } from "../core/util.js?v=6bda16dded";
 const ACC = 0x3b82f6, INK = 0xf2f1ec, BG = 0x0a0a0b, D = Math.PI / 180;
 const s5 = (t) => { t = clamp(t, 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
 export const VIEWS = {
@@ -49,6 +49,9 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
       if (n > 0 && sb.items[n - 1].k > fk) { fk = sb.items[n - 1].k; const q = sb.items[n - 1].seg; front = frontV.set(q[3], q[4], q[5]).applyMatrix4(sb.obj.matrixWorld); } });
     if (light) { const on = p > 0.001 && p < 0.999 && front; light.visible = !!on; if (on) { light.position.copy(front); light.material.opacity = Math.sin(Math.PI * p) ** 0.5; } } }
   function highlight(names) { names = [].concat(names || []).filter((n) => ACCENT[n]); Object.keys(ACCENT).forEach((n) => { if (!names.includes(n)) ACCENT[n].forEach((sb) => (sb.c.visible = sb.gl.visible = false)); }); hl = names; progT0 = performance.now(); prog = 0; kick(); }
+  // Blue fill on the faces of the named parts (e.g. a deflected control surface), on top of the accent lines. Pass [] to clear.
+  const tintMat = P.meshes[0] ? P.meshes[0].material.clone() : null; if (tintMat) tintMat.color.setHex(0x1e4fae);
+  function tint(names) { names = [].concat(names || []); P.meshes.forEach((m) => { m.userData.mat0 ||= m.material; m.material = tintMat && names.includes(m.userData.part) ? tintMat : m.userData.mat0; }); kick(); }
   // camera state (spherical around a target), eased transitions
   const cs = { ...VIEWS[view], tg: [...VIEWS[view].tg] }; let camTw = null;
   function applyCam() { const az = cs.az * D, el = cs.el * D; camera.position.set(cs.tg[0] + cs.d * Math.cos(el) * Math.cos(az), cs.tg[1] + cs.d * Math.sin(el), cs.tg[2] + cs.d * Math.cos(el) * Math.sin(az)); camera.lookAt(...cs.tg); if (controls) controls.target.set(...cs.tg); }
@@ -100,7 +103,7 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
     try { renderer.render(scene, camera); } catch (e) {}
     tmp.forEach(([o, v]) => { o.visible = false; if (o.isSprite) o.material.opacity = v; else o.geometry.instanceCount = v; }); }
   kick(1000);
-  return { THREE, P, scene, camera, renderer, pivot, CG, highlight, setView, setAttitude, pose, project, kick, parts: Object.keys(P.parts), inkLines,
+  return { THREE, P, scene, camera, renderer, pivot, CG, highlight, tint, setView, setAttitude, pose, project, kick, parts: Object.keys(P.parts), inkLines,
     animate(fn) { extra = fn; kick(); }, setInkOpacity(o) { inkMat.opacity = o; kick(); },
     destroy() { alive = false; cancelAnimationFrame(raf); raf = 0; ro.disconnect(); io.disconnect(); controls && controls.dispose(); renderer.dispose(); renderer.forceContextLoss && renderer.forceContextLoss(); canvas.remove(); } };
 }

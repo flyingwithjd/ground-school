@@ -123,3 +123,8 @@ These notes are updated as work goes, so an interruption loses nothing. The time
   Callouts are sized in screen pixels (~11.5 px) so they stay legible on a phone; one-line load statement is the caption label. Draw-on respects reduced motion.
 - PHAK 25C (Ch 3) names longerons/struts for truss and bulkhead, formers, stringers, skin for (semi)monocoque; it does not name Pratt/Warren, so neither does the visual.
 - overlap-audit.mjs now also checks the pager (no overlap, no spill, no clipped label) and every fuselage type (+dent) for overlapping or <10 px callouts. 0 problems at 360 and 430 px.
+
+### 2026-10-31, ~11:30 PM MDT: exaggerated control-surface deflection (JD: "can't see the ailerons moving" on Roll)
+- axes.js: cause → effect loop (surface deflects 28° visual, then the airplane rotates; surface neutral, attitude holds; opposite; back to level). Deflected surface gets a blue face tint (planestage `tint()`) plus pinned "▲ UP / ▼ DOWN / RIGHT" tags at the trailing edges; caption reads e.g. "Right aileron UP · left aileron DOWN / Rolling right". Roll now viewed from behind (right wing on screen right). Explain text per axis (PHAK 6) + "Surface movement exaggerated for clarity." Reduced motion: one snapped pose. Same single rAF loop (tags positioned inside the frame callback).
+- controls.js: full yoke/pedal = 28° visual on all three surfaces, deflected ones tinted, exaggeration note. plane3d.js: aileron/elevator/rudder poses 25°, wings/empennage 18°.
+- Tests: validate 609/71/0 bad; smoke 187 desktop + 5 phone routes no errors; parts-ui DESELECT PASS; overlap-audit 360 px 0 problems.
