@@ -1,0 +1,90 @@
+// Live, interactive version of the C172S wireframe explainer scene.
+// Thin ink lines over a solid dark body; only the named part is redrawn in the accent by a moving point of light.
+import * as THREE from "three";
+import { OrbitControls } from "three/addons/controls/OrbitControls.js";
+import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
+import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
+import { LineMaterial } from "three/addons/lines/LineMaterial.js";
+import { buildPlane } from "./c172-model.js";
+import { reduced, clamp } from "../core/util.js";
+const ACC = 0x3b82f6, INK = 0xf2f1ec, BG = 0x0a0a0b, D = Math.PI / 180;
+const s5 = (t) => { t = clamp(t, 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
+export const VIEWS = {
+  iso: { tg: [-4.5, 4.2, 0], az: -32, el: 16, d: 52 }, side: { tg: [-4.5, 4.4, 0], az: -90, el: 2, d: 54 }, top: { tg: [-4.5, 4.2, 0], az: -90, el: 88.5, d: 62 },
+  front: { tg: [-3, 5, 0], az: 0, el: 4, d: 52 }, rear: { tg: [-4, 5, 0], az: 180, el: 8, d: 52 }, tail: { tg: [-16.5, 5.6, 0], az: -150, el: 22, d: 24 },
+  nose: { tg: [5.5, 4, 0], az: -38, el: 16, d: 17 }, wingL: { tg: [-2, 6.4, -9], az: -130, el: 34, d: 30 }, wingR: { tg: [-2, 6.4, 9], az: 130, el: 34, d: 30 },
+  gear: { tg: [0, 2.2, 0], az: -60, el: 6, d: 28 }, cabin: { tg: [-1, 5, 0], az: -70, el: 18, d: 26 } };
+export function planeStage(stage, { view = "iso", orbit = true, onPick = null, ortho = false, ground = false } = {}) {
+  const canvas = document.createElement("canvas"); stage.prepend(canvas);
+  const renderer = new THREE.WebGLRenderer({ canvas, antialias: !matchMedia("(max-width: 760px)").matches, alpha: false, powerPreference: "low-power" });
+  const PHONE = matchMedia("(max-width: 760px)").matches; renderer.setPixelRatio(Math.min(PHONE ? 1.5 : 2, window.devicePixelRatio || 1)); renderer.setClearColor(BG, 1);
+  const scene = new THREE.Scene(); const res = new THREE.Vector2(1, 1);
+  const camera = new THREE.PerspectiveCamera(34, 16 / 9, 0.1, 800);
+  const P = buildPlane(THREE); const pivot = new THREE.Group(); scene.add(pivot);
+  const CG = new THREE.Vector3(-1.2, 4.6, 0); P.root.position.sub(CG); pivot.position.copy(CG); pivot.add(P.root);
+  const inkMat = new THREE.LineBasicMaterial({ color: INK, transparent: true, opacity: 0.5 });
+  const coreMat = new LineMaterial({ color: ACC, linewidth: 2.4, resolution: res }), glowMat = new LineMaterial({ color: ACC, linewidth: PHONE ? 6 : 9, transparent: true, opacity: PHONE ? 0.15 : 0.22, depthWrite: false, blending: THREE.AdditiveBlending, resolution: res });
+  const INKLESS = new Set(["fuel", "propDim"]); const ACCENT = {}; const inkLines = {};
+  P.root.updateMatrixWorld(true);
+  for (const [name, part] of Object.entries(P.parts)) {
+    inkLines[name] = [];
+    if (!INKLESS.has(name)) part.subs.forEach((sb) => { const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(sb.segs, 3)); const l = new THREE.LineSegments(g, inkMat); sb.obj.add(l); inkLines[name].push(l); });
+    const box = new THREE.Box3(), wp = []; part.subs.forEach((sb, si) => { for (let k = 0; k + 5 < sb.segs.length; k += 6) { const m = new THREE.Vector3((sb.segs[k] + sb.segs[k + 3]) / 2, (sb.segs[k + 1] + sb.segs[k + 4]) / 2, (sb.segs[k + 2] + sb.segs[k + 5]) / 2).applyMatrix4(sb.obj.matrixWorld); wp.push([si, k, m]); box.expandByPoint(m); } });
+    if (!wp.length) continue;
+    const sz = box.getSize(new THREE.Vector3()), ax = sz.x >= sz.y && sz.x >= sz.z ? "x" : sz.z >= sz.y ? "z" : "y", lo = box.min[ax], span = Math.max(1e-6, sz[ax]);
+    const key = (m) => (name === "propeller" ? Math.abs(m.y + CG.y - P.PROP_Y) / 3.2 : ["wing", "flaps", "ailerons", "elevator", "hstab", "fuel", "trimtab"].includes(name) ? Math.abs(m.z) / Math.max(1e-6, Math.max(Math.abs(box.min.z), Math.abs(box.max.z))) : name === "engine" ? (box.max.x - m.x) / sz.x : (m[ax] - lo) / span);
+    ACCENT[name] = part.subs.map((sb, si) => { const items = wp.filter((w) => w[0] === si).map((w) => ({ k: key(w[2]), seg: sb.segs.slice(w[1], w[1] + 6) })).sort((a, b) => a.k - b.k);
+      if (!items.length) return null; const g1 = new LineSegmentsGeometry().setPositions(items.flatMap((i) => i.seg)), g2 = new LineSegmentsGeometry().setPositions(items.flatMap((i) => i.seg));
+      const c = new LineSegments2(g1, coreMat), gl = new LineSegments2(g2, glowMat); c.renderOrder = 2; gl.renderOrder = 3; c.visible = gl.visible = false; sb.obj.add(c, gl); return { obj: sb.obj, items, c, gl }; }).filter(Boolean);
+  }
+  const dotTex = (() => { const c = document.createElement("canvas"); c.width = c.height = 64; const x = c.getContext("2d"); const g = x.createRadialGradient(32, 32, 0, 32, 32, 32);
+    g.addColorStop(0, "rgba(255,255,255,1)"); g.addColorStop(0.25, "rgba(59,130,246,0.9)"); g.addColorStop(1, "rgba(59,130,246,0)"); x.fillStyle = g; x.fillRect(0, 0, 64, 64); return new THREE.CanvasTexture(c); })();
+  const lights = [0, 1, 2, 3].map(() => { const sp = new THREE.Sprite(new THREE.SpriteMaterial({ map: dotTex, sizeAttenuation: false, transparent: true, depthWrite: false, depthTest: false, blending: THREE.AdditiveBlending })); sp.scale.set(0.035, 0.035, 1); sp.renderOrder = 5; sp.visible = false; scene.add(sp); return sp; });
+  // optional faint ground grid (supporting object, never competes)
+  let grid = null; if (ground) { grid = new THREE.GridHelper(140, 28, INK, INK); grid.material.transparent = true; grid.material.opacity = 0.07; grid.position.y = 0; scene.add(grid); }
+  let hl = [], prog = 0, progT0 = 0, drawDur = reduced() ? 1 : 1300;
+  function setAccent(name, p, light) { let front = null, fk = -1;
+    (ACCENT[name] || []).forEach((sb) => { let n = 0; while (n < sb.items.length && sb.items[n].k <= p * 1.0001 + 1e-6) n++; sb.c.visible = sb.gl.visible = n > 0; sb.c.geometry.instanceCount = n; sb.gl.geometry.instanceCount = n;
+      if (n > 0 && sb.items[n - 1].k > fk) { fk = sb.items[n - 1].k; const q = sb.items[n - 1].seg; front = new THREE.Vector3(q[3], q[4], q[5]).applyMatrix4(sb.obj.matrixWorld); } });
+    if (light) { const on = p > 0.001 && p < 0.999 && front; light.visible = !!on; if (on) { light.position.copy(front); light.material.opacity = Math.sin(Math.PI * p) ** 0.5; } } }
+  function highlight(names) { names = [].concat(names || []).filter((n) => ACCENT[n]); Object.keys(ACCENT).forEach((n) => { if (!names.includes(n)) ACCENT[n].forEach((sb) => (sb.c.visible = sb.gl.visible = false)); }); hl = names; progT0 = performance.now(); prog = 0; kick(); }
+  // camera state (spherical around a target), eased transitions
+  const cs = { ...VIEWS[view], tg: [...VIEWS[view].tg] }; let camTw = null;
+  function applyCam() { const az = cs.az * D, el = cs.el * D; camera.position.set(cs.tg[0] + cs.d * Math.cos(el) * Math.cos(az), cs.tg[1] + cs.d * Math.sin(el), cs.tg[2] + cs.d * Math.cos(el) * Math.sin(az)); camera.lookAt(...cs.tg); if (controls) controls.target.set(...cs.tg); }
+  function setView(v, dur = 1600) { const to = typeof v === "string" ? VIEWS[v] : v; if (!to) return; if (controls) syncFromControls();
+    const from = { ...cs, tg: [...cs.tg] }; let daz = to.az - from.az; while (daz > 180) daz -= 360; while (daz < -180) daz += 360;
+    const t0 = performance.now(), dd = reduced() ? 1 : dur; camTw = (now) => { const k = s5((now - t0) / dd); cs.az = from.az + daz * k; cs.el = from.el + (to.el - from.el) * k; cs.d = Math.exp(Math.log(from.d) + (Math.log(to.d) - Math.log(from.d)) * k); cs.tg = from.tg.map((x, i) => x + (to.tg[i] - x) * k); applyCam(); if (k >= 1) camTw = null; }; kick(); }
+  let controls = null;
+  function syncFromControls() { const o = camera.position.clone().sub(controls.target); cs.d = o.length(); cs.el = Math.asin(clamp(o.y / cs.d, -1, 1)) / D; cs.az = Math.atan2(o.z, o.x) / D; cs.tg = controls.target.toArray(); }
+  if (orbit) { controls = new OrbitControls(camera, canvas); controls.enableDamping = true; controls.dampingFactor = 0.08; controls.enablePan = false; controls.minDistance = 8; controls.maxDistance = 90; controls.rotateSpeed = 0.6; controls.zoomSpeed = 0.6;
+    controls.addEventListener("start", () => { camTw = null; kick(); }); controls.addEventListener("change", kick); }
+  applyCam();
+  // attitude (deg) and control surface pose (deg)
+  const att = { pitch: 0, bank: 0, yaw: 0 }; let poseA = {};
+  function setAttitude(a) { Object.assign(att, a); pivot.rotation.set(0, 0, 0); pivot.rotation.order = "YZX"; pivot.rotation.y = -att.yaw * D; pivot.rotation.z = att.pitch * D; pivot.rotation.x = att.bank * D; kick(); }
+  function pose(a) { poseA = { ...poseA, ...a }; const r = {}; for (const [k, v] of Object.entries(poseA)) r[k] = k === "prop" || k === "wheel" || k === "wheelN" ? v : v * D; P.pose(r); kick(); }
+  // picking
+  const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(); let downAt = null;
+  const pickable = P.meshes;
+  canvas.addEventListener("pointerdown", (e) => (downAt = [e.clientX, e.clientY]));
+  canvas.addEventListener("pointerup", (e) => { if (!onPick || !downAt) return; if (Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 6) return; const r = canvas.getBoundingClientRect(); ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, camera); const hit = ray.intersectObjects(pickable, false)[0]; onPick(hit ? hit.object.userData.part : null, hit ? hit.object.userData.tag : null); });
+  // project a model-space point (feet) to stage pixels, for SVG overlays
+  const tmp = new THREE.Vector3();
+  function project(p, local = true) { tmp.set(p[0], p[1], p[2]); if (local) { tmp.sub(CG); tmp.applyEuler(pivot.rotation); tmp.add(CG); } tmp.project(camera); const r = stage.getBoundingClientRect(); return { x: (tmp.x * 0.5 + 0.5) * r.width, y: (-tmp.y * 0.5 + 0.5) * r.height, z: tmp.z }; }
+  function resize() { const r = stage.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.updateProjectionMatrix(); const pr = renderer.getPixelRatio(); res.set(r.width * pr, r.height * pr); coreMat.resolution.copy(res); glowMat.resolution.copy(res); kick(); }
+  const ro = new ResizeObserver(resize); ro.observe(stage);
+  let raf = null, alive = true, visible = true, idleUntil = 0, extra = null;
+  function kick(ms = 400) { idleUntil = Math.max(idleUntil, performance.now() + ms); if (!raf && alive) raf = requestAnimationFrame(loop); }
+  function loop(now) { raf = null; if (!alive) return;
+    if (camTw) camTw(now); if (controls) controls.update();
+    if (extra) extra(now);
+    lights.forEach((l) => (l.visible = false));
+    if (hl.length) { prog = clamp((now - progT0) / drawDur, 0, 1); const p = s5(prog); hl.forEach((n, i) => setAccent(n, p, lights[i % 4])); if (prog < 1) idleUntil = Math.max(idleUntil, now + 50); }
+    renderer.render(scene, camera);
+    if (visible && (now < idleUntil || camTw || extra)) raf = requestAnimationFrame(loop); }
+  const io = new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) kick(); }); io.observe(stage);
+  resize(); kick(1000);
+  return { THREE, P, scene, camera, renderer, pivot, CG, highlight, setView, setAttitude, pose, project, kick, parts: Object.keys(P.parts), inkLines,
+    animate(fn) { extra = fn; kick(); }, setInkOpacity(o) { inkMat.opacity = o; kick(); },
+    destroy() { alive = false; cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); controls && controls.dispose(); renderer.dispose(); renderer.forceContextLoss && renderer.forceContextLoss(); canvas.remove(); } };
+}

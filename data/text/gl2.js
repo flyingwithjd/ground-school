@@ -1,0 +1,57 @@
+// GL2 lesson text
+const CFI = `<div class="note cfi">Procedures here are general. Confirm with your CFI and your aircraft's POH.</div>`;
+export default {
+  sections: [
+    { id: "primary", label: "Primary controls · PHAK 6", title: "Three controls, three axes",
+      body: `<p>The control wheel moves the [[ailerons]] and the [[elevator]]; the rudder pedals move the [[rudder]]. In the 172S they are connected by cables and pushrods, so what you feel is the air pushing back on the surfaces.</p>
+<p><strong>Ailerons</strong> move opposite each other. Turn the wheel right and the right aileron rises (less lift on that wing) while the left one drops (more lift), and the airplane rolls right. The wing that rises also carries more [[induced drag]], which pulls the nose the wrong way. That is [[adverse yaw]], and it gets worse at low airspeed when you need big aileron inputs. <span class="src">PHAK 6</span></p>
+<p><strong>Rudder</strong> in the direction of the turn cancels adverse yaw. Coordinated flight means the ball is centered: the airplane is pointed where it is going.</p>
+<p><strong>Elevator</strong> changes pitch, and in doing so changes the wing's [[angle of attack]]. Back pressure raises the elevator's trailing edge, pushes the tail down and the nose up.</p>`,
+      viz: { type: "controls", opts: { mode: "primary" } },
+      kdr: { k: "Each primary control and the axis it acts on; why adverse yaw exists.", d: "Roll in and out of turns with the ball centered.", r: "Uncoordinated flight at low airspeed is how stall-spins start.", codes: ["PA.I.G.K1a"] } },
+    { id: "secondary", label: "Trim and flaps · PHAK 6", title: "Trim holds, flaps slow",
+      body: `<p><strong>Trim</strong> relieves pressure. The 172S has a manual trim wheel that moves a small [[trim tab]] on the elevator. The tab moves <em>opposite</em> the elevator: to hold the elevator up (nose-up trim) the tab goes down. Forward rotation of the wheel trims nose down. <span class="src">PHAK 6 · POH 7</span></p>
+<p>Fly the attitude first, then trim away the pressure. If you trim to make the airplane fly an attitude, you are chasing it.</p>
+<p><strong>Flaps</strong> increase lift and drag. They let you fly slower and descend at a steeper angle without gaining speed. The 172S has electric single-slot flaps with stops at 10°, 20° and 30°. Do not exceed 110 KIAS with 10°, or 85 KIAS with more. <span class="src">POH 2, 7</span></p>`,
+      viz: { type: "controls", opts: { mode: "secondary" } },
+      kdr: { k: "Trim tab direction; flap effects; flap speeds.", d: "Set attitude, then trim; manage flap changes with pitch.", r: "Flap extension above VFE can overstress the structure.", codes: ["PA.I.G.K1b"] } },
+    { id: "engine", label: "Powerplant · PHAK 7", title: "Four strokes, two magnetos",
+      body: `<p>The 172S uses a [[reciprocating engine]]: a Lycoming IO-360-L2A with four horizontally opposed, air-cooled cylinders, fuel injection and 180 hp at 2,700 RPM. It drives a two-blade, fixed-pitch propeller. <span class="src">POH 1, 7</span></p>
+<p>Each cylinder repeats four strokes: <strong>intake</strong> (mixture drawn in), <strong>compression</strong>, <strong>power</strong> (spark fires, gas expands, piston pushed down) and <strong>exhaust</strong>. <span class="src">PHAK 7</span></p>
+<p>Ignition comes from two [[magneto|magnetos]]. A magneto makes its own spark from a spinning magnet, so the engine keeps running with the master switch off. Each magneto fires one of two plugs per cylinder: redundancy, plus a more complete burn. The flip side: if a magneto's ground wire breaks, the propeller can start the engine when you move it. Treat every prop as live.</p>
+<p><strong>Mixture.</strong> As you climb the air thins but fuel flow does not, so the mixture becomes rich. Leaning restores the ratio. Too lean and too hot invites [[detonation]], an explosive uncontrolled burn, and [[preignition]], ignition before the spark. Use the right fuel grade and follow the POH leaning procedure.</p>
+<p><strong>Carburetor ice</strong> does not apply to the fuel-injected 172S, but many trainers have carburetors. Ice is most likely below 70 °F with humidity above 80%, and possible up to 100 °F. The first sign in a fixed-pitch airplane is a drop in RPM. <span class="src">PHAK 7</span></p>`,
+      viz: { type: "engine4" },
+      kdr: { k: "Four-stroke cycle; magnetos; mixture; detonation and preignition.", d: "Magneto check on runup: no more than 150 RPM drop, 50 RPM difference (172S).", r: "A hot magneto can start the engine. Never stand in the prop arc.", codes: ["PA.I.G.K1c"] } },
+    { id: "fuel", label: "Fuel system · POH 7", title: "Gravity first, pumps second",
+      body: `<p>Two vented tanks, one in each wing, hold 56 gallons total, 53 usable. Fuel flows by gravity to a three-position selector (BOTH, LEFT, RIGHT), then to a reservoir tank, through the auxiliary (electric) pump, a shutoff valve and a strainer, to the engine-driven pump and the fuel/air control unit, and finally to a distribution valve and the injector nozzles. <span class="src">POH 7</span></p>
+<p>Tanks must be <strong>vented</strong> so air replaces fuel as it is used; a blocked vent can starve the engine. Sump every drain before each flight and after refueling. Water is heavier than fuel and sits at the bottom of the cup as clear beads. Drain until it is gone. <span class="src">PHAK 7 · POH 4, 7</span></p>
+<p>Approved fuel is 100LL (blue) or 100 (green). Jet fuel is clear or straw-colored and will destroy a piston engine.</p>`,
+      viz: { type: "fuelsys" },
+      kdr: { k: "Fuel flow path; selector positions; sumping; fuel grades.", d: "Sample all drains; check vents; confirm fuel quantity visually.", r: "Fuel starvation (selector or vent) and contamination are common causes of engine failure.", codes: ["PA.I.G.K1e"] } },
+    { id: "elec", label: "Electrical · POH 7", title: "Alternator runs, battery waits",
+      body: `<p>The 172S has a 28-volt DC system. A 60-amp belt-driven [[alternator]] powers everything once the engine runs and recharges the 24-volt battery. The battery starts the engine and is the backup if the alternator fails. The master switch is split: BAT and ALT halves. An avionics master feeds the radios separately so they are off during engine start. <span class="src">POH 7</span></p>
+<p>The [[ammeter]] shows charge or discharge. A discharge or the <strong>VOLTS</strong> annunciator means the battery is carrying the load. Shed what you don't need and plan to land.</p>
+<p>What is <em>not</em> electric: the engine's ignition (magnetos), the vacuum-driven attitude and heading indicators, and the pitot-static instruments. A total electrical failure leaves you flying, with fewer radios and lights.</p>` + CFI,
+      kdr: { k: "Alternator vs battery; master switch; ammeter indications.", d: "Check ammeter and annunciators after start and in cruise.", r: "Recognize an alternator failure early, while the battery still has charge.", codes: ["PA.I.G.K1f", "PA.I.G.K2"] } },
+    { id: "pitot", label: "Pitot-static · PHAK 8", title: "Two pressures, three gauges",
+      body: `<p>The [[pitot tube]] under the left wing feels ram (total) pressure. The [[static port]] on the side of the fuselage feels still-air pressure. The [[airspeed indicator]] compares the two. The [[altimeter]] and [[vertical speed indicator]] use static pressure only. <span class="src">PHAK 8 · POH 7</span></p>
+<p>Blockages are classic oral-exam material because each one fails differently. Try them below, then climb and descend.</p>`,
+      viz: { type: "pitotstatic" },
+      body2: `<p><strong>Alternate static.</strong> The 172S valve is below the throttle and vents to the cabin. Cabin pressure is lower than outside, so expect airspeed and altitude to read a little high. Pitot heat protects the tube in visible moisture. <span class="src">PHAK 8 · POH 7</span></p>`,
+      kdr: { k: "Which instruments use which pressure; blockage symptoms.", d: "Cross-check instruments; use alternate static if the static source is blocked.", r: "A blocked pitot (with drain) acts like an altimeter and can hide a stall.", codes: ["PA.I.G.K1h"] } },
+    { id: "gyro", label: "Gyroscopic instruments · PHAK 8", title: "Spinning wheels, steady reference",
+      body: `<p>A gyro wheel spun fast resists being tilted: [[rigidity in space]]. A force applied to it shows up 90° later in the direction of rotation: [[precession]]. <span class="src">PHAK 8</span></p>
+<p>In the 172S the [[attitude indicator]] and [[heading indicator]] are vacuum-driven; the [[turn coordinator]] is electric, so one failure does not take out every gyro. The heading indicator drifts with precession, so realign it with the [[magnetic compass]] about every 15 minutes in straight-and-level flight.</p>
+<p>A suction gauge should read in its green range (4.5 to 5.5 in. Hg in the 172S) to trust the vacuum gyros. <span class="src">POH 2</span></p>`,
+      viz: { type: "instruments" },
+      kdr: { k: "Gyro principles; power source for each instrument.", d: "Check vacuum and align the heading indicator before takeoff.", r: "A failing vacuum gyro gives slowly wrong information; cross-check.", codes: ["PA.I.G.K1h"] } },
+    { id: "limits", label: "Limitations · POH 2", title: "The numbers on the dial",
+      body: `<p>Section 2 of the POH holds the limitations: the speeds, weights, loads and engine values the airplane was certificated to. They are not suggestions. Tap each arc. <span class="src">POH 2</span></p>`,
+      viz: { type: "asi" },
+      body2: `<p><strong>Maneuvering speed (VA)</strong> is not marked. At or below VA a full or abrupt control input stalls the wing before it can overload the structure. VA is 105 KIAS at 2,550 lb, 98 at 2,200 and 90 at 1,900: a lighter airplane reaches its load limit at a lower speed. <span class="src">POH 2 · PHAK 5</span></p>
+<p><strong>Load limits</strong> (normal category, flaps up): +3.8 g and −1.52 g; flaps down +3.0 g. Utility category, with the rear seat empty and no baggage, allows +4.4 g and −1.76 g. Flight into known icing is prohibited.</p>
+<p><strong>Engine:</strong> 2,700 RPM maximum; oil pressure 20 PSI minimum, 50–90 PSI normal, 115 PSI maximum; oil temperature 245 °F maximum. <span class="src">POH 2</span></p>`,
+      kdr: { k: "V-speeds and markings; load limits; operating limitations.", d: "Recite the limitations from memory and find them in Section 2.", r: "Turbulence above VA or VNO can exceed load limits.", codes: ["PA.I.F.K1", "PA.I.G.K1"] } },
+  ],
+};

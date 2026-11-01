@@ -1,0 +1,129 @@
+import { h, esc, pct, fmtDue, toast, download, shuffle } from "../core/util.js";
+import { S, save, exportJSON, importJSON, reset } from "../core/store.js";
+import { get } from "../core/srs.js";
+import { STAGES, MODULES, STAGE_CHECK } from "../../data/course.js";
+import { LESSONS, QUESTIONS, ORAL, TOPICS, ORDER, lessonItems } from "../../data/index.js";
+import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone } from "../core/progress.js";
+import { session } from "./quiz.js";
+import { G, rich } from "../core/rich.js";
+const page = (host) => { const p = h("div", { class: "page" }); host.append(p); return p; };
+const meter = (x, big) => `<div class="meter${big ? " big" : ""}"><i style="width:${Math.round(x * 100)}%"></i></div>`;
+const stage1Ids = () => [...STAGES[0].ground, ...STAGES[0].flight, ...MODULES.flatMap((m) => m.units)].flatMap((id) => lessonItems(id, { deep: false }));
+const foot = () => `<div class="footer">Study aid for ground training. It does not replace instruction from an authorized instructor, the FAA handbooks, the regulations, or your aircraft's Pilot's Operating Handbook. Figures for the Cessna 172S are stated from the manufacturer's published limitations for study; always use the POH for the airplane you fly. <a href="#/about">Sources and licenses</a></div>`;
+
+export function home(host) {
+  const p = page(host); const st = stats(stage1Ids()); const due = dueIds(); const weak = weakest(3); const nl = nextLesson(); const L = nl && LESSONS[nl];
+  const first = !Object.keys(S().items).length && !Object.keys(S().lessons).length;
+  p.innerHTML = `<section class="hero"><span class="label">Stage 1 · Pre-solo</span><h1>${first ? "Learn it. Keep it." : "What to work on now"}</h1>
+  <p>${first ? "Ground school for the private pilot certificate, built on the FAA handbooks, the Airman Certification Standards and 14 CFR. Read a lesson, play with the visuals, then answer. The app schedules every question for review and brings back what you are losing, so one right answer never counts as knowing it." : "Reviews that are due come first, then the areas you are weakest in, then new material."}</p></section>`;
+  const g = h("div", { class: "grid g3" }); p.append(g);
+  g.innerHTML = `<a class="cell" href="#/review"><span class="label">Due for review</span><div class="num">${due.length}<small>${due.length === 1 ? "item" : "items"}</small></div><p>${due.length ? "Answer these before they fade. Misses come back within minutes." : isFinite(nextDue()) ? `Nothing due. Next review ${fmtDue(nextDue())}.` : "Nothing scheduled yet. Start a lesson and answer its questions."}</p><span class="go btn ${due.length ? "pri" : ""} arrow">${due.length ? "Start review" : "Open review"}</span></a>
+  ${weak.length ? `<a class="cell" href="#/drill/${weak[0].t.id}"><span class="label">Weakest area</span><h3>${esc(weak[0].t.title)}</h3><p>${{ over: "You answered certain and were wrong here. Fix this first.", weak: "Recent accuracy is low or items keep slipping.", fading: "You knew this, but reviews are overdue.", building: "Still early. A few more spaced reviews will lock it in." }[weak[0].c]} ${LESSONS[weak[0].t.lesson].code}.</p>${meter(weak[0].st.readiness)}<span class="go btn arrow">Drill it</span></a>`
+  : `<a class="cell" href="#/map"><span class="label">Weakest area</span><h3>Not enough answers yet</h3><p>After you answer some questions, your weakest topics show up here automatically.</p><span class="go btn arrow">Blind-spot map</span></a>`}
+  ${L ? `<a class="cell" href="#/lesson/${L.id}"><span class="label">Next lesson · ${esc(L.code)}</span><h3>${esc(L.title)}</h3><p>${esc(L.short || "")}</p><span class="go btn ${due.length ? "" : "pri"} arrow">${S().lessons[L.id] ? "Continue" : "Begin"}</span></a>` : `<a class="cell" href="#/sim"><span class="label">Next</span><h3>Stage check simulator</h3><p>Every Stage 1 lesson is read. Take a timed mixed exam.</p><span class="go btn pri arrow">Start</span></a>`}`;
+  const r = h("section", { class: "section-gap" }); p.append(r);
+  r.innerHTML = `<div class="list-head"><span class="label">Stage 1 readiness</span><span class="pct">${pct(st.readiness)}</span></div>${meter(st.readiness, true)}
+  <div class="grid g3 mt"><div class="cell"><span class="label">Seen</span><div class="num">${st.seen}<small>of ${st.total}</small></div><p>Questions and oral items you have answered at least once.</p></div>
+  <div class="cell"><span class="label">Mastered</span><div class="num">${st.mastered}</div><p>Recalled correctly across spaced reviews until the next review is three weeks or more away.</p></div>
+  <a class="cell" href="#/map"><span class="label">Certain but wrong</span><div class="num">${st.over}</div><p>Answers you marked certain that were wrong. These are the dangerous ones.</p><span class="go btn ghost arrow" style="padding:0">Blind spots</span></a></div>
+  <p class="dim mt" style="font-size:15px">Readiness estimates how much of Stage 1 you would recall right now. It counts unseen items as zero and decays as reviews come due.</p>`;
+  p.insertAdjacentHTML("beforeend", foot());
+}
+function row(L) { const st = lessonStats(L.id); const done = lessonDone(L.id);
+  return `<a class="row" href="#/lesson/${L.id}"><span class="code">${esc(L.code)}</span><span><div class="t">${esc(L.title)}${L.stage === 2 ? ' <span class="tag">Stage 2</span>' : ""}</div><div class="s">${esc(L.short || "")}${done ? " · read" : ""}</div></span><span><div class="meter"><i style="width:${Math.round(st.readiness * 100)}%"></i></div></span></a>`; }
+export function course(host) {
+  const p = page(host); const s1 = STAGES[0];
+  p.innerHTML = `<section class="hero"><span class="label">Course</span><h1>Stage 1</h1><p>Six ground lessons and seven flight lesson briefings, sequenced like a Part 141 syllabus and keyed to the Private Pilot ACS. The bar on each row is readiness: what you would recall today.</p></section>
+  <div class="list-head"><span class="label">Ground lessons</span><span class="label">Readiness</span></div>${s1.ground.map((id) => row(LESSONS[id])).join("")}
+  <div class="list-head section-gap"><span class="label">Flight lesson briefings</span><span class="label">Readiness</span></div>${s1.flight.map((id) => row(LESSONS[id])).join("")}
+  <div class="list-head section-gap"><span class="label">Modules</span><span class="label">Readiness</span></div>
+  ${MODULES.map((m) => { const st = stats(m.units.flatMap((u) => lessonItems(u))); return `<a class="row" href="#/module/${m.id}"><span class="code">${esc(m.id.toUpperCase().slice(0, 6))}</span><span><div class="t">${esc(m.title)}</div><div class="s">${esc(m.sub)}</div></span><span><div class="meter"><i style="width:${Math.round(st.readiness * 100)}%"></i></div></span></a>`; }).join("")}
+  <div class="list-head section-gap"><span class="label">Stage 2 · preview</span><span class="label">Readiness</span></div>${STAGES[1].ground.map((id) => row(LESSONS[id])).join("")}
+  <p class="dim mt" style="font-size:15px">Stage 2 weather foundations are here early because Stage 1 flying already depends on wind and density altitude. They are tagged Stage 2 and are not part of the Stage 1 check.</p>${foot()}`;
+}
+export function moduleView(host, id) { const m = MODULES.find((x) => x.id === id); const p = page(host); if (!m) { p.innerHTML = "<h2>Module not found.</h2>"; return; }
+  const ids = m.units.flatMap((u) => lessonItems(u));
+  p.innerHTML = `<section class="hero"><span class="label">Module${m.partOf ? " · part of " + LESSONS[m.partOf].code : ""}</span><h1>${esc(m.title)}</h1><p>${esc(m.sub)}. Each unit stands alone and has its own questions in your review schedule.</p><div class="btns mt"><a class="btn pri arrow" href="#/practice/mod-${m.id}">Practice this module</a></div></section>
+  <div class="list-head"><span class="label">Units</span><span class="label">Readiness</span></div>${m.units.map((u) => row(LESSONS[u])).join("")}${foot()}`; }
+function runSession(host, opts) { const p = page(host); const s = session(p, { ...opts, onExit: opts.onExit || (() => history.length > 1 ? history.back() : (location.hash = "#/")) }); return s; }
+export function review(host) { const due = dueIds(); const pool = stage1Ids().concat(STAGES[1].ground.flatMap((id) => lessonItems(id, { deep: false })));
+  const seen = pool.filter((id) => get(id) && get(id).n).sort((a, b) => (get(a).ivl - get(b).ivl));
+  return runSession(host, { queue: due.slice(0, 25), extra: seen, mode: "review", title: "Review", label: `Review · ${due.length} due`, intro: due.length ? "" : (seen.length ? `Nothing is due. Next review ${fmtDue(nextDue())}. You can practice ahead; correct early answers will not stretch your schedule.` : "Nothing is scheduled yet. Open a lesson and answer its questions to start your review schedule."), onExit: () => (location.hash = "#/") }); }
+export function practice(host, id) {
+  let ids, title;
+  if (id.startsWith("mod-")) { const m = MODULES.find((x) => "mod-" + x.id === id); ids = m.units.flatMap((u) => lessonItems(u, { oral: false })); title = m.title; }
+  else { const L = LESSONS[id]; ids = lessonItems(id, { oral: false }); title = `${L.code} · ${L.title}`; }
+  const { queue, extra } = buildQueue(ids, { max: 20 });
+  return runSession(host, { queue, extra, mode: "learn", title, label: title, onExit: () => (location.hash = id.startsWith("mod-") ? "#/module/" + id.slice(4) : "#/lesson/" + id) }); }
+export function drill(host, tid) { const t = TOPICS[tid]; const ids = topicList().find((x) => x.id === tid)?.ids || [];
+  const sorted = ids.slice().sort((a, b) => { const A = get(a), B = get(b); return (A ? A.ivl : -1) - (B ? B.ivl : -1); });
+  const due = sorted.filter((id) => !get(id) || !get(id).n || get(id).due <= Date.now() || get(id).reps === 0);
+  return runSession(host, { queue: (due.length ? due : sorted).slice(0, 15), extra: [], mode: due.length ? "learn" : "ahead", title: t ? t.title : "Drill", label: `Drill · ${t ? t.title : ""}`, onExit: () => (location.hash = "#/map") }); }
+export function map(host) {
+  const p = page(host); const tl = topicList().filter((t) => LESSONS[t.lesson]); const rows = tl.map((t) => { const st = stats(t.ids); return { t, st, c: classify(t, st) }; });
+  const by = (c) => rows.filter((r) => r.c === c);
+  const tile = (r) => `<a class="tile ${r.c === "weak" ? "weak" : r.c === "over" ? "over" : ""}" href="#/drill/${r.t.id}"><span class="label">${esc(LESSONS[r.t.lesson].code)}</span><span class="t">${esc(r.t.title)}</span><span class="f"><span class="pct">${r.st.seen ? pct(r.st.readiness) : "unseen"}</span><span class="tag ${r.c === "over" ? "acc" : ""}">${{ over: "certain, wrong", weak: "weak", fading: "fading", strong: "strong", building: "building", unseen: "never seen" }[r.c]}</span></span>${meter(r.st.readiness)}</a>`;
+  const block = (title, sub, list) => list.length ? `<section class="section-gap"><div class="list-head"><span class="label">${title}</span><span class="pct">${list.length}</span></div><p class="dim" style="font-size:15.5px;margin:12px 0 18px">${sub}</p><div class="heat">${list.map(tile).join("")}</div></section>` : "";
+  const any = rows.some((r) => r.st.seen);
+  p.innerHTML = `<section class="hero"><span class="label">Blind-spot map</span><h1>Where you are weak</h1><p>Every topic in the course, sorted by what needs you most. A topic is weak when recent answers are mostly wrong or items keep slipping. Certain-but-wrong means you tapped certain and missed it, which is the most dangerous kind of gap in an airplane.</p></section>
+  ${any ? "" : `<div class="card"><h3>No answers yet.</h3><p class="dim mt">Answer a few questions in any lesson and this map fills in. Tap "How sure are you?" honestly; it is how the map finds overconfidence.</p></div>`}
+  ${block("Certain but wrong", "You were sure and you were wrong. Drill these first.", by("over"))}
+  ${block("Weak", "Low recent accuracy or repeated lapses.", by("weak"))}
+  ${block("Fading", "You knew these; reviews are overdue, so recall is dropping.", by("fading"))}
+  ${block("Building", "Seen, not yet secure. Spaced reviews will carry these to strong.", by("building"))}
+  ${block("Strong", "High estimated recall across nearly all items. They still come back for review.", by("strong"))}
+  ${block("Never seen", "Topics you have not answered anything in yet.", by("unseen").filter((r) => LESSONS[r.t.lesson].stage !== 2))}
+  ${foot()}`;
+}
+export function tools(host) { const p = page(host); const sims = S().sims || [];
+  p.innerHTML = `<section class="hero"><span class="label">Tools</span><h1>Test yourself honestly</h1><p>Oral exam practice, a timed stage check, the glossary, and your saved progress.</p></section>
+  <div class="grid g2"><a class="cell" href="#/oral"><span class="label">Oral exam</span><h3>Questions an examiner asks</h3><p>Open questions keyed to ACS elements. Answer out loud, compare with the model answer, and grade yourself. Your grade feeds the review schedule.</p><span class="go btn arrow">Start</span></a>
+  <a class="cell" href="#/sim"><span class="label">Stage check simulator</span><h3>Timed, mixed, no hints</h3><p>${STAGE_CHECK.s1.n} questions across Stage 1 in ${STAGE_CHECK.s1.minutes} minutes. Feedback only at the end.${sims.length ? ` Last score ${Math.round(sims[sims.length - 1].score * 100)}%.` : ""}</p><span class="go btn arrow">Start</span></a>
+  <a class="cell" href="#/glossary"><span class="label">Glossary</span><h3>${Object.keys(G).length} terms</h3><p>Every underlined term in a lesson opens its definition. Browse or search them all here.</p><span class="go btn arrow">Open</span></a>
+  <a class="cell" href="#/settings"><span class="label">Progress and settings</span><h3>Your data stays here</h3><p>Progress is saved only in this browser. Export it to a file to move devices or keep a backup.</p><span class="go btn arrow">Open</span></a></div>${foot()}`; }
+export function oral(host, lid) {
+  const s1 = [...STAGES[0].ground, ...STAGES[0].flight, ...MODULES.flatMap((m) => m.units)];
+  const pool = Object.values(ORAL).filter((o) => (lid && lid !== "all" ? o.lesson === lid : s1.includes(o.lesson))).map((o) => o.id);
+  if (!lid) { const p = page(host); const lessonsWithOral = [...new Set(Object.values(ORAL).map((o) => o.lesson))];
+    p.innerHTML = `<section class="hero"><span class="label">Oral exam</span><h1>Say it out loud</h1><p>An examiner asks open questions and follows up. Answer aloud as if at the table, then compare with the model answer. Grade yourself honestly; "partly" schedules it sooner.</p></section>
+    <div class="btns"><a class="btn pri arrow" href="#/oral/all">All Stage 1 · ${pool.length}</a></div><div class="list-head section-gap"><span class="label">By lesson</span><span class="label">Items</span></div>
+    ${lessonsWithOral.map((id) => `<a class="row" href="#/oral/${id}"><span class="code">${esc(LESSONS[id].code)}</span><span><div class="t">${esc(LESSONS[id].title)}</div></span><span class="pct">${Object.values(ORAL).filter((o) => o.lesson === id).length}</span></a>`).join("")}${foot()}`; return; }
+  const ids = lid === "all" ? pool.concat() : Object.values(ORAL).filter((o) => o.lesson === lid).map((o) => o.id);
+  const { queue, extra } = buildQueue(ids, { includeOral: true, max: 12, newMax: 12 });
+  return runSession(host, { queue: queue.length ? queue : shuffle(ids).slice(0, 10), extra, mode: "oral", title: "Oral exam", label: "Oral exam" + (lid !== "all" ? " · " + LESSONS[lid].code : ""), onExit: () => (location.hash = "#/oral") });
+}
+export function sim(host) { const cfg = STAGE_CHECK.s1; const p = page(host);
+  p.innerHTML = `<section class="hero"><span class="label">Stage check simulator · Stage 1</span><h1>No hints. Timed.</h1><p>${cfg.n} questions drawn across every Stage 1 lesson and module, ${cfg.minutes} minutes, no feedback until the end, like the knowledge test. 70% is the knowledge test passing score. Results also update your review schedule.</p></section>`;
+  const b = h("button", { class: "btn pri arrow", type: "button" }, "Begin"); p.append(h("div", { class: "btns" }, b));
+  const hist = (S().sims || []).slice(-5).reverse(); if (hist.length) p.insertAdjacentHTML("beforeend", `<div class="list-head section-gap"><span class="label">Recent attempts</span><span class="label">Score</span></div>${hist.map((x) => `<div class="row"><span class="code">${new Date(x.t).toLocaleDateString()}</span><span><div class="t">${x.ok} of ${x.n}</div></span><span class="pct">${Math.round(x.score * 100)}%</span></div>`).join("")}`);
+  b.onclick = () => { // stratified draw: proportional to each lesson's bank, at least two from each
+    const groups = cfg.pool.map((id) => shuffle((LESSONS[id].questions || []).map((q) => q.id))).filter((g) => g.length); const total = groups.reduce((a, g) => a + g.length, 0); let qs = [];
+    groups.forEach((g) => qs.push(...g.slice(0, Math.max(1, Math.round((g.length / total) * cfg.n))))); qs = shuffle(qs).slice(0, cfg.n);
+    p.innerHTML = "";
+    session(p, { queue: qs, mode: "exam", title: "Stage 1 stage check", label: "Stage check · Stage 1", minutes: cfg.minutes, passMark: cfg.pass, onExit: () => (location.hash = "#/tools"), onFinish: (r) => { S().sims.push({ t: Date.now(), n: r.total, ok: r.correct, score: r.score }); save(); } }); };
+}
+export function glossary(host) { const p = page(host); const keys = Object.keys(G).sort();
+  p.innerHTML = `<section class="hero"><span class="label">Glossary</span><h1>Terms, plainly</h1></section>`;
+  const inp = h("input", { type: "search", placeholder: "Search terms", "aria-label": "Search terms" }); p.append(h("div", { class: "field", style: "max-width:28rem" }, inp)); const list = h("div", { class: "mt" }); p.append(list);
+  const draw = () => { const q = inp.value.trim().toLowerCase(); list.innerHTML = keys.filter((k) => !q || k.includes(q) || G[k].def.toLowerCase().includes(q)).map((k) => `<div class="row" style="grid-template-columns:1fr;gap:6px"><div class="t">${esc(G[k].term)}</div><div class="s" style="font-size:16px">${G[k].def}${G[k].src ? ` <span class="src">${esc(G[k].src)}</span>` : ""}</div></div>`).join("") || `<p class="dim">No match.</p>`; };
+  inp.oninput = draw; draw(); }
+export function settings(host) { const p = page(host); const st = S();
+  p.innerHTML = `<section class="hero"><span class="label">Progress and settings</span><h1>Your data, your device</h1><p>Nothing leaves this browser. No account, no server. Clearing site data erases progress, so export a backup now and then.</p></section>`;
+  const c1 = h("div", { class: "card" }); c1.innerHTML = `<span class="label">Confidence check</span><p class="dim mt" style="font-size:16px">After you pick an answer, tap how sure you are. Guessed-right answers return sooner; certain-but-wrong answers are flagged as blind spots.</p>`;
+  const ch = h("div", { class: "chips mt" }); [["on", "On"], ["off", "Off"]].forEach(([v, t]) => { const b = h("button", { class: "chip" + ((st.settings.confidence ? "on" : "off") === v ? " on" : ""), type: "button" }, t); b.onclick = () => { st.settings.confidence = v === "on"; save(); ch.querySelectorAll(".chip").forEach((x) => x.classList.toggle("on", x === b)); }; ch.append(b); }); c1.append(ch);
+  const c2 = h("div", { class: "card" }); c2.innerHTML = `<span class="label">New questions per session</span><p class="dim mt" style="font-size:16px">How many never-seen questions a practice session adds after due reviews.</p>`;
+  const ch2 = h("div", { class: "chips mt" }); [6, 12, 20].forEach((n) => { const b = h("button", { class: "chip" + (st.settings.newPerSession === n ? " on" : ""), type: "button" }, String(n)); b.onclick = () => { st.settings.newPerSession = n; save(); ch2.querySelectorAll(".chip").forEach((x) => x.classList.toggle("on", x === b)); }; ch2.append(b); }); c2.append(ch2);
+  const c3 = h("div", { class: "card" }); c3.innerHTML = `<span class="label">Backup</span><p class="dim mt" style="font-size:16px">${Object.keys(st.items).length} items with history. Started ${new Date(st.created).toLocaleDateString()}.</p>`;
+  const ex = h("button", { class: "btn", type: "button" }, "Export progress"); ex.onclick = () => download(`pilot-ground-progress-${new Date().toISOString().slice(0, 10)}.json`, exportJSON());
+  const file = h("input", { type: "file", accept: "application/json,.json", hidden: true }); const im = h("button", { class: "btn", type: "button" }, "Import progress"); im.onclick = () => file.click();
+  file.onchange = async () => { const f = file.files[0]; if (!f) return; try { const t = await f.text(); if (!confirm("Replace the progress in this browser with the file's progress?")) return; importJSON(t); toast("Progress imported."); location.hash = "#/"; } catch (e) { toast(e.message || "Import failed."); } };
+  const rs = h("button", { class: "btn ghost", type: "button" }, "Reset everything"); rs.onclick = () => { if (confirm("Erase all progress in this browser? Export first if you want a backup.")) { reset(); toast("Progress erased."); location.hash = "#/"; } };
+  c3.append(h("div", { class: "btns mt" }, ex, im, rs, file));
+  p.append(c1, c2, c3); p.insertAdjacentHTML("beforeend", `<div class="card"><span class="label">How review scheduling works</span><div class="prose mt" style="font-size:16px"><p>Each question has its own schedule (a variant of the SM-2 spaced repetition algorithm). A miss resets it: the question returns in about 10 minutes and again later in the same session. A correct answer pushes it out to 1 day, then 3 days, then longer intervals that grow with how easily you recall it. A correct guess grows the interval less.</p><p>An item counts as mastered only when its next review is three weeks or more away, which takes several correct answers spread over days. Readiness estimates the chance you would recall each item right now; it decays between reviews.</p></div></div>`);
+  p.insertAdjacentHTML("beforeend", foot()); }
+export function about(host) { const p = page(host);
+  p.innerHTML = `<section class="hero"><span class="label">About</span><h1>Sources and licenses</h1></section><div class="prose">
+  <h4>Teaching sources</h4><ul><li>Pilot's Handbook of Aeronautical Knowledge, FAA-H-8083-25C (PHAK)</li><li>Airplane Flying Handbook, FAA-H-8083-3C (AFH)</li><li>Aviation Weather Handbook, FAA-H-8083-28A (AWH)</li><li>Private Pilot for Airplane Category Airman Certification Standards, FAA-S-ACS-6C (ACS)</li><li>Aeronautical Information Manual (AIM), chapters 2, 4 and 7</li><li>14 CFR Parts 61 and 91, current text from the eCFR</li><li>AC 150/5340-1M Standards for Airport Markings; AC 150/5340-18H Standards for Airport Sign Systems; AC 90-66C Non-Towered Airport Flight Operations</li><li>Cessna 172S limitations and performance figures as published by the manufacturer, stated as facts for study. No manufacturer text or figures are reproduced. Use the POH for your airplane.</li></ul>
+  <p>Citations name the chapter, section or regulation. Procedures are marked to confirm with your instructor and your aircraft's POH, because flight schools and airplanes differ.</p>
+  <h4>Software and fonts</h4><ul><li>three.js r181, MIT License</li><li>GSAP 3.14, GreenSock Standard "No Charge" License (vendored, not loaded in this build)</li><li>Inter and IBM Plex Mono, SIL Open Font License 1.1</li></ul><p>License texts are in the LICENSES folder.</p>
+  <h4>Not affiliated</h4><p>Independent study aid. Not affiliated with or endorsed by the FAA or Textron Aviation. Cessna and Skyhawk are trademarks of their owner.</p></div>`; }
