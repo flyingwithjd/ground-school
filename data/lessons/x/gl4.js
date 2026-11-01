@@ -1,0 +1,27 @@
+// GL4 supplement: airport data, radar and transponders, runway safety.
+const Q = (id, t, q, c, why, src) => ({ id, t, q, c, a: 0, why, src });
+export default {
+  textx: true,
+  topics: { "gl4.kinds": "Airports and airport data", "gl4.radar": "Radar, transponder and ATC services", "gl4.incursion": "Runway incursion avoidance" },
+  questions: [
+    Q("gl4x-01", "gl4.kinds", "Which source has the most complete information about a public-use airport?", ["The Chart Supplement", "The sectional chart", "The ATIS", "The POH"], "It was formerly called the Airport/Facility Directory and is revised every 56 days.", "PHAK 14"),
+    Q("gl4x-02", "gl4.kinds", "Where would you find a temporary runway closure?", ["NOTAMs", "The sectional chart", "The POH", "The Chart Supplement legend"], "NOTAMs carry time-critical, temporary information.", "PHAK 14"),
+    Q("gl4x-03", "gl4.kinds", "When you first call the tower, why do you say \"with information Bravo\"?", ["It tells the controller you have the current ATIS, so they don't have to repeat it", "It's your squawk code", "It requests a runway", "It's required only at night"], "Each ATIS update gets a new letter.", "PHAK 14 · AIM 4-1-13"),
+    Q("gl4x-04", "gl4.kinds", "What does \"have numbers\" mean?", ["You have wind, runway and altimeter only, not the ATIS", "You have the ATIS", "You have the squawk code", "You know the tower frequency"], "Never use it to mean you have the ATIS.", "AIM 4-1-13"),
+    Q("gl4x-05", "gl4.kinds", "At a nontowered airport, radio use is:", ["Not required, but you should announce your intentions on the CTAF", "Required on the tower frequency", "Prohibited", "Required only for jets"], "The key is choosing the correct common frequency.", "PHAK 14"),
+    Q("gl4x-06", "gl4.radar", "What's the standard VFR transponder code?", ["1200", "7600", "7700", "7500"], "Unless ATC assigns another code.", "AIM 4-1-20"),
+    Q("gl4x-07", "gl4.radar", "When should you press IDENT?", ["Only when ATC asks", "On every call", "When changing frequency", "Before every takeoff"], "Unrequested idents clutter the controller's display.", "AIM 4-1-20"),
+    Q("gl4x-08", "gl4.radar", "Changing from code 2700 to 7200, you should:", ["Go 2700 → 2200 → 7200, avoiding 7700 on the way", "Go 2700 → 7700 → 7200", "Turn the transponder off first", "Set 0000 first"], "This avoids momentary false emergency alarms.", "AIM 4-1-20"),
+    Q("gl4x-09", "gl4.radar", "ATC calls traffic at 12 o'clock while you're crabbing right into a right crosswind. Where should you look?", ["A little left of the nose, because ATC calls traffic relative to your track", "Exactly over the nose", "Behind you", "To the right"], "With a right crab the nose points right of your track, so 12 o'clock on your track is left of the nose.", "AIM 4-1-15"),
+    Q("gl4x-10", "gl4.radar", "Which statement about VFR radar advisories is true?", ["They're workload-permitting and don't relieve you of see and avoid", "They guarantee separation from all traffic", "They're required in Class E", "They include vectors around weather automatically"], "Basic service: safety alerts, traffic advisories, limited vectoring and sequencing.", "AIM 4-1-18"),
+    Q("gl4x-11", "gl4.incursion", "Which instruction must you read back?", ["Hold short of a runway", "The ATIS letter", "A frequency change only", "Traffic advisories"], "Read back hold-short instructions with the runway and your call sign.", "PHAK 14"),
+    Q("gl4x-12", "gl4.incursion", "\"Line up and wait\" means:", ["Taxi onto the runway and hold; you are not cleared for takeoff", "Cleared for takeoff", "Hold short of the runway", "Taxi to the ramp"], "It replaced \"position and hold.\"", "PHAK 14"),
+    Q("gl4x-13", "gl4.incursion", "You're unsure of your taxi route at a busy towered airport. What should you do?", ["Stop and ask ground for progressive taxi", "Keep taxiing and work it out", "Follow another airplane", "Cross the nearest runway to get back"], "Progressive taxi gives step-by-step instructions.", "PHAK 14"),
+    Q("gl4x-14", "gl4.incursion", "When should you run checklists during taxi?", ["With the airplane stopped", "While crossing runways", "While taxiing at speed", "Only after takeoff"], "Keep your eyes outside while moving.", "PHAK 14"),
+    Q("gl4x-15", "gl4.incursion", "ATC gives you an instruction you can't safely follow. You should:", ["Say \"unable\" and get amended instructions", "Comply anyway", "Ignore it", "Change frequency"], "91.123 requires compliance, but you have the final authority.", "PHAK 14 · 14 CFR 91.123"),
+  ],
+  oral: [
+    { id: "gl4x-o1", t: "gl4.incursion", acs: "PA.II.D.K6c", q: "How do you avoid a runway incursion at an unfamiliar towered airport?", a: "<p>Study the airport diagram and NOTAMs before I go, then trace the taxi route. I'll write down the clearance and read back every hold-short with the runway and call sign. Do checklists stopped, keep my head outside, and ask for progressive taxi if unsure. Never cross a hold line without explicit clearance, and scan the runway and final first even when cleared.</p>", src: "PHAK 14" },
+    { id: "gl4x-o2", t: "gl4.radar", acs: "PA.III.A.K7", q: "What do you get from VFR flight following, and what don't you get?", a: "<p>Traffic advisories, safety alerts, limited vectors on request and help if something goes wrong, all workload permitting. I don't get guaranteed separation, and it doesn't relieve me of see and avoid, weather minimums or terrain clearance. Traffic is called relative to my track.</p>", src: "AIM 4-1-15, 4-1-18" },
+  ],
+};

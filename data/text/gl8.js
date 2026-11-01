@@ -1,8 +1,8 @@
-// GL8 lesson text (Stage 2 preview)
+// GL8 lesson text
 export default {
   sections: [
     { id: "brief", label: "Briefings · PHAK 13", title: "Start with the big picture",
-      body: `<p class="note">Stage 2 preview. All reports here are examples from the FAA handbooks, never current weather.</p>
+      body: `<p class="note">All reports here are examples from the FAA handbooks, never current weather.</p>
 <p>Get a <strong>standard briefing</strong> before every flight. It runs in order: adverse conditions, "VFR flight not recommended" if applicable, synopsis, current conditions, then forecasts and more. An <strong>abbreviated</strong> briefing updates one you already have; tell the briefer when and where you got it. An <strong>outlook</strong> briefing is for departures 6 hours or more away. <span class="src">PHAK 13</span></p>
 <p>"VFR flight not recommended" is advice, not a prohibition, but the PHAK says to weigh it carefully. For a student pilot, your solo endorsement limits and your CFI come first. <span class="src">PHAK 13; 14 CFR 61.87</span></p>`,
       kdr: { k: "Standard, abbreviated and outlook briefings and their order.", d: "Call for a standard briefing and take notes in the briefing order.", r: "Skipping a briefing because the sky looks fine.", codes: ["PA.I.C.K1", "PA.I.C.K2"] } },

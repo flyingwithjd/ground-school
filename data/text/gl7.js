@@ -1,9 +1,8 @@
-// GL7 lesson text (Stage 2 preview)
+// GL7 lesson text
 export default {
   sections: [
     { id: "press", label: "Pressure and wind · PHAK 12", title: "Air flows from high to low, then curves",
-      body: `<p class="note">Stage 2 preview. Your CFI may teach this later in training. It's here so the Stage 1 wind topics have a foundation.</p>
-<p>Uneven heating makes pressure differences, and air flows from high pressure toward low. The Earth's rotation bends that flow to the right in the Northern Hemisphere (the [[Coriolis force]]). The result: air circulates <strong>clockwise around a high</strong> and <strong>counterclockwise around a low</strong>. <span class="src">PHAK 12</span></p>
+      body: `<p>Uneven heating makes pressure differences, and air flows from high pressure toward low. The Earth's rotation bends that flow to the right in the Northern Hemisphere (the [[Coriolis force]]). The result: air circulates <strong>clockwise around a high</strong> and <strong>counterclockwise around a low</strong>. <span class="src">PHAK 12</span></p>
 <p>Highs are dry, descending air, so good weather is typical. Air flowing into a low rises, bringing clouds and precipitation. Within about 2,000 ft of the ground, friction slows the wind and changes its direction, so surface wind differs from the wind a few thousand feet up. <span class="src">PHAK 12</span></p>`,
       kdr: { k: "Coriolis, circulation around highs and lows, friction.", d: "Use the circulation to predict a tailwind: west-to-east, fly north of a high or south of a low.", r: "Assuming the surface wind is the wind at altitude.", codes: ["PA.I.C.K3b"] } },
     { id: "stab", label: "Lapse rates and stability · PHAK 12", title: "Will a lifted parcel keep rising?",
@@ -25,6 +24,10 @@ export default {
       kdr: { k: "Cloud families, ceiling definition, precipitation types.", d: "Name the cloud you see and what it implies.", r: "Embedded thunderstorms hidden in other cloud.", codes: ["PA.I.C.K3f", "PA.I.C.K3d"] } },
     { id: "front", label: "Air masses and fronts · PHAK 12", title: "Where two air masses meet",
       body: `<p>An air mass takes on the temperature and moisture of its source region (polar or tropical, continental or maritime). A [[front]] is the boundary between two, named by whether the advancing air is warmer or colder: warm, cold, stationary or occluded. A front always means a change in weather and a wind shift. Pick a front and walk through it. <span class="src">PHAK 12</span></p>`,
+      body2: `<ul><li><strong>Warm front</strong>: warm air slides up over cooler air. Expect widespread stratiform clouds, steady precipitation and poor visibility, often hundreds of miles ahead of the surface front.</li>
+<li><strong>Cold front</strong>: denser cold air wedges under warm air. A fast-moving one brings cumuliform clouds, showers, gusty winds and possible thunderstorms, then clearing and good visibility behind it.</li>
+<li><strong>Stationary front</strong>: neither air mass is replacing the other, so its weather can sit over an area for days.</li>
+<li><strong>Occluded front</strong>: a fast cold front catches up with a warm front. Its weather can combine both, including embedded thunderstorms.</li></ul><span class="src">PHAK 12</span>`,
       viz: { type: "front" },
       kdr: { k: "Air mass classification; the four front types and their weather.", d: "Predict what a forecast frontal passage means for your flight.", r: "Trying to fly through or under a squall line along a cold front.", codes: ["PA.I.C.K3e"] } },
     { id: "ts", label: "Thunderstorms and icing · PHAK 12", title: "The storm you never fly into",

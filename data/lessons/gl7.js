@@ -1,8 +1,8 @@
-// GL7 · Weather Theory (Stage 2 preview). Source: PHAK Ch 12; AWH for depth.
+// GL7 · Weather Theory. Source: PHAK Ch 12; AWH for depth.
 const Q = (id, t, q, c, why, src) => ({ id, t, q, c, a: 0, why, src });
 export default {
   id: "gl7", code: "GL7", stage: 2, kind: "ground", title: "Weather Theory", short: "Pressure and wind, stability, moisture and fog, clouds, fronts and thunderstorms",
-  intro: "Stage 2 preview. Weather is heat and moisture moving around a spinning planet. Learn why it happens and the reports in GL8 start to read like a story.",
+  intro: "Weather is heat and moisture moving around a spinning planet. Learn why it happens and the reports in GL8 start to read like a story.",
   refs: ["PHAK Ch 12", "AWH (FAA-H-8083-28)", "ACS PA.I.C"],
   topics: { "gl7.press": "Pressure and wind", "gl7.stab": "Lapse rates and stability", "gl7.moist": "Moisture, dew point and fog", "gl7.cloud": "Clouds, ceiling and precipitation", "gl7.front": "Air masses and fronts", "gl7.ts": "Thunderstorms and icing" },
   questions: [

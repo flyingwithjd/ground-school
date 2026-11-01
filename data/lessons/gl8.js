@@ -1,8 +1,8 @@
-// GL8 · Aviation Weather Services (Stage 2 preview). Source: PHAK Ch 13; AWH Ch 24–28.
+// GL8 · Aviation Weather Services. Source: PHAK Ch 13; AWH Ch 24–28.
 const Q = (id, t, q, c, why, src) => ({ id, t, q, c, a: 0, why, src });
 export default {
   id: "gl8", code: "GL8", stage: 2, kind: "ground", title: "Aviation Weather Services", short: "Briefings, METAR, TAF, winds aloft, PIREPs and inflight advisories",
-  intro: "Stage 2 preview. The reports are a compressed language. Decode them group by group until you can read a METAR aloud the way you would read a sentence.",
+  intro: "The reports are a compressed language. Decode them group by group until you can read a METAR aloud the way you would read a sentence.",
   refs: ["PHAK Ch 13", "AWH (FAA-H-8083-28) Ch 24–28", "ACS PA.I.C"],
   topics: { "gl8.brief": "Briefings", "gl8.metar": "METAR", "gl8.taf": "TAF", "gl8.fb": "Winds and temperatures aloft", "gl8.adv": "AIRMET, SIGMET and convective SIGMET", "gl8.pirep": "PIREPs and judgment" },
   questions: [

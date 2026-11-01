@@ -1,12 +1,12 @@
 // The practice engine UI: multiple choice, ordered sequences, oral self-rating; learn/review/exam modes.
-import { h, esc, shuffle, fmtDue, toast } from "../core/util.js?v=053e7723ad";
-import { review, get, CONF, level, LEVELS } from "../core/srs.js?v=053e7723ad";
-import { S } from "../core/store.js?v=053e7723ad";
-import { item } from "../../data/index.js?v=053e7723ad";
-import { TOPICS, LESSONS } from "../../data/index.js?v=053e7723ad";
-import { rich } from "../core/rich.js?v=053e7723ad";
+import { h, esc, shuffle, fmtDue, toast } from "../core/util.js?v=02247193df";
+import { review, get, CONF, level, LEVELS } from "../core/srs.js?v=02247193df";
+import { S } from "../core/store.js?v=02247193df";
+import { item } from "../../data/index.js?v=02247193df";
+import { TOPICS, LESSONS } from "../../data/index.js?v=02247193df";
+import { rich } from "../core/rich.js?v=02247193df";
 const KEYS = "ABCDEFG";
-export function session(host, { queue, extra = [], mode = "review", title = "Review", label = "", onExit, onFinish, minutes = 0, passMark = 0.7, intro = "" }) {
+export function session(host, { queue, extra = [], mode = "review", title = "Review", label = "", onExit, onFinish, minutes = 0, passMark = 0.7, intro = "", check = false }) {
   const exam = mode === "exam"; let i = 0; const q = queue.slice(); const results = []; const requeued = new Set(); let t0 = Date.now(), timerI = null;
   const wrap = h("div", { class: "quiz" }); host.append(wrap);
   const top = h("div", { class: "qhead" }); const lab = h("span", { class: "label" }, label || title); const right = h("span", { class: "label" }); top.append(lab, right);
@@ -69,7 +69,8 @@ export function session(host, { queue, extra = [], mode = "review", title = "Rev
     const firstTry = new Map(); results.forEach((r) => { if (!firstTry.has(r.id)) firstTry.set(r.id, r); }); const fr = [...firstTry.values()];
     const total = exam ? q.length : fr.length; const correct = fr.filter((r) => r.ok).length; const sc = total ? correct / total : 0; const overs = fr.filter((r) => !r.ok && r.conf === "sure").length;
     const el = h("div", { class: "verdict" }); const pass = sc >= passMark; onFinish && onFinish({ correct, total, score: sc });
-    el.innerHTML = exam ? `<span class="label">${esc(title)}</span><h2 class="mt">${pass ? "Passing score." : "Not yet passing."}</h2><p class="dim mt" style="font-size:19px">${correct} of ${total} correct, ${Math.round(sc * 100)}%. The FAA knowledge test passing score is 70%; a stage check asks for more than a number, so review every miss below with your instructor.</p>`
+    el.innerHTML = exam ? `<span class="label">${esc(title)}</span><h2 class="mt">${pass ? "Passing score." : "Not yet passing."}</h2><p class="dim mt" style="font-size:19px">${correct} of ${total} correct, ${Math.round(sc * 100)}%. ${passMark !== 0.7 ? `This check's standard is ${Math.round(passMark * 100)}% with every miss reviewed. ` : "The FAA knowledge test passing score is 70%. "}Review every miss below, ideally with your instructor.</p>`
+      : check ? `<span class="label">${esc(title)}</span><h2 class="mt">${pass ? "Passing: " : "Not yet: "}${correct} of ${total}, ${Math.round(sc * 100)}%.</h2><p class="dim mt" style="font-size:19px">The standard is ${Math.round(passMark * 100)}% with every miss reviewed until you can explain it. ${total - correct ? "Your misses are below; they are already back in your review schedule." : "Nothing missed. Do it again in a few days with different items."}</p>${fr.filter((r) => !r.ok).map((r) => { const it = item(r.id); return `<div class="card mt"><p style="font-weight:600;margin:0 0 8px">${rich(it.q)}</p><div class="prose dim" style="font-size:16px">${rich(it.a || it.why || "")}</div>${it.src ? `<p class="src" style="margin-top:8px">${esc(it.src)}</p>` : ""}</div>`; }).join("")}`
       : `<span class="label">Session complete</span><h2 class="mt">${total ? `${correct} of ${total} first try.` : "Nothing answered."}</h2><p class="dim mt" style="font-size:19px">${overs ? `${overs} answer${overs > 1 ? "s" : ""} marked certain were wrong. Those are your most important blind spots. ` : ""}Missed items return within minutes; correct ones come back on a growing schedule until they are truly retained.</p>`;
     if (exam) { const missed = fr.filter((r) => !r.ok); const unanswered = q.filter((id) => !firstTry.has(id));
       const byT = {}; q.forEach((id) => { const it = item(id); const k = it.t; byT[k] ||= { n: 0, ok: 0 }; byT[k].n++; if (firstTry.get(id)?.ok) byT[k].ok++; });

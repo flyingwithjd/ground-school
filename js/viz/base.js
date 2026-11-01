@@ -1,6 +1,6 @@
 // Shared building blocks for every visualization: frame, corner labels, caption, sliders, chips,
 // and the signature "point of light" line draw (a bright head with a glowing tail lays the line down).
-import { h, s, esc, ease, reduced, clamp } from "../core/util.js?v=053e7723ad";
+import { h, s, esc, ease, reduced, clamp } from "../core/util.js?v=02247193df";
 export const ACC = "#3B82F6", INK = "#F2F1EC";
 export const FAINT = "rgba(242,241,236,.22)", FAINT2 = "rgba(242,241,236,.4)";
 
@@ -11,7 +11,8 @@ export function frame(host, { cls = "", corners = {}, caption = null, explain = 
   const ctrl = h("div", { class: "ctrl" }); const ex = h("div", { class: "explain" });
   root.append(ctrl, ex); if (cls.includes("capin")) root.insertBefore(cap, ctrl); host.append(root);
   const api = { root, stage, ctrl, explainEl: ex, cleanup: [],
-    caption(label, big) { if (!label && !big) { cap.innerHTML = ""; return; } cap.innerHTML = `${label ? `<span class="label">${esc(label)}</span>` : ""}${big ? `<span class="big">${esc(big)}</span>` : ""}`; },
+    // update the caption text in place so the headline underline draws on once per visual, never again on a value or label change
+    caption(label, big) { if (!label && !big) { cap.innerHTML = ""; return; } const l = cap.querySelector(".label"), b = cap.querySelector(".big"); if (!!l === !!label && !!b === !!big && (l || b)) { if (l && l.textContent !== label) l.textContent = label; if (b && b.textContent !== big) b.textContent = big; return; } cap.innerHTML = `${label ? `<span class="label">${esc(label)}</span>` : ""}${big ? `<span class="big">${esc(big)}</span>` : ""}`; },
     explain(html) { ex.innerHTML = html || ""; ex.style.display = html ? "" : "none"; },
     corner(k, text) { let c = stage.querySelector(".corner." + k); if (!c) { c = h("div", { class: "corner " + k }); stage.append(c); } c.textContent = text || ""; },
     on(fn) { api.cleanup.push(fn); }, destroy() { api.cleanup.forEach((f) => { try { f(); } catch (e) {} }); root.remove(); } };

@@ -1,7 +1,7 @@
 // Mnemonic unpacker: tap a letter to open the item, the reason it matters and its source.
 // Recall mode hides the items so you can say each one before you tap. HTML only; every set is cited.
-import { frame, chips } from "./base.js?v=053e7723ad";
-import { h, esc } from "../core/util.js?v=053e7723ad";
+import { frame, chips } from "./base.js?v=02247193df";
+import { h, esc } from "../core/util.js?v=02247193df";
 export const SETS = {
   atomato: { name: "ATOMATOFLAMES", what: "Day VFR equipment", src: "14 CFR 91.205(b)", items: [
     ["A", "Airspeed indicator", "Stall and limit speeds are all indicated airspeeds."], ["T", "Tachometer for each engine", "Power settings and engine limits."],
@@ -43,6 +43,30 @@ export const SETS = {
     ["A", "Anti-authority: \"Don't tell me.\"", "Antidote: Follow the rules. They are usually right."], ["I", "Impulsivity: \"Do it quickly.\"", "Antidote: Not so fast. Think first."],
     ["I", "Invulnerability: \"It won't happen to me.\"", "Antidote: It could happen to me."], ["M", "Macho: \"I can do it.\"", "Antidote: Taking chances is foolish."],
     ["R", "Resignation: \"What's the use?\"", "Antidote: I'm not helpless. I can make a difference."]] },
+  care: { name: "CARE", what: "Process the hazards (3P step 2)", src: "PHAK Ch 2", items: [
+    ["C", "Consequences", "What could this hazard lead to? (Example: fatigue after a full workday.)"], ["A", "Alternatives", "What else could I do? (Delay, reschedule, drive.)"],
+    ["R", "Reality", "Face it squarely. If you hear yourself say it will \"probably\" be okay, it's time for a reality check."], ["E", "External factors", "What pressures (a meeting, family, pride) might push my decision?"]] },
+  team: { name: "TEAM", what: "Perform risk management (3P step 3)", src: "PHAK Ch 2", items: [
+    ["T", "Transfer", "Should someone else make this risk decision or fly it? (A chief instructor, another pilot.)"], ["E", "Eliminate", "Can I remove the hazard? (Cancel, wait for better weather.)"],
+    ["A", "Accept", "Do the benefits outweigh the remaining risk?"], ["M", "Mitigate", "What can I do to reduce the risk? (Fly with another pilot, pick an alternate and carry fuel to reach it.)"]] },
+  p5: { name: "5P", what: "SRM check at each decision point", src: "PHAK Ch 2", items: [
+    ["P", "Plan", "Route, weather, fuel, publications: updated throughout the flight."], ["P", "Plane", "Mechanical condition, equipment, database currency, automation and backups."],
+    ["P", "Pilot", "IMSAFE, proficiency, fatigue. Your guard is lowest at the end of a long day."], ["P", "Passengers", "Their needs and pressures. Give them a factual picture and an alternative."],
+    ["P", "Programming", "Plan when (and when not) to program avionics, so it doesn't capture your attention."]] },
+  safety: { name: "SAFETY", what: "Passenger briefing", src: "PHAK Ch 2", items: [
+    ["S", "Seat belts, shoulder harness, seat position", "Belts for taxi, takeoff and landing; harness for takeoff and landing; seat locked."], ["A", "Air vents and environmental controls", "And what to do if anyone feels unwell."],
+    ["F", "Fire extinguisher", "Location and operation."], ["E", "Exits, emergency evacuation, survival kit", "How doors open and secure; the evacuation plan; where the kit is."],
+    ["T", "Traffic and talking", "Help spot traffic; sterile flight deck expectations."], ["Y", "Your questions?", "Speak up!"]] },
+  pitfalls: { list: true, name: "Pitfalls", what: "Operational pitfalls (Fig 2-15)", src: "PHAK Ch 2, Fig 2-15", items: [
+    ["1", "Peer pressure", "Deciding emotionally to please peers."], ["2", "Mindset", "Can't recognize or cope with change."], ["3", "Get-there-itis", "Fixation on the destination; alternatives ignored."],
+    ["4", "Duck-under syndrome", "Descending below minimums to make it in."], ["5", "Scud running", "Staying low to keep visual contact while instrument conditions exist."],
+    ["6", "Continuing VFR into IMC", "Spatial disorientation or collision with terrain."], ["7", "Getting behind the aircraft", "Constant surprise at what happens next."],
+    ["8", "Loss of positional or situational awareness", "Don't know where you are or that things are getting worse."], ["9", "Operating without adequate fuel reserves", "Overconfidence or poor planning."],
+    ["10", "Descent below the minimum en route altitude", "Duck-under en route (IFR)."], ["11", "Flying outside the envelope", "Overestimating the airplane and yourself."],
+    ["12", "Neglect of planning, preflight and checklists", "Relying on memory and routine."]] },
+  hypoxia: { name: "4 kinds", what: "Types of hypoxia, by cause", src: "PHAK Ch 17", items: [
+    ["H", "Hypoxic", "Not enough oxygen available, e.g. low partial pressure at altitude."], ["H", "Hypemic", "Blood can't carry enough oxygen: CO poisoning, anemia, blood loss or donation."],
+    ["S", "Stagnant", "Oxygen-rich blood isn't flowing: excessive G, cold, shock."], ["H", "Histotoxic", "Cells can't use the oxygen: alcohol, narcotics, poisons."]] },
   abcde: { name: "ABCDE", what: "Engine failure in flight (a common training mnemonic, not a POH checklist)", src: "C172S POH 3; AFH 18", items: [
     ["A", "Airspeed: 68 KIAS, best glide", "Pitch for best glide first. Altitude is time."], ["B", "Best place to land", "Pick a field within gliding distance, ideally into the wind."],
     ["C", "Checklist", "Engine failure during flight (restart): fuel shutoff ON, selector BOTH, fuel pump ON, mixture RICH, magnetos BOTH (or START if the prop has stopped)."],

@@ -23,13 +23,15 @@ export default {
       kdr: { k: "Effects of overweight and CG position.", d: "Leave weight behind when performance is marginal.", r: "Overweight takeoffs at high density altitude.", codes: ["PA.I.F.K2e"] } },
     { id: "da", label: "Density altitude · PHAK 4, 11", title: "The altitude the airplane feels",
       body: `<p>[[Pressure altitude]] is the altitude in the standard atmosphere for the pressure you have: set 29.92 in the altimeter, or add about 1,000 ft for each inch the setting is below 29.92. [[Density altitude]] is pressure altitude corrected for nonstandard temperature. <span class="src">PHAK 4, 11</span></p>
-<p>Standard temperature is 15 °C at sea level and falls about 2 °C per 1,000 ft. Warmer than standard, the air is thinner and density altitude rises. Humidity lowers density a little more.</p>`,
+<p>Standard temperature is 15 °C at sea level and falls about 2 °C per 1,000 ft. Warmer than standard, the air is thinner and density altitude rises. Humidity lowers density a little more.</p>
+<p>A <strong>density altitude chart</strong> does this graphically: correct the field elevation to pressure altitude using the altimeter setting, then enter the chart at the outside air temperature, go up to your pressure altitude line, and read density altitude across. <span class="src">PHAK 11</span></p>`,
       viz: { type: "densalt" },
       kdr: { k: "Pressure and density altitude; their effect on performance.", d: "Compute pressure altitude before using the POH tables.", r: "Hot, high and heavy takeoffs.", codes: ["PA.I.F.K2a"] } },
     { id: "perf", label: "Takeoff and landing · POH 5", title: "Will it fit the runway",
       body: `<p>The POH tables give the ground roll and the distance to clear a 50 ft obstacle for pressure altitude and temperature at maximum weight. Their notes adjust for wind and surface. Try a hot day at a high field, then add a tailwind.</p>`,
       viz: { type: "perf" },
-      body2: `<p>Tables assume the technique in the POH, a new airplane, and a paved, level, dry runway. Slope, wet grass, soft ground, a tired engine or a late rotation all add distance that the chart does not show. Many instructors teach a personal margin on top of the book number. <span class="src">PHAK 11 · ACS PA.I.F.R3</span></p>`,
+      body2: `<p>Tables assume the technique in the POH, a new airplane, and a paved, level, dry runway. Slope, wet grass, soft ground, a tired engine or a late rotation all add distance that the chart does not show. Many instructors teach a personal margin on top of the book number. <span class="src">PHAK 11 · ACS PA.I.F.R3</span></p>
+<p><strong>14 CFR 91.103, preflight action</strong>: before every flight you must become familiar with all available information, including runway lengths at the airports you'll use and takeoff and landing distance data. For a flight not in the vicinity of an airport, that also includes weather reports and forecasts, fuel requirements, alternatives if the flight can't be completed as planned, and known ATC traffic delays. <span class="src">14 CFR 91.103</span></p>`,
       kdr: { k: "Using performance tables and their notes.", d: "Compute takeoff and landing distance for the conditions.", r: "Differences between calculated and actual performance.", codes: ["PA.I.F.S2", "PA.I.F.R3"] } },
   ],
 };

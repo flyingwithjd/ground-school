@@ -1,7 +1,7 @@
 // Mastery, readiness and blind-spot analytics, all derived from per-item SRS state.
-import { get, recall, level, isDue, recentAcc, overconfident, DAY } from "./srs.js?v=053e7723ad";
-import { LESSONS, QUESTIONS, ORAL, TOPICS, ORDER, item, lessonItems } from "../../data/index.js?v=053e7723ad";
-import { S } from "./store.js?v=053e7723ad";
+import { get, recall, level, isDue, recentAcc, overconfident, DAY } from "./srs.js?v=02247193df";
+import { LESSONS, QUESTIONS, ORAL, TOPICS, ORDER, item, lessonItems } from "../../data/index.js?v=02247193df";
+import { S } from "./store.js?v=02247193df";
 export const allIds = () => [...Object.keys(QUESTIONS), ...Object.keys(ORAL)];
 export function stats(ids, now = Date.now()) {
   let seen = 0, R = 0, ok = 0, n = 0, due = 0, over = 0, lapses = 0, mastered = 0; const lv = [0, 0, 0, 0, 0];
@@ -26,7 +26,7 @@ export function classify(t, st = stats(t.ids)) {
 export function dueIds(now = Date.now()) { return allIds().filter((id) => isDue(get(id), now)).sort((a, b) => get(a).due - get(b).due); }
 export function nextDue() { let m = Infinity; for (const id of allIds()) { const it = get(id); if (it && it.n && it.due < m) m = it.due; } return m; }
 export function lessonDone(id) { const L = LESSONS[id]; const ls = S().lessons[id]; return !!(ls && L && ls.total && ls.read && ls.read.length >= ls.total); }
-export function nextLesson() { for (const id of ORDER) { if (!LESSONS[id] || LESSONS[id].stage === 2) continue; if (!lessonDone(id)) return id; const st = lessonStats(id); if (st.coverage < 0.5) return id; } return null; }
+export function nextLesson() { for (const id of ORDER) { if (!LESSONS[id]) continue; if (!lessonDone(id)) return id; const st = lessonStats(id); if (st.coverage < 0.5) return id; } return null; }
 export function weakest(k = 3) {
   return topicList().map((t) => { const st = stats(t.ids); return { t, st, c: classify(t, st) }; }).filter((x) => x.st.seen && ["weak", "over", "fading", "building"].includes(x.c))
     .sort((a, b) => score(a) - score(b)).slice(0, k);

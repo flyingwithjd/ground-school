@@ -1,31 +1,40 @@
-import { h, esc, pct } from "../core/util.js?v=053e7723ad";
-import { S, save, lessonState } from "../core/store.js?v=053e7723ad";
-import { LESSONS, lessonItems } from "../../data/index.js?v=053e7723ad";
-import { lessonStats, buildQueue } from "../core/progress.js?v=053e7723ad";
-import { rich } from "../core/rich.js?v=053e7723ad";
-import { mountViz, destroyAll } from "../viz/index.js?v=053e7723ad";
-import { session } from "./quiz.js?v=053e7723ad";
+import { h, esc, pct } from "../core/util.js?v=02247193df";
+import { S, save, lessonState } from "../core/store.js?v=02247193df";
+import { LESSONS, lessonItems } from "../../data/index.js?v=02247193df";
+import { lessonStats, buildQueue } from "../core/progress.js?v=02247193df";
+import { rich } from "../core/rich.js?v=02247193df";
+import { mountViz, destroyAll } from "../viz/index.js?v=02247193df";
+import { session } from "./quiz.js?v=02247193df";
 const KIND = { ground: "Ground lesson", flight: "Flight lesson briefing", module: "Module unit" };
 export function lessonView(host, id, secIdx) {
   const L0 = LESSONS[id]; const p = h("div", { class: "page" }); host.append(p);
   if (!L0) { p.innerHTML = `<h2>Lesson not found.</h2>`; return; }
   let api = { destroy() {} }; let dead = false;
   // Lesson text is code-split: question banks load up front (the review engine needs them); prose loads when the lesson opens.
-  import(`../../data/text/${id}.js?v=053e7723ad`).then((m) => { if (dead) return; api = build(p, { ...L0, ...m.default }, id, secIdx); })
+  // Supplement sections (data/text/x/<id>.js) slot in after the section named by `at` ("^" = first), else at the end.
+  Promise.all([import(`../../data/text/${id}.js?v=02247193df`), L0.textx ? import(`../../data/text/x/${id}.js?v=02247193df`) : null]).then(([m, x]) => { if (dead) return;
+    const T = { ...L0, ...m.default, sections: mergeSections(m.default.sections || [], x ? x.default.sections || [] : []) };
+    if (typeof secIdx === "string") { const k = T.sections.findIndex((s) => s.id === secIdx); secIdx = k >= 0 ? k : null; }
+    api = build(p, T, id, secIdx); })
     .catch((e) => { p.innerHTML = `<h2>Could not load this lesson.</h2><p class="dim mt">${esc(e.message)}</p>`; });
   return { destroy() { dead = true; api.destroy(); } };
 }
+export function mergeSections(base, extra) { const out = base.slice(); const last = {};
+  // a later supplement with the same anchor goes after the earlier one, so runs keep the order written
+  for (const s of extra) { if (s.at === "^") { const k = last["^"] ? out.indexOf(last["^"]) + 1 : 0; out.splice(k, 0, s); last["^"] = s; continue; }
+    const a = last[s.at] || out.find((b) => b.id === s.at); const k = s.at && a ? out.indexOf(a) : -1; if (k >= 0) out.splice(k + 1, 0, s); else out.push(s); if (s.at) last[s.at] = s; }
+  return out; }
 function build(p, L, id, secIdx) {
   const ls = lessonState(id); ls.visited = Date.now(); ls.total = L.sections.length;
   const sections = L.sections.slice(); const hasPrep = !!L.prep; const steps = [...sections.map((s) => s.label), ...(hasPrep ? ["Briefing card"] : []), "Check yourself"];
   let cur = secIdx != null ? Math.min(secIdx, steps.length - 1) : (ls.sec || 0); if (secIdx == null && cur >= steps.length - 1) cur = 0;
   const st = lessonStats(id); const nItems = lessonItems(id).length;
   const top = h("section", { class: "hero", style: "margin-bottom:0" });
-  const tagLine = `${L.code} · ${L.stage === 2 ? "Stage 2" : "Stage 1"} · ${KIND[L.kind] || ""}`;
+  const tagLine = `${L.code} · Stage ${L.stage || 1} · ${KIND[L.kind] || ""}`;
   top.innerHTML = `<span class="label">${esc(tagLine)}</span><h1>${esc(L.title)}</h1>${L.intro ? `<p>${rich(L.intro)}</p>` : ""}
    <div class="btns mt" style="gap:22px"><span class="pct">${nItems} items · readiness ${pct(st.readiness)}</span>${L.refs ? `<span class="src" style="white-space:normal">${esc(L.refs.join(" · "))}</span>` : ""}</div>`;
   p.append(top);
-  if (L.includes) { const inc = h("div", { class: "mt" }); inc.innerHTML = `<div class="list-head mt2"><span class="label">This lesson includes the Airport units</span><span class="label">Readiness</span></div>${L.includes.map((u) => { const U = LESSONS[u]; const s = lessonStats(u); return `<a class="row" href="#/lesson/${u}"><span class="code">${U.code}</span><span><div class="t">${esc(U.title)}</div><div class="s">${esc(U.short || "")}</div></span><span><div class="meter"><i style="width:${Math.round(s.readiness * 100)}%"></i></div></span></a>`; }).join("")}`; p.append(inc); }
+  if (L.includes) { const inc = h("div", { class: "mt" }); inc.innerHTML = `<div class="list-head mt2"><span class="label">This lesson includes these units</span><span class="label">Readiness</span></div>${L.includes.map((u) => { const U = LESSONS[u]; const s = lessonStats(u); return `<a class="row" href="#/lesson/${u}"><span class="code">${U.code}</span><span><div class="t">${esc(U.title)}</div><div class="s">${esc(U.short || "")}</div></span><span><div class="meter"><i style="width:${Math.round(s.readiness * 100)}%"></i></div></span></a>`; }).join("")}`; p.append(inc); }
   const stepBar = h("nav", { class: "steps", "aria-label": "Lesson sections" }); p.append(stepBar);
   const body = h("div"); p.append(body);
   steps.forEach((label, i) => { const b = h("button", { type: "button", "aria-label": label, title: label }); b.onclick = () => go(i); stepBar.append(b); });

@@ -1,32 +1,36 @@
-// Ground effect: wing height vs induced drag. Reductions are PHAK Ch 5's figures at 1, 1/4 and 1/10 span.
-import { frame, chips, readout, svg, loop, ACC, FAINT, FAINT2 } from "./base.js?v=053e7723ad";
-import { s } from "../core/util.js?v=053e7723ad";
-import { rearPlane, T } from "./shapes.js?v=053e7723ad";
-const SC = 0.42, SPAN = 900 * SC, GY = 210;
-const H = { out: { f: 1.15, r: "≈ 0%", cap: ["Out of ground effect", "Full-strength vortices"], t: "Well above the runway the wingtip vortices and downwash form freely. Induced drag is normal." },
-  one: { f: 1, r: "1.4%", cap: ["Height = one wingspan", "Barely noticeable"], t: "At a height equal to its span, the wing's induced drag is only 1.4% lower. <span class=\"src\">PHAK 5</span>" },
-  qtr: { f: 0.25, r: "23.5%", cap: ["Height = ¼ wingspan", "Induced drag −23.5%"], t: "The ground squeezes the downwash and the vortices. Induced drag falls by about a quarter: the airplane floats if you arrive fast. <span class=\"src\">PHAK 5</span>" },
-  tenth: { f: 0.1, r: "47.6%", cap: ["Height = ⅒ wingspan", "Induced drag −47.6%"], t: "Just above the runway, induced drag is nearly halved. The airplane can fly here below the speed it needs to climb away, and the static source may read slightly low. <span class=\"src\">PHAK 5</span>" } };
+// Ground effect: wing height vs induced drag. Reductions are PHAK Ch 5's figures at 1, 1/4 and 1/10 span. Labels in screen px.
+import { chips } from "./base.js?v=02247193df";
+import { pxScene, T, L, P, R, C, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=02247193df";
+const H = { out: { f: 1.3, red: 0, lab: "> 1 span", cap: ["Out of ground effect", "Full-strength vortices"], t: "Well above the runway the wingtip vortices and downwash form freely. Induced drag is normal." },
+  one: { f: 1, red: 1.4, lab: "1 span", cap: ["Height = one wingspan", "Induced drag −1.4%"], t: "At a height equal to its span, the wing's induced drag is only 1.4% lower: barely noticeable. <span class=\"src\">PHAK 5</span>" },
+  qtr: { f: 0.25, red: 23.5, lab: "¼ span", cap: ["Height = ¼ wingspan", "Induced drag −23.5%"], t: "The ground squeezes the downwash and the vortices. Induced drag falls by about a quarter, so the airplane floats if you arrive fast. <span class=\"src\">PHAK 5</span>" },
+  tenth: { f: 0.1, red: 47.6, lab: "⅒ span", cap: ["Height = ⅒ wingspan", "Induced drag −47.6%"], t: "Just above the runway, induced drag is nearly halved. The airplane can fly here below the speed it needs to climb away, so a too-early liftoff can't climb out of ground effect. <span class=\"src\">PHAK 5</span>" } };
 export function mount(host) {
-  const F = frame(host, { corners: { tl: "Ground effect · view from behind", tr: "PHAK 5" } });
-  const el = svg(F.stage, "-800 -450 1600 900"); const g = s("g", {}, el);
-  s("line", { x1: -780, y1: GY, x2: 780, y2: GY, stroke: "#F2F1EC", "stroke-width": 2, opacity: 0.5 }, g); T(g, 780, GY + 32, "runway", { anchor: "end", size: 14, op: 0.45 });
-  const pg = s("g", {}, g); rearPlane(pg, { w: 2 / SC });
-  const span = s("g", {}, g); const sl = s("line", { stroke: FAINT2, "stroke-width": 1.5, "stroke-dasharray": "5 7" }, span); const hl = s("line", { stroke: ACC, "stroke-width": 2.5, filter: "url(#gw)" }, span); const hT = T(span, 0, 0, "", { size: 15, op: 0.9, fill: ACC });
-  const vort = s("g", {}, g); const P = []; for (const side of [-1, 1]) for (let i = 0; i < 18; i++) P.push({ side, a: (i / 18) * Math.PI * 2, rr: 0.3 + (i % 6) / 7, c: s("circle", { r: 3, fill: "#F2F1EC", opacity: 0.7 }, vort) });
-  const dw = s("g", {}, g);
-  const set = readout(F.ctrl, [["h", "height"], ["r", "induced drag reduction"]]);
-  let k = "out", y = 0, R = 60;
-  function upd(key) { k = key; const c = H[key], wingY = GY - c.f * SPAN; y = wingY;
-    pg.setAttribute("transform", `translate(0 ${wingY + 57 * SC}) scale(${SC})`);
-    const x = SPAN / 2 + 70; sl.setAttribute("x1", -SPAN / 2); sl.setAttribute("x2", SPAN / 2); sl.setAttribute("y1", wingY - 40); sl.setAttribute("y2", wingY - 40);
-    hl.style.display = key === "out" ? "none" : ""; hl.setAttribute("x1", x); hl.setAttribute("x2", x); hl.setAttribute("y1", wingY); hl.setAttribute("y2", GY); hT.setAttribute("x", x + 14); hT.setAttribute("y", (wingY + GY) / 2 + 5); hT.textContent = key === "out" ? "" : key === "one" ? "1 span" : key === "qtr" ? "¼ span" : "⅒ span";
-    R = Math.min(70, Math.max(10, (GY - wingY) * 0.42)); dw.innerHTML = ""; const len = Math.min(120, (GY - wingY) * 0.6);
-    for (let i = -2; i <= 2; i++) s("line", { x1: i * 60, y1: wingY + 30, x2: i * 60, y2: wingY + 30 + len * 0.75, stroke: "rgba(242,241,236,.45)", "stroke-width": 2.5, "marker-end": "url(#ahw)" }, dw);
-    set("h", key === "out" ? "> 1 span" : hT.textContent); set("r", c.r); F.caption(c.cap[0], c.cap[1]); F.explain(c.t); draw(0); }
-  function draw(dt) { for (const p of P) { p.a += dt * 0.004 * p.side; const cx = p.side * (SPAN / 2), cy = y - 6; const r = R * p.rr;
-    p.c.setAttribute("cx", (cx + Math.cos(p.a) * r * 1.1).toFixed(1)); p.c.setAttribute("cy", Math.min(GY - 4, cy + Math.sin(p.a) * r * (k === "tenth" ? 0.55 : 1)).toFixed(1)); } }
-  chips(F.ctrl, [["out", "Out of ground effect"], ["one", "1 span"], ["qtr", "¼ span"], ["tenth", "⅒ span"]], "out", upd, { label: "Wing height" });
-  upd("out"); loop(F, (now, dt) => draw(dt));
-  return { destroy() { F.destroy(); } };
+  let k = "qtr";
+  const S = pxScene(host, { cls: "tall", corners: { tl: "Ground effect · from behind", tr: "PHAK 5" } }, draw);
+  chips(S.F.ctrl, [["out", "Out of ground effect"], ["one", "1 span"], ["qtr", "¼ span"], ["tenth", "⅒ span"]], k, (v) => { k = v || k; S.redraw(); }, { label: "Wing height" });
+  function draw(g, W, H0, top) {
+    const ph = W < 520, c = H[k], gy = H0 - (ph ? 86 : 80), span = Math.min(W - 90, (gy - top - 40) / 1.3, 520), cx = W / 2 - (ph ? 12 : 0);
+    const wy = gy - c.f * span; // true geometry: height drawn to the same scale as the span
+    // runway
+    L(g, 12, gy, W - 12, gy, { stroke: GRAY, w: 2 }); T(g, W - 14, gy + 16, "RUNWAY", { anchor: "end", size: 11, fill: GRAY });
+    // airplane from behind: wing, fuselage circle, tail fin
+    L(g, cx - span / 2, wy, cx + span / 2, wy, { stroke: INK, w: 3 }); C(g, cx, wy + 4, 9, { stroke: INK, sw: 2, fill: "#0A0A0B" }); L(g, cx, wy - 5, cx, wy - 26, { stroke: INK, w: 2.4 });
+    // vortices: ellipses, flattened by the ground
+    const room = gy - wy, rr = Math.max(6, Math.min(span * 0.16, room * 0.45)), sq = k === "tenth" ? 0.45 : k === "qtr" ? 0.75 : 1;
+    for (const sd of [-1, 1]) { const vx = cx + sd * span / 2, vy = Math.min(wy + rr * sq * 0.6, gy - rr * sq - 2);
+      for (const f of [1, 0.65, 0.35]) P(g, `M${vx + rr * f * 1.1},${vy} A${rr * f * 1.1},${rr * f * sq} 0 1 ${sd > 0 ? 1 : 0} ${vx - rr * f * 1.1},${vy} A${rr * f * 1.1},${rr * f * sq} 0 1 ${sd > 0 ? 1 : 0} ${vx + rr * f * 1.1},${vy}`, { stroke: f === 1 ? GRAY : DIM, w: 1.4 }); }
+    T(g, cx - span / 2, wy - rr * sq - 10, "WINGTIP VORTEX", { anchor: "middle", size: 11, fill: GRAY });
+    // downwash arrows
+    const len = Math.min(56, room * 0.55); for (const i of [-1, 0, 1]) if (len > 14) L(g, cx + i * span * 0.22, wy + 14, cx + i * span * 0.22, wy + 14 + len, { stroke: DIM, w: 1.8, arrow: "kahg" });
+    // height dimension
+    if (k !== "out") { const hx = Math.min(W - 14, cx + span / 2 + rr * 1.2 + 14); L(g, hx, wy, hx, gy, { stroke: ACC, w: 2 }); T(g, hx - 6, wy - 8, c.lab, { anchor: "end", size: ph ? 12 : 13, fill: ACC, weight: 600 }); }
+    // induced drag bar
+    const by = H0 - 46, bx0 = 16, bx1 = W - 16, bw = bx1 - bx0;
+    T(g, bx0, by - 10, "INDUCED DRAG", { size: 11, fill: GRAY });
+    R(g, bx0, by, bw, 14, { stroke: DIM, sw: 1, rx: 3 }); R(g, bx0, by, bw * (1 - c.red / 100), 14, { fill: ACC, rx: 3 });
+    T(g, bx1, by - 10, c.red ? `−${c.red}%` : "100%", { anchor: "end", size: 12, fill: INK, weight: 600 });
+    S.F.caption(c.cap[0], c.cap[1]); S.F.explain(c.t);
+  }
+  return { destroy() { S.F.destroy(); } };
 }

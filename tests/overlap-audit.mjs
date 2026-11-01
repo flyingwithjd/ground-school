@@ -26,7 +26,7 @@ const check = () => pg.evaluate(() => { const out = [];
     const all = tx.concat(hdr); for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) { const a = all[i].r, c = all[j].r; if (a.left < c.right - 1 && c.left < a.right - 1 && a.top < c.bottom - 1 && c.top < a.bottom - 1) out.push(`fus "${all[i].t}" ⟂ "${all[j].t}"`); } });
   return out; });
 let bad = 0; const seen = new Set();
-for (const r of routes) { await pg.goto("about:blank"); await pg.goto("http://localhost:8765/index.html" + r); await pg.waitForTimeout(900);
+for (const r of routes) { await pg.goto("about:blank"); await pg.goto((process.env.BASE || "http://localhost:8765/index.html") + r); await pg.waitForTimeout(900);
   let ov = await check();
   if (await pg.locator(".viz .chip", { hasText: /^Ailerons$/ }).count()) { const chipsL = pg.locator(".viz").filter({ has: pg.locator(".chip", { hasText: /^Ailerons$/ }) }).first().locator(".chip");
     for (let i = 0; i < await chipsL.count(); i++) { const c = chipsL.nth(i); const name = await c.textContent(); await c.click(); await pg.waitForTimeout(250);

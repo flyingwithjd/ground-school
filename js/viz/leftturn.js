@@ -1,7 +1,6 @@
-// Left-turning tendencies. Pick an effect; the view changes to the one where it is easiest to see (PHAK 5).
-import { frame, chips, svg, drawOn, loop, ACC, FAINT, FAINT2 } from "./base.js?v=053e7723ad";
-import { s } from "../core/util.js?v=053e7723ad";
-import { rearPlane, topPlane, T, arrow } from "./shapes.js?v=053e7723ad";
+// Left-turning tendencies (PHAK 5). Pick an effect; the view switches to where it's easiest to see. Power sets how strong it is. Labels in screen px.
+import { chips, slider } from "./base.js?v=02247193df";
+import { pxScene, T, L, P, C, R, planeTop, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=02247193df";
 const FX = {
   torque: { view: "rear", cap: ["Torque", "The airplane rolls left"], t: "Newton's third law: the engine turns the propeller clockwise (seen from the cockpit), so the propeller turns the airplane the other way. The left wing is pressed down and the left tire takes more load on the takeoff roll." },
   slip: { view: "top", cap: ["Spiraling slipstream", "Prop wash hits the left fin"], t: "The propeller pushes its wash back in a corkscrew around the fuselage. It strikes the <strong>left</strong> side of the vertical fin, pushing the tail right and yawing the nose left. Strongest at high power and low airspeed." },
@@ -9,39 +8,53 @@ const FX = {
   gyro: { view: "rear", cap: ["Gyroscopic precession", "Force acts 90° later"], t: "A spinning propeller is a gyroscope: a force applied to its disc takes effect 90° ahead in the direction of rotation. Push the top of the disc forward (as when a tailwheel airplane raises its tail) and the effect appears on the right side: the nose yaws left." },
 };
 export function mount(host) {
-  const F = frame(host, { corners: { tl: "Left-turning tendencies", tr: "PHAK 5" } });
-  const el = svg(F.stage, "-800 -450 1600 900"); const g = s("g", {}, el);
-  const rear = s("g", { transform: "translate(0 40)" }, g), top = s("g", { transform: "translate(0 30) scale(.82)" }, g);
-  rearPlane(rear, { w: 2 }); const disc = s("circle", { cx: 0, cy: -10, r: 150, fill: "none", stroke: FAINT, "stroke-width": 1.5, "stroke-dasharray": "4 10" }, rear);
-  T(rear, -780 + 0, -400, "view from behind, looking forward", { size: 15, op: 0.45 });
-  topPlane(top, { w: 2 });
-  const topLbl = T(top, -900, -460, "top view, nose up", { size: 17, op: 0.45 });
-  const L = s("g", {}, g); // per-effect overlay
-  const blade = s("line", { x1: 0, y1: -10, x2: 0, y2: -150, stroke: "#F2F1EC", "stroke-width": 4, "stroke-linecap": "round", opacity: 0.8 }, rear);
-  const blade2 = s("line", { x1: 0, y1: -10, x2: 0, y2: 130, stroke: "#F2F1EC", "stroke-width": 4, "stroke-linecap": "round", opacity: 0.8 }, rear);
-  let cur = "torque", ang = 0;
-  const spin = loop(F, (now, dt) => { ang = (ang + dt * 0.5) % 360; const a = (ang * Math.PI) / 180; const x = Math.sin(a) * 140, y = -Math.cos(a) * 140;
-    blade.setAttribute("x2", x); blade.setAttribute("y2", -10 + y); blade2.setAttribute("x2", -x); blade2.setAttribute("y2", -10 - y); });
-  function cwArc(r, a0, a1, cy = -10) { const p = (a) => [Math.sin((a * Math.PI) / 180) * r, cy - Math.cos((a * Math.PI) / 180) * r]; const [x0, y0] = p(a0), [x1, y1] = p(a1); return `M${x0},${y0} A${r},${r} 0 ${Math.abs(a1 - a0) > 180 ? 1 : 0} ${a1 > a0 ? 1 : 0} ${x1},${y1}`; }
-  function show(k) { cur = k; const f = FX[k]; L.innerHTML = ""; rear.style.display = f.view === "rear" ? "" : "none"; top.style.display = f.view === "top" ? "" : "none";
-    const lay = s("g", { transform: f.view === "rear" ? "translate(0 40)" : "translate(0 30) scale(.82)" }, L);
-    const acc = (d, w = 4) => { const p = s("path", { d, fill: "none", stroke: ACC, "stroke-width": w, "stroke-linecap": "round", filter: "url(#gw)", "marker-end": "url(#ah)" }, lay); drawOn(p, { dur: 1300 }); return p; };
-    const ink = (d) => s("path", { d, fill: "none", stroke: "rgba(242,241,236,.55)", "stroke-width": 3, "stroke-linecap": "round", "marker-end": "url(#ahw)" }, lay);
-    if (k === "torque") { ink(cwArc(190, -40, 40)); T(lay, 0, -228, "propeller turns clockwise", { anchor: "middle", size: 15, op: 0.6 });
-      acc(cwArc(330, 60, -60, 30)); T(lay, -520, -260, "airplane rolls left", { size: 18, op: 0.9, fill: ACC }); }
-    if (k === "slip") { let d = "M0,-330"; for (let i = 0; i <= 60; i++) { const t = i / 60, y = -330 + t * 520, x = Math.sin(t * Math.PI * 2.2 - 0.3) * (60 - t * 18); d += ` L${x.toFixed(1)},${y.toFixed(1)}`; } d += " L-14,210";
-      acc(d, 3.5); T(lay, -60, 236, "hits the left side of the fin", { anchor: "end", size: 17, op: 0.9, fill: ACC });
-      ink("M30,250 L140,250"); T(lay, 150, 256, "tail pushed right", { size: 15, op: 0.6 }); ink("M-20,-340 L-140,-340"); T(lay, -150, -334, "nose yaws left", { anchor: "end", size: 15, op: 0.6 }); }
-    if (k === "pf") { s("line", { x1: -150, y1: -304, x2: 150, y2: -304, stroke: FAINT2, "stroke-width": 6, "stroke-linecap": "round" }, lay);
-      ink("M-90,-310 L-90,-400"); T(lay, -90, -420, "ascending blade", { anchor: "middle", size: 14, op: 0.6 });
-      acc("M90,-310 L90,-470", 5); T(lay, 110, -440, "descending blade · more thrust", { size: 15, op: 0.9, fill: ACC });
-      ink("M0,-300 L-120,-250"); T(lay, -130, -236, "nose yaws left", { anchor: "end", size: 15, op: 0.6 }); }
-    if (k === "gyro") { s("circle", { cx: 0, cy: -160, r: 10, fill: "none", stroke: "#F2F1EC", "stroke-width": 3 }, lay); s("path", { d: "M-7,-167 L7,-153 M7,-167 L-7,-153", stroke: "#F2F1EC", "stroke-width": 2.5 }, lay);
-      T(lay, 0, -186, "force here: top pushed forward (into the page)", { anchor: "middle", size: 15, op: 0.6 });
-      acc(cwArc(200, 6, 84)); s("circle", { cx: 160, cy: -10, r: 12, fill: "none", stroke: ACC, "stroke-width": 3, filter: "url(#gw)" }, lay); s("path", { d: "M152,-18 L168,-2 M168,-18 L152,-2", stroke: ACC, "stroke-width": 3 }, lay);
-      T(lay, 210, -4, "felt here, 90° later", { size: 17, op: 0.9, fill: ACC }); T(lay, 210, 24, "right side moves forward: nose yaws left", { size: 14, op: 0.6 }); }
-    F.caption(f.cap[0], f.cap[1]); F.explain(f.t); spin.start(); }
-  chips(F.ctrl, [["torque", "Torque"], ["slip", "Slipstream"], ["pf", "P-factor"], ["gyro", "Precession"]], "torque", show, { label: "Effect" });
-  show("torque");
-  return { destroy() { F.destroy(); } };
+  let k = "slip", pw = 90;
+  const S = pxScene(host, { cls: "tall", corners: { tl: "Left-turning tendencies", tr: "PHAK 5" } }, draw);
+  chips(S.F.ctrl, [["torque", "Torque"], ["slip", "Slipstream"], ["pf", "P-factor"], ["gyro", "Precession"]], k, (v) => { k = v || k; S.redraw(); }, { label: "Effect" });
+  slider(S.F.ctrl, { label: "Power", min: 10, max: 100, step: 5, value: pw, fmt: (v) => v + "%", oninput: (v) => { pw = v; S.redraw(); } });
+  function draw(g, W, H, top) {
+    const f = FX[k], ph = W < 520, cx = W / 2, cy = top + (H - top) * 0.5, m = Math.min(W, H - top), s = pw / 100, fs = ph ? 12 : 13;
+    if (f.view === "rear") {
+      const span = Math.min(W - 40, m * 1.1), r = m * 0.2;
+      T(g, 14, top + 6, "VIEW FROM BEHIND, LOOKING FORWARD", { size: 11, fill: GRAY });
+      L(g, cx - span / 2, cy + 6, cx + span / 2, cy + 6, { stroke: INK, w: 3 }); C(g, cx, cy + 8, 14, { stroke: INK, sw: 2, fill: "#0A0A0B" }); L(g, cx, cy - 6, cx, cy - 40, { stroke: INK, w: 2.4 });
+      C(g, cx, cy, r, { stroke: DIM, sw: 1.4, dash: "4 8" });
+      const arc = (rad, a0, a1, yc = cy) => { const p = (a) => [cx + Math.sin((a * Math.PI) / 180) * rad, yc - Math.cos((a * Math.PI) / 180) * rad]; const [x0, y0] = p(a0), [x1, y1] = p(a1); return `M${x0},${y0} A${rad},${rad} 0 ${Math.abs(a1 - a0) > 180 ? 1 : 0} ${a1 > a0 ? 1 : 0} ${x1},${y1}`; };
+      if (k === "torque") {
+        P(g, arc(r + 10, -40, 40), { stroke: GRAY, w: 2, arrow: "kahg" }); T(g, cx, cy - r - 22, "PROP TURNS CLOCKWISE", { anchor: "middle", size: 11, fill: GRAY });
+        P(g, arc(span * 0.42, 50, 50 - 100 * s, cy + 20), { stroke: ACC, w: 3, arrow: "kah" });
+        T(g, cx - span * 0.32, cy + span * 0.25 + 10, "AIRPLANE ROLLS LEFT", { anchor: "middle", size: fs, fill: ACC, weight: 600 });
+      } else {
+        C(g, cx, cy - r, 9, { stroke: INK, sw: 2 }); P(g, `M${cx - 6},${cy - r - 6} L${cx + 6},${cy - r + 6} M${cx + 6},${cy - r - 6} L${cx - 6},${cy - r + 6}`, { stroke: INK, w: 2 });
+        T(g, cx, cy - r - 18, "PUSH TOP FORWARD", { anchor: "middle", size: 11, fill: GRAY });
+        P(g, arc(r + 14, 10, 80), { stroke: ACC, w: 3, arrow: "kah" });
+        C(g, cx + r, cy, 10, { stroke: ACC, sw: 2.4 }); P(g, `M${cx + r - 6},${cy - 6} L${cx + r + 6},${cy + 6} M${cx + r + 6},${cy - 6} L${cx + r - 6},${cy + 6}`, { stroke: ACC, w: 2.4 });
+        T(g, cx + r - 4, cy + 36, "FELT HERE, 90° LATER", { anchor: "middle", size: fs, fill: ACC, weight: 600 });
+        T(g, cx, cy + span * 0.25 + 10, "RIGHT SIDE FORWARD: NOSE YAWS LEFT", { anchor: "middle", size: 11, fill: GRAY });
+      }
+    } else {
+      const sz = Math.min(W * 0.62, (H - top) * 0.62), py = cy + 12;
+      T(g, 14, top + 6, "TOP VIEW, NOSE UP", { size: 11, fill: GRAY });
+      planeTop(g, cx, py, 0, sz, { stroke: INK, w: 1.8 });
+      const kk = sz / 28, nose = py - 13 * kk, tail = py + 11 * kk;
+      L(g, cx - 13 * kk * 0.55, nose - 6, cx + 13 * kk * 0.55, nose - 6, { stroke: GRAY, w: 4 });
+      if (k === "slip") {
+        let d = `M${cx},${nose - 4}`; for (let i = 0; i <= 50; i++) { const t = i / 50, y = nose + t * (tail - nose - 6), x = cx + Math.sin(t * Math.PI * 2.2 - 0.3) * (sz * 0.11) * (1 - t * 0.3); d += ` L${x.toFixed(1)},${y.toFixed(1)}`; }
+        P(g, d + ` L${cx - 7},${tail - 6}`, { stroke: ACC, w: 1.5 + 2 * s, arrow: "kah" });
+        T(g, cx, tail + 22, "HITS LEFT SIDE OF FIN", { anchor: "middle", size: fs, fill: ACC, weight: 600 });
+      } else {
+        const bx = 13 * kk * 0.3;
+        L(g, cx - bx, nose - 8, cx - bx, nose - 8 - 20 * (0.6 + 0.4 * (1 - s)), { stroke: GRAY, w: 2.4, arrow: "kahg" });
+        L(g, cx + bx, nose - 8, cx + bx, nose - 8 - 20 - 46 * s, { stroke: ACC, w: 3, arrow: "kah" });
+        T(g, cx + bx + 10, nose - 30 - 20 * s, "DESCENDING BLADE", { size: 11, fill: ACC }); T(g, cx - bx - 10, nose - 26, "ASCENDING", { anchor: "end", size: 11, fill: GRAY });
+      }
+      // yaw arrow at the nose
+      P(g, `M${cx - 8},${nose - 46 - 20 * s} q${-30 * s - 10},${6} ${-60 * s - 20},${22}`, { stroke: INK, w: 2.4, arrow: "kahw" });
+      T(g, Math.max(14, cx - 70 * s - 30 - 112), nose - 18 - 20 * s + 42, "NOSE YAWS LEFT", { size: 11, fill: INK });
+    }
+    const need = k === "torque" ? "Left tire loaded on the takeoff roll" : k === "gyro" ? "Matters most when the tail rises" : `Stronger with power: ${s >= 0.8 ? "large" : s >= 0.4 ? "moderate" : "small"} left yaw`;
+    T(g, W / 2, H - 16, need.toUpperCase(), { anchor: "middle", size: 11, fill: GRAY });
+    S.F.caption(f.cap[0], f.cap[1]); S.F.explain(f.t + " <span class=\"src\">PHAK 5</span>");
+  }
+  return { destroy() { S.F.destroy(); } };
 }
