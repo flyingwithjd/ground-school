@@ -5,8 +5,8 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
-import { buildPlane } from "./c172-model.js?v=a81f689fed";
-import { reduced, clamp } from "../core/util.js?v=a81f689fed";
+import { buildPlane } from "./c172-model.js?v=7217eef71e";
+import { reduced, clamp } from "../core/util.js?v=7217eef71e";
 const ACC = 0x3b82f6, INK = 0xf2f1ec, BG = 0x0a0a0b, D = Math.PI / 180;
 const s5 = (t) => { t = clamp(t, 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
 export const VIEWS = {
@@ -62,10 +62,11 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
   function applyCam() { const az = cs.az * D, el = cs.el * D; camera.position.set(cs.tg[0] + cs.d * Math.cos(el) * Math.cos(az), cs.tg[1] + cs.d * Math.sin(el), cs.tg[2] + cs.d * Math.cos(el) * Math.sin(az)); camera.lookAt(...cs.tg); if (controls) controls.target.set(...cs.tg); }
   function setView(v, dur = 1600) { const to = typeof v === "string" ? VIEWS[v] : v; if (!to) return; if (controls) syncFromControls();
     const from = { ...cs, tg: [...cs.tg] }; let daz = to.az - from.az; while (daz > 180) daz -= 360; while (daz < -180) daz += 360;
-    const t0 = performance.now(), dd = reduced() ? 1 : dur; camTw = (now) => { const k = s5((now - t0) / dd); cs.az = from.az + daz * k; cs.el = from.el + (to.el - from.el) * k; cs.d = Math.exp(Math.log(from.d) + (Math.log(to.d) - Math.log(from.d)) * k); cs.tg = from.tg.map((x, i) => x + (to.tg[i] - x) * k); applyCam(); if (k >= 1) camTw = null; }; kick(); }
+    const f0 = camera.fov, f1 = to.fov || 34;   // optional narrower lens for flat, profile-like side views
+    const t0 = performance.now(), dd = reduced() ? 1 : dur; camTw = (now) => { const k = s5((now - t0) / dd); cs.az = from.az + daz * k; cs.el = from.el + (to.el - from.el) * k; cs.d = Math.exp(Math.log(from.d) + (Math.log(to.d) - Math.log(from.d)) * k); cs.tg = from.tg.map((x, i) => x + (to.tg[i] - x) * k); if (f0 !== f1) { camera.fov = f0 + (f1 - f0) * k; camera.updateProjectionMatrix(); } applyCam(); if (k >= 1) camTw = null; }; kick(); }
   let controls = null;
   function syncFromControls() { const o = camera.position.clone().sub(controls.target); cs.d = o.length(); cs.el = Math.asin(clamp(o.y / cs.d, -1, 1)) / D; cs.az = Math.atan2(o.z, o.x) / D; cs.tg = controls.target.toArray(); }
-  if (orbit) { controls = new OrbitControls(camera, canvas); controls.enableDamping = true; controls.dampingFactor = 0.08; controls.enablePan = false; controls.minDistance = 8; controls.maxDistance = 90; controls.rotateSpeed = 0.6; controls.zoomSpeed = 0.6;
+  if (orbit) { controls = new OrbitControls(camera, canvas); controls.enableDamping = true; controls.dampingFactor = 0.08; controls.enablePan = false; controls.minDistance = 8; controls.maxDistance = 240; controls.rotateSpeed = 0.6; controls.zoomSpeed = 0.6;
     controls.addEventListener("start", () => { camTw = null; kick(); }); controls.addEventListener("change", kick); }
   applyCam();
   // attitude (deg) and control surface pose (deg)

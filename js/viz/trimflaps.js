@@ -1,9 +1,9 @@
 // Trim and flaps on ONE 3D stage. Trim: the wheel moves only the tab; in flight the chain plays out in order on the
 // real airplane (tab -> air pushes the tab -> elevator swings opposite -> tail force -> airplane pitches). Flaps: the
-// same stage flies the camera to a 3/4 view from behind and above the right wing; the whole airplane stays in frame
-// while the flap, the airflow over that wing and the lift/drag arrows show the camber change. Title and chain sit in their own bands above and
+// same stage slides along the right side, square to the fuselage, to frame the whole airplane (both modes default to that flat side view; orbit is still free)
+// while the flap, an airfoil profile at the cue station, the airflow over and under that wing and the lift/drag arrows show the camber change. Title and chain sit in their own bands above and
 // below the stage, never over the model. PHAK Ch 6 · AFH Ch 9 · POH Sec 2, 7.
-import { h, s, clamp, reduced } from "../core/util.js?v=a81f689fed";
+import { h, s, clamp, reduced } from "../core/util.js?v=7217eef71e";
 const D = Math.PI / 180, ACC = "#3B82F6", INK = "#F2F1EC";
 const TAB_MAX = 35, ELEV_MAX = 20, PITCH_MAX = 4;          // degrees, exaggerated for clarity
 const HX = -16.4, Y0 = 4.62, EL = 0.92, TL = 0.44, ZF = 1.75;  // elevator hinge, chord to the tab hinge, tab chord, span station of the cues (ft, model space)
@@ -16,10 +16,16 @@ const s5 = (k) => k * k * k * (k * (k * 6 - 15) + 10);
 const liftK = (f) => (1 - Math.exp(-f / 9)) / (1 - Math.exp(-30 / 9)), dragK = (f) => Math.pow(Math.max(0, f) / 30, 2.2);
 export function trimFlaps(F, S, { wheel }) {
   const phone = () => F.stage.getBoundingClientRect().width < 560;
-  const VIEW = { trim: () => (phone() ? { tg: [-17.0, 4.9, 1.2], az: 112, el: 16, d: 15.5 } : { tg: [-15.4, 5.9, 1.0], az: 114, el: 15, d: 15 }),
-    // flaps: from the right, a little behind and above the right wing root; the whole airplane stays in frame
-    flaps: () => { const r = F.stage.getBoundingClientRect(), asp = r.width / Math.max(1, r.height);   // back off on narrower stages so tail and both wingtips stay in frame
-      return { tg: [-6.0, phone() ? 5.4 : 5.6, 3.0], az: 124, el: phone() ? 20 : 17, d: 50 / Math.pow(clamp(asp, 0.8, 2.4), 0.62) }; } };
+  // Both modes default to a flat side view from the RIGHT (camera square to the fuselage, narrow lens, low elevation), so
+  // the airflow bends over and under the surfaces in profile like the PHAK figures. Switching modes only slides along that side.
+  // w = feet of airplane to fit across the stage; the distance follows from the lens and the stage shape.
+  // w x h = feet of airplane to fit around (cx, cy); reserve = stage pixels kept clear on the right for the trim wheel.
+  const FOV = 10, TN = Math.tan((FOV / 2) * D);
+  const side = (cx, cy, [w, h], [wp, hp], reserve = 0) => { const r = F.stage.getBoundingClientRect(), W = Math.max(1, r.width - reserve), H = Math.max(1, r.height), ph = phone();
+    const ww = ph ? wp : w, hh = ph ? hp : h, d = Math.max(ww / (2 * TN * (W / H)), hh / (2 * TN)), ftPx = (2 * TN * d) / H;
+    return { tg: [cx - (reserve / 2) * ftPx, cy, 1.0], az: 90, el: 3, fov: FOV, d }; };   // screen right is aft, so the target slides aft to leave the gap
+  const wheelPx = () => (phone() ? 92 : 124);
+  const VIEW = { trim: () => side(-15.6, 6.0, [17, 8.2], [8.6, 7.6], wheelPx()), flaps: () => side(-5.8, 5.6, [36, 12], [31, 10]) };
   F.root.classList.add("tf");
   // bands: big title above the stage, the step chain below it
   const title = h("div", { class: "tf-title" }), chain = h("p", { class: "tf-chain", "aria-live": "polite" });
@@ -34,6 +40,8 @@ export function trimFlaps(F, S, { wheel }) {
   const flows = [[0.38, 1], [0.8, 0.55], [-0.38, 1], [-0.8, 0.55]].map(([d, w]) => ({ d, w, el: flowEl(gT) }));
   const tabF = s("line", { stroke: INK, "stroke-width": 2.6, "marker-end": `url(#tfw${uid})` }, gT);
   const tailF = s("line", { stroke: ACC, "stroke-width": 3.2, "marker-end": `url(#tfa${uid})` }, gT);
+  // a clean airfoil profile of the right wing at the cue station, drawn over the edge-on wing so camber reads like the PHAK figures
+  const secW = s("path", { fill: "#0b0b0c", "fill-opacity": 0.92, stroke: "rgba(242,241,236,.6)", "stroke-width": 1.2, "stroke-linejoin": "round" }, gF), secF = s("path", { fill: ACC, "fill-opacity": 0.6, stroke: ACC, "stroke-width": 1.5, "stroke-linejoin": "round" }, gF);
   const wflows = [[0.42, 1, 1], [1.0, 0.55, 1], [-0.36, 1, -1], [-0.9, 0.5, -1]].map(([d, w, sd]) => ({ d, w, sd, el: flowEl(gF) }));
   const liftF = s("line", { stroke: ACC, "stroke-width": 3.4, "marker-end": `url(#tfa${uid})` }, gF);
   const dragF = s("line", { stroke: INK, "stroke-width": 2.8, "marker-end": `url(#tfw${uid})` }, gF);
@@ -68,7 +76,14 @@ export function trimFlaps(F, S, { wheel }) {
       w.el.setAttribute("d", pathD(smooth(pts, 4).map((p) => P(p[0], p[1], ZS)))); });
     const ly = WY + WTU + 0.14, lx = -0.6; line(liftF, P(lx, ly, ZS), P(lx, ly + 1.1 + 1.7 * lk, ZS));
     const a = v.flap * D, xte = WXH - WCF * Math.cos(a), yte = WY - WCF * Math.sin(a) * 0.55; line(dragF, P(xte - 0.25, yte, ZS), P(xte - 0.25 - (0.8 + 2.6 * dk), yte, ZS)); };
-  const cues = () => { const r = F.stage.getBoundingClientRect(); sv.setAttribute("viewBox", `0 0 ${r.width} ${r.height}`); trimCues(); flapCues(); };
+  const sections = () => { const C = (WLE - WXH) / 0.75, T = (WTU + WTL) / 0.6 / 1.0, up = [], lo = [];
+    for (let i = 0; i <= 16; i++) { const u = 0.75 * (i / 16) ** 2, x = WLE - u * C; up.push(P(x, WY + 0.6 * T * nn(Math.max(u, 1e-4)), ZS)); lo.push(P(x, WY - 0.4 * T * nn(Math.max(u, 1e-4)), ZS)); }
+    secW.setAttribute("d", pathD([...up, ...lo.reverse()]) + "Z");
+    const hy = WY + 0.1 * T * nn(0.75), tu = 0.6 * T * nn(0.75), tl = 0.4 * T * nn(0.75), a = v.flap * D, ca = Math.cos(a), sa = Math.sin(a);
+    const pts = [[0.05, 0.1 * T - 0.1 * T * nn(0.75)], [-0.02, tu * 0.96 - 0.1 * T * nn(0.75)], [-WCF, 0.02 - 0.1 * T * nn(0.75)], [-0.02, -tl * 0.96 - 0.1 * T * nn(0.75)]]
+      .map(([dx, dy]) => P(WXH + dx * ca - dy * sa, hy + dx * sa + dy * ca, ZS));
+    secF.setAttribute("d", pathD(pts) + "Z"); };
+  const cues = () => { const r = F.stage.getBoundingClientRect(); sv.setAttribute("viewBox", `0 0 ${r.width} ${r.height}`); trimCues(); sections(); flapCues(); };
   const seg = (i, t) => `<span data-i="${i}">${t}</span>`, ar = ' <span class="ar" aria-hidden="true">→</span> ';
   const setChain = () => { const key = mode === "flaps" ? "f" + flap0 + ">" + flap : "t" + Math.sign(trim); if (key === chainKey) return; chainKey = key;
     if (mode === "flaps") { tName.textContent = flap ? `Flaps ${flap}°` : "Flaps up"; tSub.textContent = flap ? `Max ${flap === 10 ? 110 : 85} KIAS` : "";

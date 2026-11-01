@@ -1,8 +1,8 @@
 // Cloud base from the temperature / dew point spread (PHAK Ch 12). A lifted, unsaturated parcel cools about 5.4 °F
 // per 1,000 ft while its dew point falls about 1 °F per 1,000 ft, so they close at 4.4 °F per 1,000 ft. Where they meet, cloud.
-import { frame, slider, svg, readout, drawOn, ACC, FAINT, FAINT2, INK } from "./base.js?v=a81f689fed";
-import { s } from "../core/util.js?v=a81f689fed";
-import { T } from "./shapes.js?v=a81f689fed";
+import { frame, slider, svg, readout, drawOn, ACC, FAINT, FAINT2, INK } from "./base.js?v=7217eef71e";
+import { s } from "../core/util.js?v=7217eef71e";
+import { T } from "./shapes.js?v=7217eef71e";
 export function mount(host, opts = {}) {
   const F = frame(host, { cls: "capin", corners: { tl: "Rising air · estimate", tr: "PHAK Ch 12" } });
   const el = svg(F.stage, "0 0 1600 900"); const g = s("g", {}, el);
