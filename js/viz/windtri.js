@@ -1,6 +1,6 @@
 // Wind triangle (PHAK 16 example: TC 090°, TAS 120 kt, wind 045° at 40 kt → WCA 14° left, TH 076°, GS ≈ 88 kt).
-import { slider } from "./base.js?v=02247193df";
-import { pxScene, T, L, C, planeTop, ACC, INK, GRAY, DIM, wrap } from "./kit.js?v=02247193df";
+import { slider } from "./base.js?v=522c4707bc";
+import { pxScene, T, L, C, planeTop, ACC, INK, GRAY, DIM, wrap } from "./kit.js?v=522c4707bc";
 const rad = (d) => (d * Math.PI) / 180, deg = (r) => (r * 180) / Math.PI;
 export function mount(host) {
   let tc = 90, tas = 120, wd = 45, ws = 40;
