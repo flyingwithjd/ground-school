@@ -1,6 +1,6 @@
 // Risk assessment matrix (Risk Management Handbook, FAA-H-8083-2A, Fig 4-1): tap a cell, then try lowering the likelihood.
-import { htmlScene } from "./kit.js?v=6932bc693e";
-import { h } from "../core/util.js?v=6932bc693e";
+import { htmlScene } from "./kit.js?v=a81f689fed";
+import { h } from "../core/util.js?v=a81f689fed";
 const LIK = [["Probable", "may occur several times", "Prob."], ["Occasional", "may occur sometime", "Occas."], ["Remote", "unlikely, but possible", "Remote"], ["Improbable", "highly unlikely", "Improb."]];
 const SEV = [["Catastrophic", "fatalities or total loss"], ["Critical", "severe injury or major damage"], ["Marginal", "minor injury or damage"], ["Negligible", "less than minor"]];
 const M = [["high", "high", "serious", "medium"], ["high", "serious", "medium", "low"], ["serious", "medium", "medium", "low"], ["medium", "medium", "medium", "low"]];

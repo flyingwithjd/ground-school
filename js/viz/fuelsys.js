@@ -1,8 +1,8 @@
 // 172S fuel system as a flow schematic (layout is generic, sequence per POH Sec 7). Labels in screen px.
 // Choose selector and shutoff positions; fuel moves along the live path. Tap a component to read what it does.
-import { chips, loop } from "./base.js?v=6932bc693e";
-import { reduced } from "../core/util.js?v=6932bc693e";
-import { pxScene, T, L, P, R, C, hit, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=6932bc693e";
+import { chips, loop } from "./base.js?v=a81f689fed";
+import { reduced } from "../core/util.js?v=a81f689fed";
+import { pxScene, T, L, P, R, C, hit, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=a81f689fed";
 const NODES = [
   ["sel", "Selector valve", "BOTH, LEFT or RIGHT. Takeoff and landing are normally on BOTH. Confirm with your POH."],
   ["res", "Reservoir tank", "Small tank below the selector that keeps the line full."],

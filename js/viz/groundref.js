@@ -1,9 +1,9 @@
 // Ground reference maneuvers (AFH 6): fly a fixed ground track in wind. Bank, crab and groundspeed are computed from the wind triangle
 // for a 90 KTAS airplane; bank uses tan(bank) = GS^2 * curvature / g. Illustrative model, not a procedure.
-import { frame, slider, chips, readout, svg, loop, ACC, FAINT, FAINT2 } from "./base.js?v=6932bc693e";
-import { s, reduced } from "../core/util.js?v=6932bc693e";
-import { T, topPlane } from "./shapes.js?v=6932bc693e";
-import { windField } from "./windfield.js?v=6932bc693e";
+import { frame, slider, chips, readout, svg, loop, ACC, FAINT, FAINT2 } from "./base.js?v=a81f689fed";
+import { s, reduced } from "../core/util.js?v=a81f689fed";
+import { T, topPlane } from "./shapes.js?v=a81f689fed";
+import { windField } from "./windfield.js?v=a81f689fed";
 const TAS = 90, G = 32.174, KT = 1.68781, SC = 0.17; // SVG units per foot
 function course(mode) { const pts = []; const R = 1300; // ft
   if (mode === "point") { for (let i = 0; i < 360; i++) { const a = (i / 360) * Math.PI * 2; pts.push({ x: Math.cos(a) * R, y: -Math.sin(a) * R, tx: -Math.sin(a), ty: -Math.cos(a), k: 1 / R }); } return pts; }
