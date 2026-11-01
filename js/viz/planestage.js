@@ -5,8 +5,8 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
-import { buildPlane } from "./c172-model.js?v=7217eef71e";
-import { reduced, clamp } from "../core/util.js?v=7217eef71e";
+import { buildPlane } from "./c172-model.js?v=f59a9336fd";
+import { reduced, clamp } from "../core/util.js?v=f59a9336fd";
 const ACC = 0x3b82f6, INK = 0xf2f1ec, BG = 0x0a0a0b, D = Math.PI / 180;
 const s5 = (t) => { t = clamp(t, 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
 export const VIEWS = {
@@ -83,8 +83,9 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
   canvas.addEventListener("pointerup", (e) => { lift(e); const d = downAt; if (down.size === 0) downAt = null; if (!onPick || !d || multi) return; if (Math.hypot(e.clientX - d[0], e.clientY - d[1]) > 8 || performance.now() - d[2] > 450) return; const r = canvas.getBoundingClientRect(); ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, camera); const hit = ray.intersectObjects(pickable, false)[0]; onPick(hit ? hit.object.userData.part : null, hit ? hit.object.userData.tag : null); });
   // project a model-space point (feet) to stage pixels, for SVG overlays
   const tmp = new THREE.Vector3();
+  const cueMats = [];
   function project(p, local = true) { tmp.set(p[0], p[1], p[2]); if (local) { tmp.sub(CG); tmp.applyEuler(pivot.rotation); tmp.add(CG); } tmp.project(camera); const r = stage.getBoundingClientRect(); return { x: (tmp.x * 0.5 + 0.5) * r.width, y: (-tmp.y * 0.5 + 0.5) * r.height, z: tmp.z }; }
-  function resize() { const r = stage.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.updateProjectionMatrix(); const pr = renderer.getPixelRatio(); res.set(r.width * pr, r.height * pr); coreMat.resolution.copy(res); glowMat.resolution.copy(res); kick(); }
+  function resize() { const r = stage.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.updateProjectionMatrix(); const pr = renderer.getPixelRatio(); res.set(r.width * pr, r.height * pr); cueMats.forEach((m) => m.resolution.copy(res)); coreMat.resolution.copy(res); glowMat.resolution.copy(res); kick(); }
   const ro = new ResizeObserver(resize); ro.observe(stage);
   // ONE render loop per stage. kick() only schedules a frame when none is pending and we are not inside loop();
   // calls made during a frame (pose, setAttitude, OrbitControls "change") just extend idleUntil, and loop() decides
@@ -99,6 +100,7 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
       lights.forEach((l) => (l.visible = false));
       { const k = clamp((now - fadeT0) / fadeDur, 0, 1); coreMat.opacity = k; glowMat.opacity = glowOp * k; if (k < 1) idleUntil = Math.max(idleUntil, now + 50); }
       if (hl.length) { prog = clamp((now - progT0) / drawDur, 0, 1); const p = s5(prog); hl.forEach((n, i) => setAccent(n, p, lights[i % 4])); if (prog < 1) idleUntil = Math.max(idleUntil, now + 50); }
+      if (!reduced()) cueMats.forEach((m) => { if (m.dashed) m.dashOffset = -((now / 900) % 1000) * (m.dashSize + m.gapSize); });   // airflow dashes drift aft whenever a frame is drawn
       renderer.render(scene, camera);
     } finally { inLoop = false; }
     if (alive && visible && !raf && (now < idleUntil || camTw || extra)) raf = requestAnimationFrame(loop); }
@@ -110,7 +112,30 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
     try { renderer.render(scene, camera); } catch (e) {}
     tmp.forEach(([o, v]) => { o.visible = false; if (o.isSprite) o.material.opacity = v; else o.geometry.instanceCount = v; }); }
   kick(1000);
-  return { THREE, P, scene, camera, renderer, pivot, CG, highlight, focus, tint, setView, setAttitude, pose, project, kick, parts: Object.keys(P.parts), inkLines,
+  // 3D cues (airflow lines, force arrows) in MODEL space under the pivot: they are real scene objects, so they stay glued to
+  // the airplane through every camera move, orbit and pitch change. Drawn on top (no depth test) so the near-side cues
+  // are never hidden by the airframe. Polylines keep a fixed point count and are rewritten in place (no per-frame buffers).
+  const cueG = new THREE.Group(); cueG.position.copy(CG).negate(); pivot.add(cueG);
+  const cueMat = (color, width, opacity, dash) => { const m = new LineMaterial({ color, linewidth: width, transparent: true, opacity, depthTest: false, depthWrite: false, dashed: !!dash, dashSize: dash ? dash[0] : 1, gapSize: dash ? dash[1] : 1 }); m.resolution.copy(res); cueMats.push(m); return m; };
+  const segsOf = (pts) => { const a = new Float32Array((pts.length - 1) * 6); for (let i = 0; i + 1 < pts.length; i++) a.set([...pts[i], ...pts[i + 1]], i * 6); return a; };
+  function cueLine(n, { color = INK, width = 1.4, opacity = 0.6, dash = null } = {}) {
+    const geo = new LineSegmentsGeometry(); geo.setPositions(segsOf(Array.from({ length: n }, (_, i) => [i * 0.01, 0, 0]))); const mat = cueMat(color, width, opacity, dash);
+    const l = new LineSegments2(geo, mat); l.renderOrder = 6; l.frustumCulled = false; cueG.add(l); if (dash) l.computeLineDistances();
+    return { obj: l, set(pts) { const st = geo.attributes.instanceStart.data; st.array.set(segsOf(pts)); st.needsUpdate = true;
+        if (dash) { const dd = geo.attributes.instanceDistanceStart.data, arr = dd.array; let acc = 0; for (let i = 0; i + 1 < pts.length; i++) { arr[i * 2] = acc; acc += Math.hypot(pts[i + 1][0] - pts[i][0], pts[i + 1][1] - pts[i][1], pts[i + 1][2] - pts[i][2]); arr[i * 2 + 1] = acc; } dd.needsUpdate = true; }
+        kick(); },
+      set opacity(o) { mat.opacity = o; l.visible = o > 0.004; }, set visible(v) { l.visible = v; } };
+  }
+  const UPV = new THREE.Vector3(0, 1, 0);
+  function cueArrow({ color = INK, width = 2.6, head = 0.3 } = {}) {
+    const ln = cueLine(2, { color, width, opacity: 1 }), hm = new THREE.MeshBasicMaterial({ color, transparent: true, depthTest: false, depthWrite: false });
+    const cone = new THREE.Mesh(new THREE.ConeGeometry(head * 0.42, head, 14), hm); cone.renderOrder = 7; cone.frustumCulled = false; cueG.add(cone); let hd = head, vis = true, op = 1;
+    const a = new THREE.Vector3(), b = new THREE.Vector3(), dv = new THREE.Vector3();
+    return { set(p0, p1) { a.set(...p0); b.set(...p1); dv.subVectors(b, a); const L = dv.length(); if (L < 1e-5) return; dv.divideScalar(L); const h = Math.min(hd, L * 0.6);
+        ln.set([p0, b.clone().addScaledVector(dv, -h * 0.85).toArray()]); cone.scale.setScalar(h / hd); cone.quaternion.setFromUnitVectors(UPV, dv); cone.position.copy(b).addScaledVector(dv, -h / 2); kick(); },
+      set opacity(o) { op = o; ln.opacity = o; hm.opacity = o; cone.visible = vis && o > 0.004; }, set visible(v) { vis = v; ln.visible = v && op > 0.004; cone.visible = v && op > 0.004; kick(); } };
+  }
+  return { THREE, P, scene, camera, renderer, pivot, CG, highlight, focus, tint, setView, setAttitude, pose, project, kick, parts: Object.keys(P.parts), inkLines, cueLine, cueArrow, cueGroup: cueG,
     animate(fn) { extra = fn; kick(); }, setInkOpacity(o) { inkMat.opacity = o; kick(); },
     destroy() { alive = false; cancelAnimationFrame(raf); raf = 0; ro.disconnect(); io.disconnect(); controls && controls.dispose(); renderer.dispose(); renderer.forceContextLoss && renderer.forceContextLoss(); canvas.remove(); } };
 }

@@ -427,14 +427,10 @@ svg text:not([font-family]) { font-family: var(--mono); }
 .tf-chain [data-i]{color:var(--ink3);white-space:nowrap;transition:color 260ms var(--ease)}
 .tf-chain [data-i].on{color:var(--ink)}
 .tf-chain .ar{color:var(--acc)}
-.tf-cues{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;transition:opacity 500ms var(--ease)}
-.tf-cues g{transition:opacity 500ms var(--ease)}.tf-fcues,.viz.tf-flaps .tf-tcues{opacity:0}.viz.tf-flaps .tf-fcues{opacity:1}
 .tf-title{display:flex;align-items:baseline;justify-content:space-between;gap:12px}.tf-sub{font:500 13px/1 var(--mono);letter-spacing:.04em;color:var(--ink2);white-space:nowrap}
 .viz.tf .stage .trimwheel{transition:opacity 500ms var(--ease)}
 .viz.tf-flaps .stage .trimwheel{opacity:0;pointer-events:none}
-.tf-flow{animation:tfflow 900ms linear infinite}
-@keyframes tfflow{from{stroke-dashoffset:12}to{stroke-dashoffset:0}}
-@media (prefers-reduced-motion:reduce){.tf-flow{animation:none}.tf-chain [data-i],.tf-cues,.tf-cues g,.viz.tf .stage .trimwheel{transition:none}}
+@media (prefers-reduced-motion:reduce){.tf-chain [data-i],.viz.tf .stage .trimwheel{transition:none}}
 @media (max-width:700px){.viz.tf .stage{aspect-ratio:1/1;max-height:none}.viz.tf .stage .trimwheel{top:10px;height:calc(100% - 20px)}.tf-chain{font-size:16px}}
 /* primary flight controls: drawn yoke + pedals right beside the 3D view (under it on phones) */
 .pf-body{display:grid;grid-template-columns:minmax(0,1fr)}

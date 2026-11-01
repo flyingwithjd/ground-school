@@ -1,7 +1,7 @@
 // Kit for the newer visuals: SVG drawn in real screen pixels, so every label is a true 11–14 px on any device,
 // plus small HTML building blocks (step lists, decision cards). Each scene redraws itself when the stage resizes.
-import { frame, ACC, INK, FAINT, FAINT2 } from "./base.js?v=7217eef71e";
-import { s, h } from "../core/util.js?v=7217eef71e";
+import { frame, ACC, INK, FAINT, FAINT2 } from "./base.js?v=f59a9336fd";
+import { s, h } from "../core/util.js?v=f59a9336fd";
 export { ACC, INK, FAINT, FAINT2 };
 export const GRAY = "rgba(242,241,236,.55)", DIM = "rgba(242,241,236,.3)", ACCF = "rgba(59,130,246,.16)", ACCM = "rgba(59,130,246,.45)";
 export const MONO = "IBM Plex Mono, ui-monospace, Menlo, monospace", SANS = "Inter, system-ui, sans-serif";

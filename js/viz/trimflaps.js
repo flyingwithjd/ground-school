@@ -1,12 +1,12 @@
 // Trim and flaps on ONE 3D stage. Trim: the wheel moves only the tab; in flight the chain plays out in order on the
 // real airplane (tab -> air pushes the tab -> elevator swings opposite -> tail force -> airplane pitches). Flaps: the
 // same stage slides along the right side, square to the fuselage, to frame the whole airplane (both modes default to that flat side view; orbit is still free)
-// while the flap, an airfoil profile at the cue station, the airflow over and under that wing and the lift/drag arrows show the camber change. Title and chain sit in their own bands above and
+// while the flap, the 3D airflow lines over and under that wing and the 3D lift/drag arrows (scene objects, so they stay attached when orbiting) show the camber change. Title and chain sit in their own bands above and
 // below the stage, never over the model. PHAK Ch 6 · AFH Ch 9 · POH Sec 2, 7.
-import { h, s, clamp, reduced } from "../core/util.js?v=7217eef71e";
+import { h, clamp, reduced } from "../core/util.js?v=f59a9336fd";
 const D = Math.PI / 180, ACC = "#3B82F6", INK = "#F2F1EC";
-const TAB_MAX = 35, ELEV_MAX = 20, PITCH_MAX = 4;          // degrees, exaggerated for clarity
-const HX = -16.4, Y0 = 4.62, EL = 0.92, TL = 0.44, ZF = 1.75;  // elevator hinge, chord to the tab hinge, tab chord, span station of the cues (ft, model space)
+const TAB_MAX = 35, ELEV_MAX = 25, PITCH_MAX = 2.5;          // degrees, exaggerated for clarity
+const HX = -16.4, Y0 = 4.62, EL = 0.92, TL = 0.44, ZF = 1.75, SLE = -14.33;  // elevator hinge, chord to the tab hinge, tab chord, span station of the cues, stabilizer leading edge at that station (ft, model space)
 // right-wing section used for the flaps cues (matches c172-model.js at ~7 ft out): leading edge, flap hinge, chord line height,
 // flap chord, upper/lower thickness, and the span station of the cues (flaps run 2.0-9.4 ft out)
 const WLE = 1.6, WXH = -2.41, WY = 6.79, WCF = 1.34, WTU = 0.37, WTL = 0.25, ZS = 7.25;
@@ -25,65 +25,55 @@ export function trimFlaps(F, S, { wheel }) {
     const ww = ph ? wp : w, hh = ph ? hp : h, d = Math.max(ww / (2 * TN * (W / H)), hh / (2 * TN)), ftPx = (2 * TN * d) / H;
     return { tg: [cx - (reserve / 2) * ftPx, cy, 1.0], az: 90, el: 3, fov: FOV, d }; };   // screen right is aft, so the target slides aft to leave the gap
   const wheelPx = () => (phone() ? 92 : 124);
-  const VIEW = { trim: () => side(-15.6, 6.0, [17, 8.2], [8.6, 7.6], wheelPx()), flaps: () => side(-5.8, 5.6, [36, 12], [31, 10]) };
+  const VIEW = { trim: () => side(-16.2, 4.62, [6.6, 4.9], [4.6, 4.9], wheelPx()), flaps: () => side(-5.8, 5.6, [36, 12], [31, 10]) };
   F.root.classList.add("tf");
   // bands: big title above the stage, the step chain below it
   const title = h("div", { class: "tf-title" }), chain = h("p", { class: "tf-chain", "aria-live": "polite" });
   const tName = h("span", {}), tSub = h("span", { class: "tf-sub" }); title.append(tName, tSub);
   F.root.insertBefore(title, F.stage); F.stage.after(chain);
-  // minimal airflow cues drawn over the canvas from projected model points (no text in here)
-  const sv = s("svg", { class: "tf-cues", "aria-hidden": "true" }, F.stage);
-  const uid = Math.random().toString(36).slice(2, 7);
-  s("defs", {}, sv).innerHTML = `<marker id="tfw${uid}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${INK}"/></marker><marker id="tfa${uid}" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="4" markerHeight="4" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${ACC}"/></marker>`;
-  const gT = s("g", { class: "tf-tcues" }, sv), gF = s("g", { class: "tf-fcues" }, sv);
-  const flowEl = (g) => s("path", { class: "tf-flow", fill: "none", stroke: "rgba(242,241,236,.55)", "stroke-width": 1.3, "stroke-dasharray": "6 6" }, g);
-  const flows = [[0.38, 1], [0.8, 0.55], [-0.38, 1], [-0.8, 0.55]].map(([d, w]) => ({ d, w, el: flowEl(gT) }));
-  const tabF = s("line", { stroke: INK, "stroke-width": 2.6, "marker-end": `url(#tfw${uid})` }, gT);
-  const tailF = s("line", { stroke: ACC, "stroke-width": 3.2, "marker-end": `url(#tfa${uid})` }, gT);
-  // a clean airfoil profile of the right wing at the cue station, drawn over the edge-on wing so camber reads like the PHAK figures
-  const secW = s("path", { fill: "#0b0b0c", "fill-opacity": 0.92, stroke: "rgba(242,241,236,.6)", "stroke-width": 1.2, "stroke-linejoin": "round" }, gF), secF = s("path", { fill: ACC, "fill-opacity": 0.6, stroke: ACC, "stroke-width": 1.5, "stroke-linejoin": "round" }, gF);
-  const wflows = [[0.42, 1, 1], [1.0, 0.55, 1], [-0.36, 1, -1], [-0.9, 0.5, -1]].map(([d, w, sd]) => ({ d, w, sd, el: flowEl(gF) }));
-  const liftF = s("line", { stroke: ACC, "stroke-width": 3.4, "marker-end": `url(#tfa${uid})` }, gF);
-  const dragF = s("line", { stroke: INK, "stroke-width": 2.8, "marker-end": `url(#tfw${uid})` }, gF);
+  // airflow lines and force arrows are real 3D objects in model space (planestage cueLine/cueArrow), so they stay attached
+  // to the tail and the right wing in the default side views AND whenever the user orbits. No flat 2D overlays.
+  const TD = [0.32, 0.26], WD = [0.7, 0.55];   // dash/gap in feet: short on the small tail, longer on the wing
+  const NT = 42, NW = Math.floor((WLE + 2.6 - (WXH - 4.4)) / 0.12) + 1;
+  const flows = [[0.38, 1], [0.8, 0.55], [-0.38, 1], [-0.8, 0.55]].map(([d, w]) => ({ d, w, el: S.cueLine(NT, { dash: TD, width: 1.4, opacity: 0.6 }) }));
+  const tabF = S.cueArrow({ color: 0xf2f1ec, width: 2.8, head: 0.2 });
+  const tailF = S.cueArrow({ color: 0x3b82f6, width: 3.4, head: 0.28 });
+  const wflows = [[0.42, 1, 1], [1.0, 0.55, 1], [-0.36, 1, -1], [-0.9, 0.5, -1]].map(([d, w, sd]) => ({ d, w, sd, el: S.cueLine(NW, { dash: WD, width: 1.4, opacity: 0.6 }) }));
+  const liftF = S.cueArrow({ color: 0x3b82f6, width: 3.4, head: 0.55 });
+  const dragF = S.cueArrow({ color: 0xf2f1ec, width: 2.8, head: 0.5 });
+  let fadeT0 = -1e9, fadeFrom = 1;   // trim cues fade out / flap cues fade in when the mode changes
   let mode = "trim", trim = 0, flap = 0, flap0 = 0, chainKey = "", last = 0, running = false;
   const v = { tab: 0, push: 0, elev: 0, lift: 0, pitch: 0, flap: 0, cam: 0, force: 0, path: 0 };
   const tau = { tab: 140, push: 340, elev: 480, lift: 340, pitch: 560, cam: 260, force: 520, path: 620 };
   const targets = () => ({ tab: trim * TAB_MAX, push: v.tab / TAB_MAX, elev: -v.push * ELEV_MAX, lift: v.elev / ELEV_MAX, pitch: -v.lift * PITCH_MAX, cam: v.flap, force: v.cam, path: v.force });
-  const P = (x, y, z = ZF) => S.project([x, y, z]);
+  const P = (x, y, z = ZF) => [x, y, z];
   const camber = (s0) => { const e = v.elev * D, a = (v.elev + v.tab) * D, ts = EL * Math.cos(e), ty = Y0 - EL * Math.sin(e);   // s0 = distance aft of the hinge
     if (s0 <= 0) return Y0; if (s0 <= ts) return Y0 - s0 * Math.tan(e);
     const es = ts + TL * Math.cos(a), ey = ty - TL * Math.sin(a); if (s0 <= es) return ty - (s0 - ts) * Math.tan(a);
     return ey - (s0 - es) * Math.tan(a) * Math.exp(-(s0 - es) / 0.5); };
   const smooth = (pts, k = 3) => pts.map((p, i) => { let acc = 0, n = 0; for (let j = -k; j <= k; j++) { const q = pts[i + j]; if (q) { const wt = k + 1 - Math.abs(j); acc += q[1] * wt; n += wt; } } return [p[0], acc / n]; });
-  const pathD = (pp) => "M" + pp.map((p) => p.x.toFixed(1) + "," + p.y.toFixed(1)).join(" L");
-  const line = (el, a, b) => { el.setAttribute("x1", a.x.toFixed(1)); el.setAttribute("y1", a.y.toFixed(1)); el.setAttribute("x2", b.x.toFixed(1)); el.setAttribute("y2", b.y.toFixed(1)); };
+  // mode cross-fade of the two cue sets (0 = trim cues, 1 = flap cues); instant with reduced motion
+  const mixF = () => { const k = reduced() ? 1 : clamp((performance.now() - fadeT0) / 500, 0, 1), to = mode === "flaps" ? 1 : 0; return fadeFrom + (to - fadeFrom) * k; };
   const trimCues = () => {
-    flows.forEach((f) => { const pts = []; for (let x = -13.2; x >= -19.4; x -= 0.15) pts.push([x, Y0 + (camber(HX - x) - Y0) * f.w + f.d]); f.el.setAttribute("d", pathD(smooth(pts).map((p) => P(p[0], p[1])))); });
+    flows.forEach((f) => { const pts = []; for (let i = 0; i < NT; i++) { const x = -13.2 - i * 0.15; pts.push([x, Y0 + (camber(HX - x) - Y0) * f.w + f.d]); } f.el.set(smooth(pts).map((p) => P(p[0], p[1]))); f.el.opacity = 0.6 * mT; });
     const e = v.elev * D, a = (v.elev + v.tab) * D, tx = HX - EL * Math.cos(e), ty = Y0 - EL * Math.sin(e);
     const mx = tx - (TL / 2) * Math.cos(a), my = ty - (TL / 2) * Math.sin(a), nx = -Math.sin(a), ny = Math.cos(a);   // tab middle and its upper-surface normal
     const p = v.push, sg = p > 0 ? -1 : 1, L = 0.25 + 0.75 * Math.abs(p);   // air pushes the tab up (+): the arrow comes from below
-    line(tabF, P(mx + nx * sg * (L + 0.12), my + ny * sg * (L + 0.12)), P(mx + nx * sg * 0.12, my + ny * sg * 0.12)); tabF.setAttribute("opacity", clamp(Math.abs(p) * 2.5, 0, 1).toFixed(3));
+    tabF.set(P(mx + nx * sg * (L + 0.12), my + ny * sg * (L + 0.12)), P(mx + nx * sg * 0.12, my + ny * sg * 0.12)); tabF.opacity = clamp(Math.abs(p) * 2.5, 0, 1) * mT;
     // the tail force acts on the whole tail: draw it on the stabilizer, inboard and ahead of the tab so the two arrows never bunch
-    const lf = v.lift, dir = lf > 0 ? 1 : -1, LL = 0.3 + 1.6 * Math.abs(lf), sx = HX + 0.9, sy = Y0 + (dir > 0 ? 0.16 : -0.12);
-    line(tailF, P(sx, sy, 3.6), P(sx, sy + dir * LL, 3.6)); tailF.setAttribute("opacity", clamp(Math.abs(lf) * 2.5, 0, 1).toFixed(3)); };
+    const lf = v.lift, dir = lf > 0 ? 1 : -1, LL = 0.25 + 0.75 * Math.abs(lf), sx = HX + 0.9, sy = Y0 + (dir > 0 ? 0.16 : -0.12);
+    tailF.set(P(sx, sy, 3.6), P(sx, sy + dir * LL, 3.6)); tailF.opacity = clamp(Math.abs(lf) * 2.5, 0, 1) * mT; };
   // mean line of the wing section with the flap at angle f (deg); x in ft (model), returns y
   const wcam = (x, f) => { const a = f * D, xte = WXH - WCF * Math.cos(a), yte = WY - WCF * Math.sin(a);
     if (x >= WXH) return WY; if (x >= xte) return WY - (WXH - x) * Math.tan(a); return yte - (xte - x) * Math.tan(a) * 0.8 * Math.exp(-(xte - x) / 1.4); };
   const flapCues = () => { const f = v.cam, lk = liftK(Math.max(0, v.force)), dk = dragK(v.force), C = WLE - WXH + WCF;
-    wflows.forEach((w) => { const pts = []; for (let x = WLE + 2.6; x >= WXH - 4.4; x -= 0.12) { const u = (WLE - x) / C, th = w.sd > 0 ? WTU * nn(u) : -WTL * nn(u);
+    wflows.forEach((w) => { const pts = []; for (let i = 0; i < NW; i++) { const x = WLE + 2.6 - i * 0.12, u = (WLE - x) / C, th = w.sd > 0 ? WTU * nn(u) : -WTL * nn(u);
         const up = x > WLE ? 0.22 * liftK(Math.max(0, f)) * Math.exp(-(x - WLE) / 1.2) : 0;   // upwash ahead of the wing grows with lift
         pts.push([x, WY + (wcam(x, f) - WY + th + up) * w.w + w.d]); }
-      w.el.setAttribute("d", pathD(smooth(pts, 4).map((p) => P(p[0], p[1], ZS)))); });
-    const ly = WY + WTU + 0.14, lx = -0.6; line(liftF, P(lx, ly, ZS), P(lx, ly + 1.1 + 1.7 * lk, ZS));
-    const a = v.flap * D, xte = WXH - WCF * Math.cos(a), yte = WY - WCF * Math.sin(a) * 0.55; line(dragF, P(xte - 0.25, yte, ZS), P(xte - 0.25 - (0.8 + 2.6 * dk), yte, ZS)); };
-  const sections = () => { const C = (WLE - WXH) / 0.75, T = (WTU + WTL) / 0.6 / 1.0, up = [], lo = [];
-    for (let i = 0; i <= 16; i++) { const u = 0.75 * (i / 16) ** 2, x = WLE - u * C; up.push(P(x, WY + 0.6 * T * nn(Math.max(u, 1e-4)), ZS)); lo.push(P(x, WY - 0.4 * T * nn(Math.max(u, 1e-4)), ZS)); }
-    secW.setAttribute("d", pathD([...up, ...lo.reverse()]) + "Z");
-    const hy = WY + 0.1 * T * nn(0.75), tu = 0.6 * T * nn(0.75), tl = 0.4 * T * nn(0.75), a = v.flap * D, ca = Math.cos(a), sa = Math.sin(a);
-    const pts = [[0.05, 0.1 * T - 0.1 * T * nn(0.75)], [-0.02, tu * 0.96 - 0.1 * T * nn(0.75)], [-WCF, 0.02 - 0.1 * T * nn(0.75)], [-0.02, -tl * 0.96 - 0.1 * T * nn(0.75)]]
-      .map(([dx, dy]) => P(WXH + dx * ca - dy * sa, hy + dx * sa + dy * ca, ZS));
-    secF.setAttribute("d", pathD(pts) + "Z"); };
-  const cues = () => { const r = F.stage.getBoundingClientRect(); sv.setAttribute("viewBox", `0 0 ${r.width} ${r.height}`); trimCues(); sections(); flapCues(); };
+      w.el.set(smooth(pts, 4).map((p) => P(p[0], p[1], ZS))); w.el.opacity = 0.6 * mF; });
+    const ly = WY + WTU + 0.14, lx = -0.6; liftF.set(P(lx, ly, ZS), P(lx, ly + 1.1 + 1.7 * lk, ZS)); liftF.opacity = mF;
+    const a = v.flap * D, xte = WXH - WCF * Math.cos(a), yte = WY - WCF * Math.sin(a) * 0.55; dragF.set(P(xte - 0.25, yte, ZS), P(xte - 0.25 - (0.8 + 2.6 * dk), yte, ZS)); dragF.opacity = mF; };
+  let mT = 1, mF = 0; const cues = () => { const m = mixF(); mF = m; mT = 1 - m; trimCues(); flapCues(); };
   const seg = (i, t) => `<span data-i="${i}">${t}</span>`, ar = ' <span class="ar" aria-hidden="true">→</span> ';
   const setChain = () => { const key = mode === "flaps" ? "f" + flap0 + ">" + flap : "t" + Math.sign(trim); if (key === chainKey) return; chainKey = key;
     if (mode === "flaps") { tName.textContent = flap ? `Flaps ${flap}°` : "Flaps up"; tSub.textContent = flap ? `Max ${flap === 10 ? 110 : 85} KIAS` : "";
@@ -106,7 +96,7 @@ export function trimFlaps(F, S, { wheel }) {
     apply(); if (!busy) { running = false; last = 0; S.animate(null); } };
   const go = () => { setChain(); if (reduced()) { for (let i = 0; i < 8; i++) Object.assign(v, targets()); v.flap = flap; Object.assign(v, { cam: flap, force: flap, path: flap }); apply(); return; } if (!running) { running = true; last = 0; S.animate(tick); } };
   const FOCUS = { trim: ["trimtab"], flaps: ["flaps"] };
-  let show = (m) => { showChips.set(m); if (m === mode) return; mode = m; flap0 = flap; F.root.classList.toggle("tf-flaps", m === "flaps"); S.focus(FOCUS[m]); S.tint(FOCUS[m]); S.setView(VIEW[m](), 1500); go(); explain(); };
+  let show = (m) => { showChips.set(m); if (m === mode) return; fadeFrom = mixF(); fadeT0 = performance.now(); mode = m; flap0 = flap; F.root.classList.toggle("tf-flaps", m === "flaps"); S.focus(FOCUS[m]); S.tint(FOCUS[m]); S.setView(VIEW[m](), 1500); go(); explain(); };
   const src = (t) => `<span class="src">${t}</span>`;
   const explain = () => F.explain(mode === "flaps"
     ? "Lowering the flaps adds <b>camber</b> to the wing, so it makes more <b>lift</b> and more <b>drag</b>. The extra lift lets you fly slower; the extra drag lets you descend more steeply without speeding up. The first notch adds mostly lift; the last notches add mostly drag. " +
@@ -118,14 +108,10 @@ export function trimFlaps(F, S, { wheel }) {
   const showChips = F.chipsApi([["trim", "Elevator trim"], ["flaps", "Flaps"]], "trim", (m) => show(m), "Show");
   wheel((x) => { trim = x; show("trim"); go(); });
   F.chipsApi([["0", "0°"], ["10", "10°"], ["20", "20°"], ["30", "30°"]], "0", (x) => { show("flaps"); flap0 = flap; flap = +x; go(); explain(); }, "Flap lever");
-  // keep the cues glued to the model while the camera flies or the user orbits
-  const ro = new ResizeObserver(() => cues()); ro.observe(F.stage);
-  let craf = 0, until = 0, held = false; const follow = (now) => { cues(); craf = held || now < until ? requestAnimationFrame(follow) : 0; };
+  // the cues are 3D objects, so they follow the camera and orbit by themselves; this loop only runs the mode cross-fade
+  let craf = 0, until = 0; const follow = (now) => { cues(); craf = now < until ? requestAnimationFrame(follow) : 0; };
   const followFor = (ms) => { until = Math.max(until, performance.now() + ms); if (!craf) craf = requestAnimationFrame(follow); };
-  const cv = F.stage.querySelector("canvas");
-  const down = () => { held = true; followFor(0); }, upEv = () => { held = false; followFor(1400); };   // orbit drags (OrbitControls damps for ~1 s after release)
-  cv.addEventListener("pointerdown", down); window.addEventListener("pointerup", upEv); cv.addEventListener("wheel", () => followFor(1400), { passive: true });
-  const show0 = show; show = (m) => { const was = mode; show0(m); if (m !== was) followFor(1800); };
+  const show0 = show; show = (m) => { const was = mode; show0(m); if (m !== was) followFor(700); };
   setChain(); explain(); apply(); followFor(600);
-  return () => { cancelAnimationFrame(craf); ro.disconnect(); window.removeEventListener("pointerup", upEv); };
+  return () => { cancelAnimationFrame(craf); };
 }
