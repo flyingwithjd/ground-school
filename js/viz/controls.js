@@ -1,8 +1,8 @@
 // Flight controls on their hinges. Drag the yoke pad (roll + pitch) and the pedal bar (yaw);
 // the 3D airplane moves its surfaces and responds gently about each axis. Secondary mode: trim and flaps.
-import { frame, chips, slider } from "./base.js?v=d0b3a92d56";
-import { planeStage } from "./planestage.js?v=d0b3a92d56";
-import { h, s, clamp, reduced } from "../core/util.js?v=d0b3a92d56";
+import { frame, chips, slider } from "./base.js?v=c2a8eeaf64";
+import { planeStage } from "./planestage.js?v=c2a8eeaf64";
+import { h, s, clamp, reduced } from "../core/util.js?v=c2a8eeaf64";
 // model signs: ail>0 = roll right; elev<0 = trailing edge up (nose up); rud>0 = right rudder; trim>0 = tab TE down (nose-up trim); steer>0 = nosewheel left
 function pad(parent, { label, w = 180, hgt = 180, axes = "xy", onmove }) {
   const box = h("div", { class: "pad", role: "slider", tabindex: "0", "aria-label": label, style: `width:${w}px;height:${hgt}px` });

@@ -1,7 +1,7 @@
 // Chair-fly trainer: tap the checklist items in order from memory. Items are from the C172S POH Section 3/4
 // (172S NAV III, G1000). Confirm with your CFI and your aircraft's POH.
-import { frame, chips } from "./base.js?v=d0b3a92d56";
-import { h, esc, shuffle } from "../core/util.js?v=d0b3a92d56";
+import { frame, chips } from "./base.js?v=c2a8eeaf64";
+import { h, esc, shuffle } from "../core/util.js?v=c2a8eeaf64";
 export const DRILLS = {
   roll: { name: "Engine failure, takeoff roll", src: "C172S POH 3", steps: ["Throttle: IDLE", "Brakes: APPLY", "Wing flaps: RETRACT", "Mixture: IDLE CUTOFF", "Magnetos: OFF", "STBY BATT: OFF", "Master (ALT and BAT): OFF"] },
   after: { name: "Engine failure after takeoff", src: "C172S POH 3", steps: ["Airspeed: 70 KIAS flaps up, 65 KIAS flaps 10° to full", "Mixture: IDLE CUTOFF", "Fuel shutoff valve: OFF", "Magnetos: OFF", "Wing flaps: AS REQUIRED (full recommended)", "STBY BATT: OFF", "Master (ALT and BAT): OFF", "Cabin door: UNLATCH", "Land: STRAIGHT AHEAD"] },

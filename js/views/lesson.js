@@ -1,17 +1,17 @@
-import { h, esc, pct } from "../core/util.js?v=d0b3a92d56";
-import { S, save, lessonState } from "../core/store.js?v=d0b3a92d56";
-import { LESSONS, lessonItems } from "../../data/index.js?v=d0b3a92d56";
-import { lessonStats, buildQueue } from "../core/progress.js?v=d0b3a92d56";
-import { rich } from "../core/rich.js?v=d0b3a92d56";
-import { mountViz, destroyAll } from "../viz/index.js?v=d0b3a92d56";
-import { session } from "./quiz.js?v=d0b3a92d56";
+import { h, esc, pct } from "../core/util.js?v=c2a8eeaf64";
+import { S, save, lessonState } from "../core/store.js?v=c2a8eeaf64";
+import { LESSONS, lessonItems } from "../../data/index.js?v=c2a8eeaf64";
+import { lessonStats, buildQueue } from "../core/progress.js?v=c2a8eeaf64";
+import { rich } from "../core/rich.js?v=c2a8eeaf64";
+import { mountViz, destroyAll } from "../viz/index.js?v=c2a8eeaf64";
+import { session } from "./quiz.js?v=c2a8eeaf64";
 const KIND = { ground: "Ground lesson", flight: "Flight lesson briefing", module: "Module unit" };
 export function lessonView(host, id, secIdx) {
   const L0 = LESSONS[id]; const p = h("div", { class: "page" }); host.append(p);
   if (!L0) { p.innerHTML = `<h2>Lesson not found.</h2>`; return; }
   let api = { destroy() {} }; let dead = false;
   // Lesson text is code-split: question banks load up front (the review engine needs them); prose loads when the lesson opens.
-  import(`../../data/text/${id}.js?v=d0b3a92d56`).then((m) => { if (dead) return; api = build(p, { ...L0, ...m.default }, id, secIdx); })
+  import(`../../data/text/${id}.js?v=c2a8eeaf64`).then((m) => { if (dead) return; api = build(p, { ...L0, ...m.default }, id, secIdx); })
     .catch((e) => { p.innerHTML = `<h2>Could not load this lesson.</h2><p class="dim mt">${esc(e.message)}</p>`; });
   return { destroy() { dead = true; api.destroy(); } };
 }
@@ -47,8 +47,12 @@ function build(p, L, id, secIdx) {
       if (S0.kdr) { const k = h("div", { class: "kdr" }); k.innerHTML = [["Know it", S0.kdr.k], ["Do it", S0.kdr.d], ["Manage the risk", S0.kdr.r]].map(([t, x]) => `<div><span class="label">${t}</span><p>${rich(x || "")}</p></div>`).join("") + ""; if (S0.kdr.codes) k.insertAdjacentHTML("beforeend", ""); sec.append(k); if (S0.kdr.codes) sec.append(h("p", { class: "src", style: "margin-top:10px;white-space:normal" }, "ACS " + [].concat(S0.kdr.codes).join(", "))); }
     } else if (hasPrep && cur === sections.length) { briefing(sec); }
     else { checkYourself(sec); }
-    const nav = h("div", { class: "secnav" }); const prev = h("button", { class: "btn ghost", type: "button" }, "← " + (cur > 0 ? steps[cur - 1] : "")); prev.disabled = cur === 0; prev.onclick = () => go(cur - 1);
-    const nx = h("button", { class: "btn pri arrow", type: "button" }, cur < steps.length - 1 ? steps[cur + 1] : "Back to course"); nx.onclick = () => (cur < steps.length - 1 ? go(cur + 1) : (location.hash = L.module ? "#/module/" + L.module : "#/course"));
+    // Pager: two equal cells, a mono PREVIOUS / NEXT label over a title that wraps to 2 lines, so long titles never collide.
+    const nav = h("nav", { class: "secnav", "aria-label": "Lesson sections" });
+    const cell = (cls, label, title) => { const b = h("button", { class: "pg " + cls, type: "button" }); b.append(h("span", { class: "pg-l" }, label), h("span", { class: "pg-t" }, title)); if (title) b.title = title; return b; };
+    const prev = cur > 0 ? cell("prev", "← Previous", steps[cur - 1]) : h("span", { class: "pg-gap", "aria-hidden": "true" }); if (cur > 0) prev.onclick = () => go(cur - 1);
+    const last = cur >= steps.length - 1;
+    const nx = cell("next", last ? "Done →" : "Next →", last ? "Back to course" : steps[cur + 1]); nx.onclick = () => (!last ? go(cur + 1) : (location.hash = L.module ? "#/module/" + L.module : "#/course"));
     if (cur < steps.length - 1 || !body.querySelector(".quiz")) body.append(nav), nav.append(prev, nx);
   }
   function briefing(sec) { const P = L.prep;

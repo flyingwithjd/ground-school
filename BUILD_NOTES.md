@@ -113,3 +113,13 @@ These notes are updated as work goes, so an interruption loses nothing. The time
 - Powerplant = engine + cowling + propeller; the cowling is drawn as an outline (faces hidden) so the engine shows through.
 - Landing gear = both mains, nose gear/strut, wheel fairings (unchanged). Fuselage = fuselage + wing-root fairing (unchanged).
 - Kicker for every major component is now "Major component"; the text below lists what it includes. Part buttons still light only their own part.
+
+### 2026-10-31, ~9:55 PM MDT: lesson pager + fuselage construction rebuild
+- Lesson pager (every lesson section): two equal cells, each with a small mono PREVIOUS / NEXT label over a title that wraps to 2 lines and then ends in an ellipsis. Next is the blue cell on the right; on the first section the left cell is empty; on the last it reads DONE → Back to course. They can no longer overlap at any width.
+- Fuselage construction (js/viz/structure.js, #/lesson/gl1/1) rebuilt as a 3/4 view of a tapered fuselage. Blue = carries the load, gray dashed = shape/covering only, with a legend.
+  Truss: longerons + vertical/horizontal struts + diagonal struts (triangles), fabric ghosted and labeled not structural; end view square with corner longerons.
+  Monocoque: blue stressed skin with gray formers/bulkhead rings, no lengthwise members; "Show a dent" adds a dent and dashes the shell (PHAK: a dented can collapses). End view: ring only.
+  Semimonocoque: skin + bulkheads/formers + stringers all blue; end view ring with stringer dots; "used on the 172" (C172S POH Sec 7).
+  Callouts are sized in screen pixels (~11.5 px) so they stay legible on a phone; one-line load statement is the caption label. Draw-on respects reduced motion.
+- PHAK 25C (Ch 3) names longerons/struts for truss and bulkhead, formers, stringers, skin for (semi)monocoque; it does not name Pratt/Warren, so neither does the visual.
+- overlap-audit.mjs now also checks the pager (no overlap, no spill, no clipped label) and every fuselage type (+dent) for overlapping or <10 px callouts. 0 problems at 360 and 430 px.
