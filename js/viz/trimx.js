@@ -1,7 +1,7 @@
 // Side-view trim tab explainer (nose to the left, like the PHAK trim tab figure).
 // The wheel moves only the tab. In flight the chain plays out in order, each link lagging the one before:
 // tab deflects -> air pushes on the tab -> elevator swings the opposite way -> tail force changes -> airplane pitches.
-import { h, s, clamp, reduced } from "../core/util.js?v=522c4707bc";
+import { h, s, clamp, reduced } from "../core/util.js?v=074f6ea36d";
 const ACC = "#3B82F6", INK = "#F2F1EC", FAINT = "rgba(242,241,236,.22)";
 const Y0 = 160, HX = 160, EL = 95, TL = 38;      // chord line, elevator hinge x, elevator and tab lengths (viewBox units)
 const TAB_MAX = 36, ELEV_MAX = 20, PITCH_MAX = 12; // exaggerated for clarity
@@ -44,7 +44,7 @@ export function trimExplainer(parent) {
   s("line", { x1: HX, x2: HX, y1: 214, y2: 236, stroke: "rgba(242,241,236,.2)" }, sv);
   T(HX, 252, "HINGE", { "text-anchor": "middle", "font-size": 14 }); T(232, 272, "ELEVATOR", { "text-anchor": "middle", "font-size": 14 }); T(312, 272, "TAB", { "text-anchor": "end", "font-size": 14, fill: ACC });
   // --- state: each value chases its target; the chain order gives the staging ---
-  let trim = 0, air = "ground", raf = 0, last = 0, chainKey = "";
+  let trim = 0, air = "flight", raf = 0, last = 0, chainKey = "";
   const v = { tab: 0, push: 0, elev: 0, lift: 0, pitch: 0, flow: 0 };
   const tau = { tab: 120, push: 320, elev: 450, lift: 320, pitch: 500, flow: 260 };
   const targets = () => { const fl = air === "flight"; const tg = { tab: trim * TAB_MAX, flow: fl ? 1 : 0 };
@@ -92,7 +92,7 @@ export function trimExplainer(parent) {
   };
   const setChain = () => { const key = air + Math.sign(trim); if (key === chainKey) return; chainKey = key;
     const seg = (i, t) => `<span data-i="${i}">${t}</span>`, ar = '<span class="ar" aria-hidden="true">→</span>';
-    if (!trim) { chain.innerHTML = "Roll the wheel up for nose down, down for nose up."; big.textContent = air === "flight" ? "In flight" : "On the ground"; return; }
+    if (!trim) { chain.innerHTML = "Roll the wheel up for nose down, down for nose up."; big.textContent = "Trim neutral"; return; }
     const up = trim < 0;   // tab trailing edge up = nose-down trim
     big.textContent = up ? "Nose-down trim" : "Nose-up trim";
     chain.innerHTML = air === "ground" ? [seg(0, `Tab ${up ? "up" : "down"}`), seg(1, "no air, elevator stays put")].join(` ${ar} `)

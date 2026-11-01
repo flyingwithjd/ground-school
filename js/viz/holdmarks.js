@@ -1,8 +1,8 @@
 // Taxiway and holding position markings (AIM 2-3-4, 2-3-5, 2-3-6; FAA hot spots). Plan view, schematic, not to scale.
 // Tap a marking; switch between taxiing out and exiting the runway to see which side of the hold line you are on.
-import { frame, chips, svg, isolate, drawOn, ACC, FAINT, FAINT2, INK } from "./base.js?v=522c4707bc";
-import { s } from "../core/util.js?v=522c4707bc";
-import { T, topPlane } from "./shapes.js?v=522c4707bc";
+import { frame, chips, svg, isolate, drawOn, ACC, FAINT, FAINT2, INK } from "./base.js?v=074f6ea36d";
+import { s } from "../core/util.js?v=074f6ea36d";
+import { T, topPlane } from "./shapes.js?v=074f6ea36d";
 const Y = "rgba(242,241,236,.5)", TX = 800, TW = 46, RY = 170, RH = 80, HOLD = 330;
 const INFO = {
   center: ["Taxiway centerline", "Keep the nosewheel on it", "A continuous yellow line. Keep the airplane centered over it. Being on the centerline does <b>not</b> guarantee wingtip clearance from other aircraft or objects. <span class=\"src\">AIM 2-3-4</span>"],

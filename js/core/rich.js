@@ -1,5 +1,5 @@
-import { GLOSSARY } from "../../data/glossary.js?v=522c4707bc";
-import { esc } from "./util.js?v=522c4707bc";
+import { GLOSSARY } from "../../data/glossary.js?v=074f6ea36d";
+import { esc } from "./util.js?v=074f6ea36d";
 const norm = (k) => k.toLowerCase().replace(/[’']/g, "'").trim();
 export const G = Object.fromEntries(Object.entries(GLOSSARY).map(([k, v]) => [norm(k), { term: k, ...v }]));
 export function term(key) { return G[norm(key)] || null; }
