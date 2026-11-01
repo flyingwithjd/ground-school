@@ -1,7 +1,7 @@
 // Hazardous-attitude drill: read a pilot's thought, name the attitude, get the antidote (PHAK Ch 2, Fig 2-4).
 // The thoughts are made-up examples written for practice.
-import { frame } from "./base.js?v=67dd3f66b4";
-import { h, shuffle } from "../core/util.js?v=67dd3f66b4";
+import { frame } from "./base.js?v=b55f063b47";
+import { h, shuffle } from "../core/util.js?v=b55f063b47";
 const ATT = { anti: ["Anti-authority", "Follow the rules. They are usually right."], imp: ["Impulsivity", "Not so fast. Think first."], inv: ["Invulnerability", "It could happen to me."], macho: ["Macho", "Taking chances is foolish."], res: ["Resignation", "I'm not helpless. I can make a difference."] };
 const THOUGHTS = [
   ["The checklist is for beginners. I know this airplane.", "anti"], ["The weather's going down. Let's just go now, before it closes in.", "imp"],

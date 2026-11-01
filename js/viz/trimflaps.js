@@ -3,7 +3,7 @@
 // same stage slides along the right side, square to the fuselage, to frame the right wing and flap (both modes default to that flat side view; orbit is still free)
 // while the flap, the 3D airflow lines over and under that wing and the 3D lift/drag arrows (scene objects, so they stay attached when orbiting) show the camber change. Title and chain sit in their own bands above and
 // below the stage, never over the model. PHAK Ch 6 · AFH Ch 9 · POH Sec 2, 7.
-import { h, clamp, reduced } from "../core/util.js?v=67dd3f66b4";
+import { h, clamp, reduced } from "../core/util.js?v=b55f063b47";
 const D = Math.PI / 180, ACC = "#3B82F6", INK = "#F2F1EC";
 const TAB_MAX = 35, ELEV_MAX = 25, PITCH_MAX = 2.5;          // degrees, exaggerated for clarity
 const HX = -16.4, Y0 = 4.62, EL = 0.92, TL = 0.44, ZF = 1.75, SLE = -14.33;  // elevator hinge, chord to the tab hinge, tab chord, span station of the cues, stabilizer leading edge at that station (ft, model space)
@@ -79,8 +79,9 @@ export function trimFlaps(F, S, { wheel }) {
     if (mode === "flaps") { tName.textContent = flap ? `Flaps ${flap}°` : "Flaps up"; tSub.textContent = flap ? `Max ${flap === 10 ? 110 : 85} KIAS` : "";
       if (flap === flap0) { chain.textContent = "Move the flap lever to 10°, 20° or 30°."; return; }
       const dn = flap > flap0, big = Math.max(flap, flap0) >= 20;
-      chain.innerHTML = dn ? [seg(0, "Flaps down"), seg(1, "more camber"), seg(2, big ? "more lift, much more drag" : "more lift, little drag"), seg(3, big ? "slower, steeper approach" : "slower approach")].join(ar)
-        : [seg(0, "Flaps up"), seg(1, "less camber"), seg(2, big ? "much less drag, less lift" : "less lift"), seg(3, "more speed needed")].join(ar); return; }
+      const act = dn ? `Flaps ${flap0 ? "further " : ""}down to ${flap}°` : flap ? `Flaps partly up, to ${flap}°` : "Flaps fully up";
+      chain.innerHTML = dn ? [seg(0, act), seg(1, "more camber"), seg(2, big ? "more lift, much more drag" : "more lift, little drag"), seg(3, big ? "slower, steeper approach" : "slower approach")].join(ar)
+        : [seg(0, act), seg(1, "less camber"), seg(2, big ? "much less drag, less lift" : "less lift"), seg(3, "flatter descent, needs more speed")].join(ar); return; }
     tSub.textContent = "";
     if (!trim) { tName.textContent = "Elevator trim"; chain.textContent = "Roll the wheel up for nose down, down for nose up."; return; }
     const up = trim < 0; tName.textContent = up ? "Nose-down trim" : "Nose-up trim";
