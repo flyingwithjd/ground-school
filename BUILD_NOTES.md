@@ -106,3 +106,10 @@ These notes are updated as work goes, so an interruption loses nothing. The time
 - Same stale-button bug fixed in trim/flaps (Show buttons follow the trim wheel and flap lever) and load factor (bank buttons light only when the slider sits on that bank).
 - Cache busting: run `node tools/stamp-version.mjs` before every deploy. It puts one content-hash version on every module import, the CSS, the app entry and the import map.
 - New tests: tests/parts-ui.mjs (DESELECT=1 for the deselect checks), tests/overlap-audit.mjs (every route, corner/caption overlap at W px).
+
+### 2026-10-31, ~9:40 PM MDT: major-component highlights follow PHAK Ch 3
+- Wings = wing + struts + ailerons + flaps + fuel tank outlines (shown with ailerons and flaps slightly deflected so they read as separate surfaces).
+- Empennage = vertical + horizontal stabilizer, rudder, elevator, elevator trim tab (no rudder tab on the 172S); shown slightly deflected. Tail cone stays with Fuselage.
+- Powerplant = engine + cowling + propeller; the cowling is drawn as an outline (faces hidden) so the engine shows through.
+- Landing gear = both mains, nose gear/strut, wheel fairings (unchanged). Fuselage = fuselage + wing-root fairing (unchanged).
+- Kicker for every major component is now "Major component"; the text below lists what it includes. Part buttons still light only their own part.

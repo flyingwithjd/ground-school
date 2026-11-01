@@ -1,7 +1,7 @@
 // Three axes through the CG: rotate the airplane about each, with the axis drawn in the accent.
-import { frame, chips } from "./base.js?v=af7918520c";
-import { planeStage } from "./planestage.js?v=af7918520c";
-import { reduced } from "../core/util.js?v=af7918520c";
+import { frame, chips } from "./base.js?v=d0b3a92d56";
+import { planeStage } from "./planestage.js?v=d0b3a92d56";
+import { reduced } from "../core/util.js?v=d0b3a92d56";
 const AX = { roll: { label: "Longitudinal axis · ailerons", big: "Roll", line: [[14, 0, 0], [-24, 0, 0]], att: "bank", amp: 30, hl: ["ailerons"], pose: (v) => ({ ail: v / 2.5 }) },
   pitch: { label: "Lateral axis · elevator", big: "Pitch", line: [[0, 0, -22], [0, 0, 22]], att: "pitch", amp: 14, hl: ["elevator"], pose: (v) => ({ elev: -v }) },
   yaw: { label: "Vertical axis · rudder", big: "Yaw", line: [[0, -9, 0], [0, 12, 0]], att: "yaw", amp: 20, hl: ["rudder"], pose: (v) => ({ rud: v }) } };
