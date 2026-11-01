@@ -1,8 +1,8 @@
 // Flight controls on their hinges. Drag the yoke pad (roll + pitch) and the pedal bar (yaw);
 // the 3D airplane moves its surfaces and responds gently about each axis. Secondary mode: trim and flaps.
-import { frame, chips, slider } from "./base.js?v=58ff22094c";
-import { planeStage } from "./planestage.js?v=58ff22094c";
-import { h, s, clamp, reduced } from "../core/util.js?v=58ff22094c";
+import { frame, chips, slider } from "./base.js?v=715aa408ea";
+import { planeStage } from "./planestage.js?v=715aa408ea";
+import { h, s, clamp, reduced } from "../core/util.js?v=715aa408ea";
 // model signs: ail>0 = roll right; elev<0 = trailing edge up (nose up); rud>0 = right rudder; trim>0 = tab TE down (nose-up trim); steer>0 = nosewheel left
 function pad(parent, { label, w = 180, hgt = 180, axes = "xy", onmove }) {
   const box = h("div", { class: "pad", role: "slider", tabindex: "0", "aria-label": label, style: `width:${w}px;height:${hgt}px` });
@@ -22,6 +22,28 @@ function pad(parent, { label, w = 180, hgt = 180, axes = "xy", onmove }) {
   box.addEventListener("keydown", (e) => { const d = 0.25; const m = { ArrowLeft: [-d, 0], ArrowRight: [d, 0], ArrowUp: [0, -d], ArrowDown: [0, d] }[e.key]; if (m) { e.preventDefault(); set(x + m[0], y + m[1]); } if (e.key === "0" || e.key === " ") set(0, 0); });
   return { set, destroy() { cancelAnimationFrame(raf); } };
 }
+// Vertical trim wheel, like the 172S: roll it forward (up) for nose down, back (down) for nose up. It stays where you leave it.
+function trimWheel(parent, { onchange }) {
+  const W = 64, H = 170, sx = 16, sw = 32, sy = 22, sh = H - 44;
+  const box = h("div", { class: "pad trimwheel", role: "slider", tabindex: "0", "aria-label": "Trim wheel", "aria-valuemin": "-1", "aria-valuemax": "1", "aria-valuenow": "0", style: `width:${W}px;height:${H}px` });
+  const sv = s("svg", { viewBox: `0 0 ${W} ${H}`, width: W, height: H }, box);
+  const txt = (y, t) => { const e = s("text", { x: W / 2, y, "text-anchor": "middle", fill: "rgba(242,241,236,.55)", "font-size": 10, "font-family": "IBM Plex Mono, monospace", "letter-spacing": ".08em" }, sv); e.textContent = t; };
+  txt(12, "NOSE DN"); txt(H - 4, "NOSE UP");
+  s("rect", { x: sx, y: sy, width: sw, height: sh, rx: 10, fill: "none", stroke: "rgba(242,241,236,.25)" }, sv);
+  const clipId = "tw" + Math.random().toString(36).slice(2, 7); const cp = s("clipPath", { id: clipId }, sv); s("rect", { x: sx + 2, y: sy + 2, width: sw - 4, height: sh - 4, rx: 8 }, cp);
+  const g = s("g", { "clip-path": `url(#${clipId})` }, sv); const ridges = [];
+  for (let i = -1; i <= Math.ceil(126 / 9) + 1; i++) ridges.push(s("line", { x1: sx + 5, x2: sx + sw - 5, y1: 0, y2: 0, stroke: "rgba(242,241,236,.35)", "stroke-width": 1.5 }, g));
+  const idx = s("line", { x1: sx - 6, x2: sx + sw + 6, y1: 0, y2: 0, stroke: "#3B82F6", "stroke-width": 3, "stroke-linecap": "round" }, sv);
+  let v = 0, drag = false, y0 = 0, v0 = 0;
+  const draw = () => { const off = (((v * 60) % 9) + 9) % 9; ridges.forEach((r, i) => { const y = sy + (i - 1) * 9 + off; r.setAttribute("y1", y); r.setAttribute("y2", y); }); const iy = sy + sh / 2 + v * (sh / 2 - 8); idx.setAttribute("y1", iy); idx.setAttribute("y2", iy); box.setAttribute("aria-valuenow", v.toFixed(2)); };
+  const set = (nv) => { v = clamp(Math.round(nv * 20) / 20, -1, 1); draw(); onchange(v); };   // v>0 = rolled back (down) = nose-up trim (trim>0)
+  box.addEventListener("pointerdown", (e) => { drag = true; box.setPointerCapture(e.pointerId); y0 = e.clientY; v0 = v; });
+  box.addEventListener("pointermove", (e) => { if (drag) set(v0 + (e.clientY - y0) / (sh / 2)); });
+  const up = () => (drag = false); box.addEventListener("pointerup", up); box.addEventListener("pointercancel", up);
+  box.addEventListener("keydown", (e) => { const m = { ArrowUp: -0.1, ArrowDown: 0.1 }[e.key]; if (m) { e.preventDefault(); set(v + m); } if (e.key === "0") set(0); });
+  parent.append(box); draw(); return { set };
+}
+
 export function mount(host, { mode = "primary" } = {}) {
   const F = frame(host, { cls: "tall", corners: { tl: mode === "primary" ? "Primary flight controls" : "Trim and flaps", tr: mode === "primary" ? "Drag the yoke and pedals" : "PHAK 6 · POH 7" } });
   const S = planeStage(F.stage, { view: mode === "primary" ? "rear" : "tailR", orbit: true });
@@ -47,7 +69,7 @@ export function mount(host, { mode = "primary" } = {}) {
     const upd0 = upd; upd = () => { upd0(); wake(); };
     upd();
   } else {
-    const TRIMV = { tg: [-17.0, 4.6, 1.4], az: 130, el: 25, d: 13 }; S.setView(TRIMV, 1); S.highlight(["trimtab"]); S.tint(["trimtab"]);
+    const TRIMV = { tg: [-17.3, 4.5, 1.8], az: 100, el: 10, d: 7 }; S.setView(TRIMV, 1); S.highlight(["trimtab"]); S.tint(["trimtab"]);
     let trim = 0, flap = 0, flapShown = 0, lastTT = "trimtab";
     // flaps travel smoothly to the new setting (the motor runs the flaps; no redraw)
     const flapTo = (to) => { if (to === flapShown) return; if (reduced()) { flapShown = to; S.pose({ flap: to }); return; } const from = flapShown, t0 = performance.now(), dur = 300 + Math.abs(to - from) * 40;
@@ -58,7 +80,7 @@ export function mount(host, { mode = "primary" } = {}) {
       S.pose({ trim: trim * 20 }); flapTo(flap); const tt = cur === "trim" ? "trimtab" : ""; if (tt !== lastTT) { lastTT = tt; S.tint(tt ? [tt] : []); }
       F.caption(trim === 0 ? "Trim neutral" : `Trim tab trailing edge ${trim > 0 ? "down" : "up"}`, trim > 0 ? "Nose-up trim" : trim < 0 ? "Nose-down trim" : flap ? `Flaps ${flap}°` : "Trim neutral"); };
     showChips = chips(F.ctrl, [["trim", "Elevator trim"], ["flaps", "Flaps"]], "trim", show, { label: "Show" });
-    slider(F.ctrl, { label: "Trim wheel", min: -1, max: 1, step: 0.05, value: 0, fmt: (v) => (v > 0.02 ? "nose up" : v < -0.02 ? "nose down" : "neutral"), oninput: (v) => { trim = v; show("trim"); upd(); F.explain("The trim wheel moves <b>only the tab</b>. In flight, air pushing on the deflected tab holds the elevator the <b>opposite</b> way, so you can relax pressure on the yoke. In the 172S, roll the wheel forward to trim nose down. <span class=\"src\">Tab movement exaggerated for clarity.</span>"); } });
+    trimWheel(F.ctrl, { onchange: (v) => { trim = v; show("trim"); upd(); F.explain("The trim wheel moves <b>only the tab</b>. In flight, air pushing on the deflected tab holds the elevator the <b>opposite</b> way, so you can relax pressure on the yoke. In the 172S, roll the wheel forward to trim nose down. <span class=\"src\">Tab movement exaggerated for clarity.</span>"); } });
     const fl = chips(F.ctrl, [["0", "0°"], ["10", "10°"], ["20", "20°"], ["30", "30°"]], "0", (v) => { flap = +v; show("flaps"); upd(); F.caption(flap ? `Max ${flap === 10 ? "110" : "85"} KIAS with this setting` : "Flaps up", `Flaps ${flap}°`); F.explain(flap ? "Both flaps move down together, adding lift and drag so you can fly slower and descend more steeply." : "Retracted. The 172S flap motor has stops at 10°, 20° and 30°."); }, { label: "Flap lever" });
     upd(); F.explain("Move the trim wheel, then switch to the flaps.");
   }
