@@ -1,8 +1,8 @@
 // Flight controls on their hinges. Drag the yoke pad (roll + pitch) and the pedal bar (yaw);
 // the 3D airplane moves its surfaces and responds gently about each axis. Secondary mode: trim and flaps.
-import { frame, chips, slider } from "./base.js?v=b0dcfd86cb";
-import { planeStage } from "./planestage.js?v=b0dcfd86cb";
-import { h, s, clamp, reduced } from "../core/util.js?v=b0dcfd86cb";
+import { frame, chips, slider } from "./base.js?v=053e7723ad";
+import { planeStage } from "./planestage.js?v=053e7723ad";
+import { h, s, clamp, reduced } from "../core/util.js?v=053e7723ad";
 // model signs: ail>0 = roll right; elev<0 = trailing edge up (nose up); rud>0 = right rudder; trim>0 = tab TE down (nose-up trim); steer>0 = nosewheel left
 function pad(parent, { label, w = 180, hgt = 180, axes = "xy", onmove }) {
   const box = h("div", { class: "pad", role: "slider", tabindex: "0", "aria-label": label, style: `width:${w}px;height:${hgt}px` });
@@ -25,8 +25,8 @@ function pad(parent, { label, w = 180, hgt = 180, axes = "xy", onmove }) {
 // Vertical trim wheel, like the 172S: roll it forward (up) for nose down, back (down) for nose up. It stays where you leave it.
 function trimWheel(parent, { onchange }) {
   const W = 64, H = 170, sx = 16, sw = 32, sy = 22, sh = H - 44;
-  const box = h("div", { class: "pad trimwheel", role: "slider", tabindex: "0", "aria-label": "Trim wheel", "aria-valuemin": "-1", "aria-valuemax": "1", "aria-valuenow": "0", style: `width:${W}px;height:${H}px` });
-  const sv = s("svg", { viewBox: `0 0 ${W} ${H}`, width: W, height: H }, box);
+  const box = h("div", { class: "pad trimwheel", role: "slider", tabindex: "0", "aria-label": "Trim wheel", "aria-valuemin": "-1", "aria-valuemax": "1", "aria-valuenow": "0" });
+  const sv = s("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", height: "100%" }, box);
   const txt = (y, t) => { const e = s("text", { x: W / 2, y, "text-anchor": "middle", fill: "rgba(242,241,236,.55)", "font-size": 10, "font-family": "IBM Plex Mono, monospace", "letter-spacing": ".08em" }, sv); e.textContent = t; };
   txt(12, "NOSE DN"); txt(H - 4, "NOSE UP");
   s("rect", { x: sx, y: sy, width: sw, height: sh, rx: 10, fill: "none", stroke: "rgba(242,241,236,.25)" }, sv);

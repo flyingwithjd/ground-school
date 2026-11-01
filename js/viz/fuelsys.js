@@ -1,7 +1,7 @@
 // 172S fuel system as a flow schematic (layout is generic, sequence per POH Sec 7).
 // Choose selector and shutoff positions; fuel is drawn as moving points of light along the live path.
-import { frame, chips, svg, loop, ACC, FAINT, FAINT2 } from "./base.js?v=b0dcfd86cb";
-import { s } from "../core/util.js?v=b0dcfd86cb";
+import { frame, chips, svg, loop, ACC, FAINT, FAINT2 } from "./base.js?v=053e7723ad";
+import { s } from "../core/util.js?v=053e7723ad";
 const NODES = {
   L: [200, 140, "Left tank", "Vented integral tank in the left wing. 28 gal total, 26.5 usable."],
   R: [1400, 140, "Right tank", "Vented integral tank in the right wing. 28 gal total, 26.5 usable."],

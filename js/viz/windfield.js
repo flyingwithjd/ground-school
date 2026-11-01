@@ -1,6 +1,6 @@
 // Wind drawn as drifting points of light. Top view, north up. Pauses off screen; static streaks under reduced motion.
-import { loop } from "./base.js?v=b0dcfd86cb";
-import { s, reduced } from "../core/util.js?v=b0dcfd86cb";
+import { loop } from "./base.js?v=053e7723ad";
+import { s, reduced } from "../core/util.js?v=053e7723ad";
 export function windField(F, parent, { x = 0, y = 0, w = 1600, h = 900, n = 60, from = 270, kt = 10, op = 0.55 } = {}) {
   const g = s("g", { opacity: op }, parent); let rnd = 7; const R = () => ((rnd = (rnd * 16807) % 2147483647) / 2147483647);
   const P = Array.from({ length: n }, () => ({ x: x + R() * w, y: y + R() * h, ph: R(), el: s("line", { stroke: "#3B82F6", "stroke-width": 2.2, "stroke-linecap": "round" }, g) }));
