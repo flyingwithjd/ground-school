@@ -1,8 +1,8 @@
 // Fuselage construction (PHAK FAA-H-8083-25C Ch 3, Fig 3-5 truss, Fig 3-14 monocoque / semimonocoque).
 // 3/4 view of a tapered fuselage, nose left. Blue = carries the load, gray = shape / covering only.
 // Each type has its own members, its own end view (cross-section) and a one-line load statement.
-import { frame, chips, svg, drawOn, ACC, INK, FAINT, FAINT2 } from "./base.js?v=715aa408ea";
-import { s } from "../core/util.js?v=715aa408ea";
+import { frame, chips, svg, drawOn, ACC, INK, FAINT, FAINT2 } from "./base.js?v=b0dcfd86cb";
+import { s } from "../core/util.js?v=b0dcfd86cb";
 
 const GRAY = "rgba(242,241,236,.34)", GRAY2 = "rgba(242,241,236,.16)", ACCF = "rgba(59,130,246,.42)";
 const TYPES = {

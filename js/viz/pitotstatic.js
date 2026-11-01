@@ -1,7 +1,7 @@
 // Pitot-static blockage trainer. Pick a failure, then move the altitude slider and read the three gauges.
 // Pressures use ~1 in. Hg per 1,000 ft (PHAK 8) and q = ½ρV²; magnitudes are illustrative of direction and size.
-import { frame, chips, slider, svg, loop, ACC, FAINT, FAINT2 } from "./base.js?v=715aa408ea";
-import { s, clamp } from "../core/util.js?v=715aa408ea";
+import { frame, chips, slider, svg, loop, ACC, FAINT, FAINT2 } from "./base.js?v=b0dcfd86cb";
+import { s, clamp } from "../core/util.js?v=b0dcfd86cb";
 const CASES = {
   ok: ["Normal", "All three instruments read correctly."],
   pitot: ["Pitot blocked, drain open", "Ram air can't enter and the trapped air leaks out the drain, so the airspeed indicator drops to zero. Altimeter and VSI still work."],

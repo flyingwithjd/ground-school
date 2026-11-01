@@ -1,8 +1,8 @@
 // Flight controls on their hinges. Drag the yoke pad (roll + pitch) and the pedal bar (yaw);
 // the 3D airplane moves its surfaces and responds gently about each axis. Secondary mode: trim and flaps.
-import { frame, chips, slider } from "./base.js?v=715aa408ea";
-import { planeStage } from "./planestage.js?v=715aa408ea";
-import { h, s, clamp, reduced } from "../core/util.js?v=715aa408ea";
+import { frame, chips, slider } from "./base.js?v=b0dcfd86cb";
+import { planeStage } from "./planestage.js?v=b0dcfd86cb";
+import { h, s, clamp, reduced } from "../core/util.js?v=b0dcfd86cb";
 // model signs: ail>0 = roll right; elev<0 = trailing edge up (nose up); rud>0 = right rudder; trim>0 = tab TE down (nose-up trim); steer>0 = nosewheel left
 function pad(parent, { label, w = 180, hgt = 180, axes = "xy", onmove }) {
   const box = h("div", { class: "pad", role: "slider", tabindex: "0", "aria-label": label, style: `width:${w}px;height:${hgt}px` });
@@ -37,7 +37,7 @@ function trimWheel(parent, { onchange }) {
   let v = 0, drag = false, y0 = 0, v0 = 0;
   const draw = () => { const off = (((v * 60) % 9) + 9) % 9; ridges.forEach((r, i) => { const y = sy + (i - 1) * 9 + off; r.setAttribute("y1", y); r.setAttribute("y2", y); }); const iy = sy + sh / 2 + v * (sh / 2 - 8); idx.setAttribute("y1", iy); idx.setAttribute("y2", iy); box.setAttribute("aria-valuenow", v.toFixed(2)); };
   const set = (nv) => { v = clamp(Math.round(nv * 20) / 20, -1, 1); draw(); onchange(v); };   // v>0 = rolled back (down) = nose-up trim (trim>0)
-  box.addEventListener("pointerdown", (e) => { drag = true; box.setPointerCapture(e.pointerId); y0 = e.clientY; v0 = v; });
+  box.addEventListener("pointerdown", (e) => { e.stopPropagation(); drag = true; box.setPointerCapture(e.pointerId); y0 = e.clientY; v0 = v; });
   box.addEventListener("pointermove", (e) => { if (drag) set(v0 + (e.clientY - y0) / (sh / 2)); });
   const up = () => (drag = false); box.addEventListener("pointerup", up); box.addEventListener("pointercancel", up);
   box.addEventListener("keydown", (e) => { const m = { ArrowUp: -0.1, ArrowDown: 0.1 }[e.key]; if (m) { e.preventDefault(); set(v + m); } if (e.key === "0") set(0); });
@@ -70,17 +70,23 @@ export function mount(host, { mode = "primary" } = {}) {
     upd();
   } else {
     const TRIMV = { tg: [-17.3, 4.5, 1.8], az: 100, el: 10, d: 7 }; S.setView(TRIMV, 1); S.highlight(["trimtab"]); S.tint(["trimtab"]);
-    let trim = 0, flap = 0, flapShown = 0, lastTT = "trimtab";
+    let trim = 0, flap = 0, lastTT = "trimtab";
     // flaps travel smoothly to the new setting (the motor runs the flaps; no redraw)
-    const flapTo = (to) => { if (to === flapShown) return; if (reduced()) { flapShown = to; S.pose({ flap: to }); return; } const from = flapShown, t0 = performance.now(), dur = 300 + Math.abs(to - from) * 40;
-      S.animate((now) => { const k = Math.min(1, (now - t0) / dur), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2; flapShown = from + (to - from) * e; S.pose({ flap: flapShown }); if (k >= 1) { flapShown = to; S.animate(null); } }); };
+    // one animator for the flaps (motor travel) and the elevator (floats opposite the tab a moment after the tab moves)
+    const tgt = { flap: 0, elev: 0 }, shown = { flap: 0, elev: 0 }; let last = 0, running = false;
+    const tick = (now) => { const dt = Math.min(64, now - (last || now)); last = now; let busy = false;
+      const df = tgt.flap - shown.flap; shown.flap = Math.abs(df) < 0.05 ? tgt.flap : shown.flap + Math.sign(df) * Math.min(Math.abs(df), dt * 0.03); if (shown.flap !== tgt.flap) busy = true;
+      const de = tgt.elev - shown.elev; shown.elev = Math.abs(de) < 0.05 ? tgt.elev : shown.elev + de * Math.min(1, dt / 260); if (shown.elev !== tgt.elev) busy = true;
+      S.pose({ flap: shown.flap, elev: shown.elev }); if (!busy) { running = false; last = 0; S.animate(null); } };
+    const go = () => { if (reduced()) { Object.assign(shown, tgt); S.pose({ ...shown }); return; } if (!running) { running = true; last = 0; S.animate(tick); } };
+    const flapTo = (to) => { tgt.flap = to; go(); };
     let showChips = null;   // keep the "Show" buttons in step when the trim wheel or flap lever switches the view
     let cur = "trim"; const show = (what) => { showChips && showChips.set(what); if (what === cur) return; cur = what; if (what === "trim") { S.highlight(["trimtab"]); S.setView(TRIMV); } else { S.highlight(["flaps"]); S.setView("wingL"); } lastTT = what === "trim" ? "trimtab" : ""; S.tint(lastTT ? [lastTT] : []); };
     const upd = () => { // hands off: the tab's aerodynamic force holds the elevator opposite the tab
-      S.pose({ trim: trim * 20 }); flapTo(flap); const tt = cur === "trim" ? "trimtab" : ""; if (tt !== lastTT) { lastTT = tt; S.tint(tt ? [tt] : []); }
-      F.caption(trim === 0 ? "Trim neutral" : `Trim tab trailing edge ${trim > 0 ? "down" : "up"}`, trim > 0 ? "Nose-up trim" : trim < 0 ? "Nose-down trim" : flap ? `Flaps ${flap}°` : "Trim neutral"); };
+      S.pose({ trim: trim * 20 }); tgt.elev = -trim * 12; flapTo(flap); const tt = cur === "trim" ? "trimtab" : ""; if (tt !== lastTT) { lastTT = tt; S.tint(tt ? [tt] : []); }
+      F.caption(trim === 0 ? "Trim neutral" : `Tab ${trim > 0 ? "down" : "up"} → elevator ${trim > 0 ? "up" : "down"} → nose ${trim > 0 ? "up" : "down"}`, trim > 0 ? "Nose-up trim" : trim < 0 ? "Nose-down trim" : flap ? `Flaps ${flap}°` : "Trim neutral"); };
     showChips = chips(F.ctrl, [["trim", "Elevator trim"], ["flaps", "Flaps"]], "trim", show, { label: "Show" });
-    trimWheel(F.ctrl, { onchange: (v) => { trim = v; show("trim"); upd(); F.explain("The trim wheel moves <b>only the tab</b>. In flight, air pushing on the deflected tab holds the elevator the <b>opposite</b> way, so you can relax pressure on the yoke. In the 172S, roll the wheel forward to trim nose down. <span class=\"src\">Tab movement exaggerated for clarity.</span>"); } });
+    trimWheel(F.stage, { onchange: (v) => { trim = v; show("trim"); upd(); F.explain("The trim wheel moves <b>only the tab</b>. In flight, air pushing on the deflected tab moves the elevator the <b>opposite</b> way: tab up pushes the elevator down (nose down), tab down pushes it up (nose up). That holds the attitude so you can relax pressure on the yoke. In the 172S, roll the wheel forward to trim nose down. <span class=\"src\">Tab movement exaggerated for clarity.</span>"); } });
     const fl = chips(F.ctrl, [["0", "0°"], ["10", "10°"], ["20", "20°"], ["30", "30°"]], "0", (v) => { flap = +v; show("flaps"); upd(); F.caption(flap ? `Max ${flap === 10 ? "110" : "85"} KIAS with this setting` : "Flaps up", `Flaps ${flap}°`); F.explain(flap ? "Both flaps move down together, adding lift and drag so you can fly slower and descend more steeply." : "Retracted. The 172S flap motor has stops at 10°, 20° and 30°."); }, { label: "Flap lever" });
     upd(); F.explain("Move the trim wheel, then switch to the flaps.");
   }

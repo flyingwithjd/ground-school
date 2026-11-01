@@ -1,17 +1,17 @@
-import { h, esc, pct } from "../core/util.js?v=715aa408ea";
-import { S, save, lessonState } from "../core/store.js?v=715aa408ea";
-import { LESSONS, lessonItems } from "../../data/index.js?v=715aa408ea";
-import { lessonStats, buildQueue } from "../core/progress.js?v=715aa408ea";
-import { rich } from "../core/rich.js?v=715aa408ea";
-import { mountViz, destroyAll } from "../viz/index.js?v=715aa408ea";
-import { session } from "./quiz.js?v=715aa408ea";
+import { h, esc, pct } from "../core/util.js?v=b0dcfd86cb";
+import { S, save, lessonState } from "../core/store.js?v=b0dcfd86cb";
+import { LESSONS, lessonItems } from "../../data/index.js?v=b0dcfd86cb";
+import { lessonStats, buildQueue } from "../core/progress.js?v=b0dcfd86cb";
+import { rich } from "../core/rich.js?v=b0dcfd86cb";
+import { mountViz, destroyAll } from "../viz/index.js?v=b0dcfd86cb";
+import { session } from "./quiz.js?v=b0dcfd86cb";
 const KIND = { ground: "Ground lesson", flight: "Flight lesson briefing", module: "Module unit" };
 export function lessonView(host, id, secIdx) {
   const L0 = LESSONS[id]; const p = h("div", { class: "page" }); host.append(p);
   if (!L0) { p.innerHTML = `<h2>Lesson not found.</h2>`; return; }
   let api = { destroy() {} }; let dead = false;
   // Lesson text is code-split: question banks load up front (the review engine needs them); prose loads when the lesson opens.
-  import(`../../data/text/${id}.js?v=715aa408ea`).then((m) => { if (dead) return; api = build(p, { ...L0, ...m.default }, id, secIdx); })
+  import(`../../data/text/${id}.js?v=b0dcfd86cb`).then((m) => { if (dead) return; api = build(p, { ...L0, ...m.default }, id, secIdx); })
     .catch((e) => { p.innerHTML = `<h2>Could not load this lesson.</h2><p class="dim mt">${esc(e.message)}</p>`; });
   return { destroy() { dead = true; api.destroy(); } };
 }

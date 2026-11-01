@@ -1,8 +1,8 @@
 // Load factor and stall speed in a level turn. n = 1/cos(bank); Vs = Vs1g × √n (PHAK 5).
 // Base stall speeds and the tabulated checks are from the C172S POH Sec 5 (2,550 lb, most rearward CG, power off).
-import { frame, slider, chips, readout, svg, ACC, FAINT, FAINT2, D2R } from "./base.js?v=715aa408ea";
-import { s } from "../core/util.js?v=715aa408ea";
-import { rearPlane, T, arrow, setArrow } from "./shapes.js?v=715aa408ea";
+import { frame, slider, chips, readout, svg, ACC, FAINT, FAINT2, D2R } from "./base.js?v=b0dcfd86cb";
+import { s } from "../core/util.js?v=b0dcfd86cb";
+import { rearPlane, T, arrow, setArrow } from "./shapes.js?v=b0dcfd86cb";
 const POH = { up: { 0: 48, 30: 52, 45: 57, 60: 68 }, 10: { 0: 42, 30: 45, 45: 50, 60: 59 }, 30: { 0: 40, 30: 43, 45: 48, 60: 57 } };
 const LIMIT = 3.8, LIMF = 3.0;
 export function mount(host) {

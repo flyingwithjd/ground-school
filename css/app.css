@@ -355,3 +355,7 @@ svg text:not([font-family]) { font-family: var(--mono); }
 .mt-det p { margin: 0; max-width: 60ch; }
 .viz .fr-ro { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 12px 24px; width: 100%; }
 .viz .fr-ro b { font: 600 16px/1.35 var(--sans); }
+
+.viz .stage .trimwheel{position:absolute;right:10px;top:50%;transform:translateY(-50%);z-index:3;background:rgba(10,10,11,.72);border-radius:14px}
+@media (max-width:700px){.viz .stage .trimwheel{top:38px;transform:none;right:6px}}
+.viz .stage:has(.trimwheel) .caption{padding-right:86px}
