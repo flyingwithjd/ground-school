@@ -1,7 +1,7 @@
 // Left-turning tendencies. Pick an effect; the view changes to the one where it is easiest to see (PHAK 5).
-import { frame, chips, svg, drawOn, loop, ACC, FAINT, FAINT2 } from "./base.js?v=f687e808d6";
-import { s } from "../core/util.js?v=f687e808d6";
-import { rearPlane, topPlane, T, arrow } from "./shapes.js?v=f687e808d6";
+import { frame, chips, svg, drawOn, loop, ACC, FAINT, FAINT2 } from "./base.js?v=58ff22094c";
+import { s } from "../core/util.js?v=58ff22094c";
+import { rearPlane, topPlane, T, arrow } from "./shapes.js?v=58ff22094c";
 const FX = {
   torque: { view: "rear", cap: ["Torque", "The airplane rolls left"], t: "Newton's third law: the engine turns the propeller clockwise (seen from the cockpit), so the propeller turns the airplane the other way. The left wing is pressed down and the left tire takes more load on the takeoff roll." },
   slip: { view: "top", cap: ["Spiraling slipstream", "Prop wash hits the left fin"], t: "The propeller pushes its wash back in a corkscrew around the fuselage. It strikes the <strong>left</strong> side of the vertical fin, pushing the tail right and yawing the nose left. Strongest at high power and low airspeed." },
