@@ -3,7 +3,7 @@
 // same stage flies the camera to the right wing and slices the airplane down to a thin section of that wing, so the
 // camber change, the airflow and the lift/drag arrows read side-on. Title and chain sit in their own bands above and
 // below the stage, never over the model. PHAK Ch 6 · AFH Ch 9 · POH Sec 2, 7.
-import { h, s, clamp, reduced } from "../core/util.js?v=b01e5791a1";
+import { h, s, clamp, reduced } from "../core/util.js?v=6932bc693e";
 const D = Math.PI / 180, ACC = "#3B82F6", INK = "#F2F1EC";
 const TAB_MAX = 35, ELEV_MAX = 20, PITCH_MAX = 4;          // degrees, exaggerated for clarity
 const HX = -16.4, Y0 = 4.62, EL = 0.92, TL = 0.44, ZF = 1.75;  // elevator hinge, chord to the tab hinge, tab chord, span station of the cues (ft, model space)

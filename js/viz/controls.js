@@ -1,27 +1,53 @@
-// Flight controls on their hinges. Drag the yoke pad (roll + pitch) and the pedal bar (yaw);
+// Flight controls on their hinges. Drag the drawn yoke (turn = roll, pull/push = pitch) and press the rudder pedals (yaw);
 // the 3D airplane moves its surfaces and responds gently about each axis. Secondary mode: trim and flaps.
-import { frame, chips, slider } from "./base.js?v=b01e5791a1";
-import { planeStage } from "./planestage.js?v=b01e5791a1";
-import { trimFlaps } from "./trimflaps.js?v=b01e5791a1";
-import { h, s, clamp, reduced } from "../core/util.js?v=b01e5791a1";
+import { frame, chips, slider } from "./base.js?v=6932bc693e";
+import { planeStage } from "./planestage.js?v=6932bc693e";
+import { trimFlaps } from "./trimflaps.js?v=6932bc693e";
+import { h, s, clamp, reduced } from "../core/util.js?v=6932bc693e";
 // model signs: ail>0 = roll right; elev<0 = trailing edge up (nose up); rud>0 = right rudder; trim>0 = tab TE down (nose-up trim); steer>0 = nosewheel left
-function pad(parent, { label, w = 180, hgt = 180, axes = "xy", onmove }) {
-  const box = h("div", { class: "pad", role: "slider", tabindex: "0", "aria-label": label, style: `width:${w}px;height:${hgt}px` });
-  const sv = s("svg", { viewBox: `0 0 ${w} ${hgt}`, width: w, height: hgt }, box);
-  s("rect", { x: 1, y: 1, width: w - 2, height: hgt - 2, rx: 14, fill: "none", stroke: "rgba(242,241,236,.18)" }, sv);
-  if (axes.includes("x")) s("line", { x1: 12, y1: hgt / 2, x2: w - 12, y2: hgt / 2, stroke: "rgba(242,241,236,.12)" }, sv);
-  if (axes.includes("y")) s("line", { x1: w / 2, y1: 12, x2: w / 2, y2: hgt - 12, stroke: "rgba(242,241,236,.12)" }, sv);
-  const knob = s("circle", { cx: w / 2, cy: hgt / 2, r: 15, fill: "#3B82F6", filter: "" }, sv);
-  const cap = h("span", { class: "label" }, label); const wrap = h("div", { class: "padwrap" }, box, cap); parent.append(wrap);
-  let x = 0, y = 0, drag = false, raf = 0;
-  const set = (nx, ny) => { x = clamp(nx, -1, 1); y = clamp(ny, -1, 1); knob.setAttribute("cx", w / 2 + x * (w / 2 - 20)); knob.setAttribute("cy", hgt / 2 + y * (hgt / 2 - 20)); onmove(x, y); };
-  const fromEv = (e) => { const r = box.getBoundingClientRect(); return [axes.includes("x") ? ((e.clientX - r.left) / r.width) * 2 - 1 : 0, axes.includes("y") ? ((e.clientY - r.top) / r.height) * 2 - 1 : 0]; };
-  box.addEventListener("pointerdown", (e) => { drag = true; box.setPointerCapture(e.pointerId); cancelAnimationFrame(raf); set(...fromEv(e)); });
-  box.addEventListener("pointermove", (e) => drag && set(...fromEv(e)));
-  const release = () => { if (!drag) return; drag = false; if (reduced()) return set(0, 0); const x0 = x, y0 = y, t0 = performance.now(); const step = (now) => { const k = Math.min(1, (now - t0) / 700), e = 1 - (1 - k) ** 3; set(x0 * (1 - e), y0 * (1 - e)); if (k < 1) raf = requestAnimationFrame(step); }; raf = requestAnimationFrame(step); };
-  box.addEventListener("pointerup", release); box.addEventListener("pointercancel", release);
-  box.addEventListener("keydown", (e) => { const d = 0.25; const m = { ArrowLeft: [-d, 0], ArrowRight: [d, 0], ArrowUp: [0, -d], ArrowDown: [0, d] }[e.key]; if (m) { e.preventDefault(); set(x + m[0], y + m[1]); } if (e.key === "0" || e.key === " ") set(0, 0); });
-  return { set, destroy() { cancelAnimationFrame(raf); } };
+// Shared drag-and-spring behaviour for the drawn cockpit controls: drag moves them, release springs them back to neutral.
+function springy(box, { get, set, fromDown, fromMove, keys }) {
+  let drag = false, raf = 0, st0 = null;
+  box.addEventListener("pointerdown", (e) => { e.stopPropagation(); drag = true; box.setPointerCapture(e.pointerId); cancelAnimationFrame(raf); st0 = { x: e.clientX, y: e.clientY, v: get() }; const v = fromDown && fromDown(e, st0); if (v) set(...v); });
+  box.addEventListener("pointermove", (e) => { if (drag) set(...fromMove(e, st0)); });
+  const release = () => { if (!drag) return; drag = false; if (reduced()) return set(0, 0); const v0 = get(), t0 = performance.now(); const step = (now) => { const k = Math.min(1, (now - t0) / 700), e = 1 - (1 - k) ** 3; set(v0[0] * (1 - e), v0[1] * (1 - e)); if (k < 1) raf = requestAnimationFrame(step); }; raf = requestAnimationFrame(step); };
+  box.addEventListener("pointerup", release); box.addEventListener("pointercancel", release); box.addEventListener("lostpointercapture", release);
+  box.addEventListener("keydown", (e) => { const m = keys[e.key]; const v = get(); if (m) { e.preventDefault(); set(v[0] + m[0], v[1] + m[1]); } if (e.key === "0" || e.key === " " || e.key === "Escape") { e.preventDefault(); set(0, 0); } });
+  return () => cancelAnimationFrame(raf);
+}
+const INKC = "rgba(242,241,236,", ACCC = "#3B82F6";
+// A 172 yoke seen from the left seat. Drag left/right to turn it (roll); drag down to pull it toward you (nose up), up to push it (nose down).
+function yokeCtl(parent, { onmove }) {
+  const W = 220, H = 170, cx = 110, cy = 92;
+  const box = h("div", { class: "pad pf-yoke", role: "slider", tabindex: "0", "aria-label": "Yoke. Left and right arrows roll, down arrow pulls back for nose up, up arrow pushes for nose down" });
+  const sv = s("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", height: "100%" }, box);
+  s("rect", { x: 0, y: 0, width: W, height: 26, fill: INKC + ".05)" }, sv); s("line", { x1: 0, y1: 26, x2: W, y2: 26, stroke: INKC + ".18)" }, sv);   // instrument panel edge
+  const shaft = s("rect", { x: cx - 9, y: 26, width: 18, height: cy - 26, rx: 3, fill: INKC + ".14)", stroke: INKC + ".3)" }, sv);
+  const g = s("g", {}, sv);
+  s("path", { d: "M-78,-36 Q-86,4 -58,10 L58,10 Q86,4 78,-36", fill: "none", stroke: INKC + ".82)", "stroke-width": 15, "stroke-linecap": "round", "stroke-linejoin": "round" }, g);
+  s("rect", { x: -24, y: -6, width: 48, height: 26, rx: 8, fill: "#16171a", stroke: INKC + ".55)", "stroke-width": 1.5 }, g);
+  s("circle", { cx: 0, cy: 7, r: 4.5, fill: ACCC }, g);
+  let x = 0, y = 0;
+  const draw = () => { const sc = 1 + 0.16 * y, hy = cy + 16 * y; g.setAttribute("transform", `translate(${cx},${hy}) rotate(${x * 40}) scale(${sc})`); shaft.setAttribute("height", Math.max(4, hy - 26)); shaft.setAttribute("width", 18 * sc); shaft.setAttribute("x", cx - 9 * sc); box.setAttribute("aria-valuetext", `roll ${x.toFixed(2)}, pitch ${(-y).toFixed(2)}`); };
+  const set = (nx, ny) => { x = clamp(nx, -1, 1); y = clamp(ny, -1, 1); draw(); onmove(x, y); };
+  const off = springy(box, { get: () => [x, y], set, fromMove: (e, s0) => { const r = box.getBoundingClientRect(); return [s0.v[0] + (e.clientX - s0.x) / (r.width * 0.42), s0.v[1] + (e.clientY - s0.y) / (r.height * 0.42)]; },
+    keys: { ArrowLeft: [-0.25, 0], ArrowRight: [0.25, 0], ArrowUp: [0, -0.25], ArrowDown: [0, 0.25] } });
+  parent.append(h("div", { class: "pf-item" }, box, h("span", { class: "pf-lab" }, "Yoke"))); draw(); return { set, destroy: off };
+}
+// Rudder pedals from the seat: press or drag toward a pedal to push it forward (the other comes back). Left pedal = left rudder.
+function pedalsCtl(parent, { onmove }) {
+  const W = 220, H = 100;
+  const box = h("div", { class: "pad pf-pedals", role: "slider", tabindex: "0", "aria-label": "Rudder pedals. Left arrow pushes the left pedal, right arrow the right pedal", "aria-valuemin": "-1", "aria-valuemax": "1", "aria-valuenow": "0" });
+  const sv = s("svg", { viewBox: `0 0 ${W} ${H}`, width: "100%", height: "100%" }, box);
+  const pedal = (px) => { const g = s("g", {}, sv); const r = s("rect", { x: -27, y: -36, width: 54, height: 72, rx: 9, fill: "#16171a", stroke: INKC + ".6)", "stroke-width": 1.5 }, g);
+    for (let i = -2; i <= 2; i++) s("line", { x1: -16, x2: 16, y1: i * 11, y2: i * 11, stroke: INKC + ".28)", "stroke-width": 2, "stroke-linecap": "round" }, g); return { g, r, px }; };
+  const L = pedal(62), R = pedal(158);
+  let x = 0;
+  const draw = () => { [[L, -x], [R, x]].forEach(([p, k]) => { const f = Math.max(0, k), b = Math.max(0, -k); p.g.setAttribute("transform", `translate(${p.px},${52 - 14 * f + 8 * b}) scale(${1 - 0.14 * f + 0.06 * b})`); p.r.setAttribute("stroke", f > 0.15 ? ACCC : INKC + ".6)"); }); box.setAttribute("aria-valuenow", x.toFixed(2)); };
+  const set = (nx) => { x = clamp(nx, -1, 1); draw(); onmove(x); };
+  const at = (e) => { const r = box.getBoundingClientRect(); return [clamp((((e.clientX - r.left) / r.width) * 2 - 1) * 1.4, -1, 1), 0]; };
+  const off = springy(box, { get: () => [x, 0], set: (a) => set(a), fromDown: at, fromMove: at, keys: { ArrowLeft: [-0.25, 0], ArrowRight: [0.25, 0] } });
+  parent.append(h("div", { class: "pf-item" }, box, h("span", { class: "pf-lab" }, "Rudder pedals"))); draw(); return { set, destroy: off };
 }
 // Vertical trim wheel, like the 172S: roll it forward (up) for nose down, back (down) for nose up. It stays where you leave it.
 function trimWheel(parent, { onchange }) {
@@ -51,15 +77,23 @@ export function mount(host, { mode = "primary" } = {}) {
   let st = { ail: 0, elev: 0, rud: 0 }, att = { pitch: 0, bank: 0, yaw: 0 };
   const cleanup = [];
   if (mode === "primary") {
-    S.setView({ tg: [-5, 5, 0], az: -150, el: 16, d: 50 });
+    const pv = () => { const r = F.stage.getBoundingClientRect(); return { tg: [-5, 5, 0], az: -150, el: 16, d: r.width < 560 ? 60 : 42 }; };
+    queueMicrotask(() => S.setView(pv(), 1));
     S.highlight(["ailerons", "elevator", "rudder"]);
-    const row = h("div", { class: "pads" }); F.ctrl.append(row);
-    const words = () => { const p = []; if (Math.abs(st.ail) > 0.15) p.push(`Right aileron ${st.ail > 0 ? "up" : "down"}, left ${st.ail > 0 ? "down" : "up"}: roll ${st.ail > 0 ? "right" : "left"}`); if (Math.abs(st.elev) > 0.15) p.push(`Elevator trailing edge ${st.elev < 0 ? "up" : "down"}: nose ${st.elev < 0 ? "up" : "down"}`); if (Math.abs(st.rud) > 0.15) p.push(`Rudder ${st.rud > 0 ? "right" : "left"}: nose yaws ${st.rud > 0 ? "right" : "left"}`); return p; };
-    let lastTint = "";   // blue fill on whichever surfaces are deflected
-    let upd = () => { S.pose({ ail: st.ail * 28, elev: st.elev * 28, rud: st.rud * 28, steer: -st.rud * 10 }); const big = Math.abs(st.ail) > Math.max(Math.abs(st.elev), Math.abs(st.rud)) ? (st.ail > 0 ? "Roll right" : "Roll left") : Math.abs(st.elev) >= Math.abs(st.rud) && Math.abs(st.elev) > 0.15 ? (st.elev < 0 ? "Pitch up" : "Pitch down") : Math.abs(st.rud) > 0.15 ? (st.rud > 0 ? "Yaw right" : "Yaw left") : "Neutral"; F.caption(words()[0] ? "Control input" : "Hands off", big); const tn = [Math.abs(st.ail) > 0.15 && "ailerons", Math.abs(st.elev) > 0.15 && "elevator", Math.abs(st.rud) > 0.15 && "rudder"].filter(Boolean).join(); if (tn !== lastTint) { lastTint = tn; S.tint(tn ? tn.split(",") : []); }
-      F.explain(words().join(". ") + (words().length ? ". <span class=\"src\">Surface movement exaggerated for clarity.</span>" : "Drag the yoke pad left and right to roll, down (pull back) for nose up, up (push forward) for nose down. Use the pedal bar for rudder.")); };
-    const yoke = pad(row, { label: "Yoke · drag down (pull) = nose up", axes: "xy", onmove: (x, y) => { st.ail = x; st.elev = -y; upd(); } });
-    const ped = pad(row, { label: "Rudder pedals", w: 220, hgt: 64, axes: "x", onmove: (x) => { st.rud = x; upd(); } });
+    // title band above, the 3D view with the cockpit controls right beside it (below it on phones), words band under them
+    F.root.classList.add("tf", "pf");
+    const title = h("div", { class: "tf-title" }), chain = h("p", { class: "tf-chain", "aria-live": "polite" });
+    const body = h("div", { class: "pf-body" }), col = h("div", { class: "pf-ctl" });
+    F.root.insertBefore(title, F.stage); F.root.insertBefore(body, F.stage); body.append(col, F.stage); body.after(chain);
+    const words = () => { const p = []; if (Math.abs(st.ail) > 0.15) p.push(`Right aileron ${st.ail > 0 ? "up" : "down"}, left ${st.ail > 0 ? "down" : "up"}: roll ${st.ail > 0 ? "right" : "left"}`); if (Math.abs(st.elev) > 0.15) p.push(`Elevator ${st.elev < 0 ? "up" : "down"}: nose ${st.elev < 0 ? "up" : "down"}`); if (Math.abs(st.rud) > 0.15) p.push(`Rudder ${st.rud > 0 ? "right" : "left"}: nose yaws ${st.rud > 0 ? "right" : "left"}`); return p; };
+    let lastTint = "", lastWords = "";   // blue fill on whichever surfaces are deflected
+    let upd = () => { S.pose({ ail: st.ail * 28, elev: st.elev * 28, rud: st.rud * 28, steer: -st.rud * 10 }); const acts = [[Math.abs(st.ail), st.ail > 0 ? "roll right" : "roll left"], [Math.abs(st.elev), st.elev < 0 ? "pitch up" : "pitch down"], [Math.abs(st.rud), st.rud > 0 ? "yaw right" : "yaw left"]].filter((a) => a[0] > 0.15).sort((p, q) => q[0] - p[0]).slice(0, 2).map((a) => a[1]);
+      const big = acts.length ? (acts.join(" + ")).replace(/^./, (c) => c.toUpperCase()) : "Hands off";
+      if (title.textContent !== big) title.textContent = big; const wd = words().join(" · ") || "Drag the yoke or press a pedal."; if (wd !== lastWords) { lastWords = wd; chain.textContent = wd; }
+      const tn = [Math.abs(st.ail) > 0.15 && "ailerons", Math.abs(st.elev) > 0.15 && "elevator", Math.abs(st.rud) > 0.15 && "rudder"].filter(Boolean).join(); if (tn !== lastTint) { lastTint = tn; S.tint(tn ? tn.split(",") : []); } };
+    F.explain("Turn the yoke left or right to roll. Pull it toward you (drag down) for nose up, push it (drag up) for nose down. Push the left pedal for left yaw, the right pedal for right yaw. Keyboard: focus a control and use the arrow keys; 0 centers it. <span class=\"src\">PHAK Ch 6, flight controls. Surface movement exaggerated for clarity.</span>");
+    const yoke = yokeCtl(col, { onmove: (x, y) => { st.ail = x; st.elev = -y; upd(); } });
+    const ped = pedalsCtl(col, { onmove: (x) => { st.rud = x; upd(); } });
     cleanup.push(() => yoke.destroy(), () => ped.destroy());
     // gentle attitude response so the surface-to-motion link is visible (illustrative rates)
     let running = false;
