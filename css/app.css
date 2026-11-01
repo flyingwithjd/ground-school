@@ -97,7 +97,7 @@ button.cell { border: 0; text-align: left; width: 100%; }
 .arrow::after { content: "→"; font-weight: 400; }
 
 .chip { display: inline-flex; align-items: center; min-height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line2); background: transparent; font: 500 14px/1 var(--sans); color: var(--ink2); transition: all .3s var(--ease); }
-.chip:hover { color: var(--ink); }
+@media (hover: hover) { .chip:hover { color: var(--ink); } }   /* no sticky hover after a tap on touch screens */
 .chip.on { color: var(--ink); border-color: var(--acc); box-shadow: inset 0 0 0 1px var(--acc), 0 0 12px rgba(59,130,246,.35); }
 .chips { display: flex; flex-wrap: wrap; gap: 8px; }
 .tag { font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; border: 1px solid var(--line2); padding: 3px 8px; border-radius: 6px; color: var(--ink2); white-space: nowrap; }
@@ -155,6 +155,8 @@ button.cell { border: 0; text-align: left; width: 100%; }
 .viz .caption .label { display: block; margin-bottom: 6px; color: var(--ink2); font-size: 10.5px; }
 .viz .caption .big { font-size: clamp(22px, 3.2vw, 40px); display: inline-block; padding-bottom: 10px; position: relative; }
 .viz .caption .big::after { content: ""; position: absolute; left: 0; bottom: 0; height: 3px; width: 100%; background: var(--acc); box-shadow: var(--glow); transform-origin: left; animation: ul 800ms var(--ease) both; }
+/* top corner labels share the row: each gets at most half, and wraps instead of running into the other */
+.viz .tl, .viz .tr { max-width: calc(50% - 26px); white-space: pre-line; }
 .viz .ctrl { padding: 18px clamp(16px, 2.6vw, 26px) 20px; border-top: 1px solid var(--line); display: flex; flex-wrap: wrap; gap: 16px 28px; align-items: center; }
 .viz .ctrl .chips { gap: 6px; }
 .viz .readout { display: flex; flex-wrap: wrap; gap: 8px 28px; }

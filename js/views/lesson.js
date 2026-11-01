@@ -1,17 +1,17 @@
-import { h, esc, pct } from "../core/util.js";
-import { S, save, lessonState } from "../core/store.js";
-import { LESSONS, lessonItems } from "../../data/index.js";
-import { lessonStats, buildQueue } from "../core/progress.js";
-import { rich } from "../core/rich.js";
-import { mountViz, destroyAll } from "../viz/index.js";
-import { session } from "./quiz.js";
+import { h, esc, pct } from "../core/util.js?v=af7918520c";
+import { S, save, lessonState } from "../core/store.js?v=af7918520c";
+import { LESSONS, lessonItems } from "../../data/index.js?v=af7918520c";
+import { lessonStats, buildQueue } from "../core/progress.js?v=af7918520c";
+import { rich } from "../core/rich.js?v=af7918520c";
+import { mountViz, destroyAll } from "../viz/index.js?v=af7918520c";
+import { session } from "./quiz.js?v=af7918520c";
 const KIND = { ground: "Ground lesson", flight: "Flight lesson briefing", module: "Module unit" };
 export function lessonView(host, id, secIdx) {
   const L0 = LESSONS[id]; const p = h("div", { class: "page" }); host.append(p);
   if (!L0) { p.innerHTML = `<h2>Lesson not found.</h2>`; return; }
   let api = { destroy() {} }; let dead = false;
   // Lesson text is code-split: question banks load up front (the review engine needs them); prose loads when the lesson opens.
-  import(`../../data/text/${id}.js`).then((m) => { if (dead) return; api = build(p, { ...L0, ...m.default }, id, secIdx); })
+  import(`../../data/text/${id}.js?v=af7918520c`).then((m) => { if (dead) return; api = build(p, { ...L0, ...m.default }, id, secIdx); })
     .catch((e) => { p.innerHTML = `<h2>Could not load this lesson.</h2><p class="dim mt">${esc(e.message)}</p>`; });
   return { destroy() { dead = true; api.destroy(); } };
 }

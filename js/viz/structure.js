@@ -1,6 +1,6 @@
 // Fuselage construction: truss vs monocoque vs semimonocoque, cross-section and side view drawn on by light.
-import { frame, chips, svg, drawOn, ACC, FAINT, FAINT2 } from "./base.js";
-import { s } from "../core/util.js";
+import { frame, chips, svg, drawOn, ACC, FAINT, FAINT2 } from "./base.js?v=af7918520c";
+import { s } from "../core/util.js?v=af7918520c";
 const TYPES = {
   truss: { label: "Welded tube frame", big: "Truss", text: "Longerons run lengthwise; vertical and diagonal struts brace them into triangles. Fabric or skin over formers gives the shape but carries little load." },
   mono: { label: "Skin carries the load", big: "Monocoque", text: "A stressed shell with bulkheads only to hold its shape. Very strong, but a dent or wrinkle weakens it." },

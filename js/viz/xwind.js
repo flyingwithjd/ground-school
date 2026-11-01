@@ -1,9 +1,9 @@
 // Wind components and wind correction angle. Runway (or course) always points up the screen.
 // Headwind = V cos θ, crosswind = V sin θ (θ = wind direction minus runway heading). WCA = asin(XW / TAS).
 // Wind is drawn as moving points of light. Sources: PHAK Ch 16 (wind triangle); AFH 9 (crosswind); C172S POH 4 (demonstrated crosswind).
-import { frame, chips, slider, svg, readout, loop, ACC, FAINT, FAINT2, INK, D2R } from "./base.js";
-import { s, reduced } from "../core/util.js";
-import { T, topPlane } from "./shapes.js";
+import { frame, chips, slider, svg, readout, loop, ACC, FAINT, FAINT2, INK, D2R } from "./base.js?v=af7918520c";
+import { s, reduced } from "../core/util.js?v=af7918520c";
+import { T, topPlane } from "./shapes.js?v=af7918520c";
 const RX = 470, RY0 = 120, RY1 = 720, VX = 1160, VY = 430, SC = 13;
 export function mount(host, opts = {}) {
   const wca = opts.mode === "wca";

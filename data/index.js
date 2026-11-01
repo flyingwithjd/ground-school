@@ -1,10 +1,10 @@
 // Gathers every lesson/module file into lookup tables used by the learning engine.
-import { STAGES, MODULES } from "./course.js";
-import gl1 from "./lessons/gl1.js"; import gl2 from "./lessons/gl2.js"; import gl3 from "./lessons/gl3.js"; import gl4 from "./lessons/gl4.js"; import gl5 from "./lessons/gl5.js"; import gl6 from "./lessons/gl6.js";
-import fl1 from "./lessons/fl1.js"; import fl2 from "./lessons/fl2.js"; import fl3 from "./lessons/fl3.js"; import fl4 from "./lessons/fl4.js"; import fl5 from "./lessons/fl5.js"; import fl6 from "./lessons/fl6.js"; import fl7 from "./lessons/fl7.js";
-import gl7 from "./lessons/gl7.js"; import gl8 from "./lessons/gl8.js";
-import airport from "./modules/airport.js"; import wind from "./modules/wind.js"; import radio from "./modules/radio.js"; import regs from "./modules/regs.js";
-import emerg from "./modules/emerg.js"; import adm from "./modules/adm.js"; import flows from "./modules/flows.js"; import mnemo from "./modules/mnemo.js";
+import { STAGES, MODULES } from "./course.js?v=af7918520c";
+import gl1 from "./lessons/gl1.js?v=af7918520c"; import gl2 from "./lessons/gl2.js?v=af7918520c"; import gl3 from "./lessons/gl3.js?v=af7918520c"; import gl4 from "./lessons/gl4.js?v=af7918520c"; import gl5 from "./lessons/gl5.js?v=af7918520c"; import gl6 from "./lessons/gl6.js?v=af7918520c";
+import fl1 from "./lessons/fl1.js?v=af7918520c"; import fl2 from "./lessons/fl2.js?v=af7918520c"; import fl3 from "./lessons/fl3.js?v=af7918520c"; import fl4 from "./lessons/fl4.js?v=af7918520c"; import fl5 from "./lessons/fl5.js?v=af7918520c"; import fl6 from "./lessons/fl6.js?v=af7918520c"; import fl7 from "./lessons/fl7.js?v=af7918520c";
+import gl7 from "./lessons/gl7.js?v=af7918520c"; import gl8 from "./lessons/gl8.js?v=af7918520c";
+import airport from "./modules/airport.js?v=af7918520c"; import wind from "./modules/wind.js?v=af7918520c"; import radio from "./modules/radio.js?v=af7918520c"; import regs from "./modules/regs.js?v=af7918520c";
+import emerg from "./modules/emerg.js?v=af7918520c"; import adm from "./modules/adm.js?v=af7918520c"; import flows from "./modules/flows.js?v=af7918520c"; import mnemo from "./modules/mnemo.js?v=af7918520c";
 const ALL = [gl1, gl2, gl3, gl4, gl5, gl6, fl1, fl2, fl3, fl4, fl5, fl6, fl7, gl7, gl8, ...airport, ...wind, ...radio, ...regs, ...emerg, ...adm, ...flows, ...mnemo];
 export const LESSONS = {}; export const QUESTIONS = {}; export const ORAL = {}; export const TOPICS = {};
 for (const L of ALL) {

@@ -1,7 +1,7 @@
 // 3D part explorer and feature tour for the C172S wireframe.
-import { frame, chips } from "./base.js";
-import { planeStage } from "./planestage.js";
-import { h, reduced } from "../core/util.js";
+import { frame, chips } from "./base.js?v=af7918520c";
+import { planeStage } from "./planestage.js?v=af7918520c";
+import { h, reduced } from "../core/util.js?v=af7918520c";
 // Pose sign conventions (model): ail>0 rolls right, elev<0 = trailing edge up (nose up), rud>0 = right rudder, steer>0 = nose wheel left.
 const PARTS = {
   fuselage: { name: "Fuselage", group: "Fuselage", hl: ["fuselage", "fairing"], view: "iso", text: "The central body. Carries crew, passengers and cargo, and joins the wings and tail. Semimonocoque aluminum on the 172." },
@@ -32,21 +32,25 @@ const TOUR = [
   { key: "gear", label: "Steerable nose wheel", big: "Tricycle gear", hl: ["gear"], view: "gear", steerCycle: true },
 ];
 export function mount(host, { mode = "explore" } = {}) {
-  const F = frame(host, { corners: { tl: "Cessna 172S", tr: mode === "tour" ? "" : "Tap a part", br: "Span 36 ft 1 in · length 27 ft 2 in" } });
-  let cur = null, anim = null, ti = 0;
-  const S = planeStage(F.stage, { view: "iso", onPick: mode === "explore" ? (p) => p && MAP[p] && select(MAP[p]) : null });
+  // Dimensions sit top-right on two lines, clear of the part title at bottom-left at every width.
+  const SPEC = "Span 36 ft 1 in\nLength 27 ft 2 in".replace(/ /g, "\u00a0");   // each line stays whole on narrow phones
+  const F = frame(host, { corners: { tl: "Cessna 172S", tr: SPEC } });
+  let cur = null, anim = null, ti = 0; const groups = [];
+  // Tap a part on the model to select it; tap empty space to clear back to the default view.
+  const S = planeStage(F.stage, { view: "iso", onPick: mode === "explore" ? (p) => (p && MAP[p] ? select(MAP[p]) : !p && cur && reset()) : null });
   const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
   function animatePose(to, dur = reduced() ? 1 : 1400) { const from = { ...curPose }; const t0 = performance.now(); S.animate((now) => { const k = Math.min(1, (now - t0) / dur), e = ease(k); const p = {}; for (const key of new Set([...Object.keys(from), ...Object.keys(to)])) p[key] = (from[key] || 0) + ((to[key] || 0) - (from[key] || 0)) * e; curPose = p; S.pose(p); if (k >= 1) S.animate(null); }); }
   let curPose = {};
   function cowl(show) { (S.inkLines.cowling || []).forEach((l) => (l.visible = show)); S.P.parts.cowling.subs.forEach((sb) => sb.obj.traverse((o) => o.isMesh && (o.visible = show))); S.kick(); }
-  function select(key) { const P = PARTS[key]; if (!P) return; cur = key; chipsApi && chipsApi.set(groupOf(key)); cowl(!P.hideCowl); S.highlight(P.hl); S.setView(P.view); animatePose(P.pose || {}); F.caption(P.group, P.name); F.explain(P.text); }
-  const groupOf = (k) => k;
-  let chipsApi = null;
+  // Both button rows act as one set: exactly one button (or none, for parts without a button) is lit, matching the view.
+  const markChip = (key) => groups.forEach((g) => g.set(key));
+  const INTRO = ["Five major components", "Tap a part", "Drag to orbit. Tap the airplane or a button to isolate a part. Tap the same button again, or empty space, to clear it."];
+  function reset() { cur = null; markChip(null); cowl(true); S.highlight([]); S.setView("iso"); animatePose({}); F.caption(INTRO[0], INTRO[1]); F.explain(INTRO[2]); }
+  function select(key) { const P = PARTS[key]; if (!P) return; cur = key; markChip(key); cowl(!P.hideCowl); S.highlight(P.hl); S.setView(P.view); animatePose(P.pose || {}); F.caption(P.group, P.name); F.explain(P.text); }
   if (mode === "explore") {
-    chipsApi = chips(F.ctrl, [["fuselage", "Fuselage"], ["wing", "Wings"], ["empennage", "Empennage"], ["gear", "Landing gear"], ["powerplant", "Powerplant"]], null, select, { label: "Major components" });
-    const sub = chips(F.ctrl, [["ailerons", "Ailerons"], ["flaps", "Flaps"], ["elevator", "Elevator"], ["rudder", "Rudder"], ["trimtab", "Trim tab"], ["propeller", "Propeller"], ["fuel", "Fuel tanks"]], null, (k) => { chipsApi.set(null); select(k); }, { label: "Parts" });
-    const old = select; chipsApi.set = ((orig) => (v) => { orig(v); })(chipsApi.set);
-    F.caption("Five major components", "Tap a part"); F.explain("Drag to orbit. Tap the airplane or a button to isolate a part.");
+    groups.push(chips(F.ctrl, [["fuselage", "Fuselage"], ["wing", "Wings"], ["empennage", "Empennage"], ["gear", "Landing gear"], ["powerplant", "Powerplant"]], null, (k) => (k ? select(k) : reset()), { label: "Major components", toggle: true }));
+    groups.push(chips(F.ctrl, [["ailerons", "Ailerons"], ["flaps", "Flaps"], ["elevator", "Elevator"], ["rudder", "Rudder"], ["trimtab", "Trim tab"], ["propeller", "Propeller"], ["fuel", "Fuel tanks"]], null, (k) => (k ? select(k) : reset()), { label: "Parts", toggle: true }));
+    F.caption(INTRO[0], INTRO[1]); F.explain(INTRO[2]);
   } else {
     const prev = h("button", { class: "btn ghost", type: "button" }, "←"), next = h("button", { class: "btn pri arrow", type: "button" }, "Next");
     const dots = chips(F.ctrl, TOUR.map((t, i) => [String(i), t.big]), "0", (v) => show(+v), { label: "Tour stops" }); F.ctrl.append(h("div", { class: "btns" }, prev, next));
@@ -56,7 +60,7 @@ export function mount(host, { mode = "explore" } = {}) {
       if (T.spin) S.animate((now) => S.pose({ prop: ((now - t0) / 1000) * 0.9 }));
       else if (T.flapCycle) S.animate((now) => { const t = ((now - t0) / 1000) % 8; const st = [0, 10, 20, 30, 30, 0]; const k = Math.min(Math.floor(t / 1.4), 5); const f = st[k] + ((st[Math.min(k + 1, 5)] - st[k]) * ease(Math.min(1, (t - k * 1.4) / 0.9))) ; S.pose({ flap: f }); F.corner("tr", `Flaps ${Math.round(st[Math.min(k + 1, 5)] === st[k] ? st[k] : f)}°`); });
       else if (T.steerCycle) S.animate((now) => S.pose({ steer: Math.sin((now - t0) / 900) * 10 }));
-      else { S.animate(null); S.pose({}); F.corner("tr", ""); } }
+      else { S.animate(null); S.pose({}); F.corner("tr", SPEC); } }
     show(0);
   }
   return { destroy() { S.destroy(); F.destroy(); } };

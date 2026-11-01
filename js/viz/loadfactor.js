@@ -1,8 +1,8 @@
 // Load factor and stall speed in a level turn. n = 1/cos(bank); Vs = Vs1g × √n (PHAK 5).
 // Base stall speeds and the tabulated checks are from the C172S POH Sec 5 (2,550 lb, most rearward CG, power off).
-import { frame, slider, chips, readout, svg, ACC, FAINT, FAINT2, D2R } from "./base.js";
-import { s } from "../core/util.js";
-import { rearPlane, T, arrow, setArrow } from "./shapes.js";
+import { frame, slider, chips, readout, svg, ACC, FAINT, FAINT2, D2R } from "./base.js?v=af7918520c";
+import { s } from "../core/util.js?v=af7918520c";
+import { rearPlane, T, arrow, setArrow } from "./shapes.js?v=af7918520c";
 const POH = { up: { 0: 48, 30: 52, 45: 57, 60: 68 }, 10: { 0: 42, 30: 45, 45: 50, 60: 59 }, 30: { 0: 40, 30: 43, 45: 48, 60: 57 } };
 const LIMIT = 3.8, LIMF = 3.0;
 export function mount(host) {
@@ -37,8 +37,9 @@ export function mount(host) {
     const over = n > lim1;
     F.caption(over ? "Beyond the limit load factor" : `Flaps ${flap === "up" ? "up" : flap + "°"} · ${bank}° bank`, over ? "Structural damage possible" : `Stall ≈ ${Math.round(vs)} KIAS`);
     F.explain(over ? `Holding altitude at ${bank}° needs ${n.toFixed(2)}g, more than the normal-category limit of +${lim1.toFixed(1)}g. <span class="src">POH 2</span>` : bank === 0 ? "Wings level, lift equals weight: 1g. Tap 30°, 45° or 60° to compare the calculation with the POH stall-speed table." : `To hold altitude the wing must make ${n.toFixed(2)}× its weight in lift, so it reaches the critical AOA at √${n.toFixed(2)} = ${Math.sqrt(n).toFixed(2)}× the wings-level stall speed.`); }
-  const sl = slider(F.ctrl, { label: "Bank angle", min: 0, max: 80, step: 1, value: 30, fmt: (v) => `${v}°`, oninput: (v) => { bank = v; upd(); } });
-  chips(F.ctrl, [["0", "0°"], ["30", "30°"], ["45", "45°"], ["60", "60°"]], "30", (v) => sl.set(+v), { label: "Tabulated banks" });
+  let bankChips = null;
+  const sl = slider(F.ctrl, { label: "Bank angle", min: 0, max: 80, step: 1, value: 30, fmt: (v) => `${v}°`, oninput: (v) => { bank = v; bankChips && bankChips.set(String(v)); upd(); } });   // a chip is lit only when the slider sits on its bank
+  bankChips = chips(F.ctrl, [["0", "0°"], ["30", "30°"], ["45", "45°"], ["60", "60°"]], "30", (v) => sl.set(+v), { label: "Tabulated banks" });
   chips(F.ctrl, [["up", "Flaps up"], ["10", "Flaps 10°"], ["30", "Flaps 30°"]], "up", (v) => { flap = v; upd(); }, { label: "Flaps" });
   upd();
   return { destroy() { F.destroy(); } };

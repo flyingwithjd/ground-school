@@ -5,8 +5,8 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
-import { buildPlane } from "./c172-model.js";
-import { reduced, clamp } from "../core/util.js";
+import { buildPlane } from "./c172-model.js?v=af7918520c";
+import { reduced, clamp } from "../core/util.js?v=af7918520c";
 const ACC = 0x3b82f6, INK = 0xf2f1ec, BG = 0x0a0a0b, D = Math.PI / 180;
 const s5 = (t) => { t = clamp(t, 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
 export const VIEWS = {
@@ -67,8 +67,11 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
   // picking
   const ray = new THREE.Raycaster(), ndc = new THREE.Vector2(); let downAt = null;
   const pickable = P.meshes;
-  canvas.addEventListener("pointerdown", (e) => (downAt = [e.clientX, e.clientY]));
-  canvas.addEventListener("pointerup", (e) => { if (!onPick || !downAt) return; if (Math.hypot(e.clientX - downAt[0], e.clientY - downAt[1]) > 6) return; const r = canvas.getBoundingClientRect(); ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, camera); const hit = ray.intersectObjects(pickable, false)[0]; onPick(hit ? hit.object.userData.part : null, hit ? hit.object.userData.tag : null); });
+  // A pick is a quick single-finger tap: under 8 px of travel and 450 ms. Orbit drags, long presses and pinches never pick.
+  const down = new Set(); let multi = false;
+  canvas.addEventListener("pointerdown", (e) => { down.add(e.pointerId); if (down.size > 1) multi = true; else { multi = false; downAt = [e.clientX, e.clientY, performance.now()]; } });
+  const lift = (e) => { down.delete(e.pointerId); }; canvas.addEventListener("pointercancel", (e) => { lift(e); downAt = null; });
+  canvas.addEventListener("pointerup", (e) => { lift(e); const d = downAt; if (down.size === 0) downAt = null; if (!onPick || !d || multi) return; if (Math.hypot(e.clientX - d[0], e.clientY - d[1]) > 8 || performance.now() - d[2] > 450) return; const r = canvas.getBoundingClientRect(); ndc.set(((e.clientX - r.left) / r.width) * 2 - 1, -((e.clientY - r.top) / r.height) * 2 + 1); ray.setFromCamera(ndc, camera); const hit = ray.intersectObjects(pickable, false)[0]; onPick(hit ? hit.object.userData.part : null, hit ? hit.object.userData.tag : null); });
   // project a model-space point (feet) to stage pixels, for SVG overlays
   const tmp = new THREE.Vector3();
   function project(p, local = true) { tmp.set(p[0], p[1], p[2]); if (local) { tmp.sub(CG); tmp.applyEuler(pivot.rotation); tmp.add(CG); } tmp.project(camera); const r = stage.getBoundingClientRect(); return { x: (tmp.x * 0.5 + 0.5) * r.width, y: (-tmp.y * 0.5 + 0.5) * r.height, z: tmp.z }; }

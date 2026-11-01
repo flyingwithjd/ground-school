@@ -1,7 +1,7 @@
 // Mastery, readiness and blind-spot analytics, all derived from per-item SRS state.
-import { get, recall, level, isDue, recentAcc, overconfident, DAY } from "./srs.js";
-import { LESSONS, QUESTIONS, ORAL, TOPICS, ORDER, item, lessonItems } from "../../data/index.js";
-import { S } from "./store.js";
+import { get, recall, level, isDue, recentAcc, overconfident, DAY } from "./srs.js?v=af7918520c";
+import { LESSONS, QUESTIONS, ORAL, TOPICS, ORDER, item, lessonItems } from "../../data/index.js?v=af7918520c";
+import { S } from "./store.js?v=af7918520c";
 export const allIds = () => [...Object.keys(QUESTIONS), ...Object.keys(ORAL)];
 export function stats(ids, now = Date.now()) {
   let seen = 0, R = 0, ok = 0, n = 0, due = 0, over = 0, lapses = 0, mastered = 0; const lv = [0, 0, 0, 0, 0];

@@ -99,3 +99,10 @@ These notes are updated as work goes, so an interruption loses nothing. The time
   At 6x throttle the results are the same. Profiling script: /workspace/prof/prof.mjs (box only).
 - Tests: validate 609 MCQ / 71 oral / 0 bad; smoke 187/187 desktop + 18 phone-size routes, no console errors; reduced-motion check OK.
 - Seen, not fixed: on phone the "Wings" caption sits on top of the bottom-right "Span … length …" corner label in plane3d.
+
+### 2026-10-31, ~8:30 PM MDT: parts explorer UI fixes (after JD's iPhone test)
+- 172S part buttons: both rows now act as one set, so exactly one button is lit and it matches the view (aria-pressed too). Tapping the lit button again, or a quick tap on empty space in the 3D view, clears back to the default view. Orbit drags, long presses (>450 ms) and pinches never pick.
+- Span/length moved to the top-right corner on two lines, so it can't collide with the part title. Top corners are capped at half the width each and wrap instead of overlapping. Chip hover only on hover-capable devices (no sticky hover after a tap).
+- Same stale-button bug fixed in trim/flaps (Show buttons follow the trim wheel and flap lever) and load factor (bank buttons light only when the slider sits on that bank).
+- Cache busting: run `node tools/stamp-version.mjs` before every deploy. It puts one content-hash version on every module import, the CSS, the app entry and the import map.
+- New tests: tests/parts-ui.mjs (DESELECT=1 for the deselect checks), tests/overlap-audit.mjs (every route, corner/caption overlap at W px).

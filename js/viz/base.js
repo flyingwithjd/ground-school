@@ -1,6 +1,6 @@
 // Shared building blocks for every visualization: frame, corner labels, caption, sliders, chips,
 // and the signature "point of light" line draw (a bright head with a glowing tail lays the line down).
-import { h, s, esc, ease, reduced, clamp } from "../core/util.js";
+import { h, s, esc, ease, reduced, clamp } from "../core/util.js?v=af7918520c";
 export const ACC = "#3B82F6", INK = "#F2F1EC";
 export const FAINT = "rgba(242,241,236,.22)", FAINT2 = "rgba(242,241,236,.4)";
 
@@ -28,10 +28,11 @@ export function slider(parent, { label, min, max, step = 1, value, fmt = (v) => 
   inp.addEventListener("input", () => set(inp.value));
   return { el: w, input: inp, get value() { return +inp.value; }, set };
 }
-export function chips(parent, options, value, onchange, { label } = {}) {
+// toggle: tapping the active chip again clears it and calls onchange(null).
+export function chips(parent, options, value, onchange, { label, toggle = false } = {}) {
   const wrap = h("div", { class: "chips", role: "group", "aria-label": label || "options" });
   const btns = options.map((o) => { const [v, t] = Array.isArray(o) ? o : [o, o]; const b = h("button", { class: "chip" + (v === value ? " on" : ""), type: "button", "aria-pressed": v === value ? "true" : "false" }, t);
-    b.addEventListener("click", () => { api.set(v); onchange && onchange(v); }); b.dataset.v = v; wrap.append(b); return b; });
+    b.addEventListener("click", () => { const nv = toggle && String(value) === String(v) ? null : v; api.set(nv); onchange && onchange(nv); }); b.dataset.v = v; wrap.append(b); return b; });
   const api = { el: wrap, set(v) { value = v; btns.forEach((b) => { const on = b.dataset.v === String(v); b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); }); }, get value() { return value; } };
   parent.append(wrap); return api;
 }
