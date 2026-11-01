@@ -1,9 +1,9 @@
 // Trim and flaps on ONE 3D stage. Trim: the wheel moves only the tab; in flight the chain plays out in order on the
 // real airplane (tab -> air pushes the tab -> elevator swings opposite -> tail force -> airplane pitches). Flaps: the
-// same stage slides along the right side, square to the fuselage, to frame the right wing and flap (both modes default to that flat side view; orbit is still free)
+// same stage slides along the right side, square to the fuselage, to frame the right wing and flap (both modes default to a right rear 3/4 view from slightly above; orbit is still free)
 // while the flap, the 3D airflow lines over and under that wing and the 3D lift/drag arrows (scene objects, so they stay attached when orbiting) show the camber change. Title and chain sit in their own bands above and
 // below the stage, never over the model. PHAK Ch 6 · AFH Ch 9 · POH Sec 2, 7.
-import { h, clamp, reduced } from "../core/util.js?v=b55f063b47";
+import { h, clamp, reduced } from "../core/util.js?v=4567ef8edf";
 const D = Math.PI / 180, ACC = "#3B82F6", INK = "#F2F1EC";
 const TAB_MAX = 35, ELEV_MAX = 25, PITCH_MAX = 2.5;          // degrees, exaggerated for clarity
 const HX = -16.4, Y0 = 4.62, EL = 0.92, TL = 0.44, ZF = 1.75, SLE = -14.33;  // elevator hinge, chord to the tab hinge, tab chord, span station of the cues, stabilizer leading edge at that station (ft, model space)
@@ -16,23 +16,26 @@ const s5 = (k) => k * k * k * (k * (k * 6 - 15) + 10);
 const liftK = (f) => (1 - Math.exp(-f / 9)) / (1 - Math.exp(-30 / 9)), dragK = (f) => Math.pow(Math.max(0, f) / 30, 2.2);
 export function trimFlaps(F, S, { wheel }) {
   const phone = () => F.stage.getBoundingClientRect().width < 560;
-  // Both modes default to a flat side view from the RIGHT (camera square to the fuselage, narrow lens, low elevation), so
-  // the airflow bends over and under the surfaces in profile like the PHAK figures. Switching modes only slides along that side.
+  // Both modes default to a right rear 3/4 view (camera swung about 20 deg aft of square, a few degrees above), so the
+  // surfaces read as surfaces while the airflow still runs across the screen. Both modes share one azimuth, so switching only slides.
   // w = feet of airplane to fit across the stage; the distance follows from the lens and the stage shape.
   // w x h = feet of airplane to fit around (cx, cy); reserve = stage pixels kept clear on the right for the trim wheel.
   const FOV = 6, TN = Math.tan((FOV / 2) * D);
-  const side = (cx, cy, [w, h], [wp, hp], reserve = 0, cz = 1.0, el = 3) => { const r = F.stage.getBoundingClientRect(), W = Math.max(1, r.width - reserve), H = Math.max(1, r.height), ph = phone();
-    const ww = ph ? wp : w, hh = ph ? hp : h, d = Math.max(ww / (2 * TN * (W / H)), hh / (2 * TN)), ftPx = (2 * TN * d) / H;
-    return { tg: [cx - (reserve / 2) * ftPx, cy, cz], az: 90, el, fov: FOV, d }; };   // screen right is aft, so the target slides aft to leave the gap
+  // az 90 = square to the right side; larger az swings the camera toward the tail (right rear 3/4, like JD's orbited views)
+  const side = (cx, cy, [w, h], [wp, hp], { reserve = 0, cz = 1.0, el = 3, az = 90 } = {}) => { const r = F.stage.getBoundingClientRect(), W = Math.max(1, r.width - reserve), H = Math.max(1, r.height), ph = phone();
+    const ww = ph ? wp : w, hh = ph ? hp : h, d = Math.max(ww / (2 * TN * (W / H)), hh / (2 * TN)), ftPx = (2 * TN * d) / H, sh = (reserve / 2) * ftPx, rx = Math.sin(az * D), rz = -Math.cos(az * D);
+    return { tg: [cx - sh * rx, cy, cz - sh * rz], az, el, fov: FOV, d }; };   // slide the target against screen-right to leave the wheel gap
   const wheelPx = () => (phone() ? 92 : 124);
-  const VIEW = { trim: () => side(-16.2, 4.62, [6.6, 4.9], [4.6, 4.9], wheelPx(), ZF), flaps: () => (phone() ? side(-2.3, 8.0, [11.5, 5.9], [12, 5.9], 0, ZS, 0) : side(-1.7, 8.0, [11.5, 5.9], [11.5, 5.9], 0, ZS, 0)) };   // eye level with the wing (el 0): the span stays edge-on, so the section reads in profile   // framed on the right wing section at the cue station; the rest of the airplane runs out of frame
+  const AZ = 110;   // right rear 3/4: about 20 deg from square toward the tail
+  const VIEW = { trim: () => side(-16.2, 4.75, [6.0, 4.6], [4.6, 4.9], { reserve: wheelPx(), cz: ZF, el: 6, az: AZ }),
+    flaps: () => (phone() ? side(-2.3, 7.9, [11.5, 5.9], [12, 5.9], { cz: ZS, el: 4, az: AZ }) : side(-1.7, 7.9, [11.5, 5.9], [11.5, 5.9], { cz: ZS, el: 4, az: AZ })) };
   F.root.classList.add("tf");
   // bands: big title above the stage, the step chain below it
   const title = h("div", { class: "tf-title" }), chain = h("p", { class: "tf-chain", "aria-live": "polite" });
   const tName = h("span", {}), tSub = h("span", { class: "tf-sub" }); title.append(tName, tSub);
   F.root.insertBefore(title, F.stage); F.stage.after(chain);
   // airflow lines and force arrows are real 3D objects in model space (planestage cueLine/cueArrow), so they stay attached
-  // to the tail and the right wing in the default side views AND whenever the user orbits. No flat 2D overlays.
+  // to the tail and the right wing in the default views AND whenever the user orbits. No flat 2D overlays.
   const TD = [0.32, 0.26], WD = [0.7, 0.55];   // dash/gap in feet: short on the small tail, longer on the wing
   const NT = 42, NW = Math.floor((WLE + 2.6 - (WXH - 4.4)) / 0.12) + 1;
   const flows = [[0.38, 1], [0.8, 0.55], [-0.38, 1], [-0.8, 0.55]].map(([d, w]) => ({ d, w, el: S.cueLine(NT, { dash: TD, width: 1.4, opacity: 0.6 }) }));
