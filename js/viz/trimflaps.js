@@ -1,9 +1,9 @@
 // Trim and flaps on ONE 3D stage. Trim: the wheel moves only the tab; in flight the chain plays out in order on the
 // real airplane (tab -> air pushes the tab -> elevator swings opposite -> tail force -> airplane pitches). Flaps: the
-// same stage slides along the right side, square to the fuselage, to frame the whole airplane (both modes default to that flat side view; orbit is still free)
+// same stage slides along the right side, square to the fuselage, to frame the right wing and flap (both modes default to that flat side view; orbit is still free)
 // while the flap, the 3D airflow lines over and under that wing and the 3D lift/drag arrows (scene objects, so they stay attached when orbiting) show the camber change. Title and chain sit in their own bands above and
 // below the stage, never over the model. PHAK Ch 6 · AFH Ch 9 · POH Sec 2, 7.
-import { h, clamp, reduced } from "../core/util.js?v=f59a9336fd";
+import { h, clamp, reduced } from "../core/util.js?v=67dd3f66b4";
 const D = Math.PI / 180, ACC = "#3B82F6", INK = "#F2F1EC";
 const TAB_MAX = 35, ELEV_MAX = 25, PITCH_MAX = 2.5;          // degrees, exaggerated for clarity
 const HX = -16.4, Y0 = 4.62, EL = 0.92, TL = 0.44, ZF = 1.75, SLE = -14.33;  // elevator hinge, chord to the tab hinge, tab chord, span station of the cues, stabilizer leading edge at that station (ft, model space)
@@ -20,12 +20,12 @@ export function trimFlaps(F, S, { wheel }) {
   // the airflow bends over and under the surfaces in profile like the PHAK figures. Switching modes only slides along that side.
   // w = feet of airplane to fit across the stage; the distance follows from the lens and the stage shape.
   // w x h = feet of airplane to fit around (cx, cy); reserve = stage pixels kept clear on the right for the trim wheel.
-  const FOV = 10, TN = Math.tan((FOV / 2) * D);
-  const side = (cx, cy, [w, h], [wp, hp], reserve = 0) => { const r = F.stage.getBoundingClientRect(), W = Math.max(1, r.width - reserve), H = Math.max(1, r.height), ph = phone();
+  const FOV = 6, TN = Math.tan((FOV / 2) * D);
+  const side = (cx, cy, [w, h], [wp, hp], reserve = 0, cz = 1.0, el = 3) => { const r = F.stage.getBoundingClientRect(), W = Math.max(1, r.width - reserve), H = Math.max(1, r.height), ph = phone();
     const ww = ph ? wp : w, hh = ph ? hp : h, d = Math.max(ww / (2 * TN * (W / H)), hh / (2 * TN)), ftPx = (2 * TN * d) / H;
-    return { tg: [cx - (reserve / 2) * ftPx, cy, 1.0], az: 90, el: 3, fov: FOV, d }; };   // screen right is aft, so the target slides aft to leave the gap
+    return { tg: [cx - (reserve / 2) * ftPx, cy, cz], az: 90, el, fov: FOV, d }; };   // screen right is aft, so the target slides aft to leave the gap
   const wheelPx = () => (phone() ? 92 : 124);
-  const VIEW = { trim: () => side(-16.2, 4.62, [6.6, 4.9], [4.6, 4.9], wheelPx()), flaps: () => side(-5.8, 5.6, [36, 12], [31, 10]) };
+  const VIEW = { trim: () => side(-16.2, 4.62, [6.6, 4.9], [4.6, 4.9], wheelPx(), ZF), flaps: () => (phone() ? side(-2.3, 8.0, [11.5, 5.9], [12, 5.9], 0, ZS, 0) : side(-1.7, 8.0, [11.5, 5.9], [11.5, 5.9], 0, ZS, 0)) };   // eye level with the wing (el 0): the span stays edge-on, so the section reads in profile   // framed on the right wing section at the cue station; the rest of the airplane runs out of frame
   F.root.classList.add("tf");
   // bands: big title above the stage, the step chain below it
   const title = h("div", { class: "tf-title" }), chain = h("p", { class: "tf-chain", "aria-live": "polite" });
@@ -112,6 +112,6 @@ export function trimFlaps(F, S, { wheel }) {
   let craf = 0, until = 0; const follow = (now) => { cues(); craf = now < until ? requestAnimationFrame(follow) : 0; };
   const followFor = (ms) => { until = Math.max(until, performance.now() + ms); if (!craf) craf = requestAnimationFrame(follow); };
   const show0 = show; show = (m) => { const was = mode; show0(m); if (m !== was) followFor(700); };
-  setChain(); explain(); apply(); followFor(600);
+  setChain(); explain(); apply(); followFor(600); S.setFlow(true);   // airflow drifts continuously while the stage is on screen
   return () => { cancelAnimationFrame(craf); };
 }

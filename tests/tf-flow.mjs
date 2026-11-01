@@ -1,0 +1,27 @@
+// Usage: node tests/tf-flow.mjs [width height]  Checks the trim/flaps airflow keeps drifting (load, mode switches, settled changes, orbit, scroll back) and pauses off-screen.
+import { createRequire } from "module"; const require = createRequire("/workspace/pgs-build/");
+const { chromium } = require("playwright-core");
+const [,,w,hh] = process.argv;
+const b = await chromium.launch({ executablePath: "/usr/bin/google-chrome", args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
+const pg = await (await b.newContext({ viewport: { width: +(w||1366), height: +(hh||1024) } })).newPage(); const errs=[]; pg.on("pageerror",e=>errs.push(e.message));
+await pg.goto("http://localhost:8765/index.html#/lesson/gl2/1"); await pg.waitForTimeout(1500);
+await pg.evaluate(() => { const v = document.querySelector(".viz.tf"); window.scrollTo(0, v.getBoundingClientRect().top + scrollY - 58); }); await pg.waitForTimeout(1500);
+const ph = () => pg.evaluate(() => document.querySelector(".viz.tf .stage canvas")._flowPhase ?? null);
+let fails = 0;
+const check = async (label) => { const a = await ph(); await pg.waitForTimeout(400); const c = await ph(); await pg.waitForTimeout(400); const d = await ph();
+  const ok = a !== null && c !== a && d !== c; if (!ok) fails++; console.log(`${ok ? "PASS" : "FAIL"} ${label}: ${[a, c, d].map((x) => x === null ? "null" : x.toFixed(3)).join(" -> ")}`); };
+await check("initial load");
+const btn = (n) => pg.getByRole("button", { name: n, exact: true }).click();
+await btn("Flaps"); await pg.waitForTimeout(150); await check("right after switch to flaps");
+await pg.waitForTimeout(3000); await check("3 s after switch to flaps");
+await btn("30°"); await pg.waitForTimeout(4500); await pg.waitForTimeout(5000); await check("5 s after flap change settled");
+const bb = await pg.locator(".viz.tf .stage canvas").boundingBox(); const x = bb.x + bb.width * 0.6, y = bb.y + bb.height * 0.4;
+await pg.mouse.move(x, y); await pg.mouse.down(); await pg.mouse.move(x - 160, y + 70, { steps: 12 }); await pg.mouse.up(); await pg.waitForTimeout(3000); await check("3 s after orbit drag");
+await btn("Elevator trim"); await pg.waitForTimeout(150); await check("right after switch to trim");
+await pg.waitForTimeout(4000); await check("4 s after switch to trim");
+const bw = await pg.locator(".trimwheel").boundingBox(); await pg.mouse.move(bw.x + bw.width / 2, bw.y + bw.height / 2); await pg.mouse.down(); await pg.mouse.move(bw.x + bw.width / 2, bw.y + bw.height / 2 - 60, { steps: 8 }); await pg.mouse.up();
+await pg.waitForTimeout(8000); await check("5 s after trim change settled");
+await pg.evaluate(() => window.scrollTo(0, document.body.scrollHeight)); await pg.waitForTimeout(1200);
+const off1 = await ph(); await pg.waitForTimeout(800); const off2 = await ph(); console.log(`${off1 === off2 ? "PASS" : "FAIL"} paused off-screen: ${off1} -> ${off2}`); if (off1 !== off2) fails++;
+await pg.evaluate(() => { const v = document.querySelector(".viz.tf"); window.scrollTo(0, v.getBoundingClientRect().top + scrollY - 58); }); await pg.waitForTimeout(1200); await check("after scrolling back");
+console.log(errs.join(";") || "no errors"); console.log(fails ? `${fails} FAIL` : "ALL PASS"); await b.close(); process.exit(fails ? 1 : 0);

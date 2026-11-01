@@ -1,7 +1,7 @@
-import { initPopovers } from "./core/rich.js?v=f59a9336fd";
-import { destroyAll } from "./viz/index.js?v=f59a9336fd";
-import * as pages from "./views/pages.js?v=f59a9336fd";
-import { lessonView } from "./views/lesson.js?v=f59a9336fd";
+import { initPopovers } from "./core/rich.js?v=67dd3f66b4";
+import { destroyAll } from "./viz/index.js?v=67dd3f66b4";
+import * as pages from "./views/pages.js?v=67dd3f66b4";
+import { lessonView } from "./views/lesson.js?v=67dd3f66b4";
 const main = document.getElementById("main");
 let cleanup = [];
 const routes = [

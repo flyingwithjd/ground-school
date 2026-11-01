@@ -5,8 +5,8 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
-import { buildPlane } from "./c172-model.js?v=f59a9336fd";
-import { reduced, clamp } from "../core/util.js?v=f59a9336fd";
+import { buildPlane } from "./c172-model.js?v=67dd3f66b4";
+import { reduced, clamp } from "../core/util.js?v=67dd3f66b4";
 const ACC = 0x3b82f6, INK = 0xf2f1ec, BG = 0x0a0a0b, D = Math.PI / 180;
 const s5 = (t) => { t = clamp(t, 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
 export const VIEWS = {
@@ -55,7 +55,7 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
   function focus(names, dur = 320) { names = [].concat(names || []).filter((n) => ACCENT[n]); Object.keys(ACCENT).forEach((n) => { if (!names.includes(n)) ACCENT[n].forEach((sb) => (sb.c.visible = sb.gl.visible = false)); });
     const now = performance.now(); hl = names; progT0 = now - drawDur - 1; fadeT0 = now; fadeDur = reduced() ? 1 : dur; kick(dur + 60); }
   // Blue fill on the faces of the named parts (e.g. a deflected control surface), on top of the accent lines. Pass [] to clear.
-  const tintMat = P.meshes[0] ? P.meshes[0].material.clone() : null; if (tintMat) tintMat.color.setHex(0x1e4fae);
+  const tintMat = P.meshes[0] ? P.meshes[0].material.clone() : null; if (tintMat) tintMat.color.setHex(0x2b63d6);
   function tint(names) { names = [].concat(names || []); P.meshes.forEach((m) => { m.userData.mat0 ||= m.material; m.material = tintMat && names.includes(m.userData.part) ? tintMat : m.userData.mat0; }); kick(); }
   // camera state (spherical around a target), eased transitions
   const cs = { ...VIEWS[view], tg: [...VIEWS[view].tg] }; let camTw = null;
@@ -100,11 +100,16 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
       lights.forEach((l) => (l.visible = false));
       { const k = clamp((now - fadeT0) / fadeDur, 0, 1); coreMat.opacity = k; glowMat.opacity = glowOp * k; if (k < 1) idleUntil = Math.max(idleUntil, now + 50); }
       if (hl.length) { prog = clamp((now - progT0) / drawDur, 0, 1); const p = s5(prog); hl.forEach((n, i) => setAccent(n, p, lights[i % 4])); if (prog < 1) idleUntil = Math.max(idleUntil, now + 50); }
-      if (!reduced()) cueMats.forEach((m) => { if (m.dashed) m.dashOffset = -((now / 900) % 1000) * (m.dashSize + m.gapSize); });   // airflow dashes drift aft whenever a frame is drawn
+      if (flowOn && !reduced()) { flowPhase = (now / 900) % 1000; cueMats.forEach((m) => { if (m.dashed) m.dashOffset = -flowPhase * (m.dashSize + m.gapSize); }); canvas._flowPhase = flowPhase; }   // airflow dashes drift aft
       renderer.render(scene, camera);
     } finally { inLoop = false; }
-    if (alive && visible && !raf && (now < idleUntil || camTw || extra)) raf = requestAnimationFrame(loop); }
+    if (alive && visible && !raf && (now < idleUntil || camTw || extra || (flowOn && !reduced()))) raf = requestAnimationFrame(loop); }
   const io = new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) kick(); }); io.observe(stage);
+  // Continuous airflow: while flow is on, the loop keeps drawing as long as the stage is on screen (independent of the
+  // surface tweens and of animate()). Off-screen the IntersectionObserver stops it; a hidden tab gets no frames at all;
+  // coming back kicks it again. Reduced motion: dashes stay put and no extra frames are drawn.
+  let flowOn = false, flowPhase = 0; const onVis = () => { if (!document.hidden) kick(); }; document.addEventListener("visibilitychange", onVis);
+  function setFlow(on) { flowOn = !!on; kick(); }
   resize();
   // Warm up the accent-line and light-sprite shader programs now. They start hidden, so the first tap used to stall
   // ~100 ms compiling and linking them. One invisible draw (0 instances, 0 opacity) links every program up front.
@@ -136,6 +141,6 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
       set opacity(o) { op = o; ln.opacity = o; hm.opacity = o; cone.visible = vis && o > 0.004; }, set visible(v) { vis = v; ln.visible = v && op > 0.004; cone.visible = v && op > 0.004; kick(); } };
   }
   return { THREE, P, scene, camera, renderer, pivot, CG, highlight, focus, tint, setView, setAttitude, pose, project, kick, parts: Object.keys(P.parts), inkLines, cueLine, cueArrow, cueGroup: cueG,
-    animate(fn) { extra = fn; kick(); }, setInkOpacity(o) { inkMat.opacity = o; kick(); },
-    destroy() { alive = false; cancelAnimationFrame(raf); raf = 0; ro.disconnect(); io.disconnect(); controls && controls.dispose(); renderer.dispose(); renderer.forceContextLoss && renderer.forceContextLoss(); canvas.remove(); } };
+    animate(fn) { extra = fn; kick(); }, setFlow, flowPhase: () => flowPhase, setInkOpacity(o) { inkMat.opacity = o; kick(); },
+    destroy() { alive = false; document.removeEventListener("visibilitychange", onVis); cancelAnimationFrame(raf); raf = 0; ro.disconnect(); io.disconnect(); controls && controls.dispose(); renderer.dispose(); renderer.forceContextLoss && renderer.forceContextLoss(); canvas.remove(); } };
 }
