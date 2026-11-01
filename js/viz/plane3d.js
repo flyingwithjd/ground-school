@@ -1,7 +1,7 @@
 // 3D part explorer and feature tour for the C172S wireframe.
 import { frame, chips } from "./base.js";
 import { planeStage } from "./planestage.js";
-import { h } from "../core/util.js";
+import { h, reduced } from "../core/util.js";
 // Pose sign conventions (model): ail>0 rolls right, elev<0 = trailing edge up (nose up), rud>0 = right rudder, steer>0 = nose wheel left.
 const PARTS = {
   fuselage: { name: "Fuselage", group: "Fuselage", hl: ["fuselage", "fairing"], view: "iso", text: "The central body. Carries crew, passengers and cargo, and joins the wings and tail. Semimonocoque aluminum on the 172." },
@@ -36,7 +36,7 @@ export function mount(host, { mode = "explore" } = {}) {
   let cur = null, anim = null, ti = 0;
   const S = planeStage(F.stage, { view: "iso", onPick: mode === "explore" ? (p) => p && MAP[p] && select(MAP[p]) : null });
   const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
-  function animatePose(to, dur = 1400) { const from = { ...curPose }; const t0 = performance.now(); S.animate((now) => { const k = Math.min(1, (now - t0) / dur), e = ease(k); const p = {}; for (const key of new Set([...Object.keys(from), ...Object.keys(to)])) p[key] = (from[key] || 0) + ((to[key] || 0) - (from[key] || 0)) * e; curPose = p; S.pose(p); if (k >= 1) S.animate(null); }); }
+  function animatePose(to, dur = reduced() ? 1 : 1400) { const from = { ...curPose }; const t0 = performance.now(); S.animate((now) => { const k = Math.min(1, (now - t0) / dur), e = ease(k); const p = {}; for (const key of new Set([...Object.keys(from), ...Object.keys(to)])) p[key] = (from[key] || 0) + ((to[key] || 0) - (from[key] || 0)) * e; curPose = p; S.pose(p); if (k >= 1) S.animate(null); }); }
   let curPose = {};
   function cowl(show) { (S.inkLines.cowling || []).forEach((l) => (l.visible = show)); S.P.parts.cowling.subs.forEach((sb) => sb.obj.traverse((o) => o.isMesh && (o.visible = show))); S.kick(); }
   function select(key) { const P = PARTS[key]; if (!P) return; cur = key; chipsApi && chipsApi.set(groupOf(key)); cowl(!P.hideCowl); S.highlight(P.hl); S.setView(P.view); animatePose(P.pose || {}); F.caption(P.group, P.name); F.explain(P.text); }

@@ -67,7 +67,7 @@ export function drawOn(el, { dur = 1300, delay = 0, tail = 0.12, light = true, d
   }
   let raf, t0 = null, stopped = false;
   const tl = Math.max(8, L * tail);
-  const step = (ts) => { if (stopped) return; if (t0 == null) t0 = ts + delay; const k = clamp((ts - t0) / dur, 0, 1), p = ease(k), d = L * p;
+  const step = (ts) => { if (stopped) return; if (!el.isConnected) { cancel(); return; } /* scene was redrawn: drop the stale draw-on */ if (t0 == null) t0 = ts + delay; const k = clamp((ts - t0) / dur, 0, 1), p = ease(k), d = L * p;
     el.style.strokeDashoffset = L - d;
     if (light) { const seg = Math.min(tl, d); tailEl.style.strokeDasharray = `0 ${d - seg} ${seg} ${L + 10}`; tailEl.style.strokeDashoffset = 0; const pt = el.getPointAtLength(d); dot.setAttribute("cx", pt.x); dot.setAttribute("cy", pt.y); const o = Math.sin(Math.PI * p) ** 0.4; dot.style.opacity = o; tailEl.style.opacity = o; }
     if (k < 1) raf = requestAnimationFrame(step); else finish(); };
@@ -95,7 +95,7 @@ export const D2R = Math.PI / 180;
 // fn(now, dt) may return false to stop. Returns { start, stop }.
 export function loop(F, fn, { always = false } = {}) {
   let raf = 0, vis = false, on = true, last = 0;
-  const tick = (now) => { raf = 0; if (!on || !vis) return; const dt = last ? Math.min(64, now - last) : 16; last = now; if (fn(now, dt) === false) { on = false; return; } raf = requestAnimationFrame(tick); };
+  const tick = (now) => { raf = 0; if (!on || !vis) return; const dt = last ? Math.min(64, now - last) : 16; last = now; if (fn(now, dt) === false) { on = false; return; } if (on && !raf) raf = requestAnimationFrame(tick); };   // never double-schedule if fn() called start()
   const io = new IntersectionObserver((es) => { vis = es[0].isIntersecting; last = 0; if (vis && on && !raf) raf = requestAnimationFrame(tick); });
   io.observe(F.stage);
   const api = { start() { if (!always && reduced()) { fn(performance.now(), 0); return; } on = true; if (vis && !raf) raf = requestAnimationFrame(tick); }, stop() { on = false; cancelAnimationFrame(raf); raf = 0; } };

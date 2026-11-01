@@ -17,7 +17,7 @@ export const VIEWS = {
 export function planeStage(stage, { view = "iso", orbit = true, onPick = null, ortho = false, ground = false } = {}) {
   const canvas = document.createElement("canvas"); stage.prepend(canvas);
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !matchMedia("(max-width: 760px)").matches, alpha: false, powerPreference: "low-power" });
-  const PHONE = matchMedia("(max-width: 760px)").matches; renderer.setPixelRatio(Math.min(PHONE ? 1.5 : 2, window.devicePixelRatio || 1)); renderer.setClearColor(BG, 1);
+  const PHONE = matchMedia("(max-width: 760px)").matches; renderer.setPixelRatio(Math.min(PHONE ? 1.5 : 2, window.devicePixelRatio || 1)); renderer.setClearColor(BG, 1); renderer.debug.checkShaderErrors = false;   // skip the synchronous shader-log readback (a stall on first draw of each program)
   const scene = new THREE.Scene(); const res = new THREE.Vector2(1, 1);
   const camera = new THREE.PerspectiveCamera(34, 16 / 9, 0.1, 800);
   const P = buildPlane(THREE); const pivot = new THREE.Group(); scene.add(pivot);
@@ -43,9 +43,10 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
   // optional faint ground grid (supporting object, never competes)
   let grid = null; if (ground) { grid = new THREE.GridHelper(140, 28, INK, INK); grid.material.transparent = true; grid.material.opacity = 0.07; grid.position.y = 0; scene.add(grid); }
   let hl = [], prog = 0, progT0 = 0, drawDur = reduced() ? 1 : 1300;
+  const frontV = new THREE.Vector3();
   function setAccent(name, p, light) { let front = null, fk = -1;
     (ACCENT[name] || []).forEach((sb) => { let n = 0; while (n < sb.items.length && sb.items[n].k <= p * 1.0001 + 1e-6) n++; sb.c.visible = sb.gl.visible = n > 0; sb.c.geometry.instanceCount = n; sb.gl.geometry.instanceCount = n;
-      if (n > 0 && sb.items[n - 1].k > fk) { fk = sb.items[n - 1].k; const q = sb.items[n - 1].seg; front = new THREE.Vector3(q[3], q[4], q[5]).applyMatrix4(sb.obj.matrixWorld); } });
+      if (n > 0 && sb.items[n - 1].k > fk) { fk = sb.items[n - 1].k; const q = sb.items[n - 1].seg; front = frontV.set(q[3], q[4], q[5]).applyMatrix4(sb.obj.matrixWorld); } });
     if (light) { const on = p > 0.001 && p < 0.999 && front; light.visible = !!on; if (on) { light.position.copy(front); light.material.opacity = Math.sin(Math.PI * p) ** 0.5; } } }
   function highlight(names) { names = [].concat(names || []).filter((n) => ACCENT[n]); Object.keys(ACCENT).forEach((n) => { if (!names.includes(n)) ACCENT[n].forEach((sb) => (sb.c.visible = sb.gl.visible = false)); }); hl = names; progT0 = performance.now(); prog = 0; kick(); }
   // camera state (spherical around a target), eased transitions
@@ -73,18 +74,30 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
   function project(p, local = true) { tmp.set(p[0], p[1], p[2]); if (local) { tmp.sub(CG); tmp.applyEuler(pivot.rotation); tmp.add(CG); } tmp.project(camera); const r = stage.getBoundingClientRect(); return { x: (tmp.x * 0.5 + 0.5) * r.width, y: (-tmp.y * 0.5 + 0.5) * r.height, z: tmp.z }; }
   function resize() { const r = stage.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.updateProjectionMatrix(); const pr = renderer.getPixelRatio(); res.set(r.width * pr, r.height * pr); coreMat.resolution.copy(res); glowMat.resolution.copy(res); kick(); }
   const ro = new ResizeObserver(resize); ro.observe(stage);
-  let raf = null, alive = true, visible = true, idleUntil = 0, extra = null;
-  function kick(ms = 400) { idleUntil = Math.max(idleUntil, performance.now() + ms); if (!raf && alive) raf = requestAnimationFrame(loop); }
-  function loop(now) { raf = null; if (!alive) return;
-    if (camTw) camTw(now); if (controls) controls.update();
-    if (extra) extra(now);
-    lights.forEach((l) => (l.visible = false));
-    if (hl.length) { prog = clamp((now - progT0) / drawDur, 0, 1); const p = s5(prog); hl.forEach((n, i) => setAccent(n, p, lights[i % 4])); if (prog < 1) idleUntil = Math.max(idleUntil, now + 50); }
-    renderer.render(scene, camera);
-    if (visible && (now < idleUntil || camTw || extra)) raf = requestAnimationFrame(loop); }
+  // ONE render loop per stage. kick() only schedules a frame when none is pending and we are not inside loop();
+  // calls made during a frame (pose, setAttitude, OrbitControls "change") just extend idleUntil, and loop() decides
+  // once, at its end, whether to continue. (Bug fixed 2026-10-31: kick() inside loop() used to schedule a second
+  // loop while the tail scheduled another, doubling the live loops every frame during any part switch or animation.)
+  let raf = 0, alive = true, visible = true, idleUntil = 0, extra = null, inLoop = false;
+  function kick(ms = 400) { idleUntil = Math.max(idleUntil, performance.now() + ms); if (!raf && !inLoop && alive && visible) raf = requestAnimationFrame(loop); }
+  function loop(now) { raf = 0; if (!alive) return; inLoop = true;
+    try {
+      if (camTw) camTw(now); if (controls) controls.update();
+      if (extra) extra(now);
+      lights.forEach((l) => (l.visible = false));
+      if (hl.length) { prog = clamp((now - progT0) / drawDur, 0, 1); const p = s5(prog); hl.forEach((n, i) => setAccent(n, p, lights[i % 4])); if (prog < 1) idleUntil = Math.max(idleUntil, now + 50); }
+      renderer.render(scene, camera);
+    } finally { inLoop = false; }
+    if (alive && visible && !raf && (now < idleUntil || camTw || extra)) raf = requestAnimationFrame(loop); }
   const io = new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) kick(); }); io.observe(stage);
-  resize(); kick(1000);
+  resize();
+  // Warm up the accent-line and light-sprite shader programs now. They start hidden, so the first tap used to stall
+  // ~100 ms compiling and linking them. One invisible draw (0 instances, 0 opacity) links every program up front.
+  { const tmp = []; scene.traverse((o) => { if (!o.visible && (o.isLineSegments2 || o.isSprite)) { tmp.push([o, o.isSprite ? o.material.opacity : o.geometry.instanceCount]); o.visible = true; if (o.isSprite) o.material.opacity = 0; else o.geometry.instanceCount = 0; } });
+    try { renderer.render(scene, camera); } catch (e) {}
+    tmp.forEach(([o, v]) => { o.visible = false; if (o.isSprite) o.material.opacity = v; else o.geometry.instanceCount = v; }); }
+  kick(1000);
   return { THREE, P, scene, camera, renderer, pivot, CG, highlight, setView, setAttitude, pose, project, kick, parts: Object.keys(P.parts), inkLines,
     animate(fn) { extra = fn; kick(); }, setInkOpacity(o) { inkMat.opacity = o; kick(); },
-    destroy() { alive = false; cancelAnimationFrame(raf); ro.disconnect(); io.disconnect(); controls && controls.dispose(); renderer.dispose(); renderer.forceContextLoss && renderer.forceContextLoss(); canvas.remove(); } };
+    destroy() { alive = false; cancelAnimationFrame(raf); raf = 0; ro.disconnect(); io.disconnect(); controls && controls.dispose(); renderer.dispose(); renderer.forceContextLoss && renderer.forceContextLoss(); canvas.remove(); } };
 }

@@ -79,3 +79,23 @@ These notes are updated as work goes, so an interruption loses nothing. The time
 - GSAP <script> removed from index.html (it was never used, saves 76 KB). The file stays vendored. Added LICENSES/IBMPlexMono-OFL.txt and GSAP-NOTICE.txt, plus README.md.
 - tests: routes.mjs (187 routes), smoke.mjs now opens a fresh page per route (one long-lived tab hung swiftshader after several WebGL scenes), srs-persist.mjs (SRS state identical after reload), shots.mjs (final screenshots).
 - Full smoke: 187/187 routes, no console errors. Validate: 609 MCQ / 71 oral / 0 bad / 0 missing glossary.
+
+### 2026-10-31 evening MDT: 3D part-switch lag fix (user report: ~1 fps when tapping parts on iPhone, orbit smooth)
+- ROOT CAUSE (js/viz/planestage.js): the render loop set `raf = null` at the start of each frame, then code run inside the frame
+  (`S.pose()`, `S.setAttitude()`, OrbitControls "change") called `kick()`, which saw no pending frame and scheduled a second loop;
+  the loop's own tail then scheduled another. Every frame doubled the number of live render loops, so each part switch
+  (camera tween + pose animation) piled up hundreds of renders per frame. Orbiting by finger was smooth because the drag
+  events call kick() outside the loop. Axes of flight (fl2) was worse: its constant rocking animation kicked every frame, so loops grew without limit.
+- FIX: single-loop guard (`inLoop` flag; kick() never schedules while a frame is running or one is pending; the tail schedules
+  at most once; kick() is a no-op while off-screen). Also warm up the accent-line and light-sprite shader programs at mount with one invisible
+  draw (0 instances / 0 opacity) and set `renderer.debug.checkShaderErrors = false`, which removes a ~100 ms first-tap compile/link stall.
+  setAccent reuses one Vector3 instead of allocating per frame.
+- Same pattern hardened elsewhere: base.js loop() tail now never double-schedules; drawOn() stops when its element was removed
+  (SVG scenes that redraw on chip taps, e.g. structure.js, no longer keep stale draw-on loops running); plane3d animatePose snaps under reduced motion.
+  All 3D visuals share planestage.js, so plane3d (explore + tour), axes and controls (primary + trim/flaps) all get the fix.
+- MEASURED (playwright, 390x844 @3x, isMobile, CPU throttle 4x, swiftshader; frame intervals while the switch animates):
+  before: tap Wings → 8 frames in 1.8 s (p95 533 ms), 1,032 rAF calls; the next tap got 1 frame, then the page stalled. Axes page never settled.
+  after: tap Wings/Empennage/Powerplant/Ailerons → p50 16.7 ms, p95 17–67 ms, ~150–210 rAF calls (same as orbit's ~150). Orbit unchanged (16.7 ms).
+  At 6x throttle the results are the same. Profiling script: /workspace/prof/prof.mjs (box only).
+- Tests: validate 609 MCQ / 71 oral / 0 bad; smoke 187/187 desktop + 18 phone-size routes, no console errors; reduced-motion check OK.
+- Seen, not fixed: on phone the "Wings" caption sits on top of the bottom-right "Span … length …" corner label in plane3d.
