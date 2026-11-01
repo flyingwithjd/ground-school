@@ -1,11 +1,11 @@
 // Stage checks (written + oral), the pre-solo written practice exam, and the syllabus coverage checklist.
-import { h, esc, shuffle } from "../core/util.js?v=074f6ea36d";
-import { S, save } from "../core/store.js?v=074f6ea36d";
-import { STAGES, STAGE_CHECK } from "../../data/course.js?v=074f6ea36d";
-import { LESSONS, QUESTIONS, ORAL, TOPICS, lessonItems } from "../../data/index.js?v=074f6ea36d";
-import { stats } from "../core/progress.js?v=074f6ea36d";
-import { session } from "./quiz.js?v=074f6ea36d";
-import { rich } from "../core/rich.js?v=074f6ea36d";
+import { h, esc, shuffle } from "../core/util.js?v=25fe20f25f";
+import { S, save } from "../core/store.js?v=25fe20f25f";
+import { STAGES, STAGE_CHECK } from "../../data/course.js?v=25fe20f25f";
+import { LESSONS, QUESTIONS, ORAL, TOPICS, lessonItems } from "../../data/index.js?v=25fe20f25f";
+import { stats } from "../core/progress.js?v=25fe20f25f";
+import { session } from "./quiz.js?v=25fe20f25f";
+import { rich } from "../core/rich.js?v=25fe20f25f";
 const page = (host) => { const p = h("div", { class: "page" }); host.append(p); return p; };
 const foot = `<div class="footer">Study aid. Your school's syllabus, your instructor and the FAA sources decide what a stage check covers and how it is graded.</div>`;
 const sid = (k) => STAGES.find((s) => s.id === k);

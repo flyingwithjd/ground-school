@@ -419,25 +419,19 @@ svg text:not([font-family]) { font-family: var(--mono); }
 .hv-hd { font: 500 11px/1.25 var(--mono); letter-spacing: .08em; text-transform: uppercase; color: var(--ink2); display: flex; align-items: center; justify-content: center; text-align: center; padding: 2px; }
 .hv-sel { font: 500 15px/1.2 var(--sans); background: var(--bg); color: var(--ink); border: 1px solid var(--line2); border-radius: 8px; padding: 10px 12px; min-height: 44px; }
 .hv-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 8px; }
-/* trim tab explainer: 2D side view of the tail beside the trim wheel (replaces the 3D close-up while trim is shown) */
-.viz.trim2d .stage{aspect-ratio:auto;display:grid;grid-template-columns:96px minmax(0,1fr);gap:20px;padding:46px 22px 20px;align-items:stretch}
-.viz.trim2d .stage>canvas,.viz.trim2d .stage>.caption{display:none}
-.viz.trim2d .stage .trimwheel{position:relative;left:auto;top:auto;transform:none;width:96px;height:auto;min-height:256px;max-height:420px;align-self:center}
-.viz .trimx{display:none}
-.viz.trim2d .trimx{display:flex;flex-direction:column;min-width:0;gap:6px}
-.trimx-head{display:flex;flex-direction:column;gap:2px}
-.trimx-head .label{font-size:10.5px}
-.trimx-big{font:800 clamp(20px,2.6vw,30px)/1.1 var(--sans);letter-spacing:-.02em}
-.trimx-svg{display:block;width:min(100%,calc(min(420px,52vh) * 320 / 280));height:auto}
-.trimx-chain{margin:0;font-size:16px;max-width:36rem;line-height:1.5;color:var(--ink3)}
-.trimx-chain b{color:var(--ink);font-weight:600}
-.trimx-chain [data-i]{transition:color 260ms var(--ease)}
-.trimx-chain [data-i].on{color:var(--ink)}
-.trimx-chain .ar{margin:0 .1em;color:var(--acc)}
-.trimx-flow{animation:trimflow 900ms linear infinite}
-@keyframes trimflow{from{stroke-dashoffset:12}to{stroke-dashoffset:0}}
-@media (prefers-reduced-motion:reduce){.trimx-flow{animation:none}.trimx-chain [data-i]{transition:none}}
-@media (max-width:700px){.viz.trim2d .stage{grid-template-columns:72px minmax(0,1fr);gap:10px;padding:40px 10px 14px}.viz.trim2d .stage .trimwheel{width:72px;min-height:0;height:100%;max-height:none;align-self:stretch}.trimx-chain{font-size:16px}.trimx-big{font-size:24px}.viz.trim2d .stage:has(.trimwheel) .caption{padding-left:0}}
-.viz.trim2d>.caption{display:none}
-.trimx-chain [data-i]{white-space:nowrap}
-.viz.capin:not(.trim2d) .stage .trimwheel{display:none}
+/* trim and flaps: one 3D stage; title band above, step chain below, airflow cues drawn over the canvas */
+.viz.tf .stage{aspect-ratio:16/9;max-height:60vh}
+.viz.tf .corner,.viz.tf .stage>.caption{display:none}
+.tf-title{padding:18px clamp(16px,2.6vw,26px) 12px;font:800 clamp(22px,2.6vw,30px)/1.1 var(--sans);letter-spacing:-.02em;border-bottom:1px solid var(--line)}
+.tf-chain{margin:0;padding:14px clamp(16px,2.6vw,26px) 4px;min-height:calc(3em + 18px);font-size:17px;line-height:1.5;color:var(--ink2);border-top:1px solid var(--line)}
+.tf-chain [data-i]{color:var(--ink3);white-space:nowrap;transition:color 260ms var(--ease)}
+.tf-chain [data-i].on{color:var(--ink)}
+.tf-chain .ar{color:var(--acc)}
+.tf-cues{position:absolute;inset:0;width:100%;height:100%;pointer-events:none;z-index:2;transition:opacity 500ms var(--ease)}
+.viz.tf-flaps .tf-cues{opacity:0}
+.viz.tf .stage .trimwheel{transition:opacity 500ms var(--ease)}
+.viz.tf-flaps .stage .trimwheel{opacity:0;pointer-events:none}
+.tf-flow{animation:tfflow 900ms linear infinite}
+@keyframes tfflow{from{stroke-dashoffset:12}to{stroke-dashoffset:0}}
+@media (prefers-reduced-motion:reduce){.tf-flow{animation:none}.tf-chain [data-i],.tf-cues,.viz.tf .stage .trimwheel{transition:none}}
+@media (max-width:700px){.viz.tf .stage{aspect-ratio:1/1;max-height:none}.viz.tf .stage .trimwheel{top:10px;height:calc(100% - 20px)}.tf-chain{font-size:16px}}
