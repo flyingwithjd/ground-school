@@ -1,7 +1,7 @@
 // 3D part explorer and feature tour for the C172S wireframe.
-import { frame, chips } from "./base.js?v=54b9a323a1";
-import { planeStage } from "./planestage.js?v=54b9a323a1";
-import { h, reduced } from "../core/util.js?v=54b9a323a1";
+import { frame, chips } from "./base.js?v=f687e808d6";
+import { planeStage } from "./planestage.js?v=f687e808d6";
+import { h, reduced } from "../core/util.js?v=f687e808d6";
 // Pose sign conventions (model): ail>0 rolls right, elev<0 = trailing edge up (nose up), rud>0 = right rudder, steer>0 = nose wheel left.
 const PARTS = {
   fuselage: { name: "Fuselage", group: "Major component", hl: ["fuselage", "fairing"], view: "iso", text: "The central body. Carries crew, passengers and cargo, and joins the wings and tail. Semimonocoque aluminum on the 172." },
@@ -15,7 +15,7 @@ const PARTS = {
   hstab: { name: "Horizontal stabilizer", group: "Empennage · fixed", hl: ["hstab"], view: "tail", text: "Fixed surface that gives pitch stability. The elevator is hinged to its trailing edge." },
   rudder: { name: "Rudder", group: "Empennage · primary control", hl: ["rudder"], view: "tail", pose: { rud: 25 }, text: "Hinged to the fin. Yaws the nose left and right about the vertical axis. Controlled by the rudder pedals." },
   elevator: { name: "Elevator", group: "Empennage · primary control", hl: ["elevator"], view: "tail", pose: { elev: -25 }, text: "Hinged to the horizontal stabilizer. Pitches the nose up and down about the lateral axis. Back pressure raises it." },
-  trimtab: { name: "Trim tab", group: "Empennage · secondary control", hl: ["trimtab"], view: "tail", pose: { trim: 12 }, text: "Small tab on the elevator's trailing edge. Holds the elevator where you want it so you do not have to. Manual trim wheel on the 172S." },
+  trimtab: { name: "Trim tab", group: "Empennage · secondary control", hl: ["trimtab"], view: "tailR", pose: { trim: 12 }, text: "Small tab on the elevator's trailing edge. Holds the elevator where you want it so you do not have to. Manual trim wheel on the 172S." },
   gear: { name: "Landing gear", group: "Major component", hl: ["gear"], view: "gear", pose: { steer: 10 }, text: "Fixed tricycle gear: two spring-steel <b>main gear</b> legs and a steerable <b>nose gear</b> on an air/oil strut, each wheel with a <b>wheel fairing</b>. Disc brakes on the mains." },
   powerplant: { name: "Powerplant", group: "Major component", hl: ["engine", "cowling", "propeller"], view: "nose", cowlWire: true, text: "The <b>engine</b>, its <b>cowling</b> and the <b>propeller</b>, ahead of the firewall that separates them from the cabin. Lycoming IO-360-L2A, 180 hp, turning a two-blade fixed-pitch prop. Cowling drawn as an outline so you can see the engine inside." },
   engine: { name: "Engine", group: "Powerplant", hl: ["engine"], view: "nose", hideCowl: true, text: "Four cylinders, horizontally opposed, air-cooled, fuel-injected. Shown schematically inside the cowling." },

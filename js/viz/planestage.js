@@ -5,13 +5,13 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
-import { buildPlane } from "./c172-model.js?v=54b9a323a1";
-import { reduced, clamp } from "../core/util.js?v=54b9a323a1";
+import { buildPlane } from "./c172-model.js?v=f687e808d6";
+import { reduced, clamp } from "../core/util.js?v=f687e808d6";
 const ACC = 0x3b82f6, INK = 0xf2f1ec, BG = 0x0a0a0b, D = Math.PI / 180;
 const s5 = (t) => { t = clamp(t, 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
 export const VIEWS = {
   iso: { tg: [-4.5, 4.2, 0], az: -32, el: 16, d: 52 }, side: { tg: [-4.5, 4.4, 0], az: -90, el: 2, d: 54 }, top: { tg: [-4.5, 4.2, 0], az: -90, el: 88.5, d: 62 },
-  front: { tg: [-3, 5, 0], az: 0, el: 4, d: 52 }, rear: { tg: [-4, 5, 0], az: 180, el: 8, d: 52 }, tail: { tg: [-16.5, 5.6, 0], az: -150, el: 22, d: 24 },
+  front: { tg: [-3, 5, 0], az: 0, el: 4, d: 52 }, rear: { tg: [-4, 5, 0], az: 180, el: 8, d: 52 }, tail: { tg: [-16.5, 5.6, 0], az: -150, el: 22, d: 24 }, tailR: { tg: [-16.8, 5.0, 1.2], az: 145, el: 24, d: 18 },
   nose: { tg: [5.5, 4, 0], az: -38, el: 16, d: 17 }, wingL: { tg: [-2, 6.4, -9], az: -130, el: 34, d: 30 }, wingR: { tg: [-2, 6.4, 9], az: 130, el: 34, d: 30 },
   gear: { tg: [0, 2.2, 0], az: -60, el: 6, d: 28 }, cabin: { tg: [-1, 5, 0], az: -70, el: 18, d: 26 } };
 export function planeStage(stage, { view = "iso", orbit = true, onPick = null, ortho = false, ground = false } = {}) {

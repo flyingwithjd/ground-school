@@ -1,7 +1,7 @@
 // Airport signs (AIM 2-3-7 to 2-3-13; AC 150/5340-18H). Learn: tap a sign for what it means and what you do.
 // Drill: a random sign, pick its meaning. Real sign colors are used here because the color IS the message.
-import { frame, chips } from "./base.js?v=54b9a323a1";
-import { h, shuffle } from "../core/util.js?v=54b9a323a1";
+import { frame, chips } from "./base.js?v=f687e808d6";
+import { h, shuffle } from "../core/util.js?v=f687e808d6";
 const R = "sg-red", K = "sg-loc", Yl = "sg-dir", B = "sg-dist";
 const HOLD4 = `<svg viewBox="0 0 40 30" class="sg-g"><path d="M2,6H38M2,12H38" stroke="currentColor" stroke-width="2.4" stroke-dasharray="5 3"/><path d="M2,18H38M2,24H38" stroke="currentColor" stroke-width="2.4"/></svg>`;
 const LADDER = `<svg viewBox="0 0 40 30" class="sg-g"><path d="M2,9H38M2,21H38" stroke="currentColor" stroke-width="2.4"/><path d="M6,9V21M10,9V21M18,9V21M22,9V21M30,9V21M34,9V21" stroke="currentColor" stroke-width="2"/></svg>`;
