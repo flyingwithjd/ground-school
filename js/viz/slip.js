@@ -1,8 +1,8 @@
 // Crab vs sideslip vs forward slip on final (AFH 9). Top view of the runway with the ground track, plus a rear-view bank inset.
-import { frame, chips, slider, readout, svg, ACC, FAINT, FAINT2 } from "./base.js?v=05f99f8a27";
-import { s } from "../core/util.js?v=05f99f8a27";
-import { T, topPlane, rearPlane, arrow, setArrow } from "./shapes.js?v=05f99f8a27";
-import { windField } from "./windfield.js?v=05f99f8a27";
+import { frame, chips, slider, readout, svg, ACC, FAINT, FAINT2 } from "./base.js?v=54b9a323a1";
+import { s } from "../core/util.js?v=54b9a323a1";
+import { T, topPlane, rearPlane, arrow, setArrow } from "./shapes.js?v=54b9a323a1";
+import { windField } from "./windfield.js?v=54b9a323a1";
 const M = {
   crab: { label: "Crab · wings level", big: "Nose into the wind", text: "Heading is turned into the wind so the track follows the centerline. Wings are level and the controls are coordinated. Fine on final, but the airplane must not touch down sideways." },
   side: { label: "Sideslip · wing low", big: "Low wing, opposite rudder", text: "Lower the upwind wing to stop the drift and hold opposite rudder to keep the nose on the centerline. The longitudinal axis stays aligned with the runway, so you can touch down on the upwind main wheel first. The POH notes this wing-low method gives the best control in a crosswind." },

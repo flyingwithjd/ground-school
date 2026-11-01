@@ -1,10 +1,10 @@
 // Gathers every lesson/module file into lookup tables used by the learning engine.
-import { STAGES, MODULES } from "./course.js?v=05f99f8a27";
-import gl1 from "./lessons/gl1.js?v=05f99f8a27"; import gl2 from "./lessons/gl2.js?v=05f99f8a27"; import gl3 from "./lessons/gl3.js?v=05f99f8a27"; import gl4 from "./lessons/gl4.js?v=05f99f8a27"; import gl5 from "./lessons/gl5.js?v=05f99f8a27"; import gl6 from "./lessons/gl6.js?v=05f99f8a27";
-import fl1 from "./lessons/fl1.js?v=05f99f8a27"; import fl2 from "./lessons/fl2.js?v=05f99f8a27"; import fl3 from "./lessons/fl3.js?v=05f99f8a27"; import fl4 from "./lessons/fl4.js?v=05f99f8a27"; import fl5 from "./lessons/fl5.js?v=05f99f8a27"; import fl6 from "./lessons/fl6.js?v=05f99f8a27"; import fl7 from "./lessons/fl7.js?v=05f99f8a27";
-import gl7 from "./lessons/gl7.js?v=05f99f8a27"; import gl8 from "./lessons/gl8.js?v=05f99f8a27";
-import airport from "./modules/airport.js?v=05f99f8a27"; import wind from "./modules/wind.js?v=05f99f8a27"; import radio from "./modules/radio.js?v=05f99f8a27"; import regs from "./modules/regs.js?v=05f99f8a27";
-import emerg from "./modules/emerg.js?v=05f99f8a27"; import adm from "./modules/adm.js?v=05f99f8a27"; import flows from "./modules/flows.js?v=05f99f8a27"; import mnemo from "./modules/mnemo.js?v=05f99f8a27";
+import { STAGES, MODULES } from "./course.js?v=54b9a323a1";
+import gl1 from "./lessons/gl1.js?v=54b9a323a1"; import gl2 from "./lessons/gl2.js?v=54b9a323a1"; import gl3 from "./lessons/gl3.js?v=54b9a323a1"; import gl4 from "./lessons/gl4.js?v=54b9a323a1"; import gl5 from "./lessons/gl5.js?v=54b9a323a1"; import gl6 from "./lessons/gl6.js?v=54b9a323a1";
+import fl1 from "./lessons/fl1.js?v=54b9a323a1"; import fl2 from "./lessons/fl2.js?v=54b9a323a1"; import fl3 from "./lessons/fl3.js?v=54b9a323a1"; import fl4 from "./lessons/fl4.js?v=54b9a323a1"; import fl5 from "./lessons/fl5.js?v=54b9a323a1"; import fl6 from "./lessons/fl6.js?v=54b9a323a1"; import fl7 from "./lessons/fl7.js?v=54b9a323a1";
+import gl7 from "./lessons/gl7.js?v=54b9a323a1"; import gl8 from "./lessons/gl8.js?v=54b9a323a1";
+import airport from "./modules/airport.js?v=54b9a323a1"; import wind from "./modules/wind.js?v=54b9a323a1"; import radio from "./modules/radio.js?v=54b9a323a1"; import regs from "./modules/regs.js?v=54b9a323a1";
+import emerg from "./modules/emerg.js?v=54b9a323a1"; import adm from "./modules/adm.js?v=54b9a323a1"; import flows from "./modules/flows.js?v=54b9a323a1"; import mnemo from "./modules/mnemo.js?v=54b9a323a1";
 const ALL = [gl1, gl2, gl3, gl4, gl5, gl6, fl1, fl2, fl3, fl4, fl5, fl6, fl7, gl7, gl8, ...airport, ...wind, ...radio, ...regs, ...emerg, ...adm, ...flows, ...mnemo];
 export const LESSONS = {}; export const QUESTIONS = {}; export const ORAL = {}; export const TOPICS = {};
 for (const L of ALL) {

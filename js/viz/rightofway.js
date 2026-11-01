@@ -1,7 +1,7 @@
 // Right-of-way (14 CFR 91.113). Pick a situation; the airplane that must give way is drawn faint, the one with the right-of-way in the accent.
-import { frame, chips, svg, drawOn, ACC, FAINT2 } from "./base.js?v=05f99f8a27";
-import { s } from "../core/util.js?v=05f99f8a27";
-import { T } from "./shapes.js?v=05f99f8a27";
+import { frame, chips, svg, drawOn, ACC, FAINT2 } from "./base.js?v=54b9a323a1";
+import { s } from "../core/util.js?v=54b9a323a1";
+import { T } from "./shapes.js?v=54b9a323a1";
 const CASES = {
   conv: { cap: ["Converging", "The one on the right has it"], t: "Same category, about the same altitude, converging (not head-on): the aircraft to the other's right has the right-of-way. The other gives way and does not pass over, under or ahead unless well clear. <span class=\"src\">91.113(b), (d)</span>", a: [700, 640, -45], b: [1180, 420, -135], who: "b", give: "M700,640 Q760,560 860,600" },
   head: { cap: ["Head-on", "Both turn right"], t: "Approaching head-on or nearly so: each pilot alters course to the right. <span class=\"src\">91.113(e)</span>", a: [380, 450, 0], b: [1220, 450, 180], who: "both", give: "M380,450 Q560,450 640,540", give2: "M1220,450 Q1040,450 960,360" },
