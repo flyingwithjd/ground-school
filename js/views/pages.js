@@ -1,11 +1,11 @@
-import { h, esc, pct, fmtDue, toast, download, shuffle } from "../core/util.js?v=4258458bcd";
-import { S, save, exportJSON, importJSON, reset } from "../core/store.js?v=4258458bcd";
-import { get } from "../core/srs.js?v=4258458bcd";
-import { STAGES, MODULES, STAGE_CHECK } from "../../data/course.js?v=4258458bcd";
-import { LESSONS, QUESTIONS, ORAL, TOPICS, ORDER, lessonItems } from "../../data/index.js?v=4258458bcd";
-import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone } from "../core/progress.js?v=4258458bcd";
-import { session } from "./quiz.js?v=4258458bcd";
-import { G, rich } from "../core/rich.js?v=4258458bcd";
+import { h, esc, pct, fmtDue, toast, download, shuffle } from "../core/util.js?v=69d1e15885";
+import { S, save, exportJSON, importJSON, reset } from "../core/store.js?v=69d1e15885";
+import { get } from "../core/srs.js?v=69d1e15885";
+import { STAGES, MODULES, STAGE_CHECK } from "../../data/course.js?v=69d1e15885";
+import { LESSONS, QUESTIONS, ORAL, TOPICS, ORDER, lessonItems } from "../../data/index.js?v=69d1e15885";
+import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone } from "../core/progress.js?v=69d1e15885";
+import { session } from "./quiz.js?v=69d1e15885";
+import { G, rich } from "../core/rich.js?v=69d1e15885";
 const page = (host) => { const p = h("div", { class: "page" }); host.append(p); return p; };
 const meter = (x, big) => `<div class="meter${big ? " big" : ""}"><i style="width:${Math.round(x * 100)}%"></i></div>`;
 const stageLessons = (s) => [...s.ground, ...s.flight].flatMap((id) => [id, ...((LESSONS[id] && LESSONS[id].includes) || [])]);
@@ -88,6 +88,7 @@ export function tools(host) { const p = page(host); const sims = S().sims || [];
   <a class="cell" href="#/sim"><span class="label">Stage checks</span><h3>Written and oral, 80% to pass</h3><p>Stage 1, 2 and 3 checks and the end-of-course exam. Timed written tests with no hints, and oral exams you grade yourself. Every miss is reviewed and goes into your review schedule.${sims.length ? ` Last score ${Math.round(sims[sims.length - 1].score * 100)}%.` : ""}</p><span class="go btn arrow">Start</span></a>
   <a class="cell" href="#/presolo"><span class="label">Pre-solo written · 14 CFR 61.87(b)</span><h3>Before your first solo</h3><p>A practice pre-solo knowledge test on Parts 61 and 91, airspace and procedures at your airport, and the airplane's limits. Plus a worksheet for your own airport.</p><span class="go btn arrow">Open</span></a>
   <a class="cell" href="#/coverage"><span class="label">Syllabus checklist</span><h3>Every item, ticked off</h3><p>All 19 ground lessons and every content item, with links to where each one is taught. Tick items as you finish them.</p><span class="go btn arrow">Open</span></a>
+  <a class="cell" href="#/lesson/vs1"><span class="label">V-speeds · POH Sec 2</span><h3>What V<sub>FE</sub>, V<sub>NO</sub> and V<sub>Y</sub> mean</h3><p>Every V-speed on the 172S airspeed indicator and the ones that are not on it. Tap a speed to light up its arc or line.</p><span class="go btn arrow">Open</span></a>
   <a class="cell" href="#/glossary"><span class="label">Glossary</span><h3>${Object.keys(G).length} terms</h3><p>Every underlined term in a lesson opens its definition. Browse or search them all here.</p><span class="go btn arrow">Open</span></a>
   <a class="cell" href="#/settings"><span class="label">Progress and settings</span><h3>Your data stays here</h3><p>Progress is saved only in this browser. Export it to a file to move devices or keep a backup.</p><span class="go btn arrow">Open</span></a></div>${foot()}`; }
 export function oral(host, lid) {
@@ -100,12 +101,13 @@ export function oral(host, lid) {
   const { queue, extra } = buildQueue(ids, { includeOral: true, max: 12, newMax: 12 });
   return runSession(host, { queue: queue.length ? queue : shuffle(ids).slice(0, 10), extra, mode: "oral", title: "Oral exam", label: "Oral exam" + (lid !== "all" ? " · " + LESSONS[lid].code : ""), onExit: () => (location.hash = "#/oral") });
 }
-export { sim, check } from "./checks.js?v=4258458bcd";
-export function glossary(host) { const p = page(host); const keys = Object.keys(G).sort();
-  p.innerHTML = `<section class="hero"><span class="label">Glossary</span><h1>Terms, plainly</h1></section>`;
+export { sim, check } from "./checks.js?v=69d1e15885";
+export function glossary(host, focus) { const p = page(host); const keys = Object.keys(G).sort(); const slug = (k) => k.replace(/\s+/g, "-");
+  p.innerHTML = `<section class="hero"><span class="label">Glossary</span><h1>Terms, plainly</h1><p>Every underlined term in a lesson opens its definition. Airspeed symbols like V<sub>FE</sub> are explained with the dial in <a href="#/lesson/vs1">V-speeds</a>.</p></section>`;
   const inp = h("input", { type: "search", placeholder: "Search terms", "aria-label": "Search terms" }); p.append(h("div", { class: "field", style: "max-width:28rem" }, inp)); const list = h("div", { class: "mt" }); p.append(list);
-  const draw = () => { const q = inp.value.trim().toLowerCase(); list.innerHTML = keys.filter((k) => !q || k.includes(q) || G[k].def.toLowerCase().includes(q)).map((k) => `<div class="row" style="grid-template-columns:1fr;gap:6px"><div class="t">${esc(G[k].term)}</div><div class="s" style="font-size:16px">${G[k].def}${G[k].src ? ` <span class="src">${esc(G[k].src)}</span>` : ""}</div></div>`).join("") || `<p class="dim">No match.</p>`; };
-  inp.oninput = draw; draw(); }
+  const draw = () => { const q = inp.value.trim().toLowerCase(); list.innerHTML = keys.filter((k) => !q || k.includes(q) || G[k].def.toLowerCase().includes(q)).map((k) => `<div class="row grow" id="g-${esc(slug(k))}" style="grid-template-columns:1fr;gap:6px"><div class="t">${esc(G[k].term)}</div><div class="s" style="font-size:16px">${G[k].def}${G[k].src ? ` <span class="src">${esc(G[k].src)}</span>` : ""}${G[k].more ? ` <a class="src" href="${esc(G[k].more[0])}">${esc(G[k].more[1])}</a>` : ""}</div></div>`).join("") || `<p class="dim">No match.</p>`; };
+  inp.oninput = draw; draw();
+  if (focus) { const row = list.querySelector(`#g-${CSS.escape(slug(focus.toLowerCase()))}`); if (row) { row.classList.add("hit"); setTimeout(() => row.scrollIntoView({ block: "start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }), 60); } } }
 export function settings(host) { const p = page(host); const st = S();
   p.innerHTML = `<section class="hero"><span class="label">Progress and settings</span><h1>Your data, your device</h1><p>Nothing leaves this browser. No account, no server. Clearing site data erases progress, so export a backup now and then.</p></section>`;
   const c1 = h("div", { class: "card" }); c1.innerHTML = `<span class="label">Confidence check</span><p class="dim mt" style="font-size:16px">After you pick an answer, tap how sure you are. Guessed-right answers return sooner; certain-but-wrong answers are flagged as blind spots.</p>`;
@@ -126,4 +128,4 @@ export function about(host) { const p = page(host);
   <p>Citations name the chapter, section or regulation. Procedures are marked to confirm with your instructor and your aircraft's POH, because flight schools and airplanes differ.</p>
   <h4>Software and fonts</h4><ul><li>three.js r181, MIT License</li><li>GSAP 3.14, GreenSock Standard "No Charge" License (vendored, not loaded in this build)</li><li>Inter and IBM Plex Mono, SIL Open Font License 1.1</li></ul><p>License texts are in the LICENSES folder.</p>
   <h4>Not affiliated</h4><p>Squawk School is an independent study aid. Not affiliated with or endorsed by the FAA or Textron Aviation. Cessna and Skyhawk are trademarks of their owner.</p></div>`; }
-export { coverage, presolo } from "./checks.js?v=4258458bcd";
+export { coverage, presolo } from "./checks.js?v=69d1e15885";

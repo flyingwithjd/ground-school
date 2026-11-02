@@ -1,10 +1,10 @@
 // The practice engine UI: multiple choice, ordered sequences, oral self-rating; learn/review/exam modes.
-import { h, esc, shuffle, fmtDue, toast } from "../core/util.js?v=4258458bcd";
-import { review, get, CONF, level, LEVELS } from "../core/srs.js?v=4258458bcd";
-import { S } from "../core/store.js?v=4258458bcd";
-import { item } from "../../data/index.js?v=4258458bcd";
-import { TOPICS, LESSONS } from "../../data/index.js?v=4258458bcd";
-import { rich } from "../core/rich.js?v=4258458bcd";
+import { h, esc, shuffle, fmtDue, toast } from "../core/util.js?v=69d1e15885";
+import { review, get, CONF, level, LEVELS } from "../core/srs.js?v=69d1e15885";
+import { S } from "../core/store.js?v=69d1e15885";
+import { item } from "../../data/index.js?v=69d1e15885";
+import { TOPICS, LESSONS } from "../../data/index.js?v=69d1e15885";
+import { rich, autoTerms } from "../core/rich.js?v=69d1e15885";
 const KEYS = "ABCDEFG";
 export function session(host, { queue, extra = [], mode = "review", title = "Review", label = "", onExit, onFinish, minutes = 0, passMark = 0.7, intro = "", check = false }) {
   const exam = mode === "exam"; let i = 0; const q = queue.slice(); const results = []; const requeued = new Set(); let t0 = Date.now(), timerI = null;
@@ -24,7 +24,7 @@ export function session(host, { queue, extra = [], mode = "review", title = "Rev
   function scheduleNote(r, ok) { const lv = LEVELS[level(r)]; return ok ? `Next review ${fmtDue(r.due)} · ${lv}` : `Back ${fmtDue(r.due)}${exam ? "" : ", and again later in this session"}`; }
   function verdict(it, ok, r, extraHtml = "") { if (exam) return next();
     if (!ok && !requeued.has(it.id)) { requeued.add(it.id); q.splice(Math.min(q.length, i + 4), 0, it.id); }
-    const v = h("div", { class: "verdict", "aria-live": "polite" }); v.innerHTML = `<div class="big">${ok ? "Correct." : "Not quite."}</div>${extraHtml}<div class="prose"><p>${rich(it.why || "")}</p>${it.src ? `<p class="src">${esc(it.src)}</p>` : ""}</div><p class="label">${esc(scheduleNote(r, ok))}</p>`;
+    const v = h("div", { class: "verdict", "aria-live": "polite" }); v.innerHTML = `<div class="big">${ok ? "Correct." : "Not quite."}</div>${extraHtml}<div class="prose"><p>${rich(it.why || "")}</p>${it.src ? `<p class="src">${esc(it.src)}</p>` : ""}</div><p class="label">${esc(scheduleNote(r, ok))}</p>`; autoTerms(v.querySelector(".prose"));
     const nb = h("button", { class: "btn pri arrow", "data-primary": "", type: "button" }, i + 1 >= q.length ? "Finish" : "Next"); nb.onclick = next; v.append(h("div", { class: "btns mt" }, nb, quitBtn())); body.append(v); nb.focus({ preventScroll: true }); v.scrollIntoView({ behavior: "smooth", block: "nearest" }); }
   function quitBtn() { const b = h("button", { class: "btn ghost", type: "button" }, exam ? "Stop and grade" : "End session"); b.onclick = () => finish(); return b; }
   function mc(it) {
@@ -59,7 +59,7 @@ export function session(host, { queue, extra = [], mode = "review", title = "Rev
     if (it.acs) body.append(h("p", { class: "label" }, "ACS " + it.acs));
     const notes = h("textarea", { placeholder: "Say it out loud first, or jot your answer here. It is not graded; you grade yourself.", "aria-label": "Your answer" }); body.append(notes);
     const reveal = h("button", { class: "btn pri", type: "button", "data-primary": "" }, "Show model answer"); const bx = h("div", { class: "btns mt" }, reveal, quitBtn()); body.append(bx);
-    reveal.onclick = () => { bx.remove(); const v = h("div", { class: "verdict" }); v.innerHTML = `<span class="label">Model answer</span><div class="prose mt">${rich(it.a)}</div>${it.src ? `<p class="src">${esc(it.src)}</p>` : ""}<p class="label mt">How did your answer compare?</p>`;
+    reveal.onclick = () => { bx.remove(); const v = h("div", { class: "verdict" }); v.innerHTML = `<span class="label">Model answer</span><div class="prose mt">${rich(it.a)}</div>${it.src ? `<p class="src">${esc(it.src)}</p>` : ""}<p class="label mt">How did your answer compare?</p>`; autoTerms(v.querySelector(".prose"));
       const cc = h("div", { class: "chips" }); [["Missed it", 1], ["Partly", 3], ["Got it", 4], ["Nailed it, easy", 5]].forEach(([t, qq]) => { const b = h("button", { class: "chip", type: "button" }, t); b.onclick = () => { const { r } = record(it, qq >= 3, null, qq); cc.querySelectorAll("button").forEach((x) => (x.disabled = true)); b.classList.add("on");
         if (qq < 3 && !requeued.has(it.id)) { requeued.add(it.id); q.splice(Math.min(q.length, i + 4), 0, it.id); }
         const nb = h("button", { class: "btn pri arrow mt", type: "button", "data-primary": "" }, i + 1 >= q.length ? "Finish" : "Next"); nb.onclick = next; v.append(h("p", { class: "label mt" }, scheduleNote(r, qq >= 3)), nb); nb.focus({ preventScroll: true }); }; cc.append(b); });

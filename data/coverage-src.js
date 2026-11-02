@@ -23,7 +23,7 @@ export const COVERAGE = {
     ["Landing gear, tires and brakes", "tire|brake"],
     ["Engine and propeller", "propeller|prop\\b|cowling"],
     ["Ground operations", "taxi|engine start|run-?up"] ] },
-  gl2: { refs: "PHAK 6, 7 · POH 2, 7 · ACS PA.I.G", units: ["gl2"], items: [
+  gl2: { refs: "PHAK 6, 7 · POH 2, 7 · ACS PA.I.G", units: ["gl2", "vs1"], items: [
     ["Flight control systems", "flight control"], ["Primary flight controls", "aileron|elevator|rudder"], ["Secondary flight controls", "flaps?|trim"],
     ["Autopilot", "autopilot"], ["Powerplant", "reciprocating|four-stroke|cylinder"], ["Propeller", "propeller"],
     ["Induction systems", "induction|carburetor|fuel injection"], ["Ignition systems", "magneto|ignition"], ["Oil systems", "\\boil\\b"],
@@ -56,7 +56,7 @@ export const COVERAGE = {
     ["Wake turbulence", "wake"], ["Collision avoidance", "collision|see and avoid|scan"], ["Clearing procedures", "clearing turn|clear the area|clearing"],
     ["Runway incursion avoidance", "incursion|hot spot|hold short"], ["ATC instructions", "instruction|clearance|hold short|read ?back"],
     ["Pre-landing, landing and after-landing", "before landing|after landing|after-landing|pre-landing|clear of the runway"] ] },
-  gl5: { refs: "PHAK 10, 11 · W&B Handbook · POH 5, 6 · ACS PA.I.F", units: ["gl5", "wx1", "wx4"], items: [
+  gl5: { refs: "PHAK 10, 11 · W&B Handbook · POH 5, 6 · ACS PA.I.F", units: ["gl5", "wx1", "wx4", "vs1"], items: [
     ["Weight control", "max(imum)? (gross|takeoff|ramp)|overload|weight"], ["Balance, stability and center of gravity", "center of gravity|\\bcg\\b"],
     ["Terms and definitions", "datum|\\barm\\b|moment|empty weight|useful load"], ["Determining loaded weight and CG", "total moment|divide|loaded weight|cg ="],
     ["Importance of performance data", "performance (data|chart)|\\bpoh\\b"], ["Structure of the atmosphere", "standard atmosphere|isa|15 ?°c|lapse"],
@@ -117,7 +117,7 @@ export const COVERAGE = {
     ["Airman Certification Standards", "\\bacs\\b|airman certification standards"], ["Pre-solo written exam", "pre-solo|presolo|61\\.87"] ] },
   gl12: { refs: "Stage 2 check", units: ["gl12"], check: true, items: [
     ["Stage 2 written check: 80% to pass, every miss reviewed", "."], ["Stage 2 oral review", "."] ] },
-  gl13: { refs: "PHAK 8 · POH 7 · ACS PA.I.G", units: ["gl13"], items: [
+  gl13: { refs: "PHAK 8 · POH 7 · ACS PA.I.G", units: ["gl13", "vs1"], items: [
     ["Pitot-static instruments", "pitot-static|pitot"], ["Impact pressure", "impact pressure|ram|dynamic pressure"], ["Static pressure", "static pressure|static port"],
     ["Altimeter", "altimeter"], ["Nonstandard temperature and pressure", "high to low|hot to cold|nonstandard|colder than standard|temperature"], ["Setting the altimeter", "kollsman|altimeter setting|setting window|91\\.121"],
     ["Altimeter operations", "91\\.121|29\\.92|18,000"], ["Types of altitude", "indicated altitude|true altitude|absolute altitude|pressure altitude|density altitude"],

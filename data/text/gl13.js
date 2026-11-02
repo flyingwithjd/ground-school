@@ -9,7 +9,8 @@ export default {
 <li><strong>Calibrated (CAS)</strong>: IAS corrected for installation and instrument error. The error is largest at low speed. The POH has a calibration table.</li>
 <li><strong>True (TAS)</strong>: CAS corrected for altitude and nonstandard temperature. Rule of thumb: add about 2% of CAS per 1,000 ft. TAS is used for flight planning and flight plans.</li>
 <li><strong>Groundspeed (GS)</strong>: TAS corrected for wind.</li></ul>
-<p><strong>Markings</strong>: white arc is the flap operating range (bottom V<sub>S0</sub>, top V<sub>FE</sub>); green arc is the normal range (bottom V<sub>S1</sub>, top V<sub>NO</sub>); yellow arc is smooth air only, with caution; red line is V<sub>NE</sub>. Not marked: V<sub>A</sub> (it changes with weight), V<sub>X</sub>, V<sub>Y</sub>, gear speeds. <span class="src">PHAK 8</span></p>`,
+<p><strong>Markings</strong>: white arc is the flap operating range (bottom V<sub>S0</sub>, top V<sub>FE</sub>); green arc is the normal range (bottom V<sub>S1</sub>, top V<sub>NO</sub>); yellow arc is smooth air only, with caution; red line is V<sub>NE</sub>. Not marked: V<sub>A</sub> (it changes with weight), V<sub>X</sub>, V<sub>Y</sub>, gear speeds. <span class="src">PHAK 8</span></p>
+<div class="btns mt"><a class="btn arrow" href="#/lesson/vs1">V-speeds: what each one means, on the dial</a></div>`,
       kdr: { k: "Pitot-static system; types of airspeed; ASI markings.", d: "Convert IAS to CAS to TAS; read the arcs.", r: "Using IAS for navigation or TAS for stall speed.", codes: ["PA.I.G.K1h"] } },
     { id: "alt", label: "Altimeter · PHAK 8 · 14 CFR 91.121", title: "High to low, look out below",
       body: `<p>The altimeter is an aneroid barometer: sealed wafers expand as static pressure drops in a climb. It assumes the standard atmosphere, so it's only right when the setting and temperature match. <span class="src">PHAK 8</span></p>

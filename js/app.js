@@ -1,7 +1,7 @@
-import { initPopovers } from "./core/rich.js?v=4258458bcd";
-import { destroyAll } from "./viz/index.js?v=4258458bcd";
-import * as pages from "./views/pages.js?v=4258458bcd";
-import { lessonView } from "./views/lesson.js?v=4258458bcd";
+import { initPopovers } from "./core/rich.js?v=69d1e15885";
+import { destroyAll } from "./viz/index.js?v=69d1e15885";
+import * as pages from "./views/pages.js?v=69d1e15885";
+import { lessonView } from "./views/lesson.js?v=69d1e15885";
 const main = document.getElementById("main");
 let cleanup = [];
 const routes = [
@@ -20,7 +20,7 @@ const routes = [
   [/^#\/oral(?:\/([\w-]+))?$/, (m) => pages.oral(main, m[1]), "tools"],
   [/^#\/sim$/, () => pages.sim(main), "tools"],
   [/^#\/sim\/(s[1-4])$/, (m) => pages.check(main, m[1]), "tools"],
-  [/^#\/glossary$/, () => pages.glossary(main), "tools"],
+  [/^#\/glossary(?:\/([^/]+))?$/, (m) => pages.glossary(main, m[1] ? decodeURIComponent(m[1]) : null), "tools"],
   [/^#\/settings$/, () => pages.settings(main), "tools"],
   [/^#\/about$/, () => pages.about(main), "tools"],
 ];

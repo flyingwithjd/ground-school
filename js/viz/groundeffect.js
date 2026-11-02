@@ -1,6 +1,6 @@
 // Ground effect: wing height vs induced drag. Reductions are PHAK Ch 5's figures at 1, 1/4 and 1/10 span. Labels in screen px.
-import { chips } from "./base.js?v=4258458bcd";
-import { pxScene, T, L, P, R, C, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=4258458bcd";
+import { chips } from "./base.js?v=69d1e15885";
+import { pxScene, T, L, P, R, C, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=69d1e15885";
 const H = { out: { f: 1.3, red: 0, lab: "> 1 span", cap: ["Out of ground effect", "Full-strength vortices"], t: "Well above the runway the wingtip vortices and downwash form freely. Induced drag is normal." },
   one: { f: 1, red: 1.4, lab: "1 span", cap: ["Height = one wingspan", "Induced drag −1.4%"], t: "At a height equal to its span, the wing's induced drag is only 1.4% lower: barely noticeable. <span class=\"src\">PHAK 5</span>" },
   qtr: { f: 0.25, red: 23.5, lab: "¼ span", cap: ["Height = ¼ wingspan", "Induced drag −23.5%"], t: "The ground squeezes the downwash and the vortices. Induced drag falls by about a quarter, so the airplane floats if you arrive fast. <span class=\"src\">PHAK 5</span>" },

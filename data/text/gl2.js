@@ -52,7 +52,8 @@ export default {
       viz: { type: "asi" },
       body2: `<p><strong>Maneuvering speed (VA)</strong> is not marked. At or below VA a full or abrupt control input stalls the wing before it can overload the structure. VA is 105 KIAS at 2,550 lb, 98 at 2,200 and 90 at 1,900: a lighter airplane reaches its load limit at a lower speed. <span class="src">POH 2 · PHAK 5</span></p>
 <p><strong>Load limits</strong> (normal category, flaps up): +3.8 g and −1.52 g; flaps down +3.0 g. Utility category, with the rear seat empty and no baggage, allows +4.4 g and −1.76 g. Flight into known icing is prohibited.</p>
-<p><strong>Engine:</strong> 2,700 RPM maximum; oil pressure 20 PSI minimum, 50–90 PSI normal, 115 PSI maximum; oil temperature 245 °F maximum. <span class="src">POH 2</span></p>`,
+<p><strong>Engine:</strong> 2,700 RPM maximum; oil pressure 20 PSI minimum, 50–90 PSI normal, 115 PSI maximum; oil temperature 245 °F maximum. <span class="src">POH 2</span></p>
+<div class="btns mt"><a class="btn arrow" href="#/lesson/vs1">V-speeds: what each one means, on the dial</a></div>`,
       kdr: { k: "V-speeds and markings; load limits; operating limitations.", d: "Recite the limitations from memory and find them in Section 2.", r: "Turbulence above VA or VNO can exceed load limits.", codes: ["PA.I.F.K1", "PA.I.G.K1"] } },
   ],
 };

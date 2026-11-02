@@ -1,10 +1,10 @@
-import { h, esc, pct } from "../core/util.js?v=4258458bcd";
-import { S, save, lessonState } from "../core/store.js?v=4258458bcd";
-import { LESSONS, lessonItems } from "../../data/index.js?v=4258458bcd";
-import { lessonStats, buildQueue } from "../core/progress.js?v=4258458bcd";
-import { rich } from "../core/rich.js?v=4258458bcd";
-import { mountViz, destroyAll } from "../viz/index.js?v=4258458bcd";
-import { session } from "./quiz.js?v=4258458bcd";
+import { h, esc, pct } from "../core/util.js?v=69d1e15885";
+import { S, save, lessonState } from "../core/store.js?v=69d1e15885";
+import { LESSONS, lessonItems } from "../../data/index.js?v=69d1e15885";
+import { lessonStats, buildQueue } from "../core/progress.js?v=69d1e15885";
+import { rich, autoTerms } from "../core/rich.js?v=69d1e15885";
+import { mountViz, destroyAll } from "../viz/index.js?v=69d1e15885";
+import { session } from "./quiz.js?v=69d1e15885";
 const KIND = { ground: "Ground lesson", flight: "Flight lesson briefing", module: "Module unit" };
 export function lessonView(host, id, secIdx) {
   const L0 = LESSONS[id]; const p = h("div", { class: "page" }); host.append(p);
@@ -12,7 +12,7 @@ export function lessonView(host, id, secIdx) {
   let api = { destroy() {} }; let dead = false;
   // Lesson text is code-split: question banks load up front (the review engine needs them); prose loads when the lesson opens.
   // Supplement sections (data/text/x/<id>.js) slot in after the section named by `at` ("^" = first), else at the end.
-  Promise.all([import(`../../data/text/${id}.js?v=4258458bcd`), L0.textx ? import(`../../data/text/x/${id}.js?v=4258458bcd`) : null]).then(([m, x]) => { if (dead) return;
+  Promise.all([import(`../../data/text/${id}.js?v=69d1e15885`), L0.textx ? import(`../../data/text/x/${id}.js?v=69d1e15885`) : null]).then(([m, x]) => { if (dead) return;
     const T = { ...L0, ...m.default, sections: mergeSections(m.default.sections || [], x ? x.default.sections || [] : []) };
     if (typeof secIdx === "string") { const k = T.sections.findIndex((s) => s.id === secIdx); secIdx = k >= 0 ? k : null; }
     api = build(p, T, id, secIdx); })
@@ -33,7 +33,9 @@ function build(p, L, id, secIdx) {
   const tagLine = `${L.code} · Stage ${L.stage || 1} · ${KIND[L.kind] || ""}`;
   top.innerHTML = `<span class="label">${esc(tagLine)}</span><h1>${esc(L.title)}</h1>${L.intro ? `<p>${rich(L.intro)}</p>` : ""}
    <div class="btns mt" style="gap:22px"><span class="pct">${nItems} items · readiness ${pct(st.readiness)}</span>${L.refs ? `<span class="src" style="white-space:normal">${esc(L.refs.join(" · "))}</span>` : ""}</div>`;
-  p.append(top);
+  // the V-speeds lesson defines these terms in place, so it skips the dotted underlines
+  const terms = id === "vs1" ? () => {} : autoTerms;
+  terms(top.querySelector("p")); p.append(top);
   if (L.includes) { const inc = h("div", { class: "mt" }); inc.innerHTML = `<div class="list-head mt2"><span class="label">This lesson includes these units</span><span class="label">Readiness</span></div>${L.includes.map((u) => { const U = LESSONS[u]; const s = lessonStats(u); return `<a class="row" href="#/lesson/${u}"><span class="code">${U.code}</span><span><div class="t">${esc(U.title)}</div><div class="s">${esc(U.short || "")}</div></span><span><div class="meter"><i style="width:${Math.round(s.readiness * 100)}%"></i></div></span></a>`; }).join("")}`; p.append(inc); }
   const stepBar = h("nav", { class: "steps", "aria-label": "Lesson sections" }); p.append(stepBar);
   const body = h("div"); p.append(body);
@@ -54,7 +56,8 @@ function build(p, L, id, secIdx) {
         anchor = vh; mountViz(vh, v); });
       if (S0.body2) { const p2 = h("div", { class: "prose mt" }); p2.innerHTML = rich(S0.body2); sec.append(p2); }
       if (S0.kdr) { const k = h("div", { class: "kdr" }); k.innerHTML = [["Know it", S0.kdr.k], ["Do it", S0.kdr.d], ["Manage the risk", S0.kdr.r]].map(([t, x]) => `<div><span class="label">${t}</span><p>${rich(x || "")}</p></div>`).join("") + ""; if (S0.kdr.codes) k.insertAdjacentHTML("beforeend", ""); sec.append(k); if (S0.kdr.codes) sec.append(h("p", { class: "src", style: "margin-top:10px;white-space:normal" }, "ACS " + [].concat(S0.kdr.codes).join(", "))); }
-    } else if (hasPrep && cur === sections.length) { briefing(sec); }
+      terms(sec);
+    } else if (hasPrep && cur === sections.length) { briefing(sec); terms(sec); }
     else { checkYourself(sec); }
     // Pager: two equal cells, a mono PREVIOUS / NEXT label over a title that wraps to 2 lines, so long titles never collide.
     const nav = h("nav", { class: "secnav", "aria-label": "Lesson sections" });

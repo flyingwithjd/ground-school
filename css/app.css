@@ -241,6 +241,17 @@ svg text:not([font-family]) { font-family: var(--mono); }
 .pop { position: fixed; z-index: 60; max-width: min(380px, calc(100vw - 24px)); background: #111114; border: 1px solid var(--line2); border-radius: 16px; padding: 18px 20px; font-size: 15.5px; line-height: 1.55; color: rgba(242,241,236,.9); animation: rise 280ms var(--ease) both; }
 .pop .label { display: block; margin-bottom: 6px; color: var(--acc); }
 .pop .src { display: block; margin-top: 10px; }
+.pop { overflow-y: auto; overscroll-behavior: contain; }
+.pop .plinks { display: flex; flex-wrap: wrap; gap: 6px 18px; margin-top: 12px; padding-top: 10px; border-top: 1px solid var(--line); }
+.pop .plinks a { font: 500 11px/1.9 var(--mono); letter-spacing: .12em; text-transform: uppercase; color: var(--acc); text-decoration: none; min-height: 32px; display: inline-flex; align-items: center; }
+.pop .plinks a:hover, .pop .plinks a:focus-visible { text-decoration: underline; }
+.gl.auto { color: inherit; border-bottom: 1px dotted rgba(242,241,236,.42); }
+.gl.auto:hover, .gl.auto[aria-expanded="true"] { color: var(--ink); border-bottom-color: var(--acc); }
+.gl:focus-visible { outline: 2px solid var(--acc); outline-offset: 2px; border-radius: 2px; }
+.gl sub { font-size: .72em; }
+.grow { scroll-margin-top: 96px; }
+.grow.hit { background: rgba(59,130,246,.07); border-radius: 12px; }
+.grow.hit .t { color: var(--acc); }
 .toast { position: fixed; left: 50%; bottom: 28px; transform: translateX(-50%) translateY(30px); opacity: 0; z-index: 70; background: #111114; border: 1px solid var(--line2); border-radius: 999px; padding: 12px 20px; font-size: 15px; transition: all .5s var(--ease); pointer-events: none; }
 .toast.on { opacity: 1; transform: translateX(-50%); }
 @media (max-width: 760px) { .toast { bottom: 96px; } }
@@ -459,3 +470,45 @@ svg text:not([font-family]) { font-family: var(--mono); }
 /* desktop: keep every visual and its controls on screen together; tall and square stages stop growing past the viewport */
 @media (min-width:701px){.viz .stage,.viz.square .stage{max-height:max(340px,calc(100vh - 250px))}}
 .viz .corner.tl{white-space:pre-line}
+
+/* ---------- V-speeds dial (real ASI colors, muted; only the accent tick glows) ---------- */
+.viz.vspd .stage { aspect-ratio: auto; display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: clamp(18px, 3vw, 40px); align-items: start; padding: 46px clamp(16px, 2.6vw, 30px) clamp(18px, 2.6vw, 28px); touch-action: manipulation; user-select: text; -webkit-user-select: text; }
+.viz.vspd .stage, .viz.square.vspd .stage { max-height: none !important; overflow: visible; }
+.viz.vspd .stage > .caption { display: none; }
+.viz.vspd .vs-dial { width: 100%; max-width: 560px; justify-self: center; }
+.viz.vspd .vs-svg { display: block; width: 100%; height: auto; aspect-ratio: 1 / 1; cursor: pointer; }
+.viz.vspd .vs-svg text { pointer-events: none; }
+.viz.vspd .vs-svg path, .viz.vspd .vs-svg line { transition: opacity .35s var(--ease), stroke-width .35s var(--ease); }
+.viz.vspd .vs-panel { display: flex; flex-direction: column; gap: 18px; min-width: 0; }
+.viz.vspd .vs-grp .label { display: block; margin-bottom: 8px; color: var(--ink2); }
+.viz.vspd .vs-grp + .vs-grp { margin-top: 12px; }
+.viz.vspd .vs-chip { min-height: 44px; min-width: 52px; justify-content: center; font: 600 15px/1 var(--sans); }
+.viz.vspd .chip sub, .viz.vspd .vs-sym sub { font-size: .66em; vertical-align: -.28em; line-height: 0; }
+.viz.vspd .vs-card { border-top: 1px solid var(--line); padding-top: 16px; }
+.viz.vspd .vs-card > .label { color: var(--ink2); }
+.viz.vspd .vs-head { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; margin-top: 8px; flex-wrap: wrap; }
+.viz.vspd .vs-sym { font: 800 clamp(30px, 3.4vw, 42px)/1.1 var(--sans); letter-spacing: -.01em; }
+.viz.vspd .vs-val { font: 800 clamp(30px, 3.4vw, 42px)/1.1 var(--sans); font-variant-numeric: tabular-nums; color: var(--acc); }
+.viz.vspd .vs-val small { font: 500 11px/1 var(--mono); letter-spacing: .16em; color: var(--ink2); margin-left: 8px; }
+.viz.vspd .vs-name { margin-top: 4px; font-size: 17px; color: var(--ink); }
+.viz.vspd .vs-var { margin-top: 14px; }
+.viz.vspd .vs-var .label { display: block; margin-bottom: 8px; color: var(--ink2); }
+.viz.vspd .vs-var .chip { min-height: 44px; }
+.viz.vspd .vs-dl { display: grid; grid-template-columns: auto 1fr; gap: 10px 16px; margin: 16px 0 0; font-size: 15.5px; line-height: 1.55; color: var(--ink2); }
+.viz.vspd .vs-dl dt { font: 500 10.5px/2.1 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--ink2); opacity: .8; }
+.viz.vspd .vs-dl dd { margin: 0; color: rgba(242,241,236,.86); }
+.viz.vspd .vs-lead { margin: 10px 0 0; font-size: 16px; color: rgba(242,241,236,.86); }
+.viz.vspd .src { margin-top: 12px; }
+@media (max-width: 860px) { .viz.vspd .stage { grid-template-columns: 1fr; } .viz.vspd .vs-dial { max-width: 440px; } }
+@media (max-width: 480px) { .viz.vspd .vs-dl { grid-template-columns: 1fr; gap: 2px; } .viz.vspd .vs-dl dd { margin-bottom: 8px; } }
+/* V-speed reference list */
+.vsref { margin-top: 28px; border-top: 1px solid var(--line); }
+.vsref .r { display: grid; grid-template-columns: 92px minmax(0, 1.5fr) minmax(0, 1fr) minmax(0, 1.1fr); gap: 6px 22px; padding: 16px 0; border-bottom: 1px solid var(--line); align-items: baseline; font-size: 15.5px; }
+.vsref .r.h { padding: 10px 0; font: 500 10.5px/1.5 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--ink2); }
+.vsref .sym { font: 800 22px/1.2 var(--sans); }
+.vsref .sym sub { font-size: .66em; vertical-align: -.28em; line-height: 0; }
+.vsref .val { font-weight: 600; font-variant-numeric: tabular-nums; color: var(--ink); }
+.vsref .mean { color: rgba(242,241,236,.86); }
+.vsref .where { color: var(--ink2); }
+.vsref .r .src { display: block; margin-top: 4px; }
+@media (max-width: 760px) { .vsref .r { grid-template-columns: 72px minmax(0, 1fr); } .vsref .r.h { display: none; } .vsref .r > .val, .vsref .r > .where { grid-column: 2; } }

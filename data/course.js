@@ -15,11 +15,12 @@ export const MODULES = [
   { id: "emerg", title: "Emergencies", sub: "Engine failure, fire, electrical, chair-flying", units: ["em1", "em2"], partOf: "gl9" },
   { id: "adm", title: "Decisions", sub: "PAVE, IMSAFE, DECIDE, 3P and scenario drills", units: ["ad1", "ad2"], partOf: "gl16" },
   { id: "flows", title: "Flows", sub: "Checklists, flows and the order things happen", units: ["fw1"], partOf: "gl1" },
+  { id: "vspeeds", title: "V-speeds", sub: "Every V-speed on the airspeed indicator, and the ones not on it", units: ["vs1"], partOf: "gl2" },
   { id: "mnemo", title: "Mnemonics", sub: "Memory aids and the reasoning behind them", units: ["mn1"] },
 ];
 // Stage checks. Written: drawn across every lesson in the pool, weighted by bank size. Oral: ACS-style explain prompts, self-graded.
 // The syllabus completion standard is 80% with every miss reviewed; misses feed the review schedule.
-const S1 = ["gl1", "gl2", "gl3", "gl4", "gl5", "fw1", "ap1", "ap2", "ap3", "ap4", "ap5", "ap6", "ap7", "wx1", "wx2", "wx3", "wx4", "rc1"];
+const S1 = ["gl1", "gl2", "vs1", "gl3", "gl4", "gl5", "fw1", "ap1", "ap2", "ap3", "ap4", "ap5", "ap6", "ap7", "wx1", "wx2", "wx3", "wx4", "rc1"];
 const S2 = ["gl7", "gl8", "gl9", "gl10", "gl11", "em1", "em2", "rg1", "rg2", "rg3"];
 const S3 = ["gl13", "gl14", "gl15", "gl16", "gl17", "ad1", "ad2", "mn1"];
 export const STAGE_CHECK = {

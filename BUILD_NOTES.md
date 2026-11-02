@@ -206,3 +206,15 @@ These notes are updated as work goes, so an interruption loses nothing. The time
 - PHAK 2: ADM def; ~80% accidents human factors; landing 24.1%, takeoff 23.4% (Fig 2-1); human factors >70% (also PHAK 2 — book gives both figures); 1987 six manuals; 10–50% fewer judgment errors; 400,000 h operator 54% reduction; 6 ADM steps; risk mgmt 6 steps (Fig 2-3); 4 principles; hazard/risk definitions; 3P/PAVE/CARE/TEAM; 3 timeframes strategic/deliberate/time-critical (Fig 2-10); 5P decision points (hourly if >2 h); 5,000 ft fatigue note; attitudes; 4,000 pilots five traits; stressors (Fig 2-16); DECIDE; automatic/naturalistic; pitfalls (Fig 2-15); SA; resources; SAFETY briefing; sterile flight deck; workload; automation (NAV→ROL on source change).
 - RMH (FAA-H-8083-2A) Fig 4-1 risk matrix read from rendered page: Probable H H S M; Occasional H S M L; Remote S M M L; Improbable M M M L. High/serious = no-go unless mitigated; medium = go, mitigate. Ch 6 expectation/confirmation bias.
 - Superseded: PHAK "Flight Watch"/EFAS 122.0 — FAA Notice JO 7210.887 eff. 10/1/2015 realigned EFAS to Inflight; 122.0 ended (Sept 24, 2015 per AOPA); use FSS freqs / 122.2.
+
+##### VS1 V-speeds lesson + term popovers (verified)
+- New lesson vs1 (code VSP, module "vspeeds", partOf gl2, after gl2 in ORDER/S1). Linked from GL2 limits, GL13 asi, Tools cell "V-speeds · POH Sec 2", glossary hero and V-speed glossary rows.
+- Values (KIAS) from C172S POH NAV III (172SPHBUS) Sec 2/3/4/5; 1998 172S Information Manual lists the same:
+  VS0 40 (white arc bottom; Sec 5 40 KIAS = 48 KCAS) · VS1 48 (green arc bottom, max wt fwd CG) · VFE 110 flaps 10° / 85 flaps 10°–FULL (Fig 2-1; white arc top 85) ·
+  VNO 129 (green top / yellow bottom) · yellow 129–163 · VNE 163 (red line) · VA 105/98/90 at 2,550/2,200/1,900 lb (Fig 2-1) ·
+  VX 62 SL / 67 10,000 ft · VY 74 SL / 72 10,000 ft (Sec 4) · nose wheel lift 55 (Sec 4; POH has no VR symbol) · best glide 68 flaps up (Sec 3; "VG" is shorthand, not in 14 CFR 1.2) ·
+  approach 65–75 flaps up, 60–70 flaps FULL, short field 61 (Sec 4; no VREF in POH) · balked landing 60 flaps 20° · engine failure after takeoff 70 up / 65 flaps 10°–FULL (Sec 3).
+- AFH Ch 9: with no manufacturer speed, approach not more than 1.3 VS0, plus no more than one-half the gust factor. Definitions: 14 CFR 1.2.
+- ASI viz (js/viz/vspeeds.js) uses the real arc colors, muted (color is the message, like the airport signs). Only the accent tick + selected chip glow. Tapping a speed shows only its arc/line; unmarked speeds dim all arcs and show an accent tick.
+- Auto-terms (rich.js autoTerms): first use per block of V-speed symbols, KIAS/KCAS/KTAS, CTAF, POH, AFM, ACS, MSL, AGL get a dotted underline + popover (tap; hover/focus on fine pointers; Esc closes). Plain "VR"/"VMC" not auto-marked (ambiguous). Never applied to questions/choices, code, labels, the viz, or the vs1 lesson itself (defined in place).
+- Glossary deep links #/glossary/<slug> highlight and scroll to the row.
