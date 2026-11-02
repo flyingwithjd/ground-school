@@ -9,7 +9,7 @@
   --bg: #0A0A0B; --ink: #F2F1EC; --ink2: rgba(242,241,236,.62); --ink3: rgba(242,241,236,.38); --ink4: rgba(242,241,236,.14);
   --line: rgba(242,241,236,.10); --line2: rgba(242,241,236,.18); --acc: #3B82F6; --acc2: rgba(59,130,246,.16);
   --glow: 0 0 10px rgba(59,130,246,.55), 0 0 2px rgba(59,130,246,.9);
-  --pad: clamp(20px, 5vw, 64px); --maxw: 1180px; --read: 40rem;
+  --pad: clamp(20px, 5vw, 64px); --maxw: 1080px; --read: min(100%, 84ch);
   --ease: cubic-bezier(.22,.61,.36,1); --slow: 620ms;
   --mono: "IBM Plex Mono", ui-monospace, Menlo, monospace; --sans: "Inter", system-ui, -apple-system, "Segoe UI", sans-serif;
   color-scheme: dark;
@@ -57,7 +57,7 @@ main { display: block; outline: none; }
 @keyframes rise { from { opacity: 0; transform: translateY(14px); } to { opacity: 1; transform: none; } }
 .hero { margin-bottom: clamp(40px, 7vw, 88px); }
 .hero .label { margin-bottom: 18px; display: block; }
-.hero p { color: var(--ink2); max-width: 36rem; margin: 22px 0 0; font-size: 19px; }
+.hero p { color: var(--ink2); max-width: min(100%, 48rem); margin: 22px 0 0; font-size: 19px; }
 .section-gap { margin-top: clamp(56px, 8vw, 104px); }
 .grid { display: grid; gap: 1px; background: var(--line); border: 1px solid var(--line); border-radius: 18px; overflow: hidden; }
 .grid > * { background: var(--bg); }
@@ -113,6 +113,9 @@ button.cell { border: 0; text-align: left; width: 100%; }
 .sec { margin-top: clamp(36px, 6vw, 72px); animation: rise var(--slow) var(--ease) both; }
 .sec > .label { display: block; margin-bottom: 14px; }
 .prose { max-width: var(--read); }
+/* desktop: one centred column; prose fills it at a slightly larger size so lines stay near 80-84ch */
+@media (min-width: 1200px) { .prose { font-size: 19px; } }
+@media (min-width: 1700px) { :root { --maxw: 1180px; } .prose { font-size: 20px; } }
 .prose p, .prose li { color: rgba(242,241,236,.88); }
 .prose p { margin: 0 0 1.05em; }
 .prose strong { color: var(--ink); font-weight: 600; }
@@ -170,7 +173,7 @@ button.cell { border: 0; text-align: left; width: 100%; }
 .viz .readout b { font: 600 22px/1.2 var(--sans); letter-spacing: -.01em; font-variant-numeric: tabular-nums; }
 .viz .readout span { font: 500 10.5px/1.6 var(--mono); letter-spacing: .16em; color: var(--ink2); text-transform: uppercase; }
 .viz .hint { font-size: 14px; color: var(--ink2); }
-.viz .explain { padding: 0 clamp(16px, 2.6vw, 26px) 22px; color: var(--ink2); font-size: 16px; max-width: 46rem; }
+.viz .explain { padding: 0 clamp(16px, 2.6vw, 26px) 22px; color: var(--ink2); font-size: 16px; max-width: min(100%, 88ch); }
 .viz .explain b { color: var(--ink); font-weight: 600; }
 .slider { display: grid; grid-template-columns: auto 1fr auto; gap: 14px; align-items: center; min-width: min(100%, 300px); flex: 1 1 300px; }
 .slider label { font: 500 10.5px/1.4 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--ink2); white-space: nowrap; }
@@ -190,7 +193,7 @@ svg text:not([font-family]) { font-family: var(--mono); }
 .svgbig { font-family: var(--sans); font-weight: 800; }
 
 /* ---------- quiz ---------- */
-.quiz { max-width: 46rem; }
+.quiz { max-width: none; }
 .qhead { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 26px; }
 .qtext { font: 600 clamp(23px, 2.8vw, 32px)/1.28 var(--sans); letter-spacing: -.015em; margin: 0 0 30px; }
 .choices { display: flex; flex-direction: column; gap: 10px; }
@@ -251,7 +254,7 @@ svg text:not([font-family]) { font-family: var(--mono); }
 .mt { margin-top: 28px; } .mt2 { margin-top: 48px; } .mb { margin-bottom: 24px; }
 .split { display: grid; grid-template-columns: 1.2fr 1fr; gap: clamp(28px, 5vw, 72px); align-items: start; }
 @media (max-width: 900px) { .split { grid-template-columns: 1fr; } }
-.footer { margin-top: 120px; padding-top: 28px; border-top: 1px solid var(--line); color: var(--ink3); font-size: 13.5px; line-height: 1.6; max-width: 52rem; }
+.footer { margin-top: 120px; padding-top: 28px; border-top: 1px solid var(--line); color: var(--ink3); font-size: 13.5px; line-height: 1.6; max-width: none; }
 
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: 1ms !important; animation-delay: 0ms !important; transition-duration: 1ms !important; }

@@ -1,10 +1,10 @@
-import { h, esc, pct } from "../core/util.js?v=4567ef8edf";
-import { S, save, lessonState } from "../core/store.js?v=4567ef8edf";
-import { LESSONS, lessonItems } from "../../data/index.js?v=4567ef8edf";
-import { lessonStats, buildQueue } from "../core/progress.js?v=4567ef8edf";
-import { rich } from "../core/rich.js?v=4567ef8edf";
-import { mountViz, destroyAll } from "../viz/index.js?v=4567ef8edf";
-import { session } from "./quiz.js?v=4567ef8edf";
+import { h, esc, pct } from "../core/util.js?v=e5d7639588";
+import { S, save, lessonState } from "../core/store.js?v=e5d7639588";
+import { LESSONS, lessonItems } from "../../data/index.js?v=e5d7639588";
+import { lessonStats, buildQueue } from "../core/progress.js?v=e5d7639588";
+import { rich } from "../core/rich.js?v=e5d7639588";
+import { mountViz, destroyAll } from "../viz/index.js?v=e5d7639588";
+import { session } from "./quiz.js?v=e5d7639588";
 const KIND = { ground: "Ground lesson", flight: "Flight lesson briefing", module: "Module unit" };
 export function lessonView(host, id, secIdx) {
   const L0 = LESSONS[id]; const p = h("div", { class: "page" }); host.append(p);
@@ -12,7 +12,7 @@ export function lessonView(host, id, secIdx) {
   let api = { destroy() {} }; let dead = false;
   // Lesson text is code-split: question banks load up front (the review engine needs them); prose loads when the lesson opens.
   // Supplement sections (data/text/x/<id>.js) slot in after the section named by `at` ("^" = first), else at the end.
-  Promise.all([import(`../../data/text/${id}.js?v=4567ef8edf`), L0.textx ? import(`../../data/text/x/${id}.js?v=4567ef8edf`) : null]).then(([m, x]) => { if (dead) return;
+  Promise.all([import(`../../data/text/${id}.js?v=e5d7639588`), L0.textx ? import(`../../data/text/x/${id}.js?v=e5d7639588`) : null]).then(([m, x]) => { if (dead) return;
     const T = { ...L0, ...m.default, sections: mergeSections(m.default.sections || [], x ? x.default.sections || [] : []) };
     if (typeof secIdx === "string") { const k = T.sections.findIndex((s) => s.id === secIdx); secIdx = k >= 0 ? k : null; }
     api = build(p, T, id, secIdx); })
@@ -71,7 +71,7 @@ function build(p, L, id, secIdx) {
     const ta = h("textarea", { "aria-label": "Debrief notes" }); ta.value = S().notes[id] || ""; ta.oninput = () => { S().notes[id] = ta.value; save(); }; sec.append(ta); }
   function checkYourself(sec) { const ids = lessonItems(id, { oral: false, deep: !L.includes ? true : false });
     const { queue, extra, dueCount, newCount } = buildQueue(ids, { max: 20 });
-    sec.innerHTML = `<span class="label">Check yourself</span><h2>Answer, then trust the schedule</h2><p class="dim mt" style="max-width:40rem">${ids.length} questions in this ${L.includes ? "lesson (the Airport units have their own sets)" : "lesson"}. This session: ${Math.min(queue.length, 20)} (${dueCount} due, ${Math.max(0, queue.length - dueCount)} new). Missed questions come back within minutes; the rest return on a spaced schedule.</p>`;
+    sec.innerHTML = `<span class="label">Check yourself</span><h2>Answer, then trust the schedule</h2><p class="dim mt" style="max-width:48rem">${ids.length} questions in this ${L.includes ? "lesson (the Airport units have their own sets)" : "lesson"}. This session: ${Math.min(queue.length, 20)} (${dueCount} due, ${Math.max(0, queue.length - dueCount)} new). Missed questions come back within minutes; the rest return on a spaced schedule.</p>`;
     const go2 = h("button", { class: "btn pri arrow", type: "button" }, queue.length ? "Start" : "Practice ahead"); const box = h("div", { class: "mt" }); const bt = h("div", { class: "btns mt" }, go2); if ((L.oral || []).length) bt.append(h("a", { class: "btn", href: `#/oral/${id}` }, `Oral questions · ${L.oral.length}`)); sec.append(bt, box);
     go2.onclick = () => { bt.remove(); sec.querySelector("p").remove(); sess = session(box, { queue: queue.length ? queue : extra.slice(0, 10), extra: queue.length ? extra : extra.slice(10), mode: queue.length ? "learn" : "ahead", title: L.code, label: `${L.code} · ${L.title}`, onExit: () => (location.hash = L.module ? "#/module/" + L.module : "#/course") }); }; }
   render();
