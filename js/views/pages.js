@@ -1,11 +1,11 @@
-import { h, esc, pct, fmtDue, toast, download, shuffle } from "../core/util.js?v=269fcd6a6e";
-import { S, save, exportJSON, importJSON, reset } from "../core/store.js?v=269fcd6a6e";
-import { get } from "../core/srs.js?v=269fcd6a6e";
-import { STAGES, MODULES, STAGE_CHECK } from "../../data/course.js?v=269fcd6a6e";
-import { LESSONS, QUESTIONS, ORAL, TOPICS, ORDER, lessonItems } from "../../data/index.js?v=269fcd6a6e";
-import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone } from "../core/progress.js?v=269fcd6a6e";
-import { session } from "./quiz.js?v=269fcd6a6e";
-import { G, rich } from "../core/rich.js?v=269fcd6a6e";
+import { h, esc, pct, fmtDue, toast, download, shuffle } from "../core/util.js?v=167338b5e8";
+import { S, save, exportJSON, importJSON, reset } from "../core/store.js?v=167338b5e8";
+import { get } from "../core/srs.js?v=167338b5e8";
+import { STAGES, MODULES, STAGE_CHECK } from "../../data/course.js?v=167338b5e8";
+import { LESSONS, QUESTIONS, ORAL, TOPICS, ORDER, lessonItems } from "../../data/index.js?v=167338b5e8";
+import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone } from "../core/progress.js?v=167338b5e8";
+import { session } from "./quiz.js?v=167338b5e8";
+import { G, rich } from "../core/rich.js?v=167338b5e8";
 const page = (host) => { const p = h("div", { class: "page" }); host.append(p); return p; };
 const meter = (x, big) => `<div class="meter${big ? " big" : ""}"><i style="width:${Math.round(x * 100)}%"></i></div>`;
 const stageLessons = (s) => [...s.ground, ...s.flight].flatMap((id) => [id, ...((LESSONS[id] && LESSONS[id].includes) || [])]);
@@ -16,9 +16,19 @@ const foot = () => `<div class="footer">Squawk School is a study aid for ground 
 
 export function home(host) {
   const p = page(host); const CS = curStage(); const st = stats(stageIds(CS)); const due = dueIds(); const weak = weakest(3); const nl = nextLesson(); const L = nl && LESSONS[nl];
-  const first = !Object.keys(S().items).length && !Object.keys(S().lessons).length;
-  p.innerHTML = `<section class="hero"><span class="label">${esc(CS.title)} · ${esc(CS.sub)}</span><h1>${first ? "Learn it. Squawk it." : "What to work on now"}</h1>
-  <p>${first ? "Squawk School is ground school for the private pilot certificate, built on the FAA handbooks, the Airman Certification Standards and 14 CFR. Read a lesson, play with the visuals, then answer. The app schedules every question for review and brings back what you are losing, so one right answer never counts as knowing it." : "Reviews that are due come first, then the areas you are weakest in, then new material."}</p></section>`;
+  // No progress = no question or oral item answered yet. Until then the page is just a clear way in: no empty progress cards.
+  const answered = Object.values(S().items).some((it) => it && it.n > 0);
+  if (!answered) {
+    const started = Object.keys(S().lessons).length > 0 && L;
+    const go = started ? `#/lesson/${L.id}` : `#/lesson/${ORDER.find((id) => LESSONS[id])}/0`;
+    p.innerHTML = `<section class="hero hero-start"><span class="label">Private pilot ground school</span><h1>Learn it. Squawk it.</h1>
+  <p>Short lessons, visuals you can play with, and questions that come back right before you would forget them.</p>
+  <div class="btns start-btns"><a class="btn pri arrow" id="begin" href="${go}">${started ? `Continue ${esc(L.code)}` : "Begin"}</a><a class="btn ghost" href="#/course">Browse the course</a></div></section>
+  <section class="start-about"><span class="label">How it works</span><p>Squawk School is built on the FAA handbooks, the Airman Certification Standards and 14 CFR. Read a lesson, try the visuals, then answer. Every question is scheduled for review and the ones you are losing come back, so one right answer never counts as knowing it. Your review queue and weakest areas show up here once you have answered a few questions.</p></section>`;
+    p.insertAdjacentHTML("beforeend", foot()); return;
+  }
+  p.innerHTML = `<section class="hero"><span class="label">${esc(CS.title)} · ${esc(CS.sub)}</span><h1>What to work on now</h1>
+  <p>Reviews that are due come first, then the areas you are weakest in, then new material.</p></section>`;
   const g = h("div", { class: "grid g3" }); p.append(g);
   g.innerHTML = `<a class="cell" href="#/review"><span class="label">Due for review</span><div class="num">${due.length}<small>${due.length === 1 ? "item" : "items"}</small></div><p>${due.length ? "Answer these before they fade. Misses come back within minutes." : isFinite(nextDue()) ? `Nothing due. Next review ${fmtDue(nextDue())}.` : "Nothing scheduled yet. Start a lesson and answer its questions."}</p><span class="go btn ${due.length ? "pri" : ""} arrow">${due.length ? "Start review" : "Open review"}</span></a>
   ${weak.length ? `<a class="cell" href="#/drill/${weak[0].t.id}"><span class="label">Weakest area</span><h3>${esc(weak[0].t.title)}</h3><p>${{ over: "You answered certain and were wrong here. Fix this first.", weak: "Recent accuracy is low or items keep slipping.", fading: "You knew this, but reviews are overdue.", building: "Still early. A few more spaced reviews will lock it in." }[weak[0].c]} ${LESSONS[weak[0].t.lesson].code}.</p>${meter(weak[0].st.readiness)}<span class="go btn arrow">Drill it</span></a>`
@@ -101,7 +111,7 @@ export function oral(host, lid) {
   const { queue, extra } = buildQueue(ids, { includeOral: true, max: 12, newMax: 12 });
   return runSession(host, { queue: queue.length ? queue : shuffle(ids).slice(0, 10), extra, mode: "oral", title: "Oral exam", label: "Oral exam" + (lid !== "all" ? " · " + LESSONS[lid].code : ""), onExit: () => (location.hash = "#/oral") });
 }
-export { sim, check } from "./checks.js?v=269fcd6a6e";
+export { sim, check } from "./checks.js?v=167338b5e8";
 export function glossary(host, focus) { const p = page(host); const keys = Object.keys(G).sort(); const slug = (k) => k.replace(/\s+/g, "-");
   p.innerHTML = `<section class="hero"><span class="label">Glossary</span><h1>Terms, plainly</h1><p>Every underlined term in a lesson opens its definition. Airspeed symbols like V<sub>FE</sub> are explained with the dial in <a href="#/lesson/vs1">V-speeds</a>.</p></section>`;
   const inp = h("input", { type: "search", placeholder: "Search terms", "aria-label": "Search terms" }); p.append(h("div", { class: "field", style: "max-width:28rem" }, inp)); const list = h("div", { class: "mt" }); p.append(list);
@@ -128,4 +138,4 @@ export function about(host) { const p = page(host);
   <p>Citations name the chapter, section or regulation. Procedures are marked to confirm with your instructor and your aircraft's POH, because flight schools and airplanes differ.</p>
   <h4>Software and fonts</h4><ul><li>three.js r181, MIT License</li><li>GSAP 3.14, GreenSock Standard "No Charge" License (vendored, not loaded in this build)</li><li>Inter and IBM Plex Mono, SIL Open Font License 1.1</li></ul><p>License texts are in the LICENSES folder.</p>
   <h4>Not affiliated</h4><p>Squawk School is an independent study aid. Not affiliated with or endorsed by the FAA or Textron Aviation. Cessna and Skyhawk are trademarks of their owner.</p></div>`; }
-export { coverage, presolo } from "./checks.js?v=269fcd6a6e";
+export { coverage, presolo } from "./checks.js?v=167338b5e8";

@@ -27,6 +27,7 @@ Any static file server works, for example `python3 -m http.server 8765`, then op
 ## Test
 - `node tests/validate.mjs`: question shape, ACS codes, counts, glossary links, unique question ids, known topics, an up-to-date coverage map with working links, and the pre-solo topic list. Exits 1 on any problem.
 - `node tests/srs-persist.mjs`, `node tests/parts-ui.mjs`, `W=360 node tests/overlap-audit.mjs`: review state survives reload, 3D parts buttons, and label overlap on phones
+- `node tests/now-start.mjs [shotdir]`: first-visit Now page (Begin above the fold, progress cards hidden until the first answer)
 - `node tests/routes.mjs`: lists every route
 - `node tests/smoke.mjs <routes...>`: Playwright console-error check. Env options: `W`, `H`, `SHOT=/path/%.png`, `VIZ=1`, `FULL=1`. Needs playwright-core and a server on :8765.
 

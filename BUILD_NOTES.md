@@ -243,3 +243,8 @@ These notes are updated as work goes, so an interruption loses nothing. The time
 - `<meta name="robots" content="noindex, nofollow">` and robots.txt `Disallow: /` while gated. og:url/og:image use https://squawkschool.com (CNAME added by GitHub Pages settings).
 - Tests set the flag with an init script before loading. tests/gate.mjs checks the gate at any size: first paint locked, main/nav hidden, deep link not rendered, focus, 16px input, wrong code stays locked, " TestPilot " unlocks and renders the deep link, flag stored, reload not asked again, and no plain code in shipped files.
 - Home hero headline is now "Learn it. Squawk it." (was "Learn it. Keep it."); the subline was unchanged.
+
+### 2026-11-02, ~2:45 PM MST: Now page first visit
+- "No progress" = no item in `ppg.v1` items with `n > 0` (no question or oral item answered). Lesson visits alone don't count.
+- With no progress, #/ shows only the hero: "Learn it. Squawk it.", one subline, a primary **Begin** (to #/lesson/gl1/0; "Continue GLx" if a lesson was opened) and a quiet "Browse the course" link, then a short "How it works" paragraph. The Due/Weakest/Next cards and readiness stats are hidden until the first answer, then the normal layout returns.
+- tests/now-start.mjs: Begin above the fold (and above the phone bottom nav) at 1440x900, 1024x768, 820x1180, 390x844, no progress cards; Begin opens GL1 §0; after one answer the cards show. Optional arg: screenshot dir.
