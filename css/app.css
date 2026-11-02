@@ -559,3 +559,16 @@ html.locked #gate { display: flex; }
 .start-about { max-width: min(100%, 48rem); }
 .start-about .label { display: block; margin-bottom: 12px; }
 .start-about p { color: var(--ink2); margin: 0; font-size: 16px; }
+/* fuselage construction (3D): corner labels + leader lines over the canvas */
+.viz.fus3d .stage { cursor: grab; }
+.viz.fus3d .stage:active { cursor: grabbing; }
+.viz.fus3d .fus-lead { position: absolute; inset: 0; width: 100%; height: 100%; pointer-events: none; z-index: 2; overflow: visible; }
+.viz.fus3d .fus-lead line { stroke: rgba(242,241,236,.38); stroke-width: 1; }
+.viz.fus3d .fus-lead line.on { stroke: rgba(242,241,236,.6); }
+.viz.fus3d .fus-lead circle { fill: rgba(242,241,236,.7); }
+.viz.fus3d .fus-lead circle.on { fill: #F2F1EC; stroke: #3B82F6; stroke-width: 2; }
+.viz.fus3d .fus-lab { position: absolute; z-index: 3; pointer-events: none; font: 500 10.5px/1.45 var(--mono); letter-spacing: .14em; text-transform: uppercase; padding: 4px 6px; background: rgba(10,10,11,.72); border-radius: 6px; white-space: nowrap; }
+.viz.fus3d .fus-lab b { display: block; font-weight: 500; color: var(--ink); }
+.viz.fus3d .fus-lab span { display: block; color: var(--ink2); letter-spacing: .06em; text-transform: none; }
+.viz.fus3d .fus-lab.dim b { color: var(--ink2); }
+@media (max-width: 700px) { .viz.fus3d .fus-lab { font-size: 9.5px; letter-spacing: .1em; padding: 3px 5px; } }

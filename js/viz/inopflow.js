@@ -1,6 +1,6 @@
 // Inoperative equipment without an MEL (14 CFR 91.213(d)): answer four questions about the broken item.
-import { htmlScene } from "./kit.js?v=98d92ee42f";
-import { h } from "../core/util.js?v=98d92ee42f";
+import { htmlScene } from "./kit.js?v=3358ab0706";
+import { h } from "../core/util.js?v=3358ab0706";
 const Q = [
   ["Is it part of the VFR-day type-certification equipment?", "Type-certification equipment"],
   ["Is it marked required on the equipment list or the Kinds of Operations Equipment List (KOEL) for this kind of flight?", "Equipment list / KOEL"],

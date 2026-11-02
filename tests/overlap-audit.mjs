@@ -24,6 +24,10 @@ const check = () => pg.evaluate(() => { const out = [];
     const hdr = [...v.querySelectorAll(".stage > .corner")].map((e) => ({ t: e.textContent, r: e.getBoundingClientRect() }));
     for (const a of tx) { if (a.r.right > sr.right + 1 || a.r.left < sr.left - 1) out.push(`fus "${a.t}" spills out of card`); if (a.r.height < 12) out.push(`fus "${a.t}" smaller than 10px`); }
     const all = tx.concat(hdr); for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) { const a = all[i].r, c = all[j].r; if (a.left < c.right - 1 && c.left < a.right - 1 && a.top < c.bottom - 1 && c.top < a.bottom - 1) out.push(`fus "${all[i].t}" ⟂ "${all[j].t}"`); } });
+  // 3D fuselage construction labels (HTML)
+  document.querySelectorAll(".viz.fus3d").forEach((v) => { const sr = v.querySelector(".stage").getBoundingClientRect(); const L = [...v.querySelectorAll(".fus-lab")].filter((e) => e.offsetParent).map((e) => ({ t: e.textContent, r: e.getBoundingClientRect() }));
+    for (const a of L) if (a.r.right > sr.right + 1 || a.r.left < sr.left - 1 || a.r.top < sr.top - 1 || a.r.bottom > sr.bottom + 1) out.push(`fus3d "${a.t}" spills out of stage`);
+    for (let i = 0; i < L.length; i++) for (let j = i + 1; j < L.length; j++) { const a = L[i].r, c = L[j].r; if (a.left < c.right - 1 && c.left < a.right - 1 && a.top < c.bottom - 1 && c.top < a.bottom - 1) out.push(`fus3d "${L[i].t}" ⟂ "${L[j].t}"`); } });
   return out; });
 let bad = 0; const seen = new Set();
 for (const r of routes) { await pg.goto("about:blank"); await pg.goto((process.env.BASE || "http://localhost:8765/index.html") + r); await pg.waitForTimeout(900);

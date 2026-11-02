@@ -23,6 +23,18 @@ for (const sz of sizes) { const [wh, dpr] = sz.split("@"); const [w, hh] = wh.sp
   if (!ok) fail++;
   console.log(`${w}x${hh}`, ok ? "PASS" : "FAIL", JSON.stringify(st), errs.length ? "errors: " + errs.join("; ") : "no errors");
   await viz.screenshot({ path: `${OUT}${tag}_parts-explorer_${w}x${hh}.png` });
+  { // every part you can tap on the model has a button too (Cowling, Engine, stabilizers), and picking one works like a tap
+    const texts = await viz.locator(".chip").allTextContents();
+    const need = ["Fuselage", "Wings", "Landing gear", "Ailerons", "Flaps", "Fuel tanks", "Horizontal stabilizer", "Elevator", "Trim tab", "Vertical stabilizer", "Rudder", "Engine", "Cowling", "Propeller"];
+    const miss = need.filter((n) => !texts.includes(n)); if (miss.length) fail++; console.log("  ", miss.length ? "FAIL" : "PASS", "buttons for every tappable part", miss.length ? "missing " + miss : "");
+    const rowsBefore = await viz.locator(".chips").evaluateAll((g) => g.map((e) => Math.round(e.getBoundingClientRect().top)));
+    await viz.locator(".chip", { hasText: /^Cowling$/ }).click(); await pg.waitForTimeout(1800);
+    const c = await pg.evaluate(() => { const v = document.querySelector(".viz"); return { on: [...v.querySelectorAll(".chip")].filter((c) => c.classList.contains("on")).map((c) => c.textContent), big: v.querySelector(".caption .big")?.textContent, label: v.querySelector(".caption .label")?.textContent }; });
+    const rowsAfter = await viz.locator(".chips").evaluateAll((g) => g.map((e) => Math.round(e.getBoundingClientRect().top)));
+    const cok = c.on.join() === "Cowling" && c.big === "Cowling" && c.label === "Powerplant" && rowsBefore.join() === rowsAfter.join(); if (!cok) fail++;
+    console.log("  ", cok ? "PASS" : "FAIL", "Cowling button", JSON.stringify(c), rowsBefore.join() === rowsAfter.join() ? "rows fixed" : "rows moved");
+    await viz.screenshot({ path: `${OUT}${tag}_parts-cowling_${w}x${hh}.png` });
+    await viz.locator(".chip", { hasText: /^Cowling$/ }).click(); await pg.waitForTimeout(1200); }
   if (process.env.DESELECT) { // tap active chip again -> default; tap empty canvas -> default; orbit drag keeps selection
     const state = () => pg.evaluate(() => { const v = document.querySelector(".viz"); return { on: [...v.querySelectorAll(".chip")].filter((c) => c.classList.contains("on") || c.getAttribute("aria-pressed") === "true").map((c) => c.textContent), big: v.querySelector(".caption .big")?.textContent }; });
     const chip = (n) => viz.locator(".chip", { hasText: new RegExp("^" + n + "$") });

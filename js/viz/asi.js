@@ -1,6 +1,6 @@
 // C172S airspeed indicator: tap an arc or line to read its meaning (values from POH Sec 2; unmarked speeds from Sec 4).
-import { frame, chips, svg, drawOn, ACC, FAINT, FAINT2 } from "./base.js?v=98d92ee42f";
-import { s } from "../core/util.js?v=98d92ee42f";
+import { frame, chips, svg, drawOn, ACC, FAINT, FAINT2 } from "./base.js?v=3358ab0706";
+import { s } from "../core/util.js?v=3358ab0706";
 const MIN = 30, MAX = 180, A0 = -150, A1 = 150; // dial range (illustrative layout)
 const ang = (v) => A0 + ((v - MIN) / (MAX - MIN)) * (A1 - A0);
 const MARKS = {

@@ -1,7 +1,7 @@
 // 3D part explorer and feature tour for the C172S wireframe.
-import { frame, chips } from "./base.js?v=98d92ee42f";
-import { planeStage } from "./planestage.js?v=98d92ee42f";
-import { h, reduced } from "../core/util.js?v=98d92ee42f";
+import { frame, chips } from "./base.js?v=3358ab0706";
+import { planeStage } from "./planestage.js?v=3358ab0706";
+import { h, reduced } from "../core/util.js?v=3358ab0706";
 // Pose sign conventions (model): ail>0 rolls right, elev<0 = trailing edge up (nose up), rud>0 = right rudder, steer>0 = nose wheel left.
 const PARTS = {
   fuselage: { name: "Fuselage", group: "Major component", hl: ["fuselage", "fairing"], view: "iso", text: "The central body. Carries crew, passengers and cargo, and joins the wings and tail. Semimonocoque aluminum on the 172." },
@@ -45,6 +45,7 @@ export function mount(host, { mode = "explore" } = {}) {
   // Cowling: solid (default), wire = outline only so the engine shows through (faces hidden), or hidden entirely.
   // Accent lines (LineSegments2 are meshes too) are left to highlight(), which runs right after.
   function cowl(show, wire = false) { (S.inkLines.cowling || []).forEach((l) => (l.visible = show || wire)); S.P.parts.cowling.subs.forEach((sb) => sb.obj.traverse((o) => o.isMesh && !o.isLineSegments2 && (o.visible = show && !wire))); S.kick(); }
+  // Every part you can tap on the model has its own button (MAP targets = the Parts row + Fuselage / Wings / Landing gear).
   // Both button rows act as one set: exactly one button (or none, for parts without a button) is lit, matching the view.
   const markChip = (key) => groups.forEach((g) => g.set(key));
   const INTRO = ["Five major components", "Tap a part", "Drag to orbit. Tap the airplane or a button to isolate a part. Tap the same button again, or empty space, to clear it."];
@@ -52,7 +53,7 @@ export function mount(host, { mode = "explore" } = {}) {
   function select(key) { const P = PARTS[key]; if (!P) return; cur = key; markChip(key); cowl(!P.hideCowl && !P.cowlWire, P.cowlWire); S.highlight(P.hl); S.setView(P.view); animatePose(P.pose || {}); F.caption(P.group, P.name); F.explain(P.text); }
   if (mode === "explore") {
     groups.push(chips(F.ctrl, [["fuselage", "Fuselage"], ["wing", "Wings"], ["empennage", "Empennage"], ["gear", "Landing gear"], ["powerplant", "Powerplant"]], null, (k) => (k ? select(k) : reset()), { label: "Major components", toggle: true }));
-    groups.push(chips(F.ctrl, [["ailerons", "Ailerons"], ["flaps", "Flaps"], ["elevator", "Elevator"], ["rudder", "Rudder"], ["trimtab", "Trim tab"], ["propeller", "Propeller"], ["fuel", "Fuel tanks"]], null, (k) => (k ? select(k) : reset()), { label: "Parts", toggle: true }));
+    groups.push(chips(F.ctrl, [["ailerons", "Ailerons"], ["flaps", "Flaps"], ["fuel", "Fuel tanks"], ["hstab", "Horizontal stabilizer"], ["elevator", "Elevator"], ["trimtab", "Trim tab"], ["fin", "Vertical stabilizer"], ["rudder", "Rudder"], ["engine", "Engine"], ["cowling", "Cowling"], ["propeller", "Propeller"]], null, (k) => (k ? select(k) : reset()), { label: "Parts", toggle: true }));
     F.caption(INTRO[0], INTRO[1]); F.explain(INTRO[2]);
   } else {
     const prev = h("button", { class: "btn ghost", type: "button" }, "←"), next = h("button", { class: "btn pri arrow", type: "button" }, "Next");
