@@ -1,8 +1,8 @@
 // Segmented circle (AIM 4-3-4; PHAK Ch 14). Set the wind; the wind sock swings; pick the runway most nearly into the wind
 // and read the traffic pattern indicators. Example airport: runway 9-27, right traffic for runway 27.
-import { frame, chips, slider, svg, readout, drawOn, loop, ACC, FAINT, FAINT2, INK } from "./base.js?v=167338b5e8";
-import { s } from "../core/util.js?v=167338b5e8";
-import { T } from "./shapes.js?v=167338b5e8";
+import { frame, chips, slider, svg, readout, drawOn, loop, ACC, FAINT, FAINT2, INK } from "./base.js?v=98d92ee42f";
+import { s } from "../core/util.js?v=98d92ee42f";
+import { T } from "./shapes.js?v=98d92ee42f";
 const CX = 960, CY = 430, R = 140, D2R = Math.PI / 180;
 export function mount(host, opts = {}) {
   const F = frame(host, { corners: { tl: "Segmented circle · example airport", tr: "AIM 4-3-4" } });
