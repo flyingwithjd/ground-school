@@ -7,7 +7,7 @@ const { chromium } = require("playwright-core"); import { execSync } from "child
 const routes = execSync("node tests/routes.mjs", { cwd: "/workspace/pilot-ground-school" }).toString().trim().split("\n").filter((r) => r.startsWith("#/lesson/") || r.startsWith("#/module/"));
 const w = +(process.env.W || 360), hh = +(process.env.H || 800);
 const b = await chromium.launch({ executablePath: "/usr/bin/google-chrome", args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
-const ctx = await b.newContext({ viewport: { width: w, height: hh } }); const pg = await ctx.newPage(); const errs = []; pg.on("pageerror", (e) => errs.push(e.message));
+const ctx = await b.newContext({ viewport: { width: w, height: hh } }); const pg = await ctx.newPage(); await pg.addInitScript(() => { try { localStorage.setItem("sqs.access", "1"); } catch (e) {} }); /* entry gate */  const errs = []; pg.on("pageerror", (e) => errs.push(e.message));
 const check = () => pg.evaluate(() => { const out = [];
   document.querySelectorAll(".viz").forEach((v, vi) => { const boxes = [...v.querySelectorAll(".stage > .corner, .stage > .caption .label, .stage > .caption .big, .stage > .caption .spec")].filter((e) => e.textContent.trim() && e.offsetParent).map((e) => { const r = e.getBoundingClientRect(); return { t: e.textContent.slice(0, 28), l: r.left, r: r.right, t2: r.top, b: r.bottom }; });
     const sr = v.querySelector(".stage").getBoundingClientRect();

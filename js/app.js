@@ -1,7 +1,8 @@
-import { initPopovers } from "./core/rich.js?v=b44a743634";
-import { destroyAll } from "./viz/index.js?v=b44a743634";
-import * as pages from "./views/pages.js?v=b44a743634";
-import { lessonView } from "./views/lesson.js?v=b44a743634";
+import { whenUnlocked } from "./gate.js?v=269fcd6a6e";
+import { initPopovers } from "./core/rich.js?v=269fcd6a6e";
+import { destroyAll } from "./viz/index.js?v=269fcd6a6e";
+import * as pages from "./views/pages.js?v=269fcd6a6e";
+import { lessonView } from "./views/lesson.js?v=269fcd6a6e";
 const main = document.getElementById("main");
 let cleanup = [];
 const routes = [
@@ -37,6 +38,5 @@ function route() {
   main.innerHTML = `<div class="page"><h2>Page not found.</h2><p class="dim mt"><a href="#/">Back to what to work on now</a></p></div>`; setTitle();
 }
 route.sameLesson = (h) => (route.last || "").split("/").slice(0, 3).join("/") === h.split("/").slice(0, 3).join("/");
-addEventListener("hashchange", route);
 initPopovers();
-route();
+whenUnlocked(() => { addEventListener("hashchange", route); route(); }); // nothing renders until the entry gate is passed

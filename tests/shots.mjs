@@ -16,7 +16,7 @@ const shots = [
   ["desktop-1440x900_blind-spots.png", 1440, 900, "#/map"],
 ];
 for (const [name, w, hh, r, o = {}] of shots) {
-  const ctx = await b.newContext({ viewport: { width: w, height: hh }, storageState }); const pg = await ctx.newPage(); const errs = []; pg.on("pageerror", (e) => errs.push(e.message));
+  const ctx = await b.newContext({ viewport: { width: w, height: hh }, storageState }); const pg = await ctx.newPage(); await pg.addInitScript(() => { try { localStorage.setItem("sqs.access", "1"); } catch (e) {} }); /* entry gate */  const errs = []; pg.on("pageerror", (e) => errs.push(e.message));
   await pg.goto("http://localhost:8765/index.html" + r); await pg.waitForTimeout(o.wait || 2000);
   if (o.viz) { await pg.evaluate(() => { const v = document.querySelector(".viz"); if (v) window.scrollTo(0, v.getBoundingClientRect().top + scrollY - 70); }); await pg.waitForTimeout(2200); }
   if (o.tap) { const t = pg.locator(".mt-tok"); for (let i = 0; i < o.tap; i++) { await t.nth(i).click(); await pg.waitForTimeout(150); } }

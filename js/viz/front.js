@@ -1,8 +1,8 @@
 // Frontal cross-section (PHAK Ch 12). Pick a cold or warm front, then stand ahead of it, under it or behind it
 // and read what the PHAK says to expect. The frontal surface is drawn on by the point of light.
-import { frame, chips, svg, drawOn, ACC, FAINT, FAINT2, INK } from "./base.js?v=b44a743634";
-import { s } from "../core/util.js?v=b44a743634";
-import { T } from "./shapes.js?v=b44a743634";
+import { frame, chips, svg, drawOn, ACC, FAINT, FAINT2, INK } from "./base.js?v=269fcd6a6e";
+import { s } from "../core/util.js?v=269fcd6a6e";
+import { T } from "./shapes.js?v=269fcd6a6e";
 const WX = {
   cold: { before: { cl: "Cirriform or towering cumulus; cumulonimbus may develop", pr: "Rain showers may develop", vi: "–", wi: "–", te: "High dew point", ps: "Falling" },
     at: { cl: "Towering cumulus or cumulonimbus", pr: "Heavy rain showers; possible lightning, thunder, hail", vi: "Poor", wi: "Variable and gusty", te: "Temperature and dew point drop rapidly", ps: "Bottoms out, then starts to rise" },

@@ -4,7 +4,10 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="theme-color" content="#0A0A0B">
-<meta name="build" content="b44a743634">
+<meta name="build" content="269fcd6a6e">
+<meta name="robots" content="noindex, nofollow">
+<script>try{if(localStorage.getItem("sqs.access")!=="1")document.documentElement.classList.add("locked")}catch(e){document.documentElement.classList.add("locked")}</script>
+<style>html.locked body>:not(#gate){display:none!important}html:not(.locked) #gate{display:none!important}</style>
 <meta name="description" content="Squawk School: private pilot ground school. All 19 ground lessons across four stages, with interactive visualizations, stage checks, an end-of-course exam and spaced review, built on FAA handbooks, the ACS and 14 CFR.">
 <meta name="application-name" content="Squawk School">
 <meta name="apple-mobile-web-app-title" content="Squawk School">
@@ -12,26 +15,37 @@
 <meta property="og:site_name" content="Squawk School">
 <meta property="og:title" content="Squawk School · Private pilot ground">
 <meta property="og:description" content="Squawk School: private pilot ground school. All 19 ground lessons across four stages, with interactive visualizations, stage checks, an end-of-course exam and spaced review, built on FAA handbooks, the ACS and 14 CFR.">
-<meta property="og:image" content="assets/brand/og-card.png">
+<meta property="og:url" content="https://squawkschool.com/">
+<meta property="og:image" content="https://squawkschool.com/assets/brand/og-card.png">
 <meta property="og:image:width" content="1200">
 <meta property="og:image:height" content="630">
 <meta property="og:image:alt" content="Squawk School logo: a bird whose body is an airfoil, squawking, beside the words Squawk School">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="assets/brand/og-card.png">
+<meta name="twitter:image" content="https://squawkschool.com/assets/brand/og-card.png">
 <title>Squawk School · Private pilot ground</title>
 <link rel="preload" href="fonts/Inter-400.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/Inter-800.woff2" as="font" type="font/woff2" crossorigin>
 <link rel="preload" href="fonts/IBMPlexMono-500.woff2" as="font" type="font/woff2" crossorigin>
-<link rel="stylesheet" href="css/app.css?v=b44a743634">
+<link rel="stylesheet" href="css/app.css?v=269fcd6a6e">
 <link rel="icon" href="favicon.svg" type="image/svg+xml">
 <link rel="icon" href="assets/brand/icon-192.png" type="image/png" sizes="192x192">
 <link rel="apple-touch-icon" href="apple-touch-icon.png">
 <link rel="manifest" href="manifest.webmanifest">
 <script type="importmap">
-{ "imports": { "three": "./vendor/three/build/three.module.js?v=b44a743634", "three/addons/": "./vendor/three/addons/" } }
+{ "imports": { "three": "./vendor/three/build/three.module.js?v=269fcd6a6e", "three/addons/": "./vendor/three/addons/" } }
 </script>
 </head>
 <body>
+<div id="gate" class="gate">
+  <form class="gate-box" autocomplete="off">
+    <svg class="gate-mark" viewBox="2 35 98 34" aria-hidden="true" focusable="false"><path d="M4 64 C22 52 42 38 58 38 C68 38 73 46 70 54 C67 61 58 64 46 65 C32 66 16 66 4 64 Z" fill="#F2F1EC"/><path d="M68 42 L86 42 L71 48 Z" fill="#F2F1EC"/><path d="M71 53 L84 61 L67 59 Z" fill="#F2F1EC"/><circle cx="59" cy="46" r="3.4" fill="#0A0A0B"/><path d="M88.09 46.12 A10 10 0 0 1 88.09 57.88" fill="none" stroke="#3B82F6" stroke-width="4.5" stroke-linecap="round"/><path d="M93.75 42.01 A17 17 0 0 1 93.75 61.99" fill="none" stroke="#3B82F6" stroke-width="4.5" stroke-linecap="round"/></svg>
+    <div class="gate-word mono">Squawk School</div>
+    <h1 class="gate-h">Learn it. Squawk it.</h1>
+    <label class="label" for="gate-code">Access code</label>
+    <div class="gate-row"><input id="gate-code" name="code" type="password" autocomplete="off" autocapitalize="none" autocorrect="off" spellcheck="false" enterkeyhint="go" autofocus required><button class="btn pri" type="submit">Enter</button></div>
+    <p class="gate-err" role="status" aria-live="polite"></p>
+  </form>
+</div>
 <a class="skip" href="#main">Skip to content</a>
 <header class="top" id="top">
   <a class="brand" href="#/" aria-label="Squawk School, private pilot ground: what to work on now"><svg class="brand-m" viewBox="2 35 98 34" aria-hidden="true" focusable="false"><path d="M4 64 C22 52 42 38 58 38 C68 38 73 46 70 54 C67 61 58 64 46 65 C32 66 16 66 4 64 Z" fill="#F2F1EC"/><path d="M68 42 L86 42 L71 48 Z" fill="#F2F1EC"/><path d="M71 53 L84 61 L67 59 Z" fill="#F2F1EC"/><circle cx="59" cy="46" r="3.4" fill="#0A0A0B"/><path d="M88.09 46.12 A10 10 0 0 1 88.09 57.88" fill="none" stroke="#3B82F6" stroke-width="4.5" stroke-linecap="round"/><path d="M93.75 42.01 A17 17 0 0 1 93.75 61.99" fill="none" stroke="#3B82F6" stroke-width="4.5" stroke-linecap="round"/></svg><span class="brand-n mono">Squawk School</span><span class="brand-t mono" aria-hidden="true">Private pilot ground</span></a>
@@ -47,6 +61,6 @@
 <div id="pop" class="pop" role="dialog" aria-modal="false" hidden></div>
 <div id="toast" class="toast" role="status" aria-live="polite"></div>
 <noscript><p style="padding:2rem;color:#F2F1EC">This course runs in your browser and needs JavaScript.</p></noscript>
-<script type="module" src="js/app.js?v=b44a743634"></script>
+<script type="module" src="js/app.js?v=269fcd6a6e"></script>
 </body>
 </html>

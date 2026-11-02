@@ -3,7 +3,7 @@ import { createRequire } from "module"; const require = createRequire("/workspac
 const { chromium } = require("playwright-core");
 const [,,w,hh] = process.argv;
 const b = await chromium.launch({ executablePath: "/usr/bin/google-chrome", args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
-const pg = await (await b.newContext({ viewport: { width: +(w||1366), height: +(hh||1024) } })).newPage(); const errs=[]; pg.on("pageerror",e=>errs.push(e.message));
+const pg = await (await b.newContext({ viewport: { width: +(w||1366), height: +(hh||1024) } })).newPage(); await pg.addInitScript(() => { try { localStorage.setItem("sqs.access", "1"); } catch (e) {} }); /* entry gate */  const errs=[]; pg.on("pageerror",e=>errs.push(e.message));
 await pg.goto("http://localhost:8765/index.html#/lesson/gl2/1"); await pg.waitForTimeout(1500);
 await pg.evaluate(() => { const v = document.querySelector(".viz.tf"); window.scrollTo(0, v.getBoundingClientRect().top + scrollY - 58); }); await pg.waitForTimeout(1500);
 const ph = () => pg.evaluate(() => document.querySelector(".viz.tf .stage canvas")._flowPhase ?? null);

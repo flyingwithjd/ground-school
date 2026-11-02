@@ -9,7 +9,7 @@ const argv = process.argv.slice(2);
 const routes = argv.length ? argv : execSync("node tests/routes.mjs", { cwd: "/workspace/pilot-ground-school" }).toString().trim().split("\n").filter((r) => r.startsWith("#/lesson/") || r.startsWith("#/module/") || r.startsWith("#/tools"));
 const w = +(process.env.W || 1440), hh = +(process.env.H || 900), TOL = 1.5;
 const b = await chromium.launch({ executablePath: "/usr/bin/google-chrome", args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
-const ctx = await b.newContext({ viewport: { width: w, height: hh }, hasTouch: w < 1100, isMobile: w < 500, reducedMotion: "reduce" }); const pg = await ctx.newPage();
+const ctx = await b.newContext({ viewport: { width: w, height: hh }, hasTouch: w < 1100, isMobile: w < 500, reducedMotion: "reduce" }); const pg = await ctx.newPage(); await pg.addInitScript(() => { try { localStorage.setItem("sqs.access", "1"); } catch (e) {} }); /* entry gate */ 
 const errs = []; pg.on("pageerror", (e) => errs.push(e.message));
 // snapshot: every visible control group in visual #vi (chip group, slider, or the parent of a lone button), page coordinates
 const snap = (vi) => pg.evaluate((vi) => { const v = document.querySelectorAll("[data-viz]")[vi]; if (!v) return null; const G = new Map();

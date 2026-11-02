@@ -8,7 +8,7 @@ const b = await chromium.launch({ executablePath: "/usr/bin/google-chrome", args
 let fail = 0;
 const sizes = (process.env.SIZES || "390x844@3,1366x1024@1").split(",");
 for (const sz of sizes) { const [wh, dpr] = sz.split("@"); const [w, hh] = wh.split("x").map(Number);
-  const ctx = await b.newContext({ viewport: { width: w, height: hh }, deviceScaleFactor: +dpr || 1, isMobile: w < 700, hasTouch: w < 700 }); const pg = await ctx.newPage(); const errs = [];
+  const ctx = await b.newContext({ viewport: { width: w, height: hh }, deviceScaleFactor: +dpr || 1, isMobile: w < 700, hasTouch: w < 700 }); const pg = await ctx.newPage(); await pg.addInitScript(() => { try { localStorage.setItem("sqs.access", "1"); } catch (e) {} }); /* entry gate */  const errs = [];
   pg.on("pageerror", (e) => errs.push(e.message)); pg.on("console", (m) => m.type() === "error" && errs.push(m.text()));
   await pg.goto(base + "#/lesson/gl1/0"); await pg.waitForTimeout(2500);
   const viz = pg.locator(".viz").first(); await viz.scrollIntoViewIfNeeded(); await pg.evaluate(() => { const v = document.querySelector(".viz"); window.scrollTo(0, v.getBoundingClientRect().top + scrollY - 70); });
