@@ -1,13 +1,13 @@
 // Stage checks (written + oral), the pre-solo written practice exam, and the syllabus coverage checklist.
-import { h, esc, shuffle } from "../core/util.js?v=e5d7639588";
-import { S, save } from "../core/store.js?v=e5d7639588";
-import { STAGES, STAGE_CHECK } from "../../data/course.js?v=e5d7639588";
-import { LESSONS, QUESTIONS, ORAL, TOPICS, lessonItems } from "../../data/index.js?v=e5d7639588";
-import { stats } from "../core/progress.js?v=e5d7639588";
-import { session } from "./quiz.js?v=e5d7639588";
-import { rich } from "../core/rich.js?v=e5d7639588";
+import { h, esc, shuffle } from "../core/util.js?v=22e9bcaea0";
+import { S, save } from "../core/store.js?v=22e9bcaea0";
+import { STAGES, STAGE_CHECK } from "../../data/course.js?v=22e9bcaea0";
+import { LESSONS, QUESTIONS, ORAL, TOPICS, lessonItems } from "../../data/index.js?v=22e9bcaea0";
+import { stats } from "../core/progress.js?v=22e9bcaea0";
+import { session } from "./quiz.js?v=22e9bcaea0";
+import { rich } from "../core/rich.js?v=22e9bcaea0";
 const page = (host) => { const p = h("div", { class: "page" }); host.append(p); return p; };
-const foot = `<div class="footer">Study aid. Your school's syllabus, your instructor and the FAA sources decide what a stage check covers and how it is graded.</div>`;
+const foot = `<div class="footer">Squawk School is a study aid. Your school's syllabus, your instructor and the FAA sources decide what a stage check covers and how it is graded.</div>`;
 const sid = (k) => STAGES.find((s) => s.id === k);
 // stratified draw: proportional to each lesson's bank, at least one from each
 function draw(pool, n, filter = () => true) {

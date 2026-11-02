@@ -1,4 +1,7 @@
-# Private Pilot Ground School
+# Squawk School
+
+Private pilot ground school (squawkschool.com).
+
 
 A static, offline study app for student pilots. It teaches every content item of a 19-lesson, four-stage Part 141 Appendix B style private pilot ground course, with stage checks after lessons 6, 12 and 18 and an end-of-course exam (80% to pass; misses go into spaced review). Lessons and map to the Private Pilot ACS (FAA-S-ACS-6C). Content comes from PHAK (FAA-H-8083-25C), AFH (FAA-H-8083-3C), the AIM, AC 90-66C, the Aviation Weather Handbook and 14 CFR, with sources cited inline. Cessna 172S figures come from the manufacturer's POH. Procedures say "Confirm with your CFI and your aircraft's POH."
 

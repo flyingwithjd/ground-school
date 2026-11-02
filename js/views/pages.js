@@ -1,24 +1,24 @@
-import { h, esc, pct, fmtDue, toast, download, shuffle } from "../core/util.js?v=e5d7639588";
-import { S, save, exportJSON, importJSON, reset } from "../core/store.js?v=e5d7639588";
-import { get } from "../core/srs.js?v=e5d7639588";
-import { STAGES, MODULES, STAGE_CHECK } from "../../data/course.js?v=e5d7639588";
-import { LESSONS, QUESTIONS, ORAL, TOPICS, ORDER, lessonItems } from "../../data/index.js?v=e5d7639588";
-import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone } from "../core/progress.js?v=e5d7639588";
-import { session } from "./quiz.js?v=e5d7639588";
-import { G, rich } from "../core/rich.js?v=e5d7639588";
+import { h, esc, pct, fmtDue, toast, download, shuffle } from "../core/util.js?v=22e9bcaea0";
+import { S, save, exportJSON, importJSON, reset } from "../core/store.js?v=22e9bcaea0";
+import { get } from "../core/srs.js?v=22e9bcaea0";
+import { STAGES, MODULES, STAGE_CHECK } from "../../data/course.js?v=22e9bcaea0";
+import { LESSONS, QUESTIONS, ORAL, TOPICS, ORDER, lessonItems } from "../../data/index.js?v=22e9bcaea0";
+import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone } from "../core/progress.js?v=22e9bcaea0";
+import { session } from "./quiz.js?v=22e9bcaea0";
+import { G, rich } from "../core/rich.js?v=22e9bcaea0";
 const page = (host) => { const p = h("div", { class: "page" }); host.append(p); return p; };
 const meter = (x, big) => `<div class="meter${big ? " big" : ""}"><i style="width:${Math.round(x * 100)}%"></i></div>`;
 const stageLessons = (s) => [...s.ground, ...s.flight].flatMap((id) => [id, ...((LESSONS[id] && LESSONS[id].includes) || [])]);
 const stageIds = (s) => stageLessons(s).flatMap((id) => lessonItems(id, { deep: false }));
 const allCourseIds = () => [...new Set([...STAGES.flatMap(stageIds), ...MODULES.flatMap((m) => m.units).flatMap((id) => lessonItems(id, { deep: false }))])];
 const curStage = () => { const nl = nextLesson(); const L = nl && LESSONS[nl]; return STAGES.find((s) => s.n === ((L && L.stage) || 1)) || STAGES[0]; };
-const foot = () => `<div class="footer">Study aid for ground training. It does not replace instruction from an authorized instructor, the FAA handbooks, the regulations, or your aircraft's Pilot's Operating Handbook. Figures for the Cessna 172S are stated from the manufacturer's published limitations for study; always use the POH for the airplane you fly. <a href="#/about">Sources and licenses</a></div>`;
+const foot = () => `<div class="footer">Squawk School is a study aid for ground training. It does not replace instruction from an authorized instructor, the FAA handbooks, the regulations, or your aircraft's Pilot's Operating Handbook. Figures for the Cessna 172S are stated from the manufacturer's published limitations for study; always use the POH for the airplane you fly. <a href="#/about">Sources and licenses</a></div>`;
 
 export function home(host) {
   const p = page(host); const CS = curStage(); const st = stats(stageIds(CS)); const due = dueIds(); const weak = weakest(3); const nl = nextLesson(); const L = nl && LESSONS[nl];
   const first = !Object.keys(S().items).length && !Object.keys(S().lessons).length;
   p.innerHTML = `<section class="hero"><span class="label">${esc(CS.title)} · ${esc(CS.sub)}</span><h1>${first ? "Learn it. Keep it." : "What to work on now"}</h1>
-  <p>${first ? "Ground school for the private pilot certificate, built on the FAA handbooks, the Airman Certification Standards and 14 CFR. Read a lesson, play with the visuals, then answer. The app schedules every question for review and brings back what you are losing, so one right answer never counts as knowing it." : "Reviews that are due come first, then the areas you are weakest in, then new material."}</p></section>`;
+  <p>${first ? "Squawk School is ground school for the private pilot certificate, built on the FAA handbooks, the Airman Certification Standards and 14 CFR. Read a lesson, play with the visuals, then answer. The app schedules every question for review and brings back what you are losing, so one right answer never counts as knowing it." : "Reviews that are due come first, then the areas you are weakest in, then new material."}</p></section>`;
   const g = h("div", { class: "grid g3" }); p.append(g);
   g.innerHTML = `<a class="cell" href="#/review"><span class="label">Due for review</span><div class="num">${due.length}<small>${due.length === 1 ? "item" : "items"}</small></div><p>${due.length ? "Answer these before they fade. Misses come back within minutes." : isFinite(nextDue()) ? `Nothing due. Next review ${fmtDue(nextDue())}.` : "Nothing scheduled yet. Start a lesson and answer its questions."}</p><span class="go btn ${due.length ? "pri" : ""} arrow">${due.length ? "Start review" : "Open review"}</span></a>
   ${weak.length ? `<a class="cell" href="#/drill/${weak[0].t.id}"><span class="label">Weakest area</span><h3>${esc(weak[0].t.title)}</h3><p>${{ over: "You answered certain and were wrong here. Fix this first.", weak: "Recent accuracy is low or items keep slipping.", fading: "You knew this, but reviews are overdue.", building: "Still early. A few more spaced reviews will lock it in." }[weak[0].c]} ${LESSONS[weak[0].t.lesson].code}.</p>${meter(weak[0].st.readiness)}<span class="go btn arrow">Drill it</span></a>`
@@ -100,7 +100,7 @@ export function oral(host, lid) {
   const { queue, extra } = buildQueue(ids, { includeOral: true, max: 12, newMax: 12 });
   return runSession(host, { queue: queue.length ? queue : shuffle(ids).slice(0, 10), extra, mode: "oral", title: "Oral exam", label: "Oral exam" + (lid !== "all" ? " · " + LESSONS[lid].code : ""), onExit: () => (location.hash = "#/oral") });
 }
-export { sim, check } from "./checks.js?v=e5d7639588";
+export { sim, check } from "./checks.js?v=22e9bcaea0";
 export function glossary(host) { const p = page(host); const keys = Object.keys(G).sort();
   p.innerHTML = `<section class="hero"><span class="label">Glossary</span><h1>Terms, plainly</h1></section>`;
   const inp = h("input", { type: "search", placeholder: "Search terms", "aria-label": "Search terms" }); p.append(h("div", { class: "field", style: "max-width:28rem" }, inp)); const list = h("div", { class: "mt" }); p.append(list);
@@ -113,7 +113,7 @@ export function settings(host) { const p = page(host); const st = S();
   const c2 = h("div", { class: "card" }); c2.innerHTML = `<span class="label">New questions per session</span><p class="dim mt" style="font-size:16px">How many never-seen questions a practice session adds after due reviews.</p>`;
   const ch2 = h("div", { class: "chips mt" }); [6, 12, 20].forEach((n) => { const b = h("button", { class: "chip" + (st.settings.newPerSession === n ? " on" : ""), type: "button" }, String(n)); b.onclick = () => { st.settings.newPerSession = n; save(); ch2.querySelectorAll(".chip").forEach((x) => x.classList.toggle("on", x === b)); }; ch2.append(b); }); c2.append(ch2);
   const c3 = h("div", { class: "card" }); c3.innerHTML = `<span class="label">Backup</span><p class="dim mt" style="font-size:16px">${Object.keys(st.items).length} items with history. Started ${new Date(st.created).toLocaleDateString()}.</p>`;
-  const ex = h("button", { class: "btn", type: "button" }, "Export progress"); ex.onclick = () => download(`pilot-ground-progress-${new Date().toISOString().slice(0, 10)}.json`, exportJSON());
+  const ex = h("button", { class: "btn", type: "button" }, "Export progress"); ex.onclick = () => download(`squawk-school-progress-${new Date().toISOString().slice(0, 10)}.json`, exportJSON());
   const file = h("input", { type: "file", accept: "application/json,.json", hidden: true }); const im = h("button", { class: "btn", type: "button" }, "Import progress"); im.onclick = () => file.click();
   file.onchange = async () => { const f = file.files[0]; if (!f) return; try { const t = await f.text(); if (!confirm("Replace the progress in this browser with the file's progress?")) return; importJSON(t); toast("Progress imported."); location.hash = "#/"; } catch (e) { toast(e.message || "Import failed."); } };
   const rs = h("button", { class: "btn ghost", type: "button" }, "Reset everything"); rs.onclick = () => { if (confirm("Erase all progress in this browser? Export first if you want a backup.")) { reset(); toast("Progress erased."); location.hash = "#/"; } };
@@ -121,9 +121,9 @@ export function settings(host) { const p = page(host); const st = S();
   p.append(c1, c2, c3); p.insertAdjacentHTML("beforeend", `<div class="card"><span class="label">How review scheduling works</span><div class="prose mt" style="font-size:16px"><p>Each question has its own schedule (a variant of the SM-2 spaced repetition algorithm). A miss resets it: the question returns in about 10 minutes and again later in the same session. A correct answer pushes it out to 1 day, then 3 days, then longer intervals that grow with how easily you recall it. A correct guess grows the interval less.</p><p>An item counts as mastered only when its next review is three weeks or more away, which takes several correct answers spread over days. Readiness estimates the chance you would recall each item right now; it decays between reviews.</p></div></div>`);
   p.insertAdjacentHTML("beforeend", foot()); }
 export function about(host) { const p = page(host);
-  p.innerHTML = `<section class="hero"><span class="label">About</span><h1>Sources and licenses</h1></section><div class="prose">
+  p.innerHTML = `<section class="hero"><span class="label">About Squawk School</span><h1>Sources and licenses</h1><p>Squawk School is private pilot ground school you can study anywhere: every lesson, visual and check below is built from the FAA sources listed here.</p></section><div class="prose">
   <h4>Teaching sources</h4><ul><li>Pilot's Handbook of Aeronautical Knowledge, FAA-H-8083-25C (PHAK)</li><li>Airplane Flying Handbook, FAA-H-8083-3C (AFH)</li><li>Aviation Weather Handbook, FAA-H-8083-28A (AWH)</li><li>Private Pilot for Airplane Category Airman Certification Standards, FAA-S-ACS-6C (ACS)</li><li>Aeronautical Information Manual (AIM), chapters 2, 4 and 7</li><li>14 CFR Parts 61 and 91, current text from the eCFR</li><li>AC 150/5340-1M Standards for Airport Markings; AC 150/5340-18H Standards for Airport Sign Systems; AC 90-66C Non-Towered Airport Flight Operations</li><li>Cessna 172S limitations and performance figures as published by the manufacturer, stated as facts for study. No manufacturer text or figures are reproduced. Use the POH for your airplane.</li></ul>
   <p>Citations name the chapter, section or regulation. Procedures are marked to confirm with your instructor and your aircraft's POH, because flight schools and airplanes differ.</p>
   <h4>Software and fonts</h4><ul><li>three.js r181, MIT License</li><li>GSAP 3.14, GreenSock Standard "No Charge" License (vendored, not loaded in this build)</li><li>Inter and IBM Plex Mono, SIL Open Font License 1.1</li></ul><p>License texts are in the LICENSES folder.</p>
-  <h4>Not affiliated</h4><p>Independent study aid. Not affiliated with or endorsed by the FAA or Textron Aviation. Cessna and Skyhawk are trademarks of their owner.</p></div>`; }
-export { coverage, presolo } from "./checks.js?v=e5d7639588";
+  <h4>Not affiliated</h4><p>Squawk School is an independent study aid. Not affiliated with or endorsed by the FAA or Textron Aviation. Cessna and Skyhawk are trademarks of their owner.</p></div>`; }
+export { coverage, presolo } from "./checks.js?v=22e9bcaea0";

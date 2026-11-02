@@ -1,4 +1,4 @@
-/* Private Pilot Ground: one look. Dark only, one accent, only the accent glows. */
+/* Squawk School: one look. Dark only, one accent, only the accent glows. */
 @font-face { font-family: "Inter"; font-weight: 400; font-display: swap; src: url("../fonts/Inter-400.woff2") format("woff2"); }
 @font-face { font-family: "Inter"; font-weight: 500; font-display: swap; src: url("../fonts/Inter-500.woff2") format("woff2"); }
 @font-face { font-family: "Inter"; font-weight: 600; font-display: swap; src: url("../fonts/Inter-600.woff2") format("woff2"); }
@@ -37,7 +37,11 @@ h3 { font-size: clamp(21px, 2.2vw, 27px); letter-spacing: -.015em; line-height: 
 
 /* ---------- top bar ---------- */
 .top { position: sticky; top: 0; z-index: 20; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 18px var(--pad); padding-top: max(18px, env(safe-area-inset-top)); background: rgba(10,10,11,.94); border-bottom: 1px solid var(--line); }
-.brand { text-decoration: none; color: var(--ink2); white-space: nowrap; }
+.brand { text-decoration: none; color: var(--ink2); white-space: nowrap; display: inline-flex; align-items: baseline; gap: 12px; }
+.brand .brand-n { color: var(--ink); }
+.brand .brand-t { color: var(--ink3); font-size: 11px; letter-spacing: .14em; padding-left: 12px; border-left: 1px solid var(--line2); }
+@media (max-width: 380px), (min-width: 761px) and (max-width: 1000px) { .brand .brand-t { display: none; } }
+.nav a { white-space: nowrap; }
 .nav { display: flex; gap: 6px; }
 .nav a { text-decoration: none; font-family: var(--mono); font-size: 12px; letter-spacing: .16em; text-transform: uppercase; padding: 10px 14px; border-radius: 999px; color: var(--ink2); transition: color .3s; position: relative; }
 .nav a:hover { color: var(--ink); }

@@ -1,7 +1,7 @@
-import { initPopovers } from "./core/rich.js?v=e5d7639588";
-import { destroyAll } from "./viz/index.js?v=e5d7639588";
-import * as pages from "./views/pages.js?v=e5d7639588";
-import { lessonView } from "./views/lesson.js?v=e5d7639588";
+import { initPopovers } from "./core/rich.js?v=22e9bcaea0";
+import { destroyAll } from "./viz/index.js?v=22e9bcaea0";
+import * as pages from "./views/pages.js?v=22e9bcaea0";
+import { lessonView } from "./views/lesson.js?v=22e9bcaea0";
 const main = document.getElementById("main");
 let cleanup = [];
 const routes = [
@@ -24,13 +24,17 @@ const routes = [
   [/^#\/settings$/, () => pages.settings(main), "tools"],
   [/^#\/about$/, () => pages.about(main), "tools"],
 ];
+// Document title per route: "<page heading> · Squawk School" (views may render a tick later, so read the heading after it lands)
+const BRAND = "Squawk School", HOME_TITLE = "Squawk School · Private pilot ground";
+function setTitle(home, nav) { const put = () => { if (home) { document.title = HOME_TITLE; return; } const hd = main.querySelector("h1") || main.querySelector("h2"); const fb = nav ? (document.querySelector(`[data-nav="${nav}"]`) || {}).textContent : ""; const s = (hd ? hd.textContent.replace(/\s+/g, " ").trim().replace(/\.$/, "") : "") || (fb || "").trim(); document.title = s ? `${s} · ${BRAND}` : BRAND; };
+  put(); setTimeout(put, 0); setTimeout(put, 400); }
 function route() {
   cleanup.forEach((f) => { try { f(); } catch (e) {} }); cleanup = []; destroyAll();
   const hash = location.hash || "#/"; main.innerHTML = "";
   for (const [re, fn, nav] of routes) { const m = hash.match(re); if (m) { const r = fn(m); if (r && r.destroy) cleanup.push(r.destroy); else if (typeof r === "function") cleanup.push(r);
       document.querySelectorAll("[data-nav]").forEach((a) => { const on = a.dataset.nav === nav; a.classList.toggle("on", on); on ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"); });
-      if (!/^#\/lesson\/[\w-]+\/\d+$/.test(hash) || !route.sameLesson(hash)) window.scrollTo(0, 0); route.last = hash; return; } }
-  main.innerHTML = `<div class="page"><h2>Page not found.</h2><p class="dim mt"><a href="#/">Back to what to work on now</a></p></div>`;
+      if (!/^#\/lesson\/[\w-]+\/\d+$/.test(hash) || !route.sameLesson(hash)) window.scrollTo(0, 0); route.last = hash; setTitle(nav === "home", nav); return; } }
+  main.innerHTML = `<div class="page"><h2>Page not found.</h2><p class="dim mt"><a href="#/">Back to what to work on now</a></p></div>`; setTitle();
 }
 route.sameLesson = (h) => (route.last || "").split("/").slice(0, 3).join("/") === h.split("/").slice(0, 3).join("/");
 addEventListener("hashchange", route);

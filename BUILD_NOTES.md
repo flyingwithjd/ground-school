@@ -1,4 +1,4 @@
-# Build notes: Private Pilot Ground School, Stage 1 (v1)
+# Build notes: Squawk School (formerly Private Pilot Ground School), Stage 1 (v1)
 
 These notes are updated as work goes, so an interruption loses nothing. The times are America/Boise.
 
