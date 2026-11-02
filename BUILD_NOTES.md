@@ -100,7 +100,7 @@ These notes are updated as work goes, so an interruption loses nothing. The time
 - Tests: validate 609 MCQ / 71 oral / 0 bad; smoke 187/187 desktop + 18 phone-size routes, no console errors; reduced-motion check OK.
 - Seen, not fixed: on phone the "Wings" caption sits on top of the bottom-right "Span … length …" corner label in plane3d.
 
-### 2026-10-31, ~8:30 PM MDT: parts explorer UI fixes (after JD's iPhone test)
+### 2026-10-31, ~8:30 PM MDT: parts explorer UI fixes (after an iPhone test)
 - 172S part buttons: both rows now act as one set, so exactly one button is lit and it matches the view (aria-pressed too). Tapping the lit button again, or a quick tap on empty space in the 3D view, clears back to the default view. Orbit drags, long presses (>450 ms) and pinches never pick.
 - Span/length moved to the top-right corner on two lines, so it can't collide with the part title. Top corners are capped at half the width each and wrap instead of overlapping. Chip hover only on hover-capable devices (no sticky hover after a tap).
 - Same stale-button bug fixed in trim/flaps (Show buttons follow the trim wheel and flap lever) and load factor (bank buttons light only when the slider sits on that bank).
@@ -124,7 +124,7 @@ These notes are updated as work goes, so an interruption loses nothing. The time
 - PHAK 25C (Ch 3) names longerons/struts for truss and bulkhead, formers, stringers, skin for (semi)monocoque; it does not name Pratt/Warren, so neither does the visual.
 - overlap-audit.mjs now also checks the pager (no overlap, no spill, no clipped label) and every fuselage type (+dent) for overlapping or <10 px callouts. 0 problems at 360 and 430 px.
 
-### 2026-10-31, ~11:30 PM MDT: exaggerated control-surface deflection (JD: "can't see the ailerons moving" on Roll)
+### 2026-10-31, ~11:30 PM MDT: exaggerated control-surface deflection (feedback: "can't see the ailerons moving" on Roll)
 - axes.js: cause → effect loop (surface deflects 28° visual, then the airplane rotates; surface neutral, attitude holds; opposite; back to level). Deflected surface gets a blue face tint (planestage `tint()`) plus pinned "▲ UP / ▼ DOWN / RIGHT" tags at the trailing edges; caption reads e.g. "Right aileron UP · left aileron DOWN / Rolling right". Roll now viewed from behind (right wing on screen right). Explain text per axis (PHAK 6) + "Surface movement exaggerated for clarity." Reduced motion: one snapped pose. Same single rAF loop (tags positioned inside the frame callback).
 - controls.js: full yoke/pedal = 28° visual on all three surfaces, deflected ones tinted, exaggeration note. plane3d.js: aileron/elevator/rudder poses 25°, wings/empennage 18°.
 - Tests: validate 609/71/0 bad; smoke 187 desktop + 5 phone routes no errors; parts-ui DESELECT PASS; overlap-audit 360 px 0 problems.
@@ -223,4 +223,8 @@ These notes are updated as work goes, so an interruption loses nothing. The time
 - js/viz/instpanel.js: static round-gauge faces grouped as the page groups them (PHAK 3): Performance = ASI, altimeter, VSI, heading indicator, turn coordinator (the 172's turn-and-slip instrument; ball = slip-skid); Control = attitude indicator + tachometer (power); Navigation = VOR CDI. Not interactive, nothing highlighted.
 - Example readings: 100 KIAS, 4,500 ft / 29.92, 0 fpm, HDG 120, wings level, 2,300 RPM, CDI course 120 centered TO.
 - ASI arcs reuse the V-speeds dial geometry and colors (POH Fig 2-2). Tach: green 2,100–2,500 RPM (sea-level arc; 2,600 at 5,000 ft, 2,700 at 10,000 ft) and red line 2,700 RPM per C172S POH Fig 2-3 (NAV III). Numerals sit above hands with a face-colored halo so a hand never hides a number.
-- N575Y: FAA registry (checked Nov 2, 2026) = Cessna 172S, serial 172S9656, MFR year 2004, owner Silverhawk Aviation Academy LLC, IO-360-L2A. Registry does not list avionics, so panel type stays unconfirmed; page says so and describes the G1000 PFD layout only in general terms.
+- Panel note is generic: many 172S airplanes have a G1000; the page describes the PFD layout in general terms and says to confirm with your CFI and your airplane's POH. The site is a generic course: no specific tail number, school, instructor or dates.
+
+##### "Fix" term (verified)
+- Glossary "Fix" = P/CG FIX wording verbatim ("A geographical position determined by visual reference to the surface, by reference to one or more radio NAVAIDs, by celestial plotting, or by another navigational device.") plus examples (VOR, VOR-radial intersection, GPS waypoint).
+- Marked explicitly with [[fix]] (no auto-regex, to avoid the verb sense): GL1 Instrument groups prose ("navigation facility or fix"), the instrument figure's Navigation subtitle, GL16 ("final approach fix"). All other "fix" uses are the verb/remedy sense and stay plain.

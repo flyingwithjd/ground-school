@@ -65,7 +65,7 @@ export default {
 <li>just before takeoff</li>
 <li>midpoint of the flight, or hourly if the flight is longer than 2 hours</li>
 <li>before descent</li>
-<li>just before the final approach fix, or before entering the traffic pattern if VFR</li></ul>`,
+<li>just before the final approach [[fix]], or before entering the traffic pattern if VFR</li></ul>`,
       viz: { type: "mnemo", opts: { set: "p5" } },
       body2: `<p>The PHAK warns that late nights, fatigue and sustained flight above 5,000 ft can make pilots less critical and more accepting, just as the hardest part of the flight arrives. Plan each arrival as if you might divert. <span class="src">PHAK 2</span></p>`,
       kdr: { k: "CRM and SRM; the 5P check and its decision points.", d: "Do a 5P review at each decision point.", r: "Sliding into acceptance mode late in a long flight.", codes: ["PA.I.H.K4", "PA.II.B.S4"] } },

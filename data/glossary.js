@@ -149,6 +149,7 @@ export const GLOSSARY = {
   "VMC (weather)": { def: "Visual meteorological conditions: weather at or above VFR minimums. Same letters as the twin-engine minimum control speed, different meaning.", src: "PHAK Glossary" },
   "VLE": { def: "Maximum landing gear extended speed, for airplanes with retractable gear. Not on the fixed-gear 172S.", src: "14 CFR 1.2 · PHAK Ch 8" },
   "VLO": { def: "Maximum speed for raising or lowering retractable landing gear. Not on the fixed-gear 172S.", src: "14 CFR 1.2 · PHAK Ch 8" },
+  "Fix": { def: "A geographical position determined by visual reference to the surface, by reference to one or more radio NAVAIDs, by celestial plotting, or by another navigational device. For example, a VOR, an intersection of two VOR radials, or a GPS waypoint.", src: "Pilot/Controller Glossary (AIM)" },
   "KIAS": { def: "Knots indicated airspeed: what the airspeed indicator shows. The dial markings and most POH speeds are in KIAS.", src: "C172S POH Sec 1 · PHAK Ch 8" },
   "KCAS": { def: "Knots calibrated airspeed: indicated airspeed corrected for instrument and position error. Equals true airspeed in a standard atmosphere at sea level.", src: "C172S POH Sec 1 · PHAK Ch 8" },
   "KTAS": { def: "Knots true airspeed: calibrated airspeed corrected for altitude and temperature. Your actual speed through the air mass.", src: "C172S POH Sec 1 · PHAK Ch 8" },

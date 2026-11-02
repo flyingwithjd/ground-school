@@ -1,6 +1,6 @@
 // Altitude vs oxygen: 91.211 requirements, AIM 8-1-2 recommendations and effects, PHAK Fig 17-1 time of useful consciousness.
-import { slider } from "./base.js?v=e7b6cbaa08";
-import { pxScene, T, L, R, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=e7b6cbaa08";
+import { slider } from "./base.js?v=961b79525f";
+import { pxScene, T, L, R, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=961b79525f";
 const TUC = [[20000, "30 min or more"], [22000, "5–10 min"], [25000, "3–5 min"], [28000, "2½–3 min"], [30000, "1–2 min"], [35000, "30–60 s"], [40000, "15–20 s"], [45000, "9–15 s"]];
 const MAX = 30000;
 function info(a) {

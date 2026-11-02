@@ -2,8 +2,9 @@
 // Faces are simplified from the PHAK Ch 8 figures and a round-gauge C172S panel. Nothing is interactive or highlighted.
 // Example readings: level cruise, 100 KIAS, 4,500 ft, 0 fpm, heading 120, wings level, 2,300 RPM.
 // Airspeed markings reuse the V-speeds dial (C172S POH Fig 2-2); tachometer markings are C172S POH Fig 2-3 (sea-level green arc).
-import { frame, FAINT, FAINT2 } from "./base.js?v=e7b6cbaa08";
-import { s, h } from "../core/util.js?v=e7b6cbaa08";
+import { frame, FAINT, FAINT2 } from "./base.js?v=961b79525f";
+import { s, h } from "../core/util.js?v=961b79525f";
+import { rich } from "../core/rich.js?v=961b79525f";
 const INK = "#F2F1EC", DIM = "rgba(242,241,236,.6)", FACE = "#111113";
 const COL = { white: "#F2F1EC", green: "#3FA66B", yellow: "#D9B23A", red: "#D9493E", sky: "#2E4D6B", ground: "#634631" };
 const P = (a, r) => { const t = (a * Math.PI) / 180; return [+(Math.sin(t) * r).toFixed(2), +(-Math.cos(t) * r).toFixed(2)]; };
@@ -107,11 +108,11 @@ const GROUPS = [
     ["Airspeed indicator", "100 KIAS", () => asi(100)], ["Altimeter", "4,500 ft · 29.92", () => alt(4500, "29.92")], ["Vertical speed", "0 fpm", () => vsi(0)],
     ["Heading indicator", "120°", () => hi(120)], ["Turn coordinator", "Wings level · ball centered", tc]] },
   { name: "Control", what: "Attitude and power", items: [["Attitude indicator", "Wings level · level pitch", ai], ["Tachometer (power)", "2,300 RPM", () => tach(2300)]] },
-  { name: "Navigation", what: "Where you are relative to a fix", items: [["Course deviation indicator", "VOR · course 120 · centered · TO", () => cdi(120)]] },
+  { name: "Navigation", what: "Where you are relative to a [[fix]]", items: [["Course deviation indicator", "VOR · course 120 · centered · TO", () => cdi(120)]] },
 ];
 export function mount(host, opts = {}) {
   const F = frame(host, { cls: "instp", corners: { tl: "Round gauges", tr: "PHAK 3, 8" } }); F.ctrl.remove();
-  for (const G of GROUPS) { const sec = h("div", { class: "ip-group" }); sec.append(h("div", { class: "ip-head" }, h("span", { class: "label" }, G.name), h("span", { class: "ip-what" }, G.what)));
+  for (const G of GROUPS) { const sec = h("div", { class: "ip-group" }); sec.append(h("div", { class: "ip-head" }, h("span", { class: "label" }, G.name), Object.assign(h("span", { class: "ip-what" }), { innerHTML: rich(G.what) })));
     const grid = h("div", { class: "ip-grid" }); for (const [name, read, fn] of G.items) { const c = h("div", { class: "ip-cell" }); c.append(fn(), h("div", { class: "ip-name" }, name), h("div", { class: "ip-read" }, read)); grid.append(c); }
     sec.append(grid); F.stage.append(sec); }
   for (const n of [].concat(opts.note || [])) F.stage.append(h("p", { class: "ip-note" }, n));

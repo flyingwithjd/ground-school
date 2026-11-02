@@ -1,6 +1,6 @@
 # Cessna 172S explainer v1 — facts used and sources
 
-Source: JD's *C172S POH Abridged.pdf* (`~/Documents/Pilot Training/`). Page = printed POH page, [PDF page] in brackets.
+Source: an abridged C172S POH (conventional round-gauge panel). Page = printed POH page, [PDF page] in brackets.
 Spec sheet = `toolkit/assets/cessna-172s/SPEC_SHEET.md` (itself sourced from the same POH).
 
 | On screen | Beat | POH wording | Page |

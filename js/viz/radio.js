@@ -1,7 +1,7 @@
 // Radio trainer (AIM 4-2-7 to 4-2-9, AIM 4-1-9). Phonetics: type a call sign, hear it spelled the AIM way.
 // Call builder: assemble a nontowered self-announce call in the AIM order. HTML-only (no SVG), fully tap-driven.
-import { frame, chips } from "./base.js?v=e7b6cbaa08";
-import { h, esc } from "../core/util.js?v=e7b6cbaa08";
+import { frame, chips } from "./base.js?v=961b79525f";
+import { h, esc } from "../core/util.js?v=961b79525f";
 const PH = { A: "Alfa", B: "Bravo", C: "Charlie", D: "Delta", E: "Echo", F: "Foxtrot", G: "Golf", H: "Hotel", I: "India", J: "Juliett", K: "Kilo", L: "Lima", M: "Mike", N: "November", O: "Oscar", P: "Papa", Q: "Quebec", R: "Romeo", S: "Sierra", T: "Tango", U: "Uniform", V: "Victor", W: "Whiskey", X: "Xray", Y: "Yankee", Z: "Zulu" };
 const SAY = { A: "AL-FAH", B: "BRAH-VOH", C: "CHAR-LEE", D: "DELL-TAH", E: "ECK-OH", F: "FOKS-TROT", G: "GOLF", H: "HOH-TEL", I: "IN-DEE-AH", J: "JEW-LEE-ETT", K: "KEY-LOH", L: "LEE-MAH", M: "MIKE", N: "NO-VEM-BER", O: "OSS-CAH", P: "PAH-PAH", Q: "KEH-BECK", R: "ROW-ME-OH", S: "SEE-AIR-RAH", T: "TANG-GO", U: "YOU-NEE-FORM", V: "VIK-TAH", W: "WISS-KEY", X: "ECKS-RAY", Y: "YANG-KEY", Z: "ZOO-LOO",
   0: "ZEE-RO", 1: "WUN", 2: "TOO", 3: "TREE", 4: "FOW-ER", 5: "FIFE", 6: "SIX", 7: "SEV-EN", 8: "AIT", 9: "NIN-ER" };

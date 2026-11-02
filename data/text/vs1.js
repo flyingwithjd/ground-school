@@ -1,6 +1,6 @@
 // V-speeds: what each one means, why it exists, where it is on the dial, and the 172S number with its source.
 // Numbers: C172S POH (NAV III, 172SPHBUS) Sec 2–5; the 1998 C172S Information Manual (Rev 5) lists the same values.
-const NOTE = `<div class="note cfi">These are the Cessna 172S POH numbers (NAV III edition; the 1998 172S Information Manual lists the same speeds). Confirm with your CFI and N575Y's POH. Other 172 models and some POH revisions list different speeds.</div>`;
+const NOTE = `<div class="note cfi">These are the Cessna 172S POH numbers (NAV III edition; the 1998 172S Information Manual lists the same speeds). Confirm with your CFI and your airplane's POH. Other 172 models and some POH revisions list different speeds.</div>`;
 const V = (sub) => `V<sub>${sub}</sub>`;
 // [symbol html, meaning, 172S value, where on the dial, source]
 const ROWS = [
