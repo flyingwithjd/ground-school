@@ -44,7 +44,7 @@ for (const sz of sizes) { const [wh, dpr] = sz.split("@"); const [w, hh] = wh.sp
     await chip("Wings").click(); await pg.waitForTimeout(1200); const a1 = await state(); await chip("Wings").click(); await pg.waitForTimeout(1800); const a2 = await state();
     res.push(["Wings, Wings again -> default", a1.big === "Wings" && a1.on.join() === "Wings" && isDefault(a2), a1, a2]);
     await chip("Ailerons").click(); await pg.waitForTimeout(1800); const b1 = await state();
-    const [ex, ey] = at(0.5, 0.06); if (w < 700) await pg.touchscreen.tap(ex, ey); else await pg.mouse.click(ex, ey); await pg.waitForTimeout(1800); const b2 = await state();
+    const cv = await viz.locator(".stage canvas").boundingBox(); const [ex, ey] = [cv.x + cv.width * 0.5, cv.y + 12]; /* empty sky just under the title band */ if (w < 700) await pg.touchscreen.tap(ex, ey); else await pg.mouse.click(ex, ey); await pg.waitForTimeout(1800); const b2 = await state();
     res.push(["Ailerons, tap empty canvas -> default", b1.big === "Ailerons" && isDefault(b2), b1, b2]);
     await chip("Wings").click(); await pg.waitForTimeout(1800);
     const [sx, sy] = at(0.3, 0.5); await pg.mouse.move(sx, sy); await pg.mouse.down(); for (let i = 1; i <= 12; i++) { await pg.mouse.move(sx + i * 12, sy + i * 3); await pg.waitForTimeout(16); } await pg.mouse.up(); await pg.waitForTimeout(1200); const c1 = await state();

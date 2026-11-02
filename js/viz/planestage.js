@@ -5,8 +5,8 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
-import { buildPlane } from "./c172-model.js?v=3358ab0706";
-import { reduced, clamp } from "../core/util.js?v=3358ab0706";
+import { buildPlane } from "./c172-model.js?v=f413a64fe0";
+import { reduced, clamp } from "../core/util.js?v=f413a64fe0";
 const ACC = 0x3b82f6, INK = 0xf2f1ec, BG = 0x0a0a0b, D = Math.PI / 180;
 const s5 = (t) => { t = clamp(t, 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
 export const VIEWS = {
@@ -17,7 +17,7 @@ export const VIEWS = {
 export function planeStage(stage, { view = "iso", orbit = true, onPick = null, ortho = false, ground = false } = {}) {
   const canvas = document.createElement("canvas"); stage.prepend(canvas);
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !matchMedia("(max-width: 760px)").matches, alpha: false, powerPreference: "low-power" });
-  const PHONE = matchMedia("(max-width: 760px)").matches; renderer.setPixelRatio(Math.min(PHONE ? 1.5 : 2, window.devicePixelRatio || 1)); renderer.setClearColor(BG, 1); renderer.debug.checkShaderErrors = false;   // skip the synchronous shader-log readback (a stall on first draw of each program)
+  const PHONE = matchMedia("(max-width: 760px)").matches; renderer.setPixelRatio(Math.min(1.5, window.devicePixelRatio || 1));   // retina / iPad: 1.5x (+ MSAA on larger screens) looks the same as 2x and fills ~45% fewer pixels renderer.setClearColor(BG, 1); renderer.debug.checkShaderErrors = false;   // skip the synchronous shader-log readback (a stall on first draw of each program)
   const scene = new THREE.Scene(); const res = new THREE.Vector2(1, 1);
   const camera = new THREE.PerspectiveCamera(34, 16 / 9, 0.1, 800);
   const P = buildPlane(THREE); const pivot = new THREE.Group(); scene.add(pivot);
@@ -84,8 +84,10 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
   // project a model-space point (feet) to stage pixels, for SVG overlays
   const tmp = new THREE.Vector3();
   const cueMats = [];
-  function project(p, local = true) { tmp.set(p[0], p[1], p[2]); if (local) { tmp.sub(CG); tmp.applyEuler(pivot.rotation); tmp.add(CG); } tmp.project(camera); const r = stage.getBoundingClientRect(); return { x: (tmp.x * 0.5 + 0.5) * r.width, y: (-tmp.y * 0.5 + 0.5) * r.height, z: tmp.z }; }
-  function resize() { const r = stage.getBoundingClientRect(); if (!r.width) return; renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.updateProjectionMatrix(); const pr = renderer.getPixelRatio(); res.set(r.width * pr, r.height * pr); cueMats.forEach((m) => m.resolution.copy(res)); coreMat.resolution.copy(res); glowMat.resolution.copy(res); kick(); }
+  function project(p, local = true) { tmp.set(p[0], p[1], p[2]); if (local) { tmp.sub(CG); tmp.applyEuler(pivot.rotation); tmp.add(CG); } tmp.project(camera); const r = canvas.getBoundingClientRect(); return { x: (tmp.x * 0.5 + 0.5) * r.width, y: topBand + (-tmp.y * 0.5 + 0.5) * r.height, z: tmp.z }; }
+  // Optional title band: the canvas starts below it, so corner labels in the band never sit over the model at any camera angle.
+  let topBand = 0; function setTopBand(px) { px = Math.max(0, Math.round(px)); if (px === topBand) return; topBand = px; canvas.style.top = px + "px"; stage.dataset.band = px; canvas.style.height = px ? `calc(100% - ${px}px)` : ""; resize(); }
+  function resize() { const r = canvas.getBoundingClientRect(); if (!r.width || !r.height) return; renderer.setSize(r.width, r.height, false); camera.aspect = r.width / r.height; camera.updateProjectionMatrix(); const pr = renderer.getPixelRatio(); res.set(r.width * pr, r.height * pr); cueMats.forEach((m) => m.resolution.copy(res)); coreMat.resolution.copy(res); glowMat.resolution.copy(res); kick(); }
   const ro = new ResizeObserver(resize); ro.observe(stage);
   // ONE render loop per stage. kick() only schedules a frame when none is pending and we are not inside loop();
   // calls made during a frame (pose, setAttitude, OrbitControls "change") just extend idleUntil, and loop() decides
@@ -93,7 +95,9 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
   // loop while the tail scheduled another, doubling the live loops every frame during any part switch or animation.)
   let raf = 0, alive = true, visible = true, idleUntil = 0, extra = null, inLoop = false;
   function kick(ms = 400) { idleUntil = Math.max(idleUntil, performance.now() + ms); if (!raf && !inLoop && alive && visible) raf = requestAnimationFrame(loop); }
-  function loop(now) { raf = 0; if (!alive) return; inLoop = true;
+  // Frame cap: 120 Hz displays (ProMotion Mac / iPad) would otherwise draw every animation twice as often for no visible gain.
+  let lastDraw = 0; const MIN_DT = 1000 / 64;
+  function loop(now) { raf = 0; if (!alive) return; if (now - lastDraw < MIN_DT && visible) { raf = requestAnimationFrame(loop); return; } lastDraw = now; inLoop = true;
     try {
       if (camTw) camTw(now); if (controls) controls.update();
       if (extra) extra(now);
@@ -140,7 +144,7 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
         ln.set([p0, b.clone().addScaledVector(dv, -h * 0.85).toArray()]); cone.scale.setScalar(h / hd); cone.quaternion.setFromUnitVectors(UPV, dv); cone.position.copy(b).addScaledVector(dv, -h / 2); kick(); },
       set opacity(o) { op = o; ln.opacity = o; hm.opacity = o; cone.visible = vis && o > 0.004; }, set visible(v) { vis = v; ln.visible = v && op > 0.004; cone.visible = v && op > 0.004; kick(); } };
   }
-  return { THREE, P, scene, camera, renderer, pivot, CG, highlight, focus, tint, setView, setAttitude, pose, project, kick, parts: Object.keys(P.parts), inkLines, cueLine, cueArrow, cueGroup: cueG,
+  return { THREE, P, scene, camera, renderer, pivot, CG, highlight, focus, tint, setView, setAttitude, pose, project, kick, setTopBand, parts: Object.keys(P.parts), inkLines, cueLine, cueArrow, cueGroup: cueG,
     animate(fn) { extra = fn; kick(); }, setFlow, flowPhase: () => flowPhase, setInkOpacity(o) { inkMat.opacity = o; kick(); },
     destroy() { alive = false; document.removeEventListener("visibilitychange", onVis); cancelAnimationFrame(raf); raf = 0; ro.disconnect(); io.disconnect(); controls && controls.dispose(); renderer.dispose(); renderer.forceContextLoss && renderer.forceContextLoss(); canvas.remove(); } };
 }

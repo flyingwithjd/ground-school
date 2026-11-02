@@ -1,7 +1,7 @@
 // 3D part explorer and feature tour for the C172S wireframe.
-import { frame, chips } from "./base.js?v=3358ab0706";
-import { planeStage } from "./planestage.js?v=3358ab0706";
-import { h, reduced } from "../core/util.js?v=3358ab0706";
+import { frame, chips } from "./base.js?v=f413a64fe0";
+import { planeStage } from "./planestage.js?v=f413a64fe0";
+import { h, reduced } from "../core/util.js?v=f413a64fe0";
 // Pose sign conventions (model): ail>0 rolls right, elev<0 = trailing edge up (nose up), rud>0 = right rudder, steer>0 = nose wheel left.
 const PARTS = {
   fuselage: { name: "Fuselage", group: "Major component", hl: ["fuselage", "fairing"], view: "iso", text: "The central body. Carries crew, passengers and cargo, and joins the wings and tail. Semimonocoque aluminum on the 172." },
@@ -39,6 +39,10 @@ export function mount(host, { mode = "explore" } = {}) {
   let cur = null, anim = null, ti = 0; const groups = [];
   // Tap a part on the model to select it; tap empty space to clear back to the default view.
   const S = planeStage(F.stage, { view: "iso", onPick: mode === "explore" ? (p) => (p && MAP[p] ? select(MAP[p]) : !p && cur && reset()) : null });
+  // Corner labels (type top-left, dimensions top-right) live in a band above the canvas, never over the model.
+  let bandW = 0, bandB = 0;   // the band only grows at a given width (a shorter tour label must not resize the canvas)
+  const band = () => { const sr = F.stage.getBoundingClientRect(); if (!sr.height) return; let b = 0; F.stage.querySelectorAll(".corner.tl, .corner.tr").forEach((c) => { if (c.textContent.trim()) b = Math.max(b, c.getBoundingClientRect().bottom - sr.top); }); if (sr.width !== bandW) { bandW = sr.width; bandB = 0; } bandB = Math.max(bandB, b ? b + 8 : 0); S.setTopBand(bandB); };
+  band(); const bandRO = new ResizeObserver(band); bandRO.observe(F.stage); F.stage.querySelectorAll(".corner.tl, .corner.tr").forEach((c) => bandRO.observe(c)); F.on && F.on(() => bandRO.disconnect());
   const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
   function animatePose(to, dur = reduced() ? 1 : 1400) { const from = { ...curPose }; const t0 = performance.now(); S.animate((now) => { const k = Math.min(1, (now - t0) / dur), e = ease(k); const p = {}; for (const key of new Set([...Object.keys(from), ...Object.keys(to)])) p[key] = (from[key] || 0) + ((to[key] || 0) - (from[key] || 0)) * e; curPose = p; S.pose(p); if (k >= 1) S.animate(null); }); }
   let curPose = {};

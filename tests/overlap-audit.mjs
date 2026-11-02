@@ -24,6 +24,9 @@ const check = () => pg.evaluate(() => { const out = [];
     const hdr = [...v.querySelectorAll(".stage > .corner")].map((e) => ({ t: e.textContent, r: e.getBoundingClientRect() }));
     for (const a of tx) { if (a.r.right > sr.right + 1 || a.r.left < sr.left - 1) out.push(`fus "${a.t}" spills out of card`); if (a.r.height < 12) out.push(`fus "${a.t}" smaller than 10px`); }
     const all = tx.concat(hdr); for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) { const a = all[i].r, c = all[j].r; if (a.left < c.right - 1 && c.left < a.right - 1 && a.top < c.bottom - 1 && c.top < a.bottom - 1) out.push(`fus "${all[i].t}" ⟂ "${all[j].t}"`); } });
+  // 3D airplane stages with a title band: corner labels sit wholly above the canvas, never over the model
+  document.querySelectorAll(".viz .stage[data-band]").forEach((st) => { const cv = st.querySelector("canvas")?.getBoundingClientRect(); if (!cv) return;
+    st.querySelectorAll(".corner").forEach((c) => { const r = c.getBoundingClientRect(); if (c.textContent.trim() && r.height && r.bottom > cv.top + 0.5 && r.top < cv.bottom) out.push(`corner "${c.textContent}" over the 3D model area`); }); });
   // 3D fuselage construction labels (HTML)
   document.querySelectorAll(".viz.fus3d").forEach((v) => { const sr = v.querySelector(".stage").getBoundingClientRect(); const L = [...v.querySelectorAll(".fus-lab")].filter((e) => e.offsetParent).map((e) => ({ t: e.textContent, r: e.getBoundingClientRect() }));
     for (const a of L) if (a.r.right > sr.right + 1 || a.r.left < sr.left - 1 || a.r.top < sr.top - 1 || a.r.bottom > sr.bottom + 1) out.push(`fus3d "${a.t}" spills out of stage`);

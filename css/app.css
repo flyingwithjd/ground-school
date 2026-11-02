@@ -571,4 +571,17 @@ html.locked #gate { display: flex; }
 .viz.fus3d .fus-lab b { display: block; font-weight: 500; color: var(--ink); }
 .viz.fus3d .fus-lab span { display: block; color: var(--ink2); letter-spacing: .06em; text-transform: none; }
 .viz.fus3d .fus-lab.dim b { color: var(--ink2); }
+.viz.fus3d .fus-lab { left: 0; top: 0; will-change: transform; border: 1px solid transparent; color: inherit; text-align: left; margin: 0; }
+.viz.fus3d .fus-lab.pick { pointer-events: auto; cursor: pointer; transition: border-color .15s, background-color .15s, opacity .15s; }
+.viz.fus3d .fus-lab.pick:hover { border-color: rgba(59,130,246,.55); }
+.viz.fus3d .fus-lab.pick:focus-visible { outline: 2px solid #3B82F6; outline-offset: 2px; }
+.viz.fus3d .fus-lab.pick.on { border-color: #3B82F6; background: rgba(23,48,96,.86); box-shadow: 0 0 0 3px rgba(59,130,246,.18); }
+.viz.fus3d .fus-lab.pick.on b { color: #F2F1EC; }
+.viz.fus3d .fus-lab.pick.off { opacity: .62; }
+@media (pointer: coarse) { .viz.fus3d .fus-lab.pick { min-height: 44px; padding: 6px 9px; } }
+.viz.fus3d .fus-desc { margin: 8px 0 0; padding: 0 clamp(16px, 2.6vw, 26px); box-sizing: content-box; color: var(--ink2); font-size: 14px; line-height: 1.45; min-height: 2.9em; max-width: 62ch; }
+@media (max-width: 700px) { .viz.fus3d .fus-desc { min-height: 5.8em; font-size: 13.5px; } }
+.viz.fus3d .fus-parts { display: flex; flex-direction: column; justify-content: flex-start; flex: 1 0 100%; width: 100%; }
 @media (max-width: 700px) { .viz.fus3d .fus-lab { font-size: 9.5px; letter-spacing: .1em; padding: 3px 5px; } }
+/* 3D airplane stages with a title band: the band matches the canvas so it reads as one picture (labels never over the model) */
+.viz .stage[data-band] { background: #0A0A0B; }
