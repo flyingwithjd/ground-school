@@ -1,8 +1,8 @@
 // Crab vs sideslip vs forward slip on final (AFH 9). Top view of the runway with the ground track, plus a rear-view bank inset.
-import { frame, chips, slider, readout, svg, ACC, FAINT, FAINT2 } from "./base.js?v=961b79525f";
-import { s } from "../core/util.js?v=961b79525f";
-import { T, topPlane, rearPlane, arrow, setArrow } from "./shapes.js?v=961b79525f";
-import { windField } from "./windfield.js?v=961b79525f";
+import { frame, chips, row, slider, readout, svg, ACC, FAINT, FAINT2 } from "./base.js?v=b44a743634";
+import { s } from "../core/util.js?v=b44a743634";
+import { T, topPlane, rearPlane, arrow, setArrow } from "./shapes.js?v=b44a743634";
+import { windField } from "./windfield.js?v=b44a743634";
 const M = {
   crab: { label: "Crab · wings level", big: "Nose into the wind", text: "Heading is turned into the wind so the track follows the centerline. Wings are level and the controls are coordinated. Fine on final, but the airplane must not touch down sideways." },
   side: { label: "Sideslip · wing low", big: "Low wing, opposite rudder", text: "Lower the upwind wing to stop the drift and hold opposite rudder to keep the nose on the centerline. The longitudinal axis stays aligned with the runway, so you can touch down on the upwind main wheel first. The POH notes this wing-low method gives the best control in a crosswind." },
@@ -26,7 +26,7 @@ export function mount(host, opts = {}) {
   const rear = s("g", {}, g); rearPlane(rear, { stroke: "#F2F1EC", w: 6 }); const lift = arrow(g, ix, iy, ix, iy - 150, { accent: true, w: 4 });
   s("line", { x1: 1180, y1: iy + 120, x2: 1500, y2: iy + 120, stroke: FAINT2, "stroke-width": 1.5 }, g);
   const vs = T(g, 1340, 460, "", { anchor: "middle", size: 15, op: 0.75 });
-  const st = { m: opts.mode || "side", xw: 10 }; const set = readout(F.ctrl, [["ail", "aileron"], ["rud", "rudder"], ["axis", "nose vs runway"], ["sink", "descent"]]);
+  const st = { m: opts.mode || "side", xw: 10 }; const set = readout(row(F.ctrl), [["ail", "aileron"], ["rud", "rudder"], ["axis", "nose vs runway"], ["sink", "descent"]]);
   function upd() { const m = M[st.m], xw = st.xw; const dir = xw >= 0 ? 1 : -1, mag = Math.abs(xw); // + = wind from the right
     const crab = st.m === "crab" ? (Math.asin(Math.min(1, mag / 65)) * 180) / Math.PI * dir : 0; // 65 KIAS approach
 const bank = st.m === "side" ? dir * Math.min(20, 2 + mag * 1.0) : st.m === "fwd" ? (dir || 1) * 18 : 0;
@@ -41,7 +41,8 @@ const bank = st.m === "side" ? dir * Math.min(20, 2 + mag * 1.0) : st.m === "fwd
     set("ail", low ? `${low} wing low` : "neutral"); set("rud", rudS); set("axis", st.m === "fwd" ? `${Math.abs(Math.round(hdg))}° off` : st.m === "crab" ? `${Math.abs(Math.round(crab))}° crab` : "aligned"); set("sink", st.m === "fwd" ? "steep" : "normal");
     vs.textContent = st.m === "fwd" ? "more drag: steeper descent" : st.m === "side" ? "horizontal lift cancels drift" : "wings level";
     F.caption(m.label, m.big); F.explain(`${m.text} <span class="src">AFH 9; POH 4</span> Steep slips with more than 20° of flap can cause slight elevator oscillation in the 172S. <span class="dim">Confirm with your CFI and your aircraft's POH.</span>`); }
-  chips(F.ctrl, [["crab", "Crab"], ["side", "Sideslip"], ["fwd", "Forward slip"]], st.m, (v) => { st.m = v; upd(); }, { label: "Technique" });
-  slider(F.ctrl, { label: "Crosswind (− left / + right)", min: -15, max: 15, step: 1, value: st.xw, fmt: (v) => (v ? `${Math.abs(v)} kt ${v > 0 ? "R" : "L"}` : "calm"), oninput: (v) => { st.xw = v; upd(); } });
+  const r2 = row(F.ctrl); // readout on its own row so its changing width never pushes the controls sideways
+  chips(r2, [["crab", "Crab"], ["side", "Sideslip"], ["fwd", "Forward slip"]], st.m, (v) => { st.m = v; upd(); }, { label: "Technique" });
+  slider(r2, { label: "Crosswind (− left / + right)", min: -15, max: 15, step: 1, value: st.xw, fmt: (v) => (v ? `${Math.abs(v)} kt ${v > 0 ? "R" : "L"}` : "calm"), oninput: (v) => { st.xw = v; upd(); } });
   upd(); return { destroy() { F.destroy(); } };
 }

@@ -1,7 +1,7 @@
 // Mnemonic unpacker: tap a letter to open the item, the reason it matters and its source.
 // Recall mode hides the items so you can say each one before you tap. HTML only; every set is cited.
-import { frame, chips } from "./base.js?v=961b79525f";
-import { h, esc } from "../core/util.js?v=961b79525f";
+import { frame, chips } from "./base.js?v=b44a743634";
+import { h, esc } from "../core/util.js?v=b44a743634";
 export const SETS = {
   atomato: { name: "ATOMATOFLAMES", what: "Day VFR equipment", src: "14 CFR 91.205(b)", items: [
     ["A", "Airspeed indicator", "Stall and limit speeds are all indicated airspeeds."], ["T", "Tachometer for each engine", "Power settings and engine limits."],
@@ -75,7 +75,7 @@ export const SETS = {
 };
 export function mount(host, opts = {}) {
   const keys = opts.sets || [opts.set || "imsafe"]; let key = keys[0], recall = false, open = -1;
-  const F = frame(host, { cls: "capin mnemo", corners: { tl: "Mnemonic", tr: "" } });
+  const F = frame(host, { cls: "capin ctrl-top mnemo", corners: { tl: "Mnemonic", tr: "" } }); F.root.insertBefore(F.ctrl, F.stage); // mode/set chips sit on top so switching never moves them
   const wrap = h("div", { class: "mn-wrap" }); F.stage.append(wrap);
   function draw() { const S = SETS[key]; wrap.innerHTML = "";
     const row = h("div", { class: "mn-row" });

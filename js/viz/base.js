@@ -1,6 +1,6 @@
 // Shared building blocks for every visualization: frame, corner labels, caption, sliders, chips,
 // and the signature "point of light" line draw (a bright head with a glowing tail lays the line down).
-import { h, s, esc, ease, reduced, clamp } from "../core/util.js?v=961b79525f";
+import { h, s, esc, ease, reduced, clamp } from "../core/util.js?v=b44a743634";
 export const ACC = "#3B82F6", INK = "#F2F1EC";
 export const FAINT = "rgba(242,241,236,.22)", FAINT2 = "rgba(242,241,236,.4)";
 
@@ -20,6 +20,9 @@ export function frame(host, { cls = "", corners = {}, caption = null, explain = 
   if (!ctrl.childNodes.length) queueMicrotask(() => { if (!ctrl.childNodes.length) ctrl.style.display = "none"; });
   return api;
 }
+// A control row that always takes its own full line in the controls bar, with a small mono label in front.
+// Groups placed in separate rows never end up side by side, whatever the selection.
+export function row(parent, label) { const r = h("div", { class: "ctrl-row" }); if (label) r.append(h("span", { class: "label ctrl-lab" }, label)); parent.append(r); return r; }
 export function slider(parent, { label, min, max, step = 1, value, fmt = (v) => v, oninput, id }) {
   const uid = id || "s" + Math.random().toString(36).slice(2, 8);
   const inp = h("input", { type: "range", min, max, step, value, id: uid, "aria-label": label });
@@ -34,7 +37,7 @@ export function chips(parent, options, value, onchange, { label, toggle = false 
   const wrap = h("div", { class: "chips", role: "group", "aria-label": label || "options" });
   const btns = options.map((o) => { const [v, t] = Array.isArray(o) ? o : [o, o]; const b = h("button", { class: "chip" + (v === value ? " on" : ""), type: "button", "aria-pressed": v === value ? "true" : "false" }, t);
     b.addEventListener("click", () => { const nv = toggle && String(value) === String(v) ? null : v; api.set(nv); onchange && onchange(nv); }); b.dataset.v = v; wrap.append(b); return b; });
-  const api = { el: wrap, set(v) { value = v; btns.forEach((b) => { const on = b.dataset.v === String(v); b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); }); }, get value() { return value; } };
+  const api = { el: wrap, enable(keys) { const ok = new Set(keys.map(String)); btns.forEach((b) => { b.disabled = !ok.has(b.dataset.v); }); }, set(v) { value = v; btns.forEach((b) => { const on = b.dataset.v === String(v); b.classList.toggle("on", on); b.setAttribute("aria-pressed", on); }); }, get value() { return value; } };
   parent.append(wrap); return api;
 }
 export function readout(parent, items) { const w = h("div", { class: "readout" }); const els = {};

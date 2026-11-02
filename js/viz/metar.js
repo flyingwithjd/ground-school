@@ -1,7 +1,7 @@
 // METAR / TAF / FB decoder (PHAK Ch 13). Tap any group to decode it. Strings are the PHAK's published
 // examples, shown as EXAMPLES only: never current weather and never for flight planning.
-import { frame, chips } from "./base.js?v=961b79525f";
-import { h, esc } from "../core/util.js?v=961b79525f";
+import { frame, chips } from "./base.js?v=b44a743634";
+import { h, esc } from "../core/util.js?v=b44a743634";
 const EX = {
   metar: { src: "PHAK Ch 13 (METAR example)", text: "METAR KGGG 161753Z AUTO 14021G26KT 3/4SM +TSRA BR BKN008 OVC012CB 18/17 A2970 RMK PRESFR" },
   metar2: { src: "PHAK Fig 12-25 (St. Louis report along a warm front; groups put in standard order)", text: "METAR KSTL 1950Z 21018KT 1SM -RA OVC010 18/18 A2960" },
@@ -66,7 +66,7 @@ function decode(tok, i, all, kind) {
 }
 function tokenize(t) { const a = t.split(/\s+/), out = []; for (let i = 0; i < a.length; i++) { if (/^\d$/.test(a[i]) && /^\d\/\dSM$/.test(a[i + 1] || "")) { out.push(a[i] + " " + a[i + 1]); i++; } else out.push(a[i]); } return out; }
 export function mount(host, opts = {}) {
-  const F = frame(host, { cls: "metar capin", corners: { tl: "Decoder · example strings", tr: "PHAK Ch 13" } });
+  const F = frame(host, { cls: "metar capin ctrl-top", corners: { tl: "Decoder · example strings", tr: "PHAK Ch 13" } }); F.root.insertBefore(F.ctrl, F.stage); // picker on top so switching never moves it
   const wrap = h("div", { class: "mt-wrap" }); F.stage.prepend(wrap);
   const tag = h("div", { class: "mt-tag" }, "Example from the FAA handbook · not current weather · do not use for flight");
   const line = h("div", { class: "mt-line", role: "group", "aria-label": "report groups" }); const det = h("div", { class: "mt-det", "aria-live": "polite" });

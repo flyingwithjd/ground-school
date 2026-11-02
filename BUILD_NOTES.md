@@ -228,3 +228,9 @@ These notes are updated as work goes, so an interruption loses nothing. The time
 ##### "Fix" term (verified)
 - Glossary "Fix" = P/CG FIX wording verbatim ("A geographical position determined by visual reference to the surface, by reference to one or more radio NAVAIDs, by celestial plotting, or by another navigational device.") plus examples (VOR, VOR-radial intersection, GPS waypoint).
 - Marked explicitly with [[fix]] (no auto-regex, to avoid the verb sense): GL1 Instrument groups prose ("navigation facility or fix"), the instrument figure's Navigation subtitle, GL16 ("final approach fix"). All other "fix" uses are the verb/remedy sense and stay plain.
+
+## Controls stay where you expect them (chip rows)
+- Runway markings: two fixed rows. Row 1 "RUNWAY" holds the runway type chips; row 2 "MARKINGS" always sits directly below and lists every marking in one fixed order. Markings a runway type does not have are dimmed (disabled), never moved.
+- New `row(parent, label)` helper in js/viz/base.js gives a control group its own full-width line with a mono label; `chips().enable(keys)` dims chips without re-rendering.
+- Visuals whose content changes height on a click (mnemonics, radio trainer, airport signs, METAR decoder, chair-fly, emergency flows with several scenarios) now put their picker chips on top of the visual (`ctrl-top`), so switching mode or answering never pushes them down. Radio: Mode chips come before Position. Crab/slip: the readout has its own row so its changing width no longer shoves the Technique chips sideways.
+- tests/stable-controls.mjs (`W=1440|820|390 node tests/stable-controls.mjs [routes]`): clicks every button in every visual and fails if a control group jumps sideways (>32px), moves more than about a row (>70px), or moves up beside a group it used to sit below. Small shifts, wraps and groups appearing or hiding are allowed. Visuals carry `data-viz` for this.

@@ -1,8 +1,8 @@
 // Runway markings by runway type (AIM 2-3-3, TBL 2-3-1; AC 150/5340-1M). Pick a runway type, then tap a marking.
 // Plan view, approach from the left. Lengths along the runway are roughly to scale; width is exaggerated for legibility.
-import { frame, chips, svg, isolate, ACC, FAINT, FAINT2, INK } from "./base.js?v=961b79525f";
-import { s } from "../core/util.js?v=961b79525f";
-import { T } from "./shapes.js?v=961b79525f";
+import { frame, chips, row, svg, isolate, ACC, FAINT, FAINT2, INK } from "./base.js?v=b44a743634";
+import { s } from "../core/util.js?v=b44a743634";
+import { T } from "./shapes.js?v=b44a743634";
 const K = 0.36, X0 = 360, CY = 360, HW = 120; // px per ft, threshold x, centerline y, half-width px
 const fx = (ft) => X0 + ft * K;
 const W = "rgba(242,241,236,.55)", Y = "rgba(242,241,236,.3)";
@@ -18,6 +18,7 @@ const INFO = {
   demarc: ["Demarcation bar", "Yellow: not runway", "A 3-ft yellow bar separating a runway with a displaced threshold from a blast pad, stopway or taxiway that precedes it. Yellow because it is not on the runway. <span class=\"src\">AIM 2-3-3</span>"],
   chev: ["Chevrons", "Unusable pavement", "Yellow chevrons mark pavement aligned with the runway that is unusable for landing, takeoff and taxiing, such as a blast pad or stopway. <span class=\"src\">AIM 2-3-3</span>"],
 };
+const ORDER = ["desig", "center", "thresh", "aim", "tdz", "side", "disp", "bar", "demarc", "chev"];
 const HAS = { visual: ["desig", "center"], nonprec: ["desig", "center", "thresh", "aim"], prec: ["desig", "center", "thresh", "aim", "tdz", "side"], disp: ["chev", "demarc", "disp", "bar", "desig", "center", "thresh", "aim"] };
 export function mount(host, opts = {}) {
   const F = frame(host, { corners: { tl: "Runway markings · plan view", tr: "AIM 2-3-3 · AC 150/5340-1M" } });
@@ -54,15 +55,15 @@ export function mount(host, opts = {}) {
       T(root, fx(1020) + 25, CY + HW + 30, "1,000", { anchor: "middle", size: 13, op: 0.4 }); }
     if (has.includes("side")) { const g = G("side"); for (const sg of [-1, 1]) rect(g, X0, CY + sg * (HW - 6) - 3, 1590 - X0, 6); }
     for (const [k, g] of Object.entries(groups)) { g.addEventListener("click", () => pick(k)); g.addEventListener("keydown", (e) => (e.key === "Enter" || e.key === " ") && pick(k)); }
-    if (elChips) elChips.el.remove();
-    elChips = chips(F.ctrl, has.map((k) => [k, INFO[k][0]]), null, (k) => pick(k), { label: "Markings" });
+    elChips.set(null); elChips.enable(has); // every marking chip stays in place; the ones this runway type lacks are dimmed
     sel = null; isolate(groups, null);
     const names = { visual: "Visual runway", nonprec: "Nonprecision instrument", prec: "Precision instrument", disp: "Displaced threshold" };
     F.caption(names[type], "Tap a marking");
     F.explain(type === "disp" ? "A displaced threshold with a blast pad in front of it. Tap each marking to see what you may and may not do on it. <span class=\"src\">AIM 2-3-3</span>" : `A ${names[type].toLowerCase()} runway carries: ${has.map((k) => INFO[k][0].toLowerCase()).join(", ")}. Markings are white on runways; taxiway, holding and blast-pad markings are yellow. <span class="src">AIM 2-3-2, TBL 2-3-1</span>`);
   }
   function pick(k) { sel = k; elChips && elChips.set(k); isolate(groups, k); F.caption(INFO[k][0], INFO[k][1]); F.explain(INFO[k][2]); }
-  chips(F.ctrl, [["visual", "Visual"], ["nonprec", "Nonprecision"], ["prec", "Precision"], ["disp", "Displaced threshold"]], type, (v) => { type = v; build(); }, { label: "Runway type" });
+  chips(row(F.ctrl, "Runway"), [["visual", "Visual"], ["nonprec", "Nonprecision"], ["prec", "Precision"], ["disp", "Displaced threshold"]], type, (v) => { type = v; build(); }, { label: "Runway type" });
+  elChips = chips(row(F.ctrl, "Markings"), ORDER.map((k) => [k, INFO[k][0]]), null, (k) => pick(k), { label: "Markings" });
   build();
   return { destroy: () => F.destroy() };
 }

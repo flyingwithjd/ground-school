@@ -528,3 +528,12 @@ svg text:not([font-family]) { font-family: var(--mono); }
 .viz.instp .ip-note:empty { display: none; }
 @media (max-width: 600px) { .viz.instp .ip-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 14px; } .viz.instp .ip-name { letter-spacing: .1em; } }
 .viz.instp .ip-note + .ip-note { margin-top: 10px; padding-top: 0; border-top: 0; }
+/* Control rows: each group on its own line, label in front (stays put whatever is selected) */
+.viz .ctrl:has(> .ctrl-row) { flex-direction: column; align-items: stretch; gap: 12px; }
+.viz .ctrl-row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; width: 100%; }
+.viz .ctrl-row > .ctrl-lab + .chips { flex: 1 1 0; min-width: 0; }
+.viz .ctrl-row > .ctrl-lab { flex: 0 0 auto; min-width: 84px; color: var(--ink2); font-size: 10.5px; }
+@media (max-width: 600px) { .viz .ctrl-row > .ctrl-lab { flex-basis: 100%; min-width: 0; } }
+.chip:disabled { opacity: .32; cursor: default; pointer-events: none; }
+.viz.ctrl-top > .ctrl { border-top: 0; border-bottom: 1px solid var(--line); }
+.rd-wrap, .mn-wrap { padding-top: 48px; } /* clear the corner labels */

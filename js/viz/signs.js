@@ -1,7 +1,7 @@
 // Airport signs (AIM 2-3-7 to 2-3-13; AC 150/5340-18H). Learn: tap a sign for what it means and what you do.
 // Drill: a random sign, pick its meaning. Real sign colors are used here because the color IS the message.
-import { frame, chips } from "./base.js?v=961b79525f";
-import { h, shuffle } from "../core/util.js?v=961b79525f";
+import { frame, chips } from "./base.js?v=b44a743634";
+import { h, shuffle } from "../core/util.js?v=b44a743634";
 const R = "sg-red", K = "sg-loc", Yl = "sg-dir", B = "sg-dist";
 const HOLD4 = `<svg viewBox="0 0 40 30" class="sg-g"><path d="M2,6H38M2,12H38" stroke="currentColor" stroke-width="2.4" stroke-dasharray="5 3"/><path d="M2,18H38M2,24H38" stroke="currentColor" stroke-width="2.4"/></svg>`;
 const LADDER = `<svg viewBox="0 0 40 30" class="sg-g"><path d="M2,9H38M2,21H38" stroke="currentColor" stroke-width="2.4"/><path d="M6,9V21M10,9V21M18,9V21M22,9V21M30,9V21M34,9V21" stroke="currentColor" stroke-width="2"/></svg>`;
@@ -25,7 +25,7 @@ const GROUPS = [["all", "All"], ["mand", "Mandatory (red)"], ["loc", "Location (
 const inGroup = (sg, gr) => gr === "all" || (gr === "mand" && sg.cls.includes(R)) || (gr === "loc" && (sg.cls === K || sg.id.endsWith("bound"))) || (gr === "dir" && ["dir", "dest", "dest2", "info", "dist"].includes(sg.id));
 const signEl = (sg, big) => { const e = h("span", { class: "sg " + sg.cls + (big ? " big" : ""), role: "img", "aria-label": sg.kind }); e.innerHTML = sg.html; return e; };
 export function mount(host, opts = {}) {
-  const F = frame(host, { cls: "capin signs", corners: { tl: "Airport signs", tr: "AIM 2-3-7 to 2-3-13" } });
+  const F = frame(host, { cls: "capin ctrl-top signs", corners: { tl: "Airport signs", tr: "AIM 2-3-7 to 2-3-13" } }); F.root.insertBefore(F.ctrl, F.stage); // mode/set chips sit on top so switching never moves them
   const wall = h("div", { class: "sg-wall" }); F.stage.append(wall);
   let mode = opts.mode || "learn", grp = "all", score = [0, 0];
   function learn() { wall.innerHTML = ""; wall.className = "sg-wall";

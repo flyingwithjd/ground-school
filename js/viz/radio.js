@@ -1,14 +1,14 @@
 // Radio trainer (AIM 4-2-7 to 4-2-9, AIM 4-1-9). Phonetics: type a call sign, hear it spelled the AIM way.
 // Call builder: assemble a nontowered self-announce call in the AIM order. HTML-only (no SVG), fully tap-driven.
-import { frame, chips } from "./base.js?v=961b79525f";
-import { h, esc } from "../core/util.js?v=961b79525f";
+import { frame, chips } from "./base.js?v=b44a743634";
+import { h, esc } from "../core/util.js?v=b44a743634";
 const PH = { A: "Alfa", B: "Bravo", C: "Charlie", D: "Delta", E: "Echo", F: "Foxtrot", G: "Golf", H: "Hotel", I: "India", J: "Juliett", K: "Kilo", L: "Lima", M: "Mike", N: "November", O: "Oscar", P: "Papa", Q: "Quebec", R: "Romeo", S: "Sierra", T: "Tango", U: "Uniform", V: "Victor", W: "Whiskey", X: "Xray", Y: "Yankee", Z: "Zulu" };
 const SAY = { A: "AL-FAH", B: "BRAH-VOH", C: "CHAR-LEE", D: "DELL-TAH", E: "ECK-OH", F: "FOKS-TROT", G: "GOLF", H: "HOH-TEL", I: "IN-DEE-AH", J: "JEW-LEE-ETT", K: "KEY-LOH", L: "LEE-MAH", M: "MIKE", N: "NO-VEM-BER", O: "OSS-CAH", P: "PAH-PAH", Q: "KEH-BECK", R: "ROW-ME-OH", S: "SEE-AIR-RAH", T: "TANG-GO", U: "YOU-NEE-FORM", V: "VIK-TAH", W: "WISS-KEY", X: "ECKS-RAY", Y: "YANG-KEY", Z: "ZOO-LOO",
   0: "ZEE-RO", 1: "WUN", 2: "TOO", 3: "TREE", 4: "FOW-ER", 5: "FIFE", 6: "SIX", 7: "SEV-EN", 8: "AIT", 9: "NIN-ER" };
 const DIG = ["Zero", "One", "Two", "Three", "Four", "Five", "Six", "Seven", "Eight", "Niner"];
 const LEGS = [["10", "10 miles out"], ["dw", "Entering downwind"], ["base", "Turning base"], ["fin", "Turning final"], ["clr", "Clear of the runway"], ["dep", "Departing"]];
 export function mount(host, opts = {}) {
-  const F = frame(host, { cls: "capin radio", corners: { tl: "Radio trainer", tr: "AIM 4-2-7, 4-1-9" } });
+  const F = frame(host, { cls: "capin ctrl-top radio", corners: { tl: "Radio trainer", tr: "AIM 4-2-7, 4-1-9" } }); F.root.insertBefore(F.ctrl, F.stage); // mode/set chips sit on top so switching never moves them
   const wrap = h("div", { class: "rd-wrap" }); F.stage.append(wrap);
   let mode = opts.mode || "phon", tail = "N172SP", leg = "dw", rwy = "27", apt = "Example Field";
   function spellTail(t) { return t.toUpperCase().replace(/[^A-Z0-9]/g, "").split("").map((c) => (/\d/.test(c) ? DIG[+c] : PH[c])).join(" "); }
@@ -28,8 +28,8 @@ export function mount(host, opts = {}) {
     wrap.append(row); F.caption("Self-announce on the CTAF", "Who, who, where, which airport");
     F.explain(`Start and end with the airport name, because nearby airports may share the frequency. Use the runway number, never "active runway". Report about 10 miles out, entering downwind, base, final and leaving the runway. Departing: before taxiing and before taxiing onto the runway. Example call for a fictional airport; confirm local practice with your CFI. <span class="src">AIM 4-1-9</span>`); }
   function rwyS() { return rwy.split("").map((d) => DIG[+d]).join(" "); }
-  const legChips = chips(F.ctrl, LEGS, leg, (v) => { leg = v; call(); }, { label: "Position" }); legChips.el.style.display = "none";
   chips(F.ctrl, [["phon", "Phonetics"], ["call", "CTAF call"]], mode, (v) => { mode = v; legChips.el.style.display = v === "call" ? "" : "none"; v === "call" ? call() : phon(); }, { label: "Mode" });
+  const legChips = chips(F.ctrl, LEGS, leg, (v) => { leg = v; call(); }, { label: "Position" }); legChips.el.style.display = "none";
   if (mode === "call") { legChips.el.style.display = ""; call(); } else phon();
   return { destroy: () => F.destroy() };
 }

@@ -1,7 +1,7 @@
 // Emergency flows: pick a scenario, choose the first action, then step through the rest. Content mirrors the lesson text (AFH 11/18, C172S POH 3).
-import { htmlScene } from "./kit.js?v=961b79525f";
-import { chips } from "./base.js?v=961b79525f";
-import { h, shuffle } from "../core/util.js?v=961b79525f";
+import { htmlScene } from "./kit.js?v=b44a743634";
+import { chips } from "./base.js?v=b44a743634";
+import { h, shuffle } from "../core/util.js?v=b44a743634";
 // scenario: [chip label, cue, first-step options (first is right), why, [steps...], source]
 const SETS = {
   fire: [
@@ -41,6 +41,7 @@ export function mount(host, opts = {}) {
   const set = SETS[opts.set] || SETS.fire;
   let si = 0, n = 0, picked = null;
   const { F, body } = htmlScene(host);
+  if (set.length > 1) { F.root.classList.add("ctrl-top"); F.root.insertBefore(F.ctrl, F.stage); } // scenario picker on top so answering never moves it
   if (set.length > 1) chips(F.ctrl, set.map((x, i) => [String(i), x[0]]), "0", (v) => { if (v == null) return; si = +v; n = 0; picked = null; render(); }, { label: "Scenario" });
   const head = h("div"), q = h("div"), list = h("ol", { class: "hv-steps" }), row = h("div", { class: "hv-row" });
   body.append(head, q, list, row);

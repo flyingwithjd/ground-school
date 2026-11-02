@@ -1,7 +1,7 @@
 // Chair-fly trainer: tap the checklist items in order from memory. Items are from the C172S POH Section 3/4
 // (172S NAV III, G1000). Confirm with your CFI and your aircraft's POH.
-import { frame, chips } from "./base.js?v=961b79525f";
-import { h, esc, shuffle } from "../core/util.js?v=961b79525f";
+import { frame, chips } from "./base.js?v=b44a743634";
+import { h, esc, shuffle } from "../core/util.js?v=b44a743634";
 export const DRILLS = {
   roll: { name: "Engine failure, takeoff roll", src: "C172S POH 3", steps: ["Throttle: IDLE", "Brakes: APPLY", "Wing flaps: RETRACT", "Mixture: IDLE CUTOFF", "Magnetos: OFF", "STBY BATT: OFF", "Master (ALT and BAT): OFF"] },
   after: { name: "Engine failure after takeoff", src: "C172S POH 3", steps: ["Airspeed: 70 KIAS flaps up, 65 KIAS flaps 10° to full", "Mixture: IDLE CUTOFF", "Fuel shutoff valve: OFF", "Magnetos: OFF", "Wing flaps: AS REQUIRED (full recommended)", "STBY BATT: OFF", "Master (ALT and BAT): OFF", "Cabin door: UNLATCH", "Land: STRAIGHT AHEAD"] },
@@ -14,7 +14,7 @@ export const DRILLS = {
 };
 export function mount(host, opts = {}) {
   const keys = opts.drills || ["after", "restart", "forced"]; let key = keys[0], pool, next, miss, t0;
-  const F = frame(host, { cls: "capin chairfly", corners: { tl: "Chair-fly", tr: "Confirm with your CFI and POH" } });
+  const F = frame(host, { cls: "capin chairfly ctrl-top", corners: { tl: "Chair-fly", tr: "Confirm with your CFI and POH" } }); F.root.insertBefore(F.ctrl, F.stage); // picker on top so switching never moves it
   const wrap = h("div", { class: "cf-wrap" }); F.stage.append(wrap);
   function reset() { const D = DRILLS[key]; pool = shuffle(D.steps.map((s, i) => ({ s, i }))); next = 0; miss = 0; t0 = 0; draw(); F.caption("Tap the steps in order", D.name); }
   function draw(flash) { const D = DRILLS[key]; wrap.innerHTML = "";
