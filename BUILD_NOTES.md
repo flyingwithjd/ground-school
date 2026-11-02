@@ -218,3 +218,9 @@ These notes are updated as work goes, so an interruption loses nothing. The time
 - ASI viz (js/viz/vspeeds.js) uses the real arc colors, muted (color is the message, like the airport signs). Only the accent tick + selected chip glow. Tapping a speed shows only its arc/line; unmarked speeds dim all arcs and show an accent tick.
 - Auto-terms (rich.js autoTerms): first use per block of V-speed symbols, KIAS/KCAS/KTAS, CTAF, POH, AFM, ACS, MSL, AGL get a dotted underline + popover (tap; hover/focus on fine pointers; Esc closes). Plain "VR"/"VMC" not auto-marked (ambiguous). Never applied to questions/choices, code, labels, the viz, or the vs1 lesson itself (defined in place).
 - Glossary deep links #/glossary/<slug> highlight and scroll to the row.
+
+##### GL1 Instrument groups drawings (verified)
+- js/viz/instpanel.js: static round-gauge faces grouped as the page groups them (PHAK 3): Performance = ASI, altimeter, VSI, heading indicator, turn coordinator (the 172's turn-and-slip instrument; ball = slip-skid); Control = attitude indicator + tachometer (power); Navigation = VOR CDI. Not interactive, nothing highlighted.
+- Example readings: 100 KIAS, 4,500 ft / 29.92, 0 fpm, HDG 120, wings level, 2,300 RPM, CDI course 120 centered TO.
+- ASI arcs reuse the V-speeds dial geometry and colors (POH Fig 2-2). Tach: green 2,100–2,500 RPM (sea-level arc; 2,600 at 5,000 ft, 2,700 at 10,000 ft) and red line 2,700 RPM per C172S POH Fig 2-3 (NAV III). Numerals sit above hands with a face-colored halo so a hand never hides a number.
+- N575Y: FAA registry (checked Nov 2, 2026) = Cessna 172S, serial 172S9656, MFR year 2004, owner Silverhawk Aviation Academy LLC, IO-360-L2A. Registry does not list avionics, so panel type stays unconfirmed; page says so and describes the G1000 PFD layout only in general terms.

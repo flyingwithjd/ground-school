@@ -512,3 +512,19 @@ svg text:not([font-family]) { font-family: var(--mono); }
 .vsref .where { color: var(--ink2); }
 .vsref .r .src { display: block; margin-top: 4px; }
 @media (max-width: 760px) { .vsref .r { grid-template-columns: 72px minmax(0, 1fr); } .vsref .r.h { display: none; } .vsref .r > .val, .vsref .r > .where { grid-column: 2; } }
+/* Instrument groups (static drawings, js/viz/instpanel.js) */
+.viz.instp .stage, .viz.square.instp .stage { aspect-ratio: auto; max-height: none !important; overflow: visible; display: block; padding: 46px clamp(16px, 2.6vw, 30px) clamp(18px, 2.6vw, 26px); touch-action: auto; user-select: text; -webkit-user-select: text; }
+.viz.instp .stage > .caption { display: none; }
+.viz.instp .ip-group + .ip-group { border-top: 1px solid var(--line); margin-top: 22px; padding-top: 20px; }
+.viz.instp .ip-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 14px; margin-bottom: 14px; }
+.viz.instp .ip-head .label { color: var(--ink); }
+.viz.instp .ip-what { font-size: 15px; color: var(--ink2); }
+.viz.instp .ip-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 22px clamp(14px, 2.4vw, 28px); }
+.viz.instp .ip-cell { display: flex; flex-direction: column; align-items: center; text-align: center; min-width: 0; }
+.viz.instp .ip-svg { display: block; width: 100%; max-width: 200px; height: auto; aspect-ratio: 1 / 1; }
+.viz.instp .ip-name { margin-top: 10px; font: 500 10.5px/1.5 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink); }
+.viz.instp .ip-read { margin-top: 2px; font: 400 12px/1.45 var(--mono); color: var(--ink2); }
+.viz.instp .ip-note { margin: 22px 0 0; padding-top: 16px; border-top: 1px solid var(--line); font-size: 15px; color: var(--ink2); max-width: 78ch; }
+.viz.instp .ip-note:empty { display: none; }
+@media (max-width: 600px) { .viz.instp .ip-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 14px; } .viz.instp .ip-name { letter-spacing: .1em; } }
+.viz.instp .ip-note + .ip-note { margin-top: 10px; padding-top: 0; border-top: 0; }
