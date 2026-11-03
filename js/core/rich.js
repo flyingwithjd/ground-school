@@ -13,9 +13,16 @@ export function rich(html) { return String(html || "").replace(/\[\[([^\]|]+)(?:
 // Auto-terms: abbreviations in lesson prose get a subtle dotted underline that opens the same popover.
 // Only the first use per paragraph, never inside links, buttons, sources, headings, visuals or question text.
 // Plain "VR" and "VMC" are skipped (VR routes, visual meteorological conditions); the V<sub>R</sub> form is unambiguous.
-const PLAIN = { VSO: "vs0", VS0: "vs0", VS1: "vs1", VFE: "vfe", VNO: "vno", VNE: "vne", VA: "va", VX: "vx", VY: "vy", VG: "vg", VREF: "vref", VYSE: "vyse", VLE: "vle", VLO: "vlo", KIAS: "kias", KCAS: "kcas", KTAS: "ktas", CTAF: "ctaf", POH: "poh", AFM: "afm", ACS: "airman certification standards", MSL: "msl", AGL: "agl" };
-const SUB = { SO: "vs0", S0: "vs0", "S1": "vs1", S: "vs", FE: "vfe", NO: "vno", NE: "vne", A: "va", X: "vx", Y: "vy", R: "vr", G: "vg", REF: "vref", YSE: "vyse", MC: "vmc (speed)", LE: "vle", LO: "vlo" };
-const RX = "\\b(" + Object.keys(PLAIN).sort((a, b) => b.length - a.length).join("|") + ")\\b"; const RE = new RegExp(RX, "g"), RE1 = new RegExp(RX);
+const PLAIN = { VSO: "vs0", VS0: "vs0", VS1: "vs1", VFE: "vfe", VNO: "vno", VNE: "vne", VA: "va", VX: "vx", VY: "vy", VG: "vg", VREF: "vref", VYSE: "vyse", VLE: "vle", VLO: "vlo", KIAS: "kias", KCAS: "kcas", KTAS: "ktas", POH: "poh", AFM: "afm", ACS: "airman certification standards", MSL: "msl", AGL: "agl",
+  HSI: "horizontal situation indicator", LAA: "local airport advisory", HS: "hot spot", AROW: "arrow", ADC: "air data computer" };
+// Every other abbreviation that has its own glossary entry (key = the letters) is tapped the same way.
+// Ambiguous letters (VR, VMC, TC, NAV, IR, DC, ID, switch and TAF codes) stay out; tests/acronyms.mjs keeps this list honest.
+export const ABBR = ["FAA", "CFR", "FAR", "AIM", "PHAK", "AFH", "AC", "VFR", "IFR", "MVFR", "LIFR", "IMC", "ATC", "CFI", "PIC", "NTSB", "ICAO", "NOAA", "UTC", "CONUS", "SM", "NM", "RPM", "GPH", "OAT", "ISA", "IAS", "CAS", "TAS", "GS", "WCA", "ETA", "ETE", "CG", "AOA", "ASI", "VSI", "IVSI", "PFD", "MFD", "EFB", "ADM", "SRM", "CRM", "CFIT", "TUC", "DCS", "CO", "AME", "PAVE", "CARE", "TEAM", "DECIDE", "ABCDE", "ANDS", "AV1ATE", "ARROW", "SAFETY", "ELT", "AD", "SAIB", "MEL", "TCDS", "TSO", "NOTAM", "TFR", "SFRA", "MOA", "MTR", "CFA", "NSA", "GPS", "RNAV", "RAIM", "VOR", "VORTAC", "NDB", "DME", "ILS", "CDI", "OBS", "ADS-B", "UAT", "TIS-B", "FIS-B", "IDENT", "ATIS", "ASOS", "AWOS", "FSS", "MULTICOM", "GFA", "CVA", "MEF", "TAC", "WAC", "MAYDAY", "PAN-PAN", "TH", "MH", "CH", "MC", "CC", "E6B", "VOT", "SOP", "PSI",
+  "VASI", "PAPI", "REIL", "CTAF", "UNICOM", "METAR", "TAF", "PIREP", "AIRMET", "SIGMET", "G-AIRMET", "TRSA", "AHRS", "IMSAFE", "NEXRAD", "ATCRBS"];
+for (const a of ABBR) PLAIN[a] = a.toLowerCase();
+export { PLAIN };
+// A token: not glued to a word or hyphen in front; an optional plural "s"; not followed by a letter/digit or a hyphenated code (IO-360).
+const RX = "(?<![\\w-])(" + Object.keys(PLAIN).sort((a, b) => b.length - a.length).join("|") + ")(s?)(?![\\w]|-[A-Z0-9])"; const RE = new RegExp(RX, "g"), RE1 = new RegExp(RX);
 const SKIP = ".gl,a,button,.src,code,svg,h1,h2,h3,h4,.label,.qtext,.choice,.viz,input,textarea,[data-noterms]";
 const BLOCK = "p,li,td,th,dd,dt,figcaption,.note";
 const mk = (k, html) => { const b = document.createElement("button"); b.type = "button"; b.className = "gl auto"; b.dataset.term = k; b.setAttribute("aria-controls", "pop"); b.setAttribute("aria-expanded", "false"); b.innerHTML = html; return b; };
@@ -35,7 +42,7 @@ export function autoTerms(root) {
   const nodes = []; while (walker.nextNode()) nodes.push(walker.currentNode);
   for (const n of nodes) {
     const txt = n.nodeValue; RE.lastIndex = 0; let m, last = 0; const frag = document.createDocumentFragment(); let hit = false;
-    while ((m = RE.exec(txt))) { const k = PLAIN[m[1]]; if (!G[k] || !once(n, k)) continue; frag.append(txt.slice(last, m.index), mk(k, m[1])); last = m.index + m[1].length; hit = true; }
+    while ((m = RE.exec(txt))) { const k = PLAIN[m[1]]; if (!G[k] || !once(n, k)) continue; frag.append(txt.slice(last, m.index), mk(k, m[0])); last = m.index + m[0].length; hit = true; }
     if (hit) { frag.append(txt.slice(last)); n.replaceWith(frag); }
   }
   return root;
