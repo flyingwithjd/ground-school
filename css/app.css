@@ -579,6 +579,14 @@ html.locked #gate { display: flex; }
 .viz.fus3d .fus-lab.pick.on b { color: #F2F1EC; }
 .viz.fus3d .fus-lab.pick.off { opacity: .62; }
 @media (pointer: coarse) { .viz.fus3d .fus-lab.pick { min-height: 44px; padding: 6px 9px; } }
+.viz.fus3d .fus-dent { position: absolute; z-index: 4; left: 50%; bottom: 16px; transform: translateX(-50%); width: 10.2em; height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--acc); background: rgba(23,48,96,.92); color: #F2F1EC; font: 600 14px/1 var(--sans); cursor: pointer; box-shadow: 0 0 0 3px rgba(59,130,246,.18), 0 0 16px rgba(59,130,246,.35); transition: background-color .2s, box-shadow .2s; white-space: nowrap; touch-action: manipulation; }
+.viz.fus3d .fus-dent[hidden] { display: none; }
+.viz.fus3d .fus-dent svg { width: 17px; height: 17px; flex: none; }
+@media (hover: hover) { .viz.fus3d .fus-dent:hover { background: rgba(37,72,140,.95); } }
+.viz.fus3d .fus-dent:focus-visible { outline: 2px solid #F2F1EC; outline-offset: 2px; }
+.viz.fus3d .fus-dent.on { background: #3B82F6; border-color: #3B82F6; box-shadow: 0 0 0 3px rgba(59,130,246,.28), 0 0 18px rgba(59,130,246,.5); }
+@media (max-width: 500px) { .viz.fus3d .fus-dent { bottom: 8px; height: 36px; font-size: 13px; width: 9.4em; padding: 0 10px; gap: 5px; } .viz.fus3d .fus-dent svg { width: 15px; height: 15px; } }
+.viz.fus3d .fus-ex { margin: 6px 0 0; padding: 0 clamp(16px, 2.6vw, 26px); font: 500 11px/1.4 var(--mono); letter-spacing: .14em; text-transform: uppercase; color: var(--ink2); min-height: 1.4em; }
 .viz.fus3d .fus-desc { margin: 8px 0 0; padding: 0 clamp(16px, 2.6vw, 26px); box-sizing: content-box; color: var(--ink2); font-size: 14px; line-height: 1.45; min-height: 2.9em; max-width: 62ch; }
 @media (max-width: 700px) { .viz.fus3d .fus-desc { min-height: 5.8em; font-size: 13.5px; } }
 .viz.fus3d .fus-parts { display: flex; flex-direction: column; justify-content: flex-start; flex: 1 0 100%; width: 100%; }

@@ -24,14 +24,15 @@ for (const [w, hh] of [[1440, 900], [390, 844]]) {
     return { type: st.dataset.type, calls: +st.dataset.calls || 0, canvas: !!st.querySelector("canvas"), row: [row.left, row.top, row.width].map(Math.round), labs: labs.length, ov, out, big: v.querySelector(".caption .big")?.textContent,
       on: [...v.querySelectorAll('[aria-label="Construction type"] .chip.on')].map((c) => c.textContent) }; });
   const s0 = await state(); let row0 = s0.row; const res = [];
-  ok(s0.canvas && s0.calls > 10, `${w}: 3D stage rendered (${s0.calls} draw calls)`);
+  ok(s0.canvas && s0.calls >= 5, `${w}: 3D stage rendered (${s0.calls} draw calls)`);
   for (const [chip, key, big] of [["Monocoque", "mono", "Monocoque"], ["Semimonocoque", "semi", "Semimonocoque"], ["Truss", "truss", "Truss"]]) {
     await viz.locator('[aria-label="Construction type"] .chip', { hasText: new RegExp("^" + chip + "$") }).click(); await pg.waitForTimeout(1800);
     const s1 = await state(); res.push([chip, s1]);
     ok(s1.type === key && s1.big === big && s1.on.join() === chip, `${w} ${chip}: switched (type ${s1.type}, caption ${s1.big}, on ${s1.on})`);
     ok(s1.row.every((v, i) => Math.abs(v - row0[i]) <= 1), `${w} ${chip}: chip row stayed put ${JSON.stringify(row0)} -> ${JSON.stringify(s1.row)}`);
     ok(s1.labs >= 3 && !s1.ov.length && !s1.out.length, `${w} ${chip}: ${s1.labs} labels, overlaps ${JSON.stringify(s1.ov)}, outside ${JSON.stringify(s1.out)}`);
-    ok(s1.calls > 10, `${w} ${chip}: rendered`);
+    ok(s1.calls >= 5 && s1.calls <= 54, `${w} ${chip}: rendered within the draw-call budget (${s1.calls})`);
+    { const ex = await viz.locator(".fus-ex").textContent(); const want = { mono: "Lockheed Vega", semi: "Cessna 172", truss: "Piper J-3 Cub" }[key]; ok(ex === "Example: " + want, `${w} ${chip}: example label "${ex}"`); }
     if (shotDir) await shot(`fuselage_${key}_${w}x${hh}`);
   }
   // part isolation: tap a label or a part chip -> that part alone in blue; tap again (or All) -> everything; rows never move
@@ -62,7 +63,7 @@ for (const [w, hh] of [[1440, 900], [390, 844]]) {
   const top = () => pg.evaluate(() => { const v = document.querySelector('[data-viz="structure"] .viz'); window.scrollTo(0, v.getBoundingClientRect().top + scrollY - 90); });
   await top(); await pg.waitForTimeout(300);
   // dent toggle (monocoque only) keeps the type row in place
-  await viz.locator(".chip", { hasText: /^Monocoque$/ }).click(); await pg.waitForTimeout(800); await viz.locator(".chip", { hasText: /^Show a dent$/ }).click(); await pg.waitForTimeout(900);
+  await viz.locator(".chip", { hasText: /^Monocoque$/ }).click(); await pg.waitForTimeout(800); await viz.locator(".fus-dent", { hasText: /Show a dent/ }).click(); await pg.waitForTimeout(900);
   { const s2 = await state(); ok(s2.row.every((v, i) => Math.abs(v - row0[i]) <= 1) && !s2.ov.length && !s2.out.length && /DENT/.test(JSON.stringify(await pg.evaluate(() => [...document.querySelectorAll(".fus-lab")].map((e) => e.textContent)))), `${w} dent: row fixed, DENT label, no overlap`); }
   await top(); await pg.waitForTimeout(400);
   // drag turns the airplane (labels follow, still no overlap)

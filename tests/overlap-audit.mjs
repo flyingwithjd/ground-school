@@ -30,7 +30,11 @@ const check = () => pg.evaluate(() => { const out = [];
   // 3D fuselage construction labels (HTML)
   document.querySelectorAll(".viz.fus3d").forEach((v) => { const sr = v.querySelector(".stage").getBoundingClientRect(); const L = [...v.querySelectorAll(".fus-lab")].filter((e) => e.offsetParent).map((e) => ({ t: e.textContent, r: e.getBoundingClientRect() }));
     for (const a of L) if (a.r.right > sr.right + 1 || a.r.left < sr.left - 1 || a.r.top < sr.top - 1 || a.r.bottom > sr.bottom + 1) out.push(`fus3d "${a.t}" spills out of stage`);
-    for (let i = 0; i < L.length; i++) for (let j = i + 1; j < L.length; j++) { const a = L[i].r, c = L[j].r; if (a.left < c.right - 1 && c.left < a.right - 1 && a.top < c.bottom - 1 && c.top < a.bottom - 1) out.push(`fus3d "${L[i].t}" ⟂ "${L[j].t}"`); } });
+    for (let i = 0; i < L.length; i++) for (let j = i + 1; j < L.length; j++) { const a = L[i].r, c = L[j].r; if (a.left < c.right - 1 && c.left < a.right - 1 && a.top < c.bottom - 1 && c.top < a.bottom - 1) out.push(`fus3d "${L[i].t}" ⟂ "${L[j].t}"`); }
+    // in-stage dent button: inside the stage, below the airplane, clear of every label
+    const db = v.querySelector(".fus-dent"); if (db && !db.hidden && db.offsetParent) { const r = db.getBoundingClientRect(), st = v.querySelector(".stage"), mb = st.__under ? st.__under(r.left - sr.left, r.right - sr.left) : (st.__mbox ? st.__mbox()[3] : 0);
+      if (r.left < sr.left - 1 || r.right > sr.right + 1 || r.bottom > sr.bottom + 1) out.push(`fus3d dent button spills out of stage`); if (r.top - sr.top < mb - 0.5) out.push(`fus3d dent button over the airplane`);
+      for (const a of L) if (a.r.left < r.right - 1 && r.left < a.r.right - 1 && a.r.top < r.bottom - 1 && r.top < a.r.bottom - 1) out.push(`fus3d dent button ⟂ "${a.t}"`); } });
   return out; });
 let bad = 0; const seen = new Set();
 for (const r of routes) { await pg.goto("about:blank"); await pg.goto((process.env.BASE || "http://localhost:8765/index.html") + r); await pg.waitForTimeout(900);
@@ -41,6 +45,8 @@ for (const r of routes) { await pg.goto("about:blank"); await pg.goto((process.e
       if (on.length !== 1 || on[0] !== name) ov.push(`after tapping ${name}, active = ${JSON.stringify(on)}`); ov.push(...(await check()).map((x) => `[${name}] ` + x)); } }
   if (await pg.locator(".viz.fus").count()) { const fv = pg.locator(".viz.fus").first();
     for (const [nm, re] of [["Monocoque", /^Monocoque$/], ["Show a dent", /^Show a dent$/], ["Semimonocoque", /^Semimonocoque$/], ["Truss", /^Truss$/]]) { await fv.locator(".chip", { hasText: re }).click(); await pg.waitForTimeout(250); ov.push(...(await check()).map((x) => `[${nm}] ` + x)); } }
+  if (await pg.locator(".viz.fus3d").count()) { const fv = pg.locator(".viz.fus3d").first(); const tc = (re) => fv.locator('[aria-label="Construction type"] .chip', { hasText: re });
+    for (const [nm, act] of [["Monocoque", () => tc(/^Monocoque$/).click()], ["Show a dent", () => fv.locator(".fus-dent").click()], ["Hide dent", () => fv.locator(".fus-dent").click()], ["Semimonocoque", () => tc(/^Semimonocoque$/).click()], ["Truss", () => tc(/^Truss$/).click()]]) { await act(); await pg.waitForTimeout(500); ov.push(...(await check()).map((x) => `[${nm}] ` + x)); } }
   ov = ov.filter((x) => !seen.has(r + x)); ov.forEach((x) => seen.add(r + x));
   if (ov.length) { bad++; console.log(r, "\n  " + ov.join("\n  ")); } }
 console.log(`${w}px: ${routes.length} routes, ${bad} with problems`, errs.length ? "\nerrors: " + [...new Set(errs)].join("; ") : "");
