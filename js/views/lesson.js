@@ -1,10 +1,10 @@
-import { h, esc, pct } from "../core/util.js?v=cd2764e5ab";
-import { S, save, lessonState } from "../core/store.js?v=cd2764e5ab";
-import { LESSONS, lessonItems } from "../../data/index.js?v=cd2764e5ab";
-import { lessonStats, buildQueue } from "../core/progress.js?v=cd2764e5ab";
-import { rich, autoTerms } from "../core/rich.js?v=cd2764e5ab";
-import { mountViz, destroyAll } from "../viz/index.js?v=cd2764e5ab";
-import { session } from "./quiz.js?v=cd2764e5ab";
+import { h, esc, pct } from "../core/util.js?v=783be66232";
+import { S, save, lessonState } from "../core/store.js?v=783be66232";
+import { LESSONS, lessonItems } from "../../data/index.js?v=783be66232";
+import { lessonStats, buildQueue } from "../core/progress.js?v=783be66232";
+import { rich, autoTerms } from "../core/rich.js?v=783be66232";
+import { mountViz, destroyAll } from "../viz/index.js?v=783be66232";
+import { session } from "./quiz.js?v=783be66232";
 const KIND = { ground: "Ground lesson", flight: "Flight lesson briefing", module: "Module unit" };
 export function lessonView(host, id, secIdx) {
   const L0 = LESSONS[id]; const p = h("div", { class: "page" }); host.append(p);
@@ -12,7 +12,7 @@ export function lessonView(host, id, secIdx) {
   let api = { destroy() {} }; let dead = false;
   // Lesson text is code-split: question banks load up front (the review engine needs them); prose loads when the lesson opens.
   // Supplement sections (data/text/x/<id>.js) slot in after the section named by `at` ("^" = first), else at the end.
-  Promise.all([import(`../../data/text/${id}.js?v=cd2764e5ab`), L0.textx ? import(`../../data/text/x/${id}.js?v=cd2764e5ab`) : null]).then(([m, x]) => { if (dead) return;
+  Promise.all([import(`../../data/text/${id}.js?v=783be66232`), L0.textx ? import(`../../data/text/x/${id}.js?v=783be66232`) : null]).then(([m, x]) => { if (dead) return;
     const T = { ...L0, ...m.default, sections: mergeSections(m.default.sections || [], x ? x.default.sections || [] : []) };
     if (typeof secIdx === "string") { const k = T.sections.findIndex((s) => s.id === secIdx); secIdx = k >= 0 ? k : null; }
     api = build(p, T, id, secIdx); })

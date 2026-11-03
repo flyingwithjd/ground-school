@@ -1,6 +1,6 @@
 // Altimeter setting error (PHAK 8): fly from high to low pressure without resetting, and the airplane sits lower than the altimeter says.
-import { slider, chips } from "./base.js?v=cd2764e5ab";
-import { pxScene, T, L, R, P, planeTop, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=cd2764e5ab";
+import { slider, chips } from "./base.js?v=783be66232";
+import { pxScene, T, L, R, P, planeTop, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=783be66232";
 export function mount(host) {
   let set = 29.94, act = 29.69, cold = false;
   const S = pxScene(host, { cls: "tall", corners: { tl: "Altimeter setting error", tr: "PHAK 8 · 91.121" } }, draw);

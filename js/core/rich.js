@@ -1,5 +1,5 @@
-import { GLOSSARY } from "../../data/glossary.js?v=cd2764e5ab";
-import { esc } from "./util.js?v=cd2764e5ab";
+import { GLOSSARY } from "../../data/glossary.js?v=783be66232";
+import { esc } from "./util.js?v=783be66232";
 const norm = (k) => k.toLowerCase().replace(/[’']/g, "'").trim();
 export const G = Object.fromEntries(Object.entries(GLOSSARY).map(([k, v]) => [norm(k), { term: k, ...v }]));
 // Other spellings that point at one entry (VSO is often written VS0; ACS is the short name).
