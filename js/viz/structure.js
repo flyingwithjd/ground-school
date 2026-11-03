@@ -112,7 +112,8 @@ export function mount(host) {
   const CUT = { x0: 0.9, x1: -12.6, t0: Math.PI - 1.15, t1: Math.PI + 0.95 };
   const inCut = (x, th) => x <= CUT.x0 && x >= CUT.x1 && angd(th, Math.PI) >= CUT.t0 - Math.PI && angd(th, Math.PI) <= CUT.t1 - Math.PI;
   // skin: [base, rim] for default / isolated / dimmed (white)
-  function skin(key, color, look, { cut = false, dent = false, off = 0 } = {}) {
+  // on / dim: [colour, fill, rim] when this part is isolated / another part is. The fill is a uniform alpha so a skin still reads face-on (side view), the rim draws its silhouette.
+  function skin(key, color, look, { cut = false, dent = false, off = 0, on = [ACC, 0.06, 0.8], dim = [INK, 0.02, 0.2] } = {}) {
     const NX = 56, NT = 56, pos = [], idx = [];
     for (let i = 0; i <= NX; i++) { const x = XF + ((XT - XF) * i) / NX; for (let j = 0; j <= NT; j++) { const th = TH(j, NT);
       let o = off; if (dent) { const dx = x - DENT.x, dt = angd(th, DENT.th); o -= 0.42 * Math.exp(-((dx / DENT.dx) ** 2) - ((dt / DENT.dt) ** 2)); }
@@ -121,7 +122,7 @@ export function mount(host) {
       const a = i * (NT + 1) + j, b = a + 1, c = a + NT + 1, d = c + 1; idx.push(a, c, b, b, c, d); }
     const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); g.computeVertexNormals();
     const mat = M(skinMat(color, look[0], look[1])); const m = new THREE.Mesh(g, mat); m.renderOrder = 4; grp.add(m);
-    addPart(key, [m], (st) => { const [c, a, f] = st === "def" ? [color, look[0], look[1]] : st === "on" ? [ACC, 0.06, 0.8] : [INK, 0.02, 0.2]; mat.uniforms.uC.value.setHex(c); mat.uniforms.uA.value = a; mat.uniforms.uF.value = f; });
+    addPart(key, [m], (st) => { const [c, a, f] = st === "def" ? [color, look[0], look[1]] : st === "on" ? on : dim; mat.uniforms.uC.value.setHex(c); mat.uniforms.uA.value = a; mat.uniforms.uF.value = f; });
     return m; }
   const ringPts = (x, off = -0.02, n = 72, t0 = 0, t1 = Math.PI * 2) => range(t0, t1, n).map((t) => surf(x, -Math.PI / 2 + t, off));
   // all polylines that share one material go into one LineSegments
@@ -152,13 +153,18 @@ export function mount(host) {
     // formers over the top (turtle deck) and a few stringers: they only shape the fabric
     ST.slice(4, 9).forEach((x) => tube("shape", "gray", ringPts(x, -0.06, 24, Math.PI * 0.12, Math.PI * 0.88), 0.03));
     [0.25, 0.5, 0.75].forEach((t) => tube("shape", "gray", range(ST[4], XT + 0.6, 10).map((x) => surf(x, Math.PI * (0.12 + 0.76 * t), -0.06)), 0.025));
-    skin("fab", INK, [0.025, 0.26]);
+    // fabric: a soft veil with a rim silhouette, plus rib-stitch rows at each station and tapes along the seams, so its surface reads side-on too
+    skin("fab", INK, [0.05, 0.3], { on: [ACC, 0.24, 0.9], dim: [INK, 0.015, 0.14] });
+    const fl = M(lineMat(INK, 0.2)), fo = 0.025;
+    ST.slice(1, -1).forEach((x) => { const rg = range(0, Math.PI * 2, 64).map((t) => surf(x, t, fo)); for (let k = 0; k + 1 < rg.length; k += 2) polyLine([rg[k], rg[k + 1]], fl); });   // stitches
+    [Math.PI * 0.5, Math.PI * 0.8, Math.PI, Math.PI * 1.25, -Math.PI * 0.5, Math.PI * 0.2, 0, -Math.PI * 0.25].forEach((t) => polyLine(range(XF - 0.1, XT + 0.2, 36).map((x) => surf(x, t, fo)), fl));   // tapes
+    addPart("fab", [], (st) => { fl.color.setHex(st === "on" ? ACC : INK); fl.opacity = st === "def" ? 0.2 : st === "on" ? 0.8 : 0.07; });
     anchors.lon = C(XF - 2.6, 1, -1); anchors.dia = C(ST[3], 0, -1).lerp(C(ST[4], 1, -1), 0.5); anchors.strut = C(ST[6], 0, -1).lerp(C(ST[6], 1, -1), 0.4); anchors.fab = surf(ST[7] - 0.8, Math.PI * 0.55, 0);
   }
   function buildMono(dent) {
     disc("bulk", XF, [INK, 0.1, 0.6]);
     const FR = range(XF - 2.4, XT + 1.4, 7); FR.forEach((x) => tube("form", "gray", ringPts(x, -0.06), 0.035, true));
-    skin("skin", ACC, dent ? [0.045, 0.6] : [0.06, 0.8], { dent });
+    skin("skin", ACC, dent ? [0.045, 0.6] : [0.06, 0.8], { dent, on: [ACC, 0.16, 0.9] });
     anchors.skin = surf(XF - 7.4, Math.PI * 0.62, 0); anchors.form = surf(FR[5], Math.PI * 1.25, -0.06); anchors.bulk = surf(XF, Math.PI * 0.9, -0.1).lerp(V(XF, 4.2, 0), 0.35);
     if (dent) { // dent outline + buckle lines on the skin
       const m = M(lineMat(INK, 0.95)), m2 = M(lineMat(INK, 0.6)), m3 = M(lineMat(INK, 0.55));
@@ -174,7 +180,7 @@ export function mount(host) {
     const NS = 18; for (let j = 0; j < NS; j++) { const th = TH(j + 0.5, NS); tube("str", "thin", range(XF, XT + 0.4, 20).map((x) => surf(x, th, -0.1)), 0.022); }
     const LONG = [Math.PI * 0.5 - 0.62, Math.PI * 0.5 + 0.62, -Math.PI * 0.5 + 0.62, -Math.PI * 0.5 - 0.62];   // four heavy longerons near the corners
     LONG.forEach((th) => tube("lon", "blue", range(XF, XT + 0.4, 24).map((x) => surf(x, th, -0.12)), 0.07));
-    skin("skin", ACC, [0.05, 0.7], { cut: true }); windows(0.5);
+    skin("skin", ACC, [0.05, 0.7], { cut: true, on: [ACC, 0.16, 0.9] }); windows(0.5);
     // cut edge of the skin, drawn in the accent (part of the skin)
     const e = [], m = M(lineMat(ACC, 0.95)), tA = CUT.t0, tB = CUT.t1;
     range(CUT.x0, CUT.x1, 30).forEach((x) => e.push(surf(x, tA, 0.01))); range(tA, tB, 16).forEach((t) => e.push(surf(CUT.x1, t, 0.01)));
