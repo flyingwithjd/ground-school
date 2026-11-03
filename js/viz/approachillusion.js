@@ -1,6 +1,6 @@
 // Approach illusions (AFH 11, PHAK 17): pick a condition and compare the path you feel you're on with where you actually fly.
-import { chips } from "./base.js?v=f413a64fe0";
-import { pxScene, T, L, P, R, ACC, INK, GRAY, DIM } from "./kit.js?v=f413a64fe0";
+import { chips } from "./base.js?v=cd2764e5ab";
+import { pxScene, T, L, P, R, ACC, INK, GRAY, DIM } from "./kit.js?v=cd2764e5ab";
 const IL = {
   black: ["Black hole", "Over water or dark land with only runway lights, you feel higher than you are.", "low", "AFH 11 · PHAK 17"],
   bright: ["Bright lights", "Bright runway and approach lights, with few lights on the terrain around them, make the runway look closer.", "high", "PHAK 17"],
