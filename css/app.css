@@ -594,3 +594,21 @@ html.locked #gate { display: flex; }
 @media (max-width: 700px) { .viz.fus3d .fus-lab { font-size: 9.5px; letter-spacing: .1em; padding: 3px 5px; } }
 /* 3D airplane stages with a title band: the band matches the canvas so it reads as one picture (labels never over the model) */
 .viz .stage[data-band] { background: #0A0A0B; }
+/* segmented circle: fixed control rows (readouts / sliders / chips) so nothing moves as the wind values change */
+.viz.segc .stage { aspect-ratio: 16 / 9; touch-action: pan-y; }
+@media (max-width: 700px) { .viz.segc .stage { aspect-ratio: 1000 / 880; } }
+.viz.segc .caption .label, .viz.segc .caption .big { white-space: nowrap; }
+@media (max-width: 600px) { .viz.segc .caption .big { font-size: 20px; } }
+.viz.segc .ctrl { display: grid; grid-template-columns: minmax(0, 1fr); gap: 16px; align-items: stretch; }
+.viz.segc .seg-ro { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 10px 20px; }
+.viz.segc .seg-ro > div { display: flex; flex-direction: column; min-width: 0; }
+.viz.segc .seg-ro b { font: 600 22px/1.2 var(--sans); letter-spacing: -.01em; font-variant-numeric: tabular-nums; white-space: nowrap; }
+.viz.segc .seg-ro span { font: 500 10.5px/1.6 var(--mono); letter-spacing: .14em; color: var(--ink2); text-transform: uppercase; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.viz.segc .seg-sl { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px 32px; }
+.viz.segc .seg-sl .slider { min-width: 0; grid-template-columns: 96px minmax(0, 1fr) 64px; }
+.viz.segc .seg-sl .slider output { min-width: 0; }
+.viz.segc .seg-ch { display: flex; align-items: center; gap: 8px 14px; min-height: 36px; }
+.viz.segc .seg-lab { flex: 0 0 auto; min-width: 96px; font: 500 10.5px/1.4 var(--mono); letter-spacing: .16em; text-transform: uppercase; color: var(--ink2); }
+@media (max-width: 700px) { .viz.segc .seg-sl { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 600px) { .viz.segc .seg-ro { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) { .viz.segc .seg-lab { display: none; } }
