@@ -579,6 +579,7 @@ html.locked #gate { display: flex; }
 .viz.fus3d .fus-lab.pick.on b { color: #F2F1EC; }
 .viz.fus3d .fus-lab.pick.off { opacity: .62; }
 @media (pointer: coarse) { .viz.fus3d .fus-lab.pick { min-height: 44px; padding: 6px 9px; } }
+.viz.fus3d .fus-dentbox{display:contents}
 .viz.fus3d .fus-dent { position: absolute; z-index: 4; left: 50%; bottom: 16px; transform: translateX(-50%); width: 10.2em; height: 38px; display: inline-flex; align-items: center; justify-content: center; gap: 7px; padding: 0 14px; border-radius: 999px; border: 1px solid var(--acc); background: rgba(23,48,96,.92); color: #F2F1EC; font: 600 14px/1 var(--sans); cursor: pointer; box-shadow: 0 0 0 3px rgba(59,130,246,.18), 0 0 16px rgba(59,130,246,.35); transition: background-color .2s, box-shadow .2s; white-space: nowrap; touch-action: manipulation; }
 .viz.fus3d .fus-dent[hidden] { display: none; }
 .viz.fus3d .fus-dent svg { width: 17px; height: 17px; flex: none; }

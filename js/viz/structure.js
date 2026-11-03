@@ -195,7 +195,7 @@ export function mount(host) {
     ov.textContent = ""; cur.forEach((c) => c.e.remove());
     cur = list.map((L) => { const an = L[3] && anchors[L[3]] ? anchors[L[3]] : null, key = L[3] && parts[L[3]] ? L[3] : null;
       const e = h(key ? "button" : "div", { class: "fus-lab" + (L[2] ? "" : " dim") + (key ? " pick" : "") }); if (key) { e.type = "button"; e.dataset.k = key; e.setAttribute("aria-pressed", "false"); e.addEventListener("click", () => isolate(sel === key ? null : key)); }
-      e.innerHTML = `<b>${L[0]}</b><span>${L[1]}</span>`; stage.append(e);
+      e.innerHTML = `<b>${L[0]}</b><span>${L[1]}</span>`; stage.insertBefore(e, stage.querySelector(".fus-dentbox"));   /* labels before the dent button in DOM order */
       let line = null, dot = null; if (an) { line = s("line", { class: L[2] ? "on" : "" }, ov); dot = s("circle", { r: 3.6, class: L[2] ? "on" : "" }, ov); }
       return { e, an, key, line, dot, w: 0, hgt: 0, top: true, x: 0, ax: an ? [0, 0] : null }; });
     cur.forEach((c, i) => { c.top = list[i][4] !== "b"; c.w = c.e.offsetWidth; c.hgt = c.e.offsetHeight; }); rowT = cur.filter((c) => c.top); rowB = cur.filter((c) => !c.top);
@@ -290,7 +290,7 @@ export function mount(host) {
   function makePartChips() { partsWrap.textContent = ""; partChips = chips(partsWrap, [["all", "All"], ...PARTS[type].map((p) => [p[0], p[1]])], sel || "all", (v) => isolate(!v || v === "all" ? null : v), { label: "Part", toggle: true }); }
   function fitPartsRow() { const keep = type; partsWrap.style.minHeight = ""; let mh = 0; for (const t of Object.keys(PARTS)) { type = t; makePartChips(); mh = Math.max(mh, partsWrap.offsetHeight); } type = keep; makePartChips(); partsWrap.style.minHeight = mh + "px"; }
   // "Show a dent" lives inside the stage (bottom centre, between the bottom labels), only in Monocoque. Fixed width, so it never shifts when it flips to "Hide dent".
-  const dentBtn = h("button", { class: "fus-dent", type: "button", "aria-pressed": "false", hidden: "" }); stage.append(dentBtn);
+  const dentBtn = h("button", { class: "fus-dent", type: "button", "aria-pressed": "false", hidden: "" }); stage.append(h("div", { class: "fus-dentbox" }, dentBtn));
   const dentIco = '<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="7.2" fill="none" stroke="currentColor" stroke-width="1.6"/><path d="M5.6 7.4 Q10 11.6 14.4 7.4" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round"/></svg>';
   function dentUI() { dentBtn.hidden = type !== "mono"; dentBtn.classList.toggle("on", dent); dentBtn.setAttribute("aria-pressed", dent ? "true" : "false"); const dt = dent ? "Hide dent" : "Show a dent"; if (dentBtn.dataset.t !== dt) { dentBtn.dataset.t = dt; dentBtn.innerHTML = dentIco + `<span>${dt}</span>`; } if (!dentBtn.hidden) dentW = dentBtn.offsetWidth; }
   dentBtn.addEventListener("pointerdown", (e) => e.stopPropagation()); dentBtn.addEventListener("click", () => { dent = !dent; draw(false); });
