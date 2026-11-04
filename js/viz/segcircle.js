@@ -11,8 +11,8 @@ import { T } from "./shapes.js?v=9b8468d04e";
 const D2R = Math.PI / 180, BAND = 5;
 // two compositions: wide (16:9 stage) and narrow (phones, taller stage); everything is placed from these numbers
 const LAY = {
-  wide: { W: 1600, H: 900, rx0: 440, rx1: 1160, ry: 400, rw: 56, dy: 130, bx0: 230, bx1: 1370, cr: 70, cx: 800, cy: 700, R: 96, a0: 22, a1: 150, arm: 80, num: 40, lab: 24, leg: 24, vs: 7, sockL: 82, tetS: 1 },
-  narrow: { W: 1000, H: 880, rx0: 250, rx1: 750, ry: 375, rw: 52, dy: 135, bx0: 70, bx1: 930, cr: 56, cx: 500, cy: 670, R: 74, a0: 18, a1: 116, arm: 64, num: 38, lab: 30, leg: 30, vs: 6, sockL: 64, tetS: 0.85 },
+  wide: { W: 1600, H: 900, rx0: 440, rx1: 1160, ry: 400, rw: 56, dy: 130, bx0: 230, bx1: 1370, cr: 70, cx: 800, cy: 700, R: 96, gap: 16, lsi: 88, tpi: 58, iw: 13, num: 40, lab: 24, leg: 24, vs: 7, sockL: 82, tetS: 1 },
+  narrow: { W: 1000, H: 880, rx0: 250, rx1: 750, ry: 375, rw: 52, dy: 135, bx0: 70, bx1: 930, cr: 56, cx: 500, cy: 670, R: 74, gap: 14, lsi: 70, tpi: 46, iw: 11, num: 38, lab: 30, leg: 30, vs: 6, sockL: 64, tetS: 0.85 },
 };
 const n180 = (a) => ((a % 360) + 540) % 360 - 180;           // -180..180
 const pt = (b, r) => [Math.sin(b * D2R) * r, -Math.cos(b * D2R) * r];   // compass bearing -> screen vector
@@ -60,9 +60,14 @@ export function mount(host, opts = {}) {
     const { cx, cy, R } = L, c = s("g", {}, root);
     for (let i = 0; i < 12; i++) { const P = (a) => [cx + R * Math.sin(a * D2R), cy - R * Math.cos(a * D2R)]; const [x0, y0] = P(i * 30 + 4), [x1, y1] = P(i * 30 + 26);
       s("path", { d: `M${x0},${y0} A${R},${R} 0 0 1 ${x1},${y1}`, stroke: FAINT2, "stroke-width": 11, fill: "none" }, c); }
-    E.ind = {}; for (const [k, sg] of [["27", 1], ["9", -1]]) { const gg = s("g", {}, c), xe = cx + sg * L.a1; // 27's approach end is east: its base arm points north = right traffic; 9 is west, base north = left traffic
-      E.ind[k] = [s("line", { x1: cx + sg * (R + L.a0), y1: cy, x2: xe, y2: cy, stroke: FAINT2, "stroke-width": 12 }, gg), s("line", { x1: xe, y1: cy + 6, x2: xe, y2: cy - L.arm, stroke: FAINT2, "stroke-width": 12 }, gg)];
-      E.ind[k].t = T(c, xe + sg * 22, cy + L.lab * 0.35, k === "27" ? "27 · right" : "9 · left", { anchor: sg > 0 ? "start" : "end", size: L.lab, op: 0.6 }); }
+    // AC 150/5340-5D Fig. 1: each landing strip indicator (16-24 ft) sits 4-12 ft outside the circle in line with the runway; the
+    // traffic pattern indicator (12-20 ft, shorter) is joined at its outer end at a right angle, making an L. Mentally enlarged
+    // (AIM 4-3-4), the long in-line arm is final and the short arm is base. 27's approach end is east and its base arm points
+    // north (right traffic); 9's approach end is west and its base arm also points north (left traffic).
+    E.ind = {}; for (const [k, sg] of [["27", 1], ["9", -1]]) { const gg = s("g", { "data-ind": k }, c), xi = cx + sg * (R + L.gap), xe = xi + sg * L.lsi, w = L.iw;
+      E.ind[k] = [s("line", { x1: xi, y1: cy, x2: xe, y2: cy, stroke: FAINT2, "stroke-width": w, "data-arm": "lsi" }, gg), s("line", { x1: xe - sg * w / 2, y1: cy - w / 2, x2: xe - sg * w / 2, y2: cy - L.tpi, stroke: FAINT2, "stroke-width": w, "data-arm": "tpi" }, gg)];
+      const xe2 = xe;
+      E.ind[k].t = T(c, xe2 + sg * 22, cy + L.lab * 0.35, k === "27" ? "27 · right" : "9 · left", { anchor: sg > 0 ? "start" : "end", size: L.lab, op: 0.6 }); }
     // wind sock (big end into the wind, fills with speed) and tetrahedron (small end toward the landing direction)
     E.sock = s("g", {}, root); E.limp = s("circle", { r: 9, fill: "none", stroke: INK, "stroke-width": 3, "stroke-opacity": 0.7 }, E.sock);
     E.cone = s("g", {}, E.sock); E.coneP = s("path", { d: "", fill: "rgba(242,241,236,.12)", stroke: INK, "stroke-width": 3, "stroke-linejoin": "round" }, E.cone); E.stripes = s("path", { d: "", stroke: INK, "stroke-width": 2, "stroke-opacity": 0.6 }, E.cone);
@@ -111,7 +116,7 @@ export function mount(host, opts = {}) {
     for (const k of ["27", "9"]) { const on = k === use; E.ind[k].forEach((l) => { l.setAttribute("stroke", on ? ACC : FAINT2); on ? l.setAttribute("filter", "url(#gw)") : l.removeAttribute("filter"); }); E.ind[k].t.setAttribute("fill", on ? ACC : INK); E.ind[k].t.setAttribute("opacity", on ? 1 : 0.6); }
     if (!E.path || E.path.u !== use) { E.path = pattern(use); E.path.u = use; E.pat.setAttribute("d", E.path.d); placeLegs(); E.legNow = ""; }
     // sock + tetrahedron placement (tetrahedron takes the circle's center when shown)
-    const sockAt = showTet ? [L.cx + L.R + 80, L.cy + L.R - 10] : [L.cx, L.cy];
+    const sockAt = showTet ? [L.cx + L.R * 1.73, L.cy + L.R + 5] : [L.cx, L.cy];
     E.sock.setAttribute("transform", `translate(${sockAt[0]} ${sockAt[1]})`); drawSock(0);
     E.tet.style.display = E.tetT.style.display = showTet ? "" : "none";
     E.tet.setAttribute("transform", `translate(${L.cx} ${L.cy}) rotate(${use === "27" ? 180 : 0}) scale(${L.tetS})`); E.tetT.setAttribute("x", L.cx); E.tetT.setAttribute("y", L.cy + L.R + L.lab * 1.6);
@@ -136,15 +141,15 @@ export function mount(host, opts = {}) {
     RO.xw(st.xd + " kt", st.xd >= 1 ? `crosswind · ${st.side}` : "crosswind");
     RO.tp(lab === "right" ? "Right" : "Left", "pattern");
   }
-  function words(lab) { const dir = String(wdir).padStart(3, "0") + "°", src = `<span class="src">AIM 4-3-4; AC 90-66C 9.11, 11.4, 11.5; AC 150/5345-27F 3.2.2, 3.5</span>`;
+  function words(lab) { const dir = String(wdir).padStart(3, "0") + "°", src = `<span class="src">AIM 4-3-4; AC 90-66C 9.11, 11.5; AC 150/5340-5D; AC 150/5345-27F 3.2.2, 3.5</span>`;
     const shown = `Shown: runway ${use}, ${lab} traffic.`, light = wkt > 0 && wkt < 3 ? " Under 3 kt a wind sock is not required to swing to the wind, so don't trust its direction much." : "";
-    const tet = showTet ? (st.state === "into" ? " The tetrahedron's small end points in the direction of landing; it can be set by hand, so don't use it for wind direction." : " In calm or very light wind a tetrahedron may not point to the airport's calm-wind runway, so don't rely on it.") : "";
+    const tet = showTet ? (wkt >= 3 ? " The tetrahedron's small end points in the direction of landing; it may be set by hand or left free-swinging, and pilots are cautioned against using it for wind direction." : " In calm or very light wind a tetrahedron may not point to the airport's calm-wind runway, so don't rely on it.") : "";
     if (st.state === "calm") { F.caption("Wind calm", "Calm wind");
-      F.explain(`No wind, so no runway is favored and the sock hangs limp. Use the runway other traffic is already using, or the airport's calm-wind runway if it has one (check the Chart Supplement). ${shown}${tet} ${src}`); return; }
+      F.explain(`No wind, so no runway is favored and the sock hangs limp. Use the runway other traffic is already using, or the airport's designated calm-wind runway if it has one. ${shown}${tet} ${src}`); return; }
     if (st.state !== "into") { F.caption(`Wind ${dir} at ${wkt} kt`, st.state === "direct" ? "Direct crosswind" : "Nearly direct crosswind");
-      F.explain(`The wind is ${st.state === "direct" ? "straight across" : "within 5° of straight across"} runway 9-27, so neither runway has a useful headwind: about ${st.xd} kt of crosswind either way. The wind doesn't pick; use the runway other traffic is already using, or the calm-wind runway if the airport has one. ${shown}${light}${tet} ${src}`); return; }
+      F.explain(`The wind is ${st.state === "direct" ? "straight across" : "within 5° of straight across"} runway 9-27, so neither runway has a useful headwind: about ${st.xd} kt of crosswind either way. The wind doesn't pick; use the runway other traffic is already using, and make sure the crosswind is within your airplane's demonstrated crosswind velocity and your own limits. ${shown}${light}${tet} ${src}`); return; }
     F.caption(`Wind ${dir} at ${wkt} kt`, `Runway ${use} · ${lab} traffic`);
-    F.explain(`The big end of the wind sock points into the wind. Land on the runway most nearly into the wind: runway ${use}, ${st.hd} kt headwind${st.xd ? `, ${st.xd} kt crosswind from the ${st.side}` : ""}. Mentally enlarge the traffic pattern indicator at runway ${use}'s approach end: the long arm is final, the short arm is base, so this airport flies ${lab} traffic for runway ${use}. Turns are left unless an indicator shows right.${light}${tet} ${src}`); }
+    F.explain(`The big end of the wind sock points into the wind. Land on the runway most nearly into the wind: runway ${use}, ${st.hd} kt headwind${st.xd ? `, ${st.xd} kt crosswind from the ${st.side}` : ""}. Mentally enlarge the L at runway ${use}'s approach end: its long arm, in line with the runway (the landing strip indicator), is final, and its short arm (the traffic pattern indicator) is base, so this airport flies ${lab} traffic for runway ${use}. All turns are left unless an indicator shows right turns.${light}${tet} ${src}`); }
   function drawSock(fl) { const ext = Math.min(1, wkt / 15);
     E.limp.style.display = wkt > 0 ? "none" : ""; E.cone.style.display = wkt > 0 ? "" : "none"; if (!wkt) return;
     const len = 16 + ext * (L.sockL - 16), w0 = 16, w1 = 6 + 4 * (1 - ext);

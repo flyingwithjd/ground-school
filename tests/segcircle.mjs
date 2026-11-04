@@ -4,6 +4,9 @@
 //  * runway choice: the runway most nearly into the wind outside a +/-5 deg band around direct crosswind (wind 360/180);
 //    inside the band the shown runway is kept (no flip-flop) and at most one change per one-way sweep
 //  * caption and readouts agree with the computed components; calm and crosswind never claim "Runway N"
+//  * indicator geometry (AC 150/5340-5D Fig. 1, AIM 4-3-4): each runway end has an L outside the circle; the landing strip
+//    indicator is in line with the runway and longer than the traffic pattern indicator, which is joined at its outer end and
+//    points to the pattern side (north for both 27 right and 9 left); 27's L is east of the circle, 9's west; caption agrees
 //  * SVG labels never overlap each other and stay inside the stage
 import { createRequire } from "module"; const require = createRequire("/workspace/pgs-build/");
 const { chromium } = require("playwright-core");
@@ -51,12 +54,27 @@ for (const [w, hh] of [[1440, 900], [1024, 768], [744, 1133], [390, 844]]) {
       // corner labels vs SVG text
       for (const c of v.querySelectorAll(".stage > .corner")) { const a = c.getBoundingClientRect(); for (const t of T) { const q = t.r; if (a.left < q.right - 1 && q.left < a.right - 1 && a.top < q.bottom - 1 && q.top < a.bottom - 1) probs.push(`${tag}: corner "${c.textContent}" overlaps "${t.t}"`); } }
       return rw; };
+    const geo = () => { const A = {};
+      for (const g of v.querySelectorAll("[data-ind]")) { const q = (a) => { const l = g.querySelector(`[data-arm=${a}]`); return ["x1", "y1", "x2", "y2", "stroke-width"].map((n) => +l.getAttribute(n)); };
+        A[g.dataset.ind] = { l: q("lsi"), t: q("tpi") }; }
+      if (!A["27"] || !A["9"]) { probs.push("missing an indicator"); return; }
+      const cx = (A["27"].l[0] + A["9"].l[0]) / 2;   // the two landing strip indicators start the same distance outside the circle
+      for (const k of ["27", "9"]) { const [lx1, ly1, lx2, ly2, lw] = A[k].l, [tx1, ty1, tx2, ty2] = A[k].t, lsiLen = Math.abs(lx2 - lx1), tpiLen = Math.abs(ty2 - ty1) + lw;   // full extent of the L's base side, counting the corner
+        if (ly1 !== ly2) probs.push(`indicator ${k}: landing strip (final) arm not parallel to the runway`);
+        if (tx1 !== tx2) probs.push(`indicator ${k}: traffic pattern (base) arm not perpendicular to the runway`);
+        if (!(lsiLen > tpiLen)) probs.push(`indicator ${k}: in-line final arm ${lsiLen} not longer than base arm ${tpiLen}`);
+        if (!(Math.abs(lx2 - cx) > Math.abs(lx1 - cx))) probs.push(`indicator ${k}: landing strip arm doesn't run outward from the circle`);
+        if (Math.abs(tx1 - lx2) > lw) probs.push(`indicator ${k}: base arm not joined at the outer end`);
+        if (!(Math.min(ty1, ty2) < ly1 - lw)) probs.push(`indicator ${k}: base arm does not point north (pattern side)`);
+        if (!((k === "27") === (lx1 > cx))) probs.push(`indicator ${k}: on the wrong side of the circle (approach end)`); }
+      const ex = v.querySelector(".explain").textContent;
+      if (v.dataset.state === "into" && !/long arm, in line with the runway \(the landing strip indicator\), is final, and its short arm \(the traffic pattern indicator\) is base/.test(ex)) probs.push("explain does not describe the arms as drawn"); };
     const dirs = []; for (let x = 10; x <= 360; x += 5) dirs.push(x);
     for (const tet of [false, true]) {
       if (tet) { v.querySelectorAll(".chip")[1].click(); }
       for (const kt of tet ? [0, 9, 25] : [0, 1, 2, 3, 9, 12, 15, 25]) { set("spd", kt);
         for (const seq of [dirs, [...dirs].reverse()]) { let prev = null, changes = 0;
-          for (const wd of seq) { set("dir", wd); const before = prev; const rw = check(wd, kt, `${tet ? "tet " : ""}${wd}/${kt}`);
+          for (const wd of seq) { set("dir", wd); if (wd % 45 === 0) geo(); const before = prev; const rw = check(wd, kt, `${tet ? "tet " : ""}${wd}/${kt}`);
             const D27 = Math.abs(n180(wd - 270)); if (before && kt > 0 && D27 >= 85 && D27 <= 95 && rw !== before) probs.push(`${wd}/${kt}: runway flipped inside the crosswind band (${before} -> ${rw})`);
             if (before && rw !== before) changes++; prev = rw; }
           if (kt > 0 && changes > 1) probs.push(`${kt} kt sweep ${seq[0]}->${seq[seq.length - 1]}: runway changed ${changes} times`); } } }
