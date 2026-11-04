@@ -1,6 +1,6 @@
 // Crash energy grows with the square of speed (AFH 18): at a uniform 9 G, about 9.4 ft to stop from 50 mph, 37.6 ft from 100 mph.
-import { slider, readout } from "./base.js?v=783be66232";
-import { pxScene, T, L, R, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=783be66232";
+import { slider, readout } from "./base.js?v=9b8468d04e";
+import { pxScene, T, L, R, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=9b8468d04e";
 export function mount(host) {
   let v = 50;
   const S = pxScene(host, { corners: { tl: "Touchdown speed vs energy", tr: "AFH 18" } }, draw);
