@@ -1,11 +1,11 @@
-import { h, esc, pct, fmtDue, toast, download, shuffle } from "../core/util.js?v=9b8468d04e";
-import { S, save, exportJSON, importJSON, reset } from "../core/store.js?v=9b8468d04e";
-import { get } from "../core/srs.js?v=9b8468d04e";
-import { STAGES, MODULES, STAGE_CHECK } from "../../data/course.js?v=9b8468d04e";
-import { LESSONS, QUESTIONS, ORAL, TOPICS, ORDER, lessonItems } from "../../data/index.js?v=9b8468d04e";
-import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone } from "../core/progress.js?v=9b8468d04e";
-import { session } from "./quiz.js?v=9b8468d04e";
-import { G, rich } from "../core/rich.js?v=9b8468d04e";
+import { h, esc, pct, fmtDue, toast, download, shuffle } from "../core/util.js?v=c8494a91a9";
+import { S, save, exportJSON, importJSON, reset } from "../core/store.js?v=c8494a91a9";
+import { get } from "../core/srs.js?v=c8494a91a9";
+import { STAGES, MODULES, STAGE_CHECK } from "../../data/course.js?v=c8494a91a9";
+import { LESSONS, QUESTIONS, ORAL, TOPICS, ORDER, lessonItems } from "../../data/index.js?v=c8494a91a9";
+import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone } from "../core/progress.js?v=c8494a91a9";
+import { session } from "./quiz.js?v=c8494a91a9";
+import { G, rich } from "../core/rich.js?v=c8494a91a9";
 const page = (host) => { const p = h("div", { class: "page" }); host.append(p); return p; };
 const meter = (x, big) => `<div class="meter${big ? " big" : ""}"><i style="width:${Math.round(x * 100)}%"></i></div>`;
 const stageLessons = (s) => [...s.ground, ...s.flight].flatMap((id) => [id, ...((LESSONS[id] && LESSONS[id].includes) || [])]);
@@ -111,7 +111,7 @@ export function oral(host, lid) {
   const { queue, extra } = buildQueue(ids, { includeOral: true, max: 12, newMax: 12 });
   return runSession(host, { queue: queue.length ? queue : shuffle(ids).slice(0, 10), extra, mode: "oral", title: "Oral exam", label: "Oral exam" + (lid !== "all" ? " · " + LESSONS[lid].code : ""), onExit: () => (location.hash = "#/oral") });
 }
-export { sim, check } from "./checks.js?v=9b8468d04e";
+export { sim, check } from "./checks.js?v=c8494a91a9";
 export function glossary(host, focus) { const p = page(host); const keys = Object.keys(G).sort(); const slug = (k) => k.replace(/\s+/g, "-");
   p.innerHTML = `<section class="hero"><span class="label">Glossary</span><h1>Terms, plainly</h1><p>Every underlined term in a lesson opens its definition. Airspeed symbols like V<sub>FE</sub> are explained with the dial in <a href="#/lesson/vs1">V-speeds</a>.</p></section>`;
   const inp = h("input", { type: "search", placeholder: "Search terms", "aria-label": "Search terms" }); p.append(h("div", { class: "field", style: "max-width:28rem" }, inp)); const list = h("div", { class: "mt" }); p.append(list);
@@ -138,4 +138,4 @@ export function about(host) { const p = page(host);
   <p>Citations name the chapter, section or regulation. Procedures are marked to confirm with your instructor and your aircraft's POH, because flight schools and airplanes differ.</p>
   <h4>Software and fonts</h4><ul><li>three.js r181, MIT License</li><li>GSAP 3.14, GreenSock Standard "No Charge" License (vendored, not loaded in this build)</li><li>Inter and IBM Plex Mono, SIL Open Font License 1.1</li></ul><p>License texts are in the LICENSES folder.</p>
   <h4>Not affiliated</h4><p>Squawk School is an independent study aid. Not affiliated with or endorsed by the FAA or Textron Aviation. Cessna and Skyhawk are trademarks of their owner.</p></div>`; }
-export { coverage, presolo } from "./checks.js?v=9b8468d04e";
+export { coverage, presolo } from "./checks.js?v=c8494a91a9";
