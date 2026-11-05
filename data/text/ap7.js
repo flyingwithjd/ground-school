@@ -2,7 +2,8 @@ export default {
   sections: [
     { id: "ctaf", label: "CTAF · AIM 4-1-9", title: "Everyone talks to everyone",
       body: `<p>Without an operating tower, pilots self-announce on the [[CTAF]]. It may be a [[UNICOM]], MULTICOM, FSS or tower frequency, shown on charts and in the [[chart supplement]]. With none of those, use MULTICOM 122.9. <span class="src">AIM 4-1-9</span></p>
-<p>Inbound, call about 10 miles out, then entering downwind, base, final and leaving the runway. Start and end with the airport name. Say the runway number, not "active runway." "Traffic in the area, please advise" isn't a recognized phrase. <span class="src">AIM 4-1-9</span></p>
+<p>The [[traffic pattern]] has five legs: upwind (departure), crosswind, downwind, base and final. <span class="src">AIM 4-3-3; AC 90-66C App A</span></p>
+<p>The AIM's recommended reports: inbound about 10 miles out, then entering downwind, base, final and leaving the runway; departing, say which runway and how you will leave the pattern. You fly the crosswind leg every circuit even though the AIM does not list a separate crosswind report. Start and end with the airport name. Say the runway number, not "active runway." "Traffic in the area, please advise" isn't a recognized phrase. <span class="src">AIM 4-1-9</span></p>
 <p class="ex">Example call: "Strawn traffic, Apache two two five zulu, one zero miles south, descending through three thousand, landing Strawn."</p>`,
       kdr: { k: "CTAF, UNICOM and self-announce procedures.", d: "Make standard position reports.", r: "Missed or unclear position reports.", codes: ["PA.III.A.K1", "PA.III.A.S2", "PA.III.A.R1"] } },
     { id: "rwy", label: "Runway choice · AC 90-66C 11.5", title: "Most nearly into wind",
@@ -11,7 +12,7 @@ export default {
       kdr: { k: "Runway selection with wind.", d: "Select the runway with the most headwind.", r: "Tailwind or excess crosswind landings.", codes: ["PA.III.B.K1", "PA.III.B.S1", "PA.III.B.R2"] } },
     { id: "entry", label: "Pattern entry · AC 90-66C 11.3", title: "The 45 at pattern altitude",
       body: `<p>Enter the downwind on a 45° angle abeam the runway midpoint, level at pattern altitude. Hold pattern altitude until at least abeam the approach end, then turn base about 45° from it. A midfield crossing above pattern altitude is an alternative, but not when the pattern is congested. Straight-in VFR approaches are discouraged. <span class="src">AC 90-66C 11.3, 11.4, App A; AIM 4-1-9</span></p>
-<p>Tap the entries and legs. Confirm local pattern altitude and procedures with your CFI and the Chart Supplement.</p>`,
+<p>Tap a leg (upwind, crosswind, downwind, base, final) or an entry. Confirm local pattern altitude and procedures with your CFI and the Chart Supplement.</p>`,
       viz: { type: "pattern", opts: { entries: true } },
       kdr: { k: "Nontowered pattern procedures.", d: "Enter, fly and depart the pattern.", r: "Collision in the pattern.", codes: ["PA.III.B.K2", "PA.III.B.S2", "PA.III.B.R1"] } },
     { id: "twr", label: "Towered airports · AIM 4-3", title: "Ask, read back, comply",
