@@ -9,6 +9,7 @@ export const GLOSSARY = {
   "Bulkheads": { def: "Vertical frames across the fuselage that give it its cross-sectional shape and carry loads.", src: "PHAK Ch 3" },
   "Stringers": { def: "Lengthwise members in a semimonocoque structure that give the skin its shape and help carry loads.", src: "PHAK Ch 3" },
   "Longerons": { def: "The main lengthwise structural members of a fuselage, larger than stringers.", src: "PHAK Ch 3" },
+  "Lift strut": { def: "A brace under a high wing that runs from the lower fuselage to about halfway out the wing. It carries flight and landing loads into the fuselage; a wing braced this way is called semi-cantilever.", src: "PHAK Ch 3; C172S POH Sec 7" },
   "Spars": { def: "The main spanwise beams of a wing. They carry the wing's bending loads; ribs and skin attach to them.", src: "PHAK Ch 3" },
   "Firewall": { def: "A fire-resistant bulkhead between the engine compartment and the cabin. In the 172S it is also the weight and balance datum.", src: "PHAK Ch 3; C172S POH Sec 6" },
   "Empennage": { def: "The tail section: the vertical stabilizer and rudder, and the horizontal stabilizer and elevator.", src: "PHAK Ch 3; Glossary" },

@@ -69,7 +69,7 @@ export function mount(host) {
   const clipW = [new THREE.Plane(V(0, 0, -1), WCUT), new THREE.Plane(V(0, 0, 1), WCUT)];
   const inkMat = new THREE.LineBasicMaterial({ color: INK, transparent: true, opacity: 0.4 });
   const wingInk = new THREE.LineBasicMaterial({ color: INK, transparent: true, opacity: 0.3, clippingPlanes: clipW });
-  const HIDE = new Set(["fuselage", "fairing", "engine", "fuel", "propDim", "ailerons"]), GHOST = new Set(["wing", "flaps"]);
+  const HIDE = new Set(["fuselage", "fairing", "engine", "fuel", "propDim", "ailerons"]), GHOST = new Set(["wing", "flaps", "struts"]);
   for (const [name, part] of Object.entries(P.parts)) part.subs.forEach((sb) => {
     sb.obj.traverse((o) => { if (o.isMesh && o.userData.part === name) o.visible = !HIDE.has(name) && !GHOST.has(name); });
     if (!HIDE.has(name) && sb.segs.length) { const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(sb.segs, 3)); sb.obj.add(new THREE.LineSegments(g, GHOST.has(name) ? wingInk : inkMat)); } });

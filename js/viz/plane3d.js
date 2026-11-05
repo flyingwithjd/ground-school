@@ -6,9 +6,10 @@ import { h, reduced } from "../core/util.js?v=c8494a91a9";
 const PARTS = {
   fuselage: { name: "Fuselage", group: "Major component", hl: ["fuselage", "fairing"], view: "iso", text: "The central body. Carries crew, passengers and cargo, and joins the wings and tail. Semimonocoque aluminum on the 172." },
   // Major components follow PHAK Ch 3 (FAA-H-8083-25C): each lights every sub-part it contains. Part buttons light only that part.
-  wing: { name: "Wings", group: "Major component", hl: ["wing", "ailerons", "flaps", "fuel"], view: "wingL", pose: { ail: 18, flap: 20 }, text: "The main lifting surfaces, including the <b>ailerons</b> (outboard) and <b>flaps</b> (inboard) hinged to the trailing edge and the <b>fuel tanks</b> built into each wing. Strut-braced (semi-cantilever) on the 172S." },
+  wing: { name: "Wings", group: "Major component", hl: ["wing", "ailerons", "flaps", "fuel", "struts"], view: "wingL", pose: { ail: 18, flap: 20 }, text: "The main lifting surfaces, including the <b>ailerons</b> (outboard) and <b>flaps</b> (inboard) hinged to the trailing edge and the <b>fuel tanks</b> built into each wing. Strut-braced (semi-cantilever) on the 172S." },
   ailerons: { name: "Ailerons", group: "Wings · primary control", hl: ["ailerons"], view: "wingL", pose: { ail: 25 }, text: "Outboard trailing edge. They move opposite each other to <b>roll</b> the airplane about its longitudinal axis: one goes up while the other goes down. Shown deflected (exaggerated) for clarity." },
   flaps: { name: "Flaps", group: "Wings · secondary control", hl: ["flaps"], view: "wingL", pose: { flap: 30 }, text: "Inboard trailing edge. Both move down together to add lift and drag for takeoff and landing. 172S: 10°, 20°, 30°." },
+  struts: { name: "Lift struts", group: "Wings · structure", hl: ["struts"], view: "strut", text: "One strut on each side runs from the lower fuselage to about halfway out the wing. It carries flight and landing loads into the fuselage, which makes this a <b>semi-cantilever</b> wing. In flight the strut is pulled in tension as it helps hold the wing up; on the ground it helps support the wing's weight. PHAK 3; C172S POH 7." },
   fuel: { name: "Fuel tanks", group: "Wings · fuel system", hl: ["fuel"], view: "top", text: "One vented integral tank in each wing, 56 gal total, 53 usable. Outline drawn schematically." },
   empennage: { name: "Empennage", group: "Major component", hl: ["fin", "hstab", "rudder", "elevator", "trimtab"], view: "tail", pose: { elev: -18, trim: 10, rud: 18 }, text: "The entire tail group. Fixed surfaces: the <b>vertical stabilizer</b> and <b>horizontal stabilizer</b>. Movable surfaces: the <b>rudder</b>, the <b>elevator</b> and the elevator <b>trim tab</b> (the 172S has no rudder trim tab). The tail cone they mount on is part of the fuselage. PHAK 3." },
   fin: { name: "Vertical stabilizer", group: "Empennage · fixed", hl: ["fin"], view: "tail", text: "Fixed fin. Gives directional (yaw) stability, like the feathers on an arrow." },
@@ -22,7 +23,7 @@ const PARTS = {
   propeller: { name: "Propeller", group: "Powerplant", hl: ["propeller"], view: "front", text: "Two blades, fixed pitch, 76 in diameter. A rotating airfoil: it makes thrust the same way a wing makes lift." },
   cowling: { name: "Cowling", group: "Powerplant", hl: ["cowling"], view: "nose", text: "Streamlined cover for the engine. It also routes cooling air across the cylinders." },
 };
-const MAP = { fuselage: "fuselage", fairing: "fuselage", wing: "wing", ailerons: "ailerons", flaps: "flaps", fuel: "fuel", fin: "fin", hstab: "hstab", rudder: "rudder", elevator: "elevator", trimtab: "trimtab", gear: "gear", engine: "engine", propeller: "propeller", cowling: "cowling" };
+const MAP = { fuselage: "fuselage", fairing: "fuselage", wing: "wing", ailerons: "ailerons", flaps: "flaps", struts: "struts", fuel: "fuel", fin: "fin", hstab: "hstab", rudder: "rudder", elevator: "elevator", trimtab: "trimtab", gear: "gear", engine: "engine", propeller: "propeller", cowling: "cowling" };
 const TOUR = [
   { key: "fuselage", label: "Four seats · high wing", big: "Cessna 172S", hl: ["fuselage", "fairing"], view: "iso" },
   { key: "wing", label: "Strut-braced · 174 sq ft", big: "High wing", hl: ["wing"], view: "wingL" },
@@ -57,7 +58,7 @@ export function mount(host, { mode = "explore" } = {}) {
   function select(key) { const P = PARTS[key]; if (!P) return; cur = key; markChip(key); cowl(!P.hideCowl && !P.cowlWire, P.cowlWire); S.highlight(P.hl); S.setView(P.view); animatePose(P.pose || {}); F.caption(P.group, P.name); F.explain(P.text); }
   if (mode === "explore") {
     groups.push(chips(F.ctrl, [["fuselage", "Fuselage"], ["wing", "Wings"], ["empennage", "Empennage"], ["gear", "Landing gear"], ["powerplant", "Powerplant"]], null, (k) => (k ? select(k) : reset()), { label: "Major components", toggle: true }));
-    groups.push(chips(F.ctrl, [["ailerons", "Ailerons"], ["flaps", "Flaps"], ["fuel", "Fuel tanks"], ["hstab", "Horizontal stabilizer"], ["elevator", "Elevator"], ["trimtab", "Trim tab"], ["fin", "Vertical stabilizer"], ["rudder", "Rudder"], ["engine", "Engine"], ["cowling", "Cowling"], ["propeller", "Propeller"]], null, (k) => (k ? select(k) : reset()), { label: "Parts", toggle: true }));
+    groups.push(chips(F.ctrl, [["ailerons", "Ailerons"], ["flaps", "Flaps"], ["struts", "Lift struts"], ["fuel", "Fuel tanks"], ["hstab", "Horizontal stabilizer"], ["elevator", "Elevator"], ["trimtab", "Trim tab"], ["fin", "Vertical stabilizer"], ["rudder", "Rudder"], ["engine", "Engine"], ["cowling", "Cowling"], ["propeller", "Propeller"]], null, (k) => (k ? select(k) : reset()), { label: "Parts", toggle: true }));
     F.caption(INTRO[0], INTRO[1]); F.explain(INTRO[2]);
   } else {
     const prev = h("button", { class: "btn ghost", type: "button" }, "←"), next = h("button", { class: "btn pri arrow", type: "button" }, "Next");

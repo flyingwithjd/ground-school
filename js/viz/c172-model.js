@@ -85,7 +85,7 @@ export function buildPlane(THREE, opts = {}) {
     // strut (fuselage lower side -> wing underside)
     const a = surf(-0.3, sd > 0 ? -0.55 : Math.PI + 0.55, -0.04), b = V(-0.75, wst(8.4).y - 0.25, sd * 8.4), L = a.distanceTo(b), sg = new THREE.CylinderGeometry(0.1, 0.1, L, 8);
     sg.applyQuaternion(new THREE.Quaternion().setFromUnitVectors(V(0, 1, 0), b.clone().sub(a).normalize())); sg.translate(...a.clone().add(b).multiplyScalar(0.5).toArray()); sg.scale(1, 1, 1);
-    tag(sd > 0 ? "strutR" : "strutL"); addSub("wing", body, sg, polyl([a, b], false));
+    tag(sd > 0 ? "strutR" : "strutL"); addSub("struts", body, sg, polyl([a, b], false));
   }
   // wing root fairing: fills cabin roof -> wing underside along the whole root chord (windshield sweeps into the LE, rear window into the TE)
   { const w0 = wst(0), c0 = w0.le - w0.te, lowerY = (x) => { const u = (w0.le - x) / c0; if (u <= 0.5) return w0.y + 0.1 * w0.t * Nn(Math.max(u, 1e-4)) - 0.03; if (u <= 0.68) return w0.y + 0.08; if (u <= 0.8) return w0.y + 0.19; if (u <= 0.9) return w0.y + 0.08;
