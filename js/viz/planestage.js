@@ -13,7 +13,7 @@ export const VIEWS = {
   iso: { tg: [-4.5, 4.2, 0], az: -32, el: 16, d: 52 }, side: { tg: [-4.5, 4.4, 0], az: -90, el: 2, d: 54 }, top: { tg: [-4.5, 4.2, 0], az: -90, el: 88.5, d: 62 },
   front: { tg: [-3, 5, 0], az: 0, el: 4, d: 52 }, rear: { tg: [-4, 5, 0], az: 180, el: 8, d: 52 }, tail: { tg: [-16.5, 5.6, 0], az: -150, el: 22, d: 24 }, tailR: { tg: [-16.8, 5.0, 1.2], az: 145, el: 24, d: 18 },
   nose: { tg: [5.5, 4, 0], az: -38, el: 16, d: 17 }, wingL: { tg: [-2, 6.4, -9], az: -130, el: 34, d: 30 }, wingR: { tg: [-2, 6.4, 9], az: 130, el: 34, d: 30 },
-  gear: { tg: [0, 2.2, 0], az: -60, el: 6, d: 28 }, cabin: { tg: [-1, 5, 0], az: -70, el: 18, d: 26 }, strut: { tg: [-3.5, 4.4, 0], az: -28, el: 2, d: 50 } };
+  gear: { tg: [0, 2.2, 0], az: -60, el: 6, d: 28 }, cabin: { tg: [-1, 5, 0], az: -70, el: 18, d: 26 }, strut: { tg: [-3, 4.6, 0], az: -18, el: -5, d: 42 } };
 export function planeStage(stage, { view = "iso", orbit = true, onPick = null, ortho = false, ground = false } = {}) {
   const canvas = document.createElement("canvas"); stage.prepend(canvas);
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !matchMedia("(max-width: 760px)").matches, alpha: false, powerPreference: "low-power" });
