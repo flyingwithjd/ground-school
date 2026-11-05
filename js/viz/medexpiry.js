@@ -1,7 +1,7 @@
 // Medical certificate duration for private pilot privileges (14 CFR 61.23(d)): exam month + age → last day it's valid.
-import { htmlScene } from "./kit.js?v=28fd5e09fd";
-import { chips } from "./base.js?v=28fd5e09fd";
-import { h } from "../core/util.js?v=28fd5e09fd";
+import { htmlScene } from "./kit.js?v=2884b27d3e";
+import { chips } from "./base.js?v=2884b27d3e";
+import { h } from "../core/util.js?v=2884b27d3e";
 const MO = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
 export function mount(host) {
   const now = new Date();

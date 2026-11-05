@@ -252,3 +252,5 @@ These notes are updated as work goes, so an interruption loses nothing. The time
 ## 2026-11-04, 9:55 PM MST: Lift struts part + AP7 crosswind leg
 - GL1/0 parts explorer: new "Lift struts" part (own sub-part `struts` in c172-model.js, still lit by Wings), chip in the Parts row after Flaps, tap-to-select on the model, new low front-quarter `strut` view with the whole airplane visible. Caption sourced PHAK 3; C172S POH 7. structure.js ghosts struts like before. Glossary "Lift strut"; GL1 Wings paragraph mentions it. parts-ui test covers the chip.
 - AP7/0: added the five pattern legs (upwind/departure, crosswind, downwind, base, final; AIM 4-3-3, AC 90-66C App A) and noted the AIM report list; AP7/2 leg prompt names all five legs.
+
+- 2026-11-04 10:10 PM MST: removed unsourced tension/ground sentence from Lift struts caption. Perf (1024x768, raw GL draws/frame): Lift struts 118 vs Flaps 114 before (+4 = 2 struts x faces+lines), idle 0 frames, drag median 33.3 ms at 4x throttle (same as baseline, 30 fps cap), heap +0.17 MB over 30 toggles (baseline +0.20).

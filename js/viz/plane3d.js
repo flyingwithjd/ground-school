@@ -1,7 +1,7 @@
 // 3D part explorer and feature tour for the C172S wireframe.
-import { frame, chips } from "./base.js?v=28fd5e09fd";
-import { planeStage } from "./planestage.js?v=28fd5e09fd";
-import { h, reduced } from "../core/util.js?v=28fd5e09fd";
+import { frame, chips } from "./base.js?v=2884b27d3e";
+import { planeStage } from "./planestage.js?v=2884b27d3e";
+import { h, reduced } from "../core/util.js?v=2884b27d3e";
 // Pose sign conventions (model): ail>0 rolls right, elev<0 = trailing edge up (nose up), rud>0 = right rudder, steer>0 = nose wheel left.
 const PARTS = {
   fuselage: { name: "Fuselage", group: "Major component", hl: ["fuselage", "fairing"], view: "iso", text: "The central body. Carries crew, passengers and cargo, and joins the wings and tail. Semimonocoque aluminum on the 172." },
@@ -9,7 +9,7 @@ const PARTS = {
   wing: { name: "Wings", group: "Major component", hl: ["wing", "ailerons", "flaps", "fuel", "struts"], view: "wingL", pose: { ail: 18, flap: 20 }, text: "The main lifting surfaces, including the <b>ailerons</b> (outboard) and <b>flaps</b> (inboard) hinged to the trailing edge and the <b>fuel tanks</b> built into each wing. Strut-braced (semi-cantilever) on the 172S." },
   ailerons: { name: "Ailerons", group: "Wings · primary control", hl: ["ailerons"], view: "wingL", pose: { ail: 25 }, text: "Outboard trailing edge. They move opposite each other to <b>roll</b> the airplane about its longitudinal axis: one goes up while the other goes down. Shown deflected (exaggerated) for clarity." },
   flaps: { name: "Flaps", group: "Wings · secondary control", hl: ["flaps"], view: "wingL", pose: { flap: 30 }, text: "Inboard trailing edge. Both move down together to add lift and drag for takeoff and landing. 172S: 10°, 20°, 30°." },
-  struts: { name: "Lift struts", group: "Wings · structure", hl: ["struts"], view: "strut", text: "One strut on each side runs from the lower fuselage to about halfway out the wing. It carries flight and landing loads into the fuselage, which makes this a <b>semi-cantilever</b> wing. In flight the strut is pulled in tension as it helps hold the wing up; on the ground it helps support the wing's weight. PHAK 3; C172S POH 7." },
+  struts: { name: "Lift struts", group: "Wings · structure", hl: ["struts"], view: "strut", text: "One strut on each side runs from the lower fuselage to about halfway out the wing. It carries flight and landing loads into the fuselage, which makes this a <b>semi-cantilever</b> wing. PHAK 3; C172S POH 7." },
   fuel: { name: "Fuel tanks", group: "Wings · fuel system", hl: ["fuel"], view: "top", text: "One vented integral tank in each wing, 56 gal total, 53 usable. Outline drawn schematically." },
   empennage: { name: "Empennage", group: "Major component", hl: ["fin", "hstab", "rudder", "elevator", "trimtab"], view: "tail", pose: { elev: -18, trim: 10, rud: 18 }, text: "The entire tail group. Fixed surfaces: the <b>vertical stabilizer</b> and <b>horizontal stabilizer</b>. Movable surfaces: the <b>rudder</b>, the <b>elevator</b> and the elevator <b>trim tab</b> (the 172S has no rudder trim tab). The tail cone they mount on is part of the fuselage. PHAK 3." },
   fin: { name: "Vertical stabilizer", group: "Empennage · fixed", hl: ["fin"], view: "tail", text: "Fixed fin. Gives directional (yaw) stability, like the feathers on an arrow." },

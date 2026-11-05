@@ -1,8 +1,8 @@
 // Weight & balance calculator that plots on the C172S CG envelope (limits from POH Sec 2; arms from POH Sec 6).
 // Defaults reproduce the POH sample loading problem's empty weight. Always use YOUR airplane's actual empty weight and moment.
-import { frame, slider, chips, readout, svg, ACC, FAINT, FAINT2 } from "./base.js?v=28fd5e09fd";
-import { s, h } from "../core/util.js?v=28fd5e09fd";
-import { T } from "./shapes.js?v=28fd5e09fd";
+import { frame, slider, chips, readout, svg, ACC, FAINT, FAINT2 } from "./base.js?v=2884b27d3e";
+import { s, h } from "../core/util.js?v=2884b27d3e";
+import { T } from "./shapes.js?v=2884b27d3e";
 const ARM = { front: 37, rear: 73, bagA: 95, bagB: 123, fuel: 48 };
 const NORMAL = [[35, 1500], [35, 1950], [41, 2550], [47.3, 2550], [47.3, 1500]], UTIL = [[35, 1500], [35, 1950], [37.5, 2200], [40.5, 2200], [40.5, 1500]];
 const fwdLimit = (w) => (w <= 1950 ? 35 : 35 + ((w - 1950) / 600) * 6);

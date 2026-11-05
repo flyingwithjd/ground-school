@@ -1,10 +1,10 @@
 // The practice engine UI: multiple choice, ordered sequences, oral self-rating; learn/review/exam modes.
-import { h, esc, shuffle, fmtDue, toast } from "../core/util.js?v=28fd5e09fd";
-import { review, get, CONF, level, LEVELS } from "../core/srs.js?v=28fd5e09fd";
-import { S } from "../core/store.js?v=28fd5e09fd";
-import { item } from "../../data/index.js?v=28fd5e09fd";
-import { TOPICS, LESSONS } from "../../data/index.js?v=28fd5e09fd";
-import { rich, autoTerms } from "../core/rich.js?v=28fd5e09fd";
+import { h, esc, shuffle, fmtDue, toast } from "../core/util.js?v=2884b27d3e";
+import { review, get, CONF, level, LEVELS } from "../core/srs.js?v=2884b27d3e";
+import { S } from "../core/store.js?v=2884b27d3e";
+import { item } from "../../data/index.js?v=2884b27d3e";
+import { TOPICS, LESSONS } from "../../data/index.js?v=2884b27d3e";
+import { rich, autoTerms } from "../core/rich.js?v=2884b27d3e";
 const KEYS = "ABCDEFG";
 export function session(host, { queue, extra = [], mode = "review", title = "Review", label = "", onExit, onFinish, minutes = 0, passMark = 0.7, intro = "", check = false }) {
   const exam = mode === "exam"; let i = 0; const q = queue.slice(); const results = []; const requeued = new Set(); let t0 = Date.now(), timerI = null;
