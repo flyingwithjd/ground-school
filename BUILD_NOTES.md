@@ -248,3 +248,7 @@ These notes are updated as work goes, so an interruption loses nothing. The time
 - "No progress" = no item in `ppg.v1` items with `n > 0` (no question or oral item answered). Lesson visits alone don't count.
 - With no progress, #/ shows only the hero: "Learn it. Squawk it.", one subline, a primary **Begin** (to #/lesson/gl1/0; "Continue GLx" if a lesson was opened) and a quiet "Browse the course" link, then a short "How it works" paragraph. The Due/Weakest/Next cards and readiness stats are hidden until the first answer, then the normal layout returns.
 - tests/now-start.mjs: Begin above the fold (and above the phone bottom nav) at 1440x900, 1024x768, 820x1180, 390x844, no progress cards; Begin opens GL1 §0; after one answer the cards show. Optional arg: screenshot dir.
+
+## 2026-11-04, 9:55 PM MST: Lift struts part + AP7 crosswind leg
+- GL1/0 parts explorer: new "Lift struts" part (own sub-part `struts` in c172-model.js, still lit by Wings), chip in the Parts row after Flaps, tap-to-select on the model, new low front-quarter `strut` view with the whole airplane visible. Caption sourced PHAK 3; C172S POH 7. structure.js ghosts struts like before. Glossary "Lift strut"; GL1 Wings paragraph mentions it. parts-ui test covers the chip.
+- AP7/0: added the five pattern legs (upwind/departure, crosswind, downwind, base, final; AIM 4-3-3, AC 90-66C App A) and noted the AIM report list; AP7/2 leg prompt names all five legs.
