@@ -1,6 +1,20 @@
 // Global glossary. Every [[term]] in lesson text opens one of these. Definitions are plain-language
 // paraphrases of the cited FAA source (mostly the PHAK glossary). Keys are case-insensitive.
 export const GLOSSARY = {
+  "BasicMed": { def: "An alternative to holding an FAA medical certificate for eligible pilots who meet its medical, course and operating conditions. It is not automatic eligibility for a new student pilot.", src: "14 CFR 61.23(c)(3), 61.113(i) · Part 68" },
+  "Throttle": { def: "The cockpit control that sets engine power. In a piston trainer, moving it forward increases power and pulling it back reduces power.", src: "PHAK Ch 7" },
+  "Rudder pedals": { def: "The foot controls that move the rudder. On a 172 they also steer the nosewheel, and pressing their tops applies the toe brakes.", src: "PHAK Ch 3 \u00b7 C172S POH Sec 7" },
+  "Position lights": { def: "The steady red, green and white navigation lights that show other pilots which way an aircraft is pointed at night.", src: "PHAK Ch 3 \u00b7 14 CFR 91.209" },
+  "Gyro": { def: "A spinning device that resists changes to its orientation. Some attitude and heading instruments use one to give a stable reference.", src: "PHAK Ch 8" },
+  "Vacuum system": { def: "A system that supplies suction to drive some gyroscopic flight instruments. Its gauge must be within the POH limits before flight.", src: "PHAK Ch 8 \u00b7 AFH Ch 2" },
+  "Electrical system": { def: "The equipment that generates, regulates and distributes electric power to the airplane\u2019s equipment.", src: "PHAK Ch 3" },
+  "Hydraulic": { def: "Operated by pressure in a liquid. Hydraulic brakes use fluid pressure to squeeze the brake pads against the discs.", src: "PHAK Ch 3" },
+  "Primary flight controls": { def: "Ailerons, elevator and rudder: the controls for roll, pitch and yaw.", src: "PHAK Ch 3, 6" },
+  "Secondary controls": { def: "Controls such as flaps and trim tabs that change performance or relieve control pressure rather than directly controlling the three axes.", src: "PHAK Ch 3, 6" },
+  "Performance instruments": { def: "Instruments showing what the airplane is actually doing, such as airspeed, altitude, heading and rate of climb or descent.", src: "PHAK Ch 3" },
+  "Control instruments": { def: "Instruments showing attitude and power, used to set the airplane up before checking the resulting performance.", src: "PHAK Ch 3" },
+  "Navigation instruments": { def: "Instruments showing the airplane\u2019s position relative to a navigation facility, fix or selected course.", src: "PHAK Ch 3" },
+
   "Yoke": { def: "The cockpit control wheel: turn it to move the ailerons, pull it back to raise the elevator, or push it forward to lower the elevator.", src: "PHAK Ch 6" },
   "Upwind": { def: "The side the wind is coming from. The upwind wing is the wing nearer the incoming wind.", src: "AFH Ch 2" },
   "Downwind": { def: "In the same direction as the wind. The downwind side is the side away from the incoming wind.", src: "AFH Ch 2" },

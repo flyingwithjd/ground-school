@@ -2,10 +2,10 @@
 // ailerons and elevator move to the AFH Fig 2-15 positions, with a drawn yoke beside the stage showing the matching input.
 // Only the deflected surfaces are lit; everything else stays ink. Renders on demand, 30 fps cap: the streaks drift for a few
 // seconds after each pick and then hold still, so an untouched view draws no frames. AFH Ch 2 (FAA-H-8083-3C), Fig 2-15.
-import { frame, chips, row } from "./base.js?v=2884b27d3e";
-import { planeStage } from "./planestage.js?v=2884b27d3e";
-import { rich } from "../core/rich.js?v=2884b27d3e";
-import { h, s, reduced, clamp } from "../core/util.js?v=2884b27d3e";
+import { frame, chips, row } from "./base.js?v=30bce312db";
+import { planeStage } from "./planestage.js?v=30bce312db";
+import { rich } from "../core/rich.js?v=30bce312db";
+import { h, s, reduced, clamp } from "../core/util.js?v=30bce312db";
 const D = Math.PI / 180, INKC = "rgba(242,241,236,", ACCC = "#3B82F6";
 const AIL = 20, ELEV = 16;   // degrees shown, exaggerated for clarity. Model signs: ail>0 rolls right (left aileron down); elev>0 = trailing edge down.
 // a = where the wind comes FROM, degrees clockwise from the nose. ail/elev = -1, 0, 1 (unit input), side = upwind wing.
@@ -17,7 +17,7 @@ export const CASES = {
   hl: { a: -45, name: "Left quartering headwind", ail: -1, elev: 0, yoke: "Turned left, toward the wind", surf: "Left aileron up, right aileron down · elevator neutral",
     why: "Wind from ahead and to the left tends to lift the <b>left</b> wing. With the left aileron <b>up</b>, the wind has less to lift; the right aileron goes down at the same time, adding a little lift and drag on the right wing, which also resists the left wing rising. In a nosewheel airplane the elevator stays <b>neutral</b>." },
   head: { a: 0, name: "Headwind", ail: 0, elev: 0, yoke: "Centered", surf: "Ailerons neutral · elevator neutral",
-    why: "Straight down the nose, neither wing is upwind, so the ailerons stay <b>neutral</b>. A strong headwind or prop blast lifts the tail surfaces; in a nosewheel airplane the AFH says hold the elevator <b>neutral</b>. (A tailwheel airplane holds it full aft instead.)" },
+    why: "Straight down the nose, neither wing is upwind, so the ailerons stay <b>neutral</b>. A strong headwind or prop blast lifts the tail surfaces; in a nosewheel airplane the AFH says hold the elevator <b>neutral</b>. (A tailwheel airplane holds it full aft, unless a very strong headwind calls for a position closer to neutral.)" },
   hr: { a: 45, name: "Right quartering headwind", ail: 1, elev: 0, yoke: "Turned right, toward the wind", surf: "Right aileron up, left aileron down · elevator neutral",
     why: "The mirror image: wind from ahead and to the right tends to lift the <b>right</b> wing, so turn toward it. Right aileron <b>up</b>, left aileron down, elevator <b>neutral</b>." },
   tl: { a: -135, name: "Left quartering tailwind", ail: 1, elev: 1, yoke: "Turned right, away from the wind, and pushed forward", surf: "Left aileron down, right aileron up · elevator down",
@@ -81,7 +81,7 @@ export function mount(host, { start = "hl" } = {}) {
       if (e < 0.4) v.op = from.op * (1 - e / 0.4); else { dir = a1; v.op = (e - 0.4) / 0.6; }
       apply(); if (k >= 1) S.animate(null); });
     // streaks drift for a few seconds, then hold still so an untouched view stops drawing
-    clearTimeout(flowT); if (!reduced()) { S.setFlow(true); flowT = setTimeout(() => S.setFlow(false), 6000); }
+    clearTimeout(flowT); S.setFlow(false); if (!reduced()) { S.setFlow(true); flowT = setTimeout(() => S.setFlow(false), 6000); }
     if (a0 === a1 && from.op > 0.99) { v.op = 1; } }
   const r1 = row(F.ctrl, "Headwind"), r2 = row(F.ctrl, "Tailwind");
   const rowH = chips(r1, [["hl", "From the left"], ["head", "Straight ahead"], ["hr", "From the right"]], null, (k) => pick(k), { label: "Headwind" });
