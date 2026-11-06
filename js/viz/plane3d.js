@@ -34,8 +34,9 @@ const TOUR = [
   { key: "fuel", label: "Two wing tanks · 53 usable", big: "56 gallons", hl: ["fuel"], view: "top" },
   { key: "gear", label: "Steerable nose wheel", big: "Tricycle gear", hl: ["gear"], view: "gear", steerCycle: true },
 ];
-export function mount(host, { mode = "explore" } = {}) {
-  if (mode === "taxi") return taxiWind(host, arguments[1] || {});   // taxiing in wind: control positions on the same 3D airplane (AFH Ch 2)
+export function mount(host, opts = {}) {
+  const { mode = "explore" } = opts;
+  if (mode === "taxi") return taxiWind(host, opts);   // taxiing in wind: control positions on the same 3D airplane (AFH Ch 2)
   // Dimensions sit top-right on two lines, clear of the part title at bottom-left at every width.
   const SPEC = "Span 36 ft 1 in\nLength 27 ft 2 in".replace(/ /g, "\u00a0");   // each line stays whole on narrow phones
   const F = frame(host, { corners: { tl: "Cessna 172S", tr: SPEC } });

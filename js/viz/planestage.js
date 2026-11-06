@@ -96,7 +96,7 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
   let raf = 0, alive = true, visible = true, idleUntil = 0, extra = null, inLoop = false;
   function kick(ms = 400) { idleUntil = Math.max(idleUntil, performance.now() + ms); if (!raf && !inLoop && alive && visible) raf = requestAnimationFrame(loop); }
   // Frame cap: 120 Hz displays (ProMotion Mac / iPad) would otherwise draw every animation twice as often for no visible gain.
-  let lastDraw = 0; const MIN_DT = 1000 / (maxFps >= 60 ? maxFps : maxFps + 2);   // maxFps 30: +2 so a 60 Hz rAF lands on every 2nd frame despite jitter
+  let lastDraw = 0; const MIN_DT = maxFps === 30 ? 1000 / 30 - 0.4 : 1000 / maxFps;   // sub-ms tolerance prevents missing the next 30 Hz slot due to rAF timestamp rounding
   function loop(now) { raf = 0; if (!alive) return; if (now - lastDraw < MIN_DT && visible) { raf = requestAnimationFrame(loop); return; } lastDraw = now; inLoop = true;
     try {
       if (camTw) camTw(now); if (controls) controls.update();
@@ -146,5 +146,11 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
   }
   return { THREE, P, scene, camera, renderer, pivot, CG, highlight, focus, tint, setView, setAttitude, pose, project, kick, setTopBand, parts: Object.keys(P.parts), inkLines, cueLine, cueArrow, cueGroup: cueG,
     animate(fn) { extra = fn; kick(); }, setFlow, flowPhase: () => flowPhase, setInkOpacity(o) { inkMat.opacity = o; kick(); },
-    destroy() { alive = false; document.removeEventListener("visibilitychange", onVis); cancelAnimationFrame(raf); raf = 0; ro.disconnect(); io.disconnect(); controls && controls.dispose(); renderer.dispose(); renderer.forceContextLoss && renderer.forceContextLoss(); canvas.remove(); } };
+    destroy() { alive = false; document.removeEventListener("visibilitychange", onVis); cancelAnimationFrame(raf); raf = 0; ro.disconnect(); io.disconnect(); controls && controls.dispose();
+      // Dispose GPU resources as well as the renderer; shared geometries/materials are released just once.
+      const geometries = new Set(), materials = new Set(), textures = new Set();
+      scene.traverse((o) => { if (o.geometry) geometries.add(o.geometry); for (const m of [].concat(o.material || [])) materials.add(m); });
+      if (tintMat) materials.add(tintMat); materials.add(inkMat); materials.add(coreMat); materials.add(glowMat);
+      materials.forEach((m) => { for (const v of Object.values(m)) if (v && v.isTexture) textures.add(v); m.dispose(); });
+      geometries.forEach((g) => g.dispose()); textures.forEach((t) => t.dispose()); renderer.dispose(); renderer.forceContextLoss && renderer.forceContextLoss(); canvas.remove(); } };
 }
