@@ -51,12 +51,12 @@ try {
   await p.evaluate(()=>{delete document.hidden;document.dispatchEvent(new Event('visibilitychange'))}); await p.waitForTimeout(450);
   const shown = await snap(); await p.waitForTimeout(450); assert.ok((await snap()).frames>shown.frames,'visible tab must resume');
   // All six cases from behind, side, top-down and near-end-on views. Direction stays readable in its reserved band.
-  for(const [key] of cases) {
-   await p.locator(`.tw .chip[data-v="${key}"]`).click();
+  for(const [key,a,e] of cases) {
+   await p.locator(`.tw .chip[data-v="${key}"]`).click(); await p.waitForTimeout(1250);
    for(const [az,el,name] of [[180,12,'behind'],[-90,88,'top'],[-90,18,'side'],[key==='hl'?-45:45,2,'end-on']]) {
     await p.evaluate(([az,el])=>document.querySelector('.tw .stage').__taxiView(az,el),[az,el]);
     await p.locator('.tw .stage').scrollIntoViewIfNeeded(); await p.waitForTimeout(180);
-    const state=await snap();assert.ok(state.bounds[0]>=0 && state.bounds[1]>=54 && state.bounds[2]<=state.w && state.bounds[3]<=state.h,`${w} ${key} ${name} whole plane`);
+    const state=await snap();assert.equal(state.ail,a);assert.equal(state.elev,e);assert.ok(state.bounds[0]>=0 && state.bounds[1]>=54 && state.bounds[2]<=state.w && state.bounds[3]<=state.h,`${w} ${key} ${name} whole plane`);
     const hud=await p.locator('.tw-wind-hud').boundingBox(), stage=await p.locator('.tw .stage').boundingBox();
     assert.ok(hud.x>=stage.x && hud.y>=stage.y && hud.x+hud.width<=stage.x+stage.width+1 && hud.y+hud.height<=stage.y+stage.height,'wind arrow stays in frame');
     assert.equal(state.ribbons,42);assert.deepEqual(await positions(),rows,'orbit must not move controls');
