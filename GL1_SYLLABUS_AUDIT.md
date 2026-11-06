@@ -36,7 +36,7 @@ GL1 now has 14 lesson sections. All syllabus topics stay in GL1; the optional Fl
 
 ## Taxi-wind accuracy
 
-For a nosewheel airplane, quartering headwind: turn into wind, upwind aileron up, elevator neutral. Quartering tailwind: yoke forward and away, upwind aileron down, elevator down. Do not interpret “climb into” as aft elevator for a nosewheel airplane. AFH Fig 2-15 gives four quarters, not a separate exact-90-degree crosswind prescription; no unsupported direct-crosswind pose is invented. Straight ahead/astern cases are the symmetric limit with ailerons neutral. The airplane remains on the ground (no flight bank or pitch animation). Wind streams are illustrative, not aerodynamic simulation. They animate for six seconds per selection, then stop rendering.
+For a nosewheel airplane, quartering headwind: turn into wind, upwind aileron up, elevator neutral. Quartering tailwind: yoke forward and away, upwind aileron down, elevator down. Do not interpret “climb into” as aft elevator for a nosewheel airplane. AFH Fig 2-15 gives four quarters, not a separate exact-90-degree crosswind prescription; no unsupported direct-crosswind pose is invented. Straight ahead/astern cases are the symmetric limit with ailerons neutral. The airplane remains on the ground (no flight bank or pitch animation). Wind streams are illustrative, not aerodynamic simulation. Wind ribbons animate continuously at a nominal 30 fps while visible. IntersectionObserver and visibilitychange suspend rendering offscreen or in a hidden tab. Reduced motion keeps the wind static. A bold projected direction arrow occupies a reserved band above the airplane and uses dot/cross cues for end-on views.
 
 ## Every bank audited
 

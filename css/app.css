@@ -615,3 +615,6 @@ html.locked #gate { display: flex; }
 @media (max-width: 700px) { .viz.segc .seg-sl { grid-template-columns: minmax(0, 1fr); } }
 @media (max-width: 600px) { .viz.segc .seg-ro { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 600px) { .viz.segc .seg-lab { display: none; } }
+
+/* Taxi wind direction has a dedicated band above the 3D canvas, clear at every orbit angle. */
+.tw-wind-hud{position:absolute;left:0;top:0;z-index:2;pointer-events:none;background:rgba(10,10,11,.96);border-bottom:1px solid var(--line)}

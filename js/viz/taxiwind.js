@@ -1,7 +1,6 @@
 // Taxiing in wind (nosewheel airplane): pick where the wind comes from; 3D wind streaks drift in from that side and the
 // ailerons and elevator move to the AFH Fig 2-15 positions, with a drawn yoke beside the stage showing the matching input.
-// Only the deflected surfaces are lit; everything else stays ink. Renders on demand, 30 fps cap: the streaks drift for a few
-// seconds after each pick and then hold still, so an untouched view draws no frames. AFH Ch 2 (FAA-H-8083-3C), Fig 2-15.
+// Only the deflected surfaces are lit; everything else stays ink. Continuous camera-facing wind ribbons at 30 fps while visible; offscreen/hidden tabs pause rendering. AFH Ch 2 (FAA-H-8083-3C), Fig 2-15.
 import { frame, chips, row } from "./base.js?v=30bce312db";
 import { planeStage } from "./planestage.js?v=30bce312db";
 import { rich } from "../core/rich.js?v=30bce312db";
@@ -56,22 +55,59 @@ export function mount(host, { start = "hl" } = {}) {
   // fixed camera: from behind and a little left and above, so left is left and both ailerons and the elevator read clearly; orbit stays free
   const view = () => { const r = F.stage.getBoundingClientRect(), asp = r.width / Math.max(1, r.height); return { tg: [-5, 4.2, 0], az: -168, el: 24, d: clamp(78 / Math.min(1.5, Math.max(0.75, asp)), 52, 104) }; };
   queueMicrotask(() => S.setView(view(), 1));
-  // 3D wind: dashed streaks upwind of the airplane at three heights, plus one arrow aimed at it. Model space (ft): x fwd, y up, z right.
-  const C = [-4.5, 4.4, 0], R0 = 33, R1 = 21, OFF = [-13, -6.5, 0, 6.5, 13], YS = [2.2, 5.6, 9.0];
-  const streaks = []; OFF.forEach((o, i) => YS.forEach((y, j) => { if ((i + j) % 2) return; streaks.push({ o, y, l: S.cueLine(2, { color: 0xf2f1ec, width: 1.6, opacity: 0, dash: [1.6, 1.4] }) }); }));
-  const arrow = S.cueArrow({ color: 0xf2f1ec, width: 3.2, head: 2.2 });
-  let dir = 0;
-  const placeWind = (a, op) => { const f = [Math.cos(a * D), 0, Math.sin(a * D)], p = [-f[2], 0, f[0]];
-    const at = (R, o, y) => [C[0] + f[0] * R + p[0] * o, y, C[2] + f[2] * R + p[2] * o];
-    streaks.forEach((st) => { st.l.set([at(R0, st.o, st.y), at(R1, st.o, st.y)]); st.l.opacity = 0.5 * op; });
-    arrow.set(at(R0 + 4, 0, 11.5), at(R1 - 2, 0, 8.5)); arrow.opacity = op; };
+  // Camera-facing wind ribbons: one instanced draw, not thin world-space lines that disappear end-on.
+  // Paths go past both sides of the airplane at wing height. Curves are illustrative, not aerodynamic simulation.
+  const T = S.THREE, C = [-4.5, 6.8, 0], lanes = [-20,-14,-8,0,8,14,20];
+  const texCanvas = document.createElement("canvas"); texCanvas.width = 128; texCanvas.height = 32;
+  const ctx = texCanvas.getContext("2d"), grad = ctx.createLinearGradient(0,0,128,0);
+  grad.addColorStop(0,"rgba(255,255,255,0)"); grad.addColorStop(.45,"rgba(255,255,255,.6)"); grad.addColorStop(.9,"white"); grad.addColorStop(1,"rgba(255,255,255,0)");
+  ctx.fillStyle = grad; ctx.beginPath(); ctx.roundRect(0,5,128,22,11); ctx.fill();
+  const texture = new T.CanvasTexture(texCanvas), material = new T.MeshBasicMaterial({map:texture,transparent:true,opacity:.82,depthWrite:false,depthTest:true});
+  const N = lanes.length * 2 * 3, wind = new T.InstancedMesh(new T.PlaneGeometry(1,1), material, N);
+  wind.frustumCulled = false; wind.instanceMatrix.setUsage(T.DynamicDrawUsage); S.scene.add(wind);
+  const matrix = new T.Matrix4(), pos = new T.Vector3(), scale = new T.Vector3(), rot = new T.Quaternion(), turn = new T.Quaternion(), Z = new T.Vector3(0,0,1);
+  let dir = 0, windTick = 0;
+  // A bold direction arrow in its own reserved band is never clipped by orbit or hidden behind the airplane.
+  // It points in the projected airflow direction; end-on views use the standard into/out-of-screen dot/cross cue.
+  S.setTopBand(54);
+  const hud = s("svg", {class:"tw-wind-hud",height:"54",width:"100%","aria-label":"Wind direction"},F.stage);
+  const arrowG = s("g",{},hud), stem = s("path",{d:"M-25,0 H23 M10,-12 L25,0 10,12",fill:"none",stroke:"#f2f1ec","stroke-width":5,"stroke-linecap":"round","stroke-linejoin":"round"},arrowG);
+  const endOn = s("g",{},hud); s("circle",{cx:43,cy:27,r:14,fill:"none",stroke:"#f2f1ec","stroke-width":3},endOn);
+  const endMark = s("path",{fill:"none",stroke:"#f2f1ec","stroke-width":4,"stroke-linecap":"round"},endOn);
+  const label = s("text",{x:86,y:31,fill:"#f2f1ec","font-size":12,"font-family":"IBM Plex Mono,monospace"},hud);
+  const directionNames = {hl:"left front",hr:"right front",head:"ahead",tl:"left rear",tr:"right rear",tail:"behind"};
+  const updateWind = (now) => {
+    const f = [Math.cos(dir*D),Math.sin(dir*D)], perp = [-f[1],f[0]], center = S.project(C,false);
+    const origin = S.project([C[0]+f[0]*15,C[1],f[1]*15],false), dx = center.x-origin.x, dy = center.y-origin.y;
+    const len = Math.hypot(dx,dy), angle = Math.atan2(dy,dx), flat = len < 13;
+    arrowG.style.display = flat ? "none" : ""; endOn.style.display = flat ? "" : "none";
+    arrowG.setAttribute("transform",`translate(43,27) rotate(${angle/D})`);
+    const toward = S.camera.position.x*f[0]+S.camera.position.z*f[1] > 0;
+    endMark.setAttribute("d",toward ? "M36,20 L50,34 M50,20 L36,34" : "M42,27 h2");
+    label.textContent = `Wind from ${directionNames[cur] || "left front"}`;
+    hud.setAttribute("aria-label",label.textContent+(flat ? (toward ? "; away from you" : "; toward you") : ""));
+    const phase = reduced() ? .35 : (now/6000)%1; windTick = phase;
+    let i=0;
+    lanes.forEach((lane,j) => [5.5,8.5].forEach((y,k) => { for(let n=0;n<3;n++) {
+      const t = ((phase+n/3+j*.071+k*.13)%1), along = 26-52*t;
+      // Inner lanes peel around the fuselage; outer lanes show wind passing beside the wings.
+      const offset = lane+(lane<0?-1:1)*Math.exp(-along*along/90)*(Math.abs(lane)<9?4:1.5);
+      pos.set(C[0]+f[0]*along+perp[0]*offset,y,f[1]*along+perp[1]*offset);
+      rot.copy(S.camera.quaternion); turn.setFromAxisAngle(Z,-angle); rot.multiply(turn);
+      // Fixed minimum screen size, even looking directly along the wind.
+      const distance = pos.distanceTo(S.camera.position), pixel = 2*distance*Math.tan(S.camera.fov*D/2)/Math.max(1,F.stage.clientHeight-54);
+      const fade = Math.min(1,t*10,(1-t)*10);
+      scale.set(pixel*(flat?11:23)*fade,pixel*(flat?7:4)*fade,1); matrix.compose(pos,rot,scale); wind.setMatrixAt(i++,matrix);
+    }}));
+    material.opacity = .82*v.op; wind.instanceMatrix.needsUpdate = true;
+  };
   // state
-  let cur = null, first = true, v = { ail: 0, elev: 0, op: 0 }, flowT = 0;
+  let cur = null, first = true, v = { ail: 0, elev: 0, op: 0 };
   const ease = (t) => (t < 0.5 ? 2 * t * t : 1 - (-2 * t + 2) ** 2 / 2);
-  const apply = () => { S.pose({ ail: v.ail * AIL, elev: v.elev * ELEV }); yoke.set(v.ail, -v.elev); placeWind(dir, v.op); };
+  const apply = () => { S.pose({ ail: v.ail * AIL, elev: v.elev * ELEV }); yoke.set(v.ail, -v.elev);  };
   function pick(key) { const K = CASES[key]; if (!K) return; cur = key; rowH.set(key in { hl: 1, head: 1, hr: 1 } ? key : null); rowT.set(key in { tl: 1, tail: 1, tr: 1 } ? key : null);
     tName.textContent = K.name; yoke.text(K.yoke); chain.textContent = K.surf;
-    F.explain(terms(K.why) + ` Confirm with your ${rich("[[CFI]]")} and your airplane's ${rich("[[POH]]")}. <span class="src">${SRC}. Surface movement exaggerated for clarity; wind streaks are an illustration. They move for six seconds after each choice, then pause to save power.</span>`);
+    F.explain(terms(K.why) + ` Confirm with your ${rich("[[CFI]]")} and your airplane's ${rich("[[POH]]")}. <span class="src">${SRC}. Surface movement exaggerated for clarity; wind streaks are an illustration.</span>`);
     const lit = [K.ail && "ailerons", K.elev && "elevator"].filter(Boolean);
     if (first) { S.highlight(lit); first = false; } else S.focus(lit); S.tint(lit);
     const from = { ...v }, to = { ail: K.ail, elev: K.elev }, a0 = dir, a1 = K.a, t0 = performance.now(), dur = reduced() ? 1 : 1100;
@@ -80,8 +116,7 @@ export function mount(host, { start = "hl" } = {}) {
       // the old streaks fade out, then the new ones fade in from the new side
       if (e < 0.4) v.op = from.op * (1 - e / 0.4); else { dir = a1; v.op = (e - 0.4) / 0.6; }
       apply(); if (k >= 1) S.animate(null); });
-    // streaks drift for a few seconds, then hold still so an untouched view stops drawing
-    clearTimeout(flowT); S.setFlow(false); if (!reduced()) { S.setFlow(true); flowT = setTimeout(() => S.setFlow(false), 6000); }
+    S.setFlow(true, updateWind);
     if (a0 === a1 && from.op > 0.99) { v.op = 1; } }
   const r1 = row(F.ctrl, "Headwind"), r2 = row(F.ctrl, "Tailwind");
   const rowH = chips(r1, [["hl", "From the left"], ["head", "Straight ahead"], ["hr", "From the right"]], null, (k) => pick(k), { label: "Headwind" });
@@ -93,8 +128,10 @@ export function mount(host, { start = "hl" } = {}) {
     S.P.meshes.filter(m=>m.visible).forEach(m => { const a = m.geometry.attributes.position; if (!a) return; for (let i=0;i<a.count;i++) { pt.fromBufferAttribute(a,i).applyMatrix4(m.matrixWorld); pts.push(S.project(pt.toArray(),false)); } });
     return { cur, ...v, dir, quats: { ailerons: quat("ailerons"), elevator: quat("elevator") },
       bounds: [Math.min(...pts.map(p=>p.x)),Math.min(...pts.map(p=>p.y)),Math.max(...pts.map(p=>p.x)),Math.max(...pts.map(p=>p.y))],
-      frames: S.renderer.info.render.frame, memory: { ...S.renderer.info.memory } };
+      windTick, ribbons: N, camera: S.camera.position.toArray(), frames: S.renderer.info.render.frame, memory: { ...S.renderer.info.memory } };
   };
   pick(start);
-  return { destroy() { clearTimeout(flowT); delete F.stage.__taxi; S.destroy(); F.destroy(); }, _state: () => ({ cur, ...v, dir }) };
+  // Read-only camera controls for angle/visibility regression, not an extra render loop.
+  F.stage.__taxiView = (az,el) => S.setView({...view(),az,el,d:Math.max(view().d,68)},1);
+  return { destroy() { delete F.stage.__taxi; delete F.stage.__taxiView; S.destroy(); F.destroy(); }, _state: () => ({ cur, ...v, dir }) };
 }

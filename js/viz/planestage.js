@@ -93,11 +93,11 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
   // calls made during a frame (pose, setAttitude, OrbitControls "change") just extend idleUntil, and loop() decides
   // once, at its end, whether to continue. (Bug fixed 2026-10-31: kick() inside loop() used to schedule a second
   // loop while the tail scheduled another, doubling the live loops every frame during any part switch or animation.)
-  let raf = 0, alive = true, visible = true, idleUntil = 0, extra = null, inLoop = false;
-  function kick(ms = 400) { idleUntil = Math.max(idleUntil, performance.now() + ms); if (!raf && !inLoop && alive && visible) raf = requestAnimationFrame(loop); }
+  let raf = 0, alive = true, visible = true, pageVisible = !document.hidden, idleUntil = 0, extra = null, inLoop = false;
+  function kick(ms = 400) { idleUntil = Math.max(idleUntil, performance.now() + ms); if (!raf && !inLoop && alive && visible && pageVisible) raf = requestAnimationFrame(loop); }
   // Frame cap: 120 Hz displays (ProMotion Mac / iPad) would otherwise draw every animation twice as often for no visible gain.
   let lastDraw = 0; const MIN_DT = maxFps === 30 ? 1000 / 30 - 0.4 : 1000 / maxFps;   // sub-ms tolerance prevents missing the next 30 Hz slot due to rAF timestamp rounding
-  function loop(now) { raf = 0; if (!alive) return; if (now - lastDraw < MIN_DT && visible) { raf = requestAnimationFrame(loop); return; } lastDraw = now; inLoop = true;
+  function loop(now) { raf = 0; if (!alive || !visible || !pageVisible) return; if (now - lastDraw < MIN_DT && visible) { raf = requestAnimationFrame(loop); return; } lastDraw = now; inLoop = true;
     try {
       if (camTw) camTw(now); if (controls) controls.update();
       if (extra) extra(now);
@@ -105,15 +105,16 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
       { const k = clamp((now - fadeT0) / fadeDur, 0, 1); coreMat.opacity = k; glowMat.opacity = glowOp * k; if (k < 1) idleUntil = Math.max(idleUntil, now + 50); }
       if (hl.length) { prog = clamp((now - progT0) / drawDur, 0, 1); const p = s5(prog); hl.forEach((n, i) => setAccent(n, p, lights[i % 4])); if (prog < 1) idleUntil = Math.max(idleUntil, now + 50); }
       if (flowOn && !reduced()) { flowPhase = (now / 900) % 1000; cueMats.forEach((m) => { if (m.dashed) m.dashOffset = -flowPhase * (m.dashSize + m.gapSize); }); canvas._flowPhase = flowPhase; }   // airflow dashes drift aft
+      if (flowOn && flowUpdate) flowUpdate(now);
       renderer.render(scene, camera);
     } finally { inLoop = false; }
-    if (alive && visible && !raf && (now < idleUntil || camTw || extra || (flowOn && !reduced()))) raf = requestAnimationFrame(loop); }
-  const io = new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) kick(); }); io.observe(stage);
+    if (alive && visible && pageVisible && !raf && (now < idleUntil || camTw || extra || (flowOn && !reduced()))) raf = requestAnimationFrame(loop); }
+  const io = new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) kick(); else { cancelAnimationFrame(raf); raf = 0; } }); io.observe(stage);
   // Continuous airflow: while flow is on, the loop keeps drawing as long as the stage is on screen (independent of the
   // surface tweens and of animate()). Off-screen the IntersectionObserver stops it; a hidden tab gets no frames at all;
   // coming back kicks it again. Reduced motion: dashes stay put and no extra frames are drawn.
-  let flowOn = false, flowPhase = 0; const onVis = () => { if (!document.hidden) kick(); }; document.addEventListener("visibilitychange", onVis);
-  function setFlow(on) { flowOn = !!on; kick(); }
+  let flowOn = false, flowPhase = 0, flowUpdate = null; const onVis = () => { pageVisible = !document.hidden; if (pageVisible) kick(); else { cancelAnimationFrame(raf); raf = 0; } }; document.addEventListener("visibilitychange", onVis);
+  function setFlow(on, update) { flowOn = !!on; if (update !== undefined) flowUpdate = update; kick(); }
   resize();
   // Warm up the accent-line and light-sprite shader programs now. They start hidden, so the first tap used to stall
   // ~100 ms compiling and linking them. One invisible draw (0 instances, 0 opacity) links every program up front.
