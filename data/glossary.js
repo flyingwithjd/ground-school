@@ -285,6 +285,19 @@ export const GLOSSARY = {
   "100LL": { def: "100-octane low-lead aviation gasoline (avgas), dyed blue. The common fuel for piston training airplanes.", src: "PHAK Ch 7" },
   "Shimmy damper": { def: "A small hydraulic damper on the nose gear that stops the nosewheel from shaking rapidly side to side during takeoff and landing.", src: "AFH Ch 2 · PHAK Ch 7" },
   "Cowling": { def: "The removable metal or composite covers around the engine. They streamline the airplane and guide cooling air over the engine.", src: "PHAK Ch 3" },
-  "Strut": { def: "A structural support, such as a wing strut or the shock-absorbing landing gear leg (oleo strut), which should be properly extended and free of leaks.", src: "PHAK Ch 3 · AFH Ch 2" }
+  "Strut": { def: "A structural support, such as a wing strut or the shock-absorbing landing gear leg (oleo strut), which should be properly extended and free of leaks.", src: "PHAK Ch 3 · AFH Ch 2" },
+  // Subcomponents, forces and ground operations (GL1)
+  "Airframe": { def: "The airplane's basic structure, built to withstand the aerodynamic forces and the stresses from the weight of fuel, crew and payload.", src: "PHAK Ch 3" },
+  "Center of lift": { def: "The point on the wing through which lift is considered to act.", src: "PHAK Ch 3" },
+  "Tachometer": { def: "The engine instrument that shows engine speed in revolutions per minute (RPM). In an airplane with a fixed-pitch propeller like the 172, it is the power instrument.", src: "PHAK Ch 3, 7" },
+  "Anticollision lights": { def: "The flashing beacon and strobe lights that make an airplane easier to see. The AFH says to turn them on before every engine start.", src: "AFH Ch 2 · 14 CFR 91.209" },
+  "Starter": { def: "The electric motor that spins the engine's crankshaft to start it. It isn't built for continuous use: crank no longer than about 30 seconds, then let it cool.", src: "AFH Ch 2" },
+  "Expectation bias": { def: "Hearing or doing what you expect instead of what was actually said, such as following last week's taxi route instead of today's instructions.", src: "AFH Ch 2" },
+  "Quartering headwind": { def: "Wind from ahead of the airplane and off to one side, between straight ahead and straight off a wingtip.", src: "AFH Ch 2" },
+  "Quartering tailwind": { def: "Wind from behind the airplane and off to one side, between straight off a wingtip and straight behind.", src: "AFH Ch 2" },
+  "Weathervaning": { def: "The tendency of an airplane on the ground to turn into the wind, the way a weathervane does. Tailwheel airplanes do it more than nosewheel airplanes.", src: "AFH Ch 2, 13" },
+  "Run-up": { def: "The engine and systems check done on the ground before takeoff, following the before-takeoff checklist in the POH.", src: "AFH Ch 2" },
+  "Stress riser": { def: "A small nick, scratch or notch where stress concentrates, so a crack can start there. A chip in a propeller's leading edge is one.", src: "AFH Ch 2" },
+  "Runway holding position markings": { def: "Four yellow lines across a taxiway, two solid and two dashed. Stop before the solid lines when you need to hold short of the runway. After landing, you're clear of the runway only once you're past them.", src: "AIM 2-3-5 · AFH Ch 2" }
 };
 export default GLOSSARY;

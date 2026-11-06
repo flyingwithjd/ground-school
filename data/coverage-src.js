@@ -3,7 +3,7 @@
 // links the sections that teach it, counts the questions that test it, and writes data/coverage.json.
 // Status: "good" = taught in at least one section and tested by 3+ questions; "thin" = taught but fewer than 3 questions; "missing" = not found.
 export const COVERAGE = {
-  gl1: { refs: "PHAK 1, 3 · AFH 2 · POH 1 · ACS PA.I.G", units: ["gl1", "fw1"], items: [
+  gl1: { refs: "PHAK 1, 3 · AFH 2 · POH 1 · ACS PA.I.G, PA.II", units: ["gl1", "fw1"], rank: true, items: [
     ["Aircraft design, certification and airworthiness", "airworth|type certificate|certificated"],
     ["Lift and basic aerodynamics", "\\blift\\b"],
     ["Major components", "fuselage|empennage|major components?"],
@@ -12,17 +12,17 @@ export const COVERAGE = {
     ["Empennage", "empennage|stabilator|vertical stabilizer|horizontal stabilizer"],
     ["Landing gear", "landing gear|tricycle|nosewheel|oleo"],
     ["The powerplant", "powerplant|engine"],
-    ["Subcomponents", "subcomponent|avionics|electrical|firewall"],
+    ["Subcomponents", "subcomponent|airframe|avionics|electrical|firewall"],
     ["Performance instruments", "performance instrument"],
     ["Control instruments", "control instrument|attitude indicator|tachometer"],
     ["Navigation instruments", "navigation instrument|course deviation|\\bcdi\\b"],
-    ["Preflight assessment", "preflight"],
+    ["Preflight assessment", "preflight|logbook|annual inspection|airworthy"],
     ["Visual preflight", "walkaround|visual preflight|walk-around|preflight inspection"],
-    ["Outer wing surfaces and tail section", "wing ?tip|leading edge|tail|stall warning"],
+    ["Outer wing surfaces and tail section", "leading edge|stall warning|wings and tail|spars? lines|fiberglass tips|rivet|wrinkled skin"],
     ["Fuel and oil", "fuel sample|sump|dipstick|oil (level|quantity)|fuel quantity"],
     ["Landing gear, tires and brakes", "tire|brake"],
-    ["Engine and propeller", "propeller|prop\\b|cowling"],
-    ["Ground operations", "taxi|engine start|run-?up"] ] },
+    ["Engine and propeller", "propeller|prop\\b|cowling|nicks|exhaust leak|air filter|bird nests"],
+    ["Ground operations", "taxi|before-takeoff check|quartering (head|tail)wind|engine start|run-?up"] ] },
   gl2: { refs: "PHAK 6, 7 · POH 2, 7 · ACS PA.I.G", units: ["gl2", "vs1"], items: [
     ["Flight control systems", "flight control"], ["Primary flight controls", "aileron|elevator|rudder"], ["Secondary flight controls", "flaps?|trim"],
     ["Autopilot", "autopilot"], ["Powerplant", "reciprocating|four-stroke|cylinder"], ["Propeller", "propeller"],

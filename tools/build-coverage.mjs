@@ -33,6 +33,8 @@ for (const [lesson, spec] of Object.entries(COVERAGE)) { const L = D.LESSONS[les
     const hits = (units) => units.flatMap((u) => (SECS[u] || []).filter((s) => re.test(s.text)).map((s) => ({ u, s })));
     let found = hits(spec.units); let local = true;
     if (!found.length) { found = hits(Object.keys(SECS)); local = false; }
+    // rank: true in the map links the sections that teach the item most, not just the first ones that mention it (stable sort: ties keep lesson order)
+    const cnt = (t) => (t.match(new RegExp(src, "gi")) || []).length; if (spec.rank) found = found.map((f, i) => ({ ...f, n: cnt(f.s.text), i })).sort((a, b) => b.n - a.n || a.i - b.i);
     const where = found.slice(0, 3).map(({ u, s }) => ({ lesson: u, sec: s.id, label: `${D.LESSONS[u] ? D.LESSONS[u].code : u.toUpperCase()} · ${s.title}` }));
     let nq = QS.filter((q) => spec.units.includes(q.unit) && re.test(q.text)).length;
     if (!local) nq = QS.filter((q) => found.some((f) => f.u === q.unit) && re.test(q.text)).length;

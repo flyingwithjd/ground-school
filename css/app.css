@@ -461,6 +461,8 @@ svg text:not([font-family]) { font-family: var(--mono); }
 .pf-yoke{aspect-ratio:220/170}.pf-pedals{aspect-ratio:220/100}
 .pf-yoke svg,.pf-pedals svg{display:block}
 .viz.pf .stage{aspect-ratio:4/3.2;max-height:none}
+.tw-ytxt{font-size:14px;line-height:1.4;color:var(--ink2);text-align:center;min-height:4.2em;max-width:220px}
+.tw-yoke{pointer-events:none}
 @media (min-width:701px){
   .pf-body{grid-template-columns:clamp(200px,24%,250px) minmax(0,1fr)}
   .pf-ctl{order:0;flex-direction:column;align-items:stretch;justify-content:center;gap:22px;padding:18px 16px;border-right:1px solid var(--line)}

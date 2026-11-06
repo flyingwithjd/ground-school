@@ -14,7 +14,7 @@ export const VIEWS = {
   front: { tg: [-3, 5, 0], az: 0, el: 4, d: 52 }, rear: { tg: [-4, 5, 0], az: 180, el: 8, d: 52 }, tail: { tg: [-16.5, 5.6, 0], az: -150, el: 22, d: 24 }, tailR: { tg: [-16.8, 5.0, 1.2], az: 145, el: 24, d: 18 },
   nose: { tg: [5.5, 4, 0], az: -38, el: 16, d: 17 }, wingL: { tg: [-2, 6.4, -9], az: -130, el: 34, d: 30 }, wingR: { tg: [-2, 6.4, 9], az: 130, el: 34, d: 30 },
   gear: { tg: [0, 2.2, 0], az: -60, el: 6, d: 28 }, cabin: { tg: [-1, 5, 0], az: -70, el: 18, d: 26 }, strut: { tg: [-3, 4.6, 0], az: -18, el: -5, d: 42 } };
-export function planeStage(stage, { view = "iso", orbit = true, onPick = null, ortho = false, ground = false } = {}) {
+export function planeStage(stage, { view = "iso", orbit = true, onPick = null, ortho = false, ground = false, maxFps = 64 } = {}) {
   const canvas = document.createElement("canvas"); stage.prepend(canvas);
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !matchMedia("(max-width: 760px)").matches, alpha: false, powerPreference: "low-power" });
   const PHONE = matchMedia("(max-width: 760px)").matches; renderer.setPixelRatio(Math.min(1.5, window.devicePixelRatio || 1));   // retina / iPad: 1.5x (+ MSAA on larger screens) looks the same as 2x and fills ~45% fewer pixels renderer.setClearColor(BG, 1); renderer.debug.checkShaderErrors = false;   // skip the synchronous shader-log readback (a stall on first draw of each program)
@@ -96,7 +96,7 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
   let raf = 0, alive = true, visible = true, idleUntil = 0, extra = null, inLoop = false;
   function kick(ms = 400) { idleUntil = Math.max(idleUntil, performance.now() + ms); if (!raf && !inLoop && alive && visible) raf = requestAnimationFrame(loop); }
   // Frame cap: 120 Hz displays (ProMotion Mac / iPad) would otherwise draw every animation twice as often for no visible gain.
-  let lastDraw = 0; const MIN_DT = 1000 / 64;
+  let lastDraw = 0; const MIN_DT = 1000 / (maxFps >= 60 ? maxFps : maxFps + 2);   // maxFps 30: +2 so a 60 Hz rAF lands on every 2nd frame despite jitter
   function loop(now) { raf = 0; if (!alive) return; if (now - lastDraw < MIN_DT && visible) { raf = requestAnimationFrame(loop); return; } lastDraw = now; inLoop = true;
     try {
       if (camTw) camTw(now); if (controls) controls.update();
