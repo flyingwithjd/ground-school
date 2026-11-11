@@ -618,3 +618,9 @@ html.locked #gate { display: flex; }
 
 /* Taxi wind direction has a dedicated band above the 3D canvas, clear at every orbit angle. */
 .tw-wind-hud{position:absolute;left:0;top:0;z-index:2;pointer-events:none;background:rgba(10,10,11,.96);border-bottom:1px solid var(--line)}
+/* pitot-static trainer: true altitude readout sits at the end of the Fly row with a fixed width so the chips never shift */
+.viz .ps-altw { margin-left: auto; display: inline-flex; align-items: baseline; gap: 8px; min-width: 9.5em; justify-content: flex-end; white-space: nowrap; }
+.viz .ps-altw .label { color: var(--ink2); font-size: 10.5px; }
+.viz .ps-alt { font: 600 17px/1.2 var(--sans); font-variant-numeric: tabular-nums; color: var(--ink); }
+.viz .ps-now { color: var(--ink); min-height: 3em; }
+.viz .ps-how { font-size: 15px; }

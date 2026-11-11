@@ -113,6 +113,7 @@ export const GLOSSARY = {
   "Detonation": { def: "Uncontrolled, explosive combustion of the fuel-air mixture in the cylinder instead of a smooth burn, when the mixture reaches its critical pressure and temperature. It can damage the engine.", src: "PHAK Ch 7; Glossary" },
   "Preignition": { def: "Ignition of the fuel-air mixture before the normal spark, often from a hot spot in the cylinder.", src: "PHAK Ch 7; Glossary" },
   "Alternator": { def: "The engine-driven unit that produces electrical power and keeps the battery charged.", src: "PHAK Ch 7" },
+  "Annunciator": { def: "A labeled warning light on the panel (or message on a glass display) that comes on by itself when a system goes out of limits, such as low voltage, low oil pressure, low fuel or low vacuum. Red means warning, amber means caution.", src: "C172S POH Sec 7" },
   "Ammeter": { def: "An instrument that shows current flowing to or from the battery, so you can tell whether the alternator is charging it.", src: "PHAK Ch 7; Glossary" },
   // Instruments
   "Pitot tube": { def: "A forward-facing tube that senses ram (impact) air pressure for the airspeed indicator.", src: "PHAK Ch 8" },
