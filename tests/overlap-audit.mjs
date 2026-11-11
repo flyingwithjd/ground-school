@@ -4,7 +4,7 @@
 // construction visual, that no two SVG callouts overlap for every type (and the dent).
 import { createRequire } from "module"; const require = createRequire("/workspace/pgs-build/");
 const { chromium } = require("playwright-core"); import { execSync } from "child_process";
-const routes = execSync("node tests/routes.mjs", { cwd: "/workspace/pilot-ground-school" }).toString().trim().split("\n").filter((r) => r.startsWith("#/lesson/") || r.startsWith("#/module/"));
+const routes = execSync("node tests/routes.mjs", { cwd: "/workspace/pilot-ground-school" }).toString().trim().split("\n").filter((r) => r.startsWith("#/lesson/") || r.startsWith("#/module/")).filter((r) => !process.env.ONLY || process.env.ONLY.split(",").some((o) => r.startsWith(o)));
 const w = +(process.env.W || 360), hh = +(process.env.H || 800);
 const b = await chromium.launch({ executablePath: "/usr/bin/google-chrome", args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
 const ctx = await b.newContext({ viewport: { width: w, height: hh } }); const pg = await ctx.newPage(); await pg.addInitScript(() => { try { localStorage.setItem("sqs.access", "1"); } catch (e) {} }); /* entry gate */  const errs = []; pg.on("pageerror", (e) => errs.push(e.message));
