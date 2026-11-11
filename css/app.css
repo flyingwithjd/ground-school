@@ -159,7 +159,9 @@ button.cell { border: 0; text-align: left; width: 100%; }
 
 /* ---------- viz ---------- */
 .viz { margin: 34px 0 10px; border: 1px solid var(--line); border-radius: 20px; overflow: hidden; position: relative; background: var(--bg); }
-.viz .stage { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; touch-action: none; user-select: none; -webkit-user-select: none; }
+/* Stages let the page scroll and pinch-zoom by default. Only real drag surfaces opt out: OrbitControls sets touch-action:none on its own
+   canvas, and drag pads (.pad) set it below, so a swipe anywhere else on a visual scrolls the page. */
+.viz .stage { position: relative; width: 100%; aspect-ratio: 16 / 9; overflow: hidden; touch-action: manipulation; user-select: none; -webkit-user-select: none; }
 .viz.tall .stage { aspect-ratio: 4 / 3; }
 .viz.square .stage { aspect-ratio: 1 / 1; max-height: 78vh; margin: 0 auto; }
 @media (max-width: 700px) { .viz .stage { aspect-ratio: 4 / 3.4; } .viz.wide-m .stage { aspect-ratio: 16/11; } }
@@ -403,7 +405,6 @@ svg text:not([font-family]) { font-family: var(--mono); }
 .viz.px.tall .stage { aspect-ratio: 4 / 3; }
 .viz.px.xtall .stage { aspect-ratio: 4 / 3; }
 @media (max-width: 700px) { .viz.px .stage { aspect-ratio: 4 / 3.6; } .viz.px.tall .stage { aspect-ratio: 3 / 3.6; } .viz.px.xtall .stage { aspect-ratio: 3 / 4.4; } }
-.viz.px .stage { touch-action: pan-y; }
 .viz.px svg text { pointer-events: none; }
 .viz.px svg [role="button"]:focus-visible { outline: none; stroke: var(--acc); }
 .viz.hv .stage { aspect-ratio: auto; min-height: 0; display: block; touch-action: auto; user-select: text; -webkit-user-select: text; }
@@ -457,7 +458,7 @@ svg text:not([font-family]) { font-family: var(--mono); }
 .pf-ctl{display:flex;gap:14px;align-items:flex-end;justify-content:center;padding:12px 12px 4px;order:2}
 .pf-item{display:flex;flex-direction:column;align-items:center;gap:6px;flex:1 1 0;max-width:220px}
 .pf-lab{font:500 10.5px/1.4 var(--mono);letter-spacing:.16em;text-transform:uppercase;color:var(--ink2)}
-.pf-yoke,.pf-pedals{width:100%;touch-action:none}
+.pf-yoke,.pf-pedals{width:100%}
 .pf-yoke{aspect-ratio:220/170}.pf-pedals{aspect-ratio:220/100}
 .pf-yoke svg,.pf-pedals svg{display:block}
 .viz.pf .stage{aspect-ratio:4/3.2;max-height:none}
@@ -598,7 +599,7 @@ html.locked #gate { display: flex; }
 /* 3D airplane stages with a title band: the band matches the canvas so it reads as one picture (labels never over the model) */
 .viz .stage[data-band] { background: #0A0A0B; }
 /* segmented circle: fixed control rows (readouts / sliders / chips) so nothing moves as the wind values change */
-.viz.segc .stage { aspect-ratio: 16 / 9; touch-action: pan-y; }
+.viz.segc .stage { aspect-ratio: 16 / 9; }
 @media (max-width: 700px) { .viz.segc .stage { aspect-ratio: 1000 / 880; } }
 .viz.segc .caption .label, .viz.segc .caption .big { white-space: nowrap; }
 @media (max-width: 600px) { .viz.segc .caption .big { font-size: 20px; } }
