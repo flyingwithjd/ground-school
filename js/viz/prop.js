@@ -34,15 +34,27 @@ function blurTex(THREE) { const N = 256, cv = document.createElement("canvas"); 
     const th = Math.atan2(x, y); let a = 0.05; for (const b0 of [0, Math.PI]) { let dl = ((b0 - th) % (2 * Math.PI) + 4 * Math.PI) % (2 * Math.PI); a += 0.32 * Math.exp(-dl / 0.55) * (dl > 0.04 ? 1 : 0); }
     const edge = Math.min(1, (1 - r) / 0.05) * Math.min(1, (r - F0) / 0.08); const k = (j * N + i) * 4; im.data[k] = im.data[k + 1] = im.data[k + 2] = 225; im.data[k + 3] = Math.round(255 * Math.min(0.6, a) * edge * (0.55 + 0.45 * r)); }
   cx.putImageData(im, 0, 0); const tx = new THREE.CanvasTexture(cv); tx.colorSpace = THREE.SRGBColorSpace; return tx; }
-function propModel(THREE) { const P = buildPlane(THREE), keep = new Set(["cowling", "engine", "fuselage"]), XC = 0.4;   // the fuselage is cut just aft of the firewall
+function propModel(THREE) { const P = buildPlane(THREE), keep = new Set(["cowling", "engine", "fuselage", "gear"]), XC = 0.9, NOSE = new Set(["wheel0", "pant0", "leg0"]);   // the fuselage is cut just aft of the windshield base; only the nose gear is kept
   for (const [nm, pt] of Object.entries(P.parts)) if (!keep.has(nm)) { pt.subs.forEach((sb) => (sb.obj.visible = false)); delete P.parts[nm]; }
-  P.meshes.splice(0, P.meshes.length, ...P.meshes.filter((m) => keep.has(m.userData.part)));
+  P.parts.gear.subs = P.parts.gear.subs.filter((sb) => { let nose = false; sb.obj.traverse((o) => { if (o.isMesh && NOSE.has(o.userData.tag)) nose = true; }); if (!nose) sb.obj.visible = false; else sb.segs = []; return nose; });
+  P.meshes.splice(0, P.meshes.length, ...P.meshes.filter((m) => keep.has(m.userData.part) && (m.userData.part !== "gear" || NOSE.has(m.userData.tag))));
   // the cowling is shaded paint too (no ink grid), with a dark nose bowl behind the spinner
-  const cowlMat = new THREE.MeshStandardMaterial({ color: 0x4a4c52, metalness: 0.2, roughness: 0.55, side: THREE.DoubleSide });
+  const cowlMat = new THREE.MeshStandardMaterial({ color: 0xd2cfc6, metalness: 0.12, roughness: 0.46, side: THREE.DoubleSide });   // Cessna white paint
   const clip = [new THREE.Plane(new THREE.Vector3(1, 0, 0), -XC)]; cowlMat.clippingPlanes = clip;
   P.parts.engine.subs.forEach((sb) => (sb.segs = []));
   for (const nm of ["cowling", "fuselage"]) P.parts[nm].subs.forEach((sb) => { const m = sb.obj.children.find((o) => o.isMesh), a = m ? Array.from(new THREE.EdgesGeometry(m.geometry, 38).attributes.position.array) : [], keepS = [];
     for (let i = 0; i < a.length; i += 6) if (a[i] > XC + 0.05 && a[i + 3] > XC + 0.05) keepS.push(...a.slice(i, i + 6)); sb.segs = keepS; });
+  const tire = new THREE.MeshStandardMaterial({ color: 0x1d1e22, roughness: 0.8 });
+  P.meshes.forEach((m) => { if (m.userData.part === "gear") { m.material = m.userData.tag === "wheel0" ? tire : cowlMat; m.userData.mat0 = m.material; } });
+  // windshield (from the model's own surface) and the two cooling-air inlets on the nose bowl, so the nose reads as a 172
+  { const glass = new THREE.MeshStandardMaterial({ color: 0x18222e, metalness: 0.5, roughness: 0.16, side: THREE.DoubleSide }), nx = 10, nt = 12, pos = [], idx = [];
+    for (let i = 0; i <= nx; i++) for (let j = 0; j <= nt; j++) { const x = 3.3 - (1.8 * i) / nx, th = 0.62 + ((Math.PI - 1.24) * j) / nt; pos.push(...P.surf(x, th, 0.03).toArray()); }
+    for (let i = 0; i < nx; i++) for (let j = 0; j < nt; j++) { const a = i * (nt + 1) + j; idx.push(a, a + 1, a + nt + 1, a + 1, a + nt + 2, a + nt + 1); }
+    const wg = new THREE.BufferGeometry(); wg.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); wg.setIndex(idx); wg.computeVertexNormals(); const wm = new THREE.Mesh(wg, glass); P.root.add(wm);
+    const inl = new THREE.MeshBasicMaterial({ color: 0x050506, side: THREE.DoubleSide });
+    for (const sd of [1, -1]) { const ring = Array.from({ length: 20 }, (_, i) => { const a = (i / 20) * 2 * Math.PI; return P.surf(6.75 + 0.22 * Math.cos(a), (sd > 0 ? 0.55 : Math.PI - 0.55) + 0.12 * Math.sin(a), 0.03); });
+      const c = ring.reduce((s2, v) => s2.add(v), new THREE.Vector3()).divideScalar(ring.length), pp = [], ii = []; pp.push(...c.toArray()); ring.forEach((v) => pp.push(...v.toArray())); for (let i = 0; i < 20; i++) ii.push(0, 1 + i, 1 + ((i + 1) % 20));
+      const g2 = new THREE.BufferGeometry(); g2.setAttribute("position", new THREE.Float32BufferAttribute(pp, 3)); g2.setIndex(ii); P.root.add(new THREE.Mesh(g2, inl)); } }
   const cb = new THREE.Box3(); P.meshes.forEach((m) => { if (m.userData.part === "cowling" || m.userData.part === "fuselage") { m.material = cowlMat; m.userData.mat0 = cowlMat; } if (m.userData.part === "cowling") cb.expandByObject(m); });
   { const bowl = new THREE.Mesh(new THREE.CircleGeometry(1, 40), new THREE.MeshBasicMaterial({ color: 0x050506, side: THREE.DoubleSide })); bowl.rotation.y = Math.PI / 2; bowl.position.set(cb.max.x - 0.06, PY, 0); bowl.scale.set(0.78, 0.78, 1); P.root.add(bowl);
     const lip = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(Array.from({ length: 48 }, (_, i) => new THREE.Vector3(0, Math.cos(i / 48 * 2 * Math.PI), Math.sin(i / 48 * 2 * Math.PI)))), new THREE.LineBasicMaterial({ color: 0xf2f1ec, transparent: true, opacity: 0.35 })); lip.position.copy(bowl.position); lip.scale.set(1, 0.8, 0.8); P.root.add(lip); }
@@ -72,7 +84,7 @@ export function mount(host) {
   const M3 = S.P; S.renderer.localClippingEnabled = true;
   // camera: three-quarter front from the left so the twist from hub to tip reads; framed to the propeller disk and the cowling
   const VZ = { az: -54, el: 14, fov: 24 }, fitPts = []; { for (let i = 0; i < 48; i++) { const a = (i / 48) * 2 * Math.PI; fitPts.push([PX, PY + Math.cos(a) * RF, Math.sin(a) * RF]); }
-    M3.meshes.forEach((m) => { if (m.userData.part !== "cowling" && m.userData.part !== "fuselage") return; m.updateWorldMatrix(true, false); const pa = m.geometry.attributes.position, v = new THREE.Vector3(); for (let i = 0; i < pa.count; i += 3) { v.fromBufferAttribute(pa, i).applyMatrix4(m.matrixWorld); if (v.x > 0.4) fitPts.push(v.toArray()); } }); }
+    M3.meshes.forEach((m) => { if (!["cowling", "fuselage", "gear"].includes(m.userData.part)) return; m.updateWorldMatrix(true, false); const pa = m.geometry.attributes.position, v = new THREE.Vector3(); for (let i = 0; i < pa.count; i += 3) { v.fromBufferAttribute(pa, i).applyMatrix4(m.matrixWorld); if (v.x > 0.9) fitPts.push(v.toArray()); } }); }
   function fit(aspect) { const cam = new THREE.PerspectiveCamera(VZ.fov, aspect, 0.1, 500), tg = new THREE.Vector3(PX - 1.2, PY, 0); let d = 20;
     for (let it = 0; it < 6; it++) { const az = VZ.az * D, el = VZ.el * D; cam.position.set(tg.x + d * Math.cos(el) * Math.cos(az), tg.y + d * Math.sin(el), tg.z + d * Math.cos(el) * Math.sin(az)); cam.lookAt(tg); cam.updateMatrixWorld();
       let x0 = 9, x1 = -9, y0 = 9, y1 = -9; const v3 = new THREE.Vector3(); fitPts.forEach((q) => { v3.set(...q).project(cam); x0 = Math.min(x0, v3.x); x1 = Math.max(x1, v3.x); y0 = Math.min(y0, v3.y); y1 = Math.max(y1, v3.y); });
@@ -147,6 +159,7 @@ export function mount(host) {
       T(g, cx, ly, wide ? ["1 · near hub", "2 · mid-blade", "3 · near tip"][i] : ["1 · hub", "2 · mid", "3 · tip"][i], { size: wide ? 11 : 12, anchor: "middle", fill: GRAY });
       T(g, cx, ly + 20, `AoA ${Math.round(aoa)}°`, { size: 15, anchor: "middle", fill: col, weight: 600 });
       T(g, cx, ly + 37, `blade ${Math.round(be)}°`, { size: wide ? 11 : 12, anchor: "middle", fill: GRAY }); });
+    T(g, pad, top + sH + 68, "blade and wind angles are illustrative", { size: 11, fill: DIM });
     // instruments: tachometer, and on a constant-speed prop manifold pressure plus what the governor is doing
     const tilt = cs ? Math.max(-1, Math.min(1, (rpm - set) / 120)) : 0, gov = Math.abs(tilt) > 0.15 ? (tilt > 0 ? "flyweights out: more pitch" : "flyweights in: less pitch") : "governor holding RPM";
     const tach = (x, y, r) => dial(g, x, y, r, { min: 0, max: 3500, arcs: [[2100, 2500, "green"]], reds: [2700], ticks: [0, 500, 1000, 1500, 2000, 2500, 3000, 3500], nums: [[1000, "10"], [2000, "20"], [3000, "30"]], title: "RPM ×100", focus: true, value: rpm, fmt: (x2) => String(Math.round(x2 / 10) * 10) });
@@ -155,15 +168,15 @@ export function mount(host) {
       else T(g, x, y, rpm > 2700 ? "Over the red line" : "Tach = power", { size: 12, anchor, fill: rpm > 2700 ? COL.red : INK, weight: 600 }); };
     let Hh;
     if (wide) { const gx0 = W - pad - gcw, gxc = gx0 + gcw / 2; L(g, gx0, top + 4, gx0, top + sH + 44, { stroke: "rgba(242,241,236,.07)", w: 1 });
-      if (cs) { const r = 56, y1 = top + r + 2; tach(gxc, y1, r); mp(gxc, y1 + 2 * r + 16, r); Hh = y1 + 3 * r + 34; note(gxc, Hh - 8, "middle"); Hh = Math.max(Hh, top + sH + 56); }
-      else { const r = Math.min(64, gcw / 2 - 8), y1 = top + 8 + r; tach(gxc, y1, r); note(gxc, y1 + r + 26, "middle"); Hh = Math.max(top + sH + 56, y1 + r + 40); } }
-    else { const iy0 = top + sH + 58, r = 56, gy = iy0 + r + 6; L(g, pad, iy0 - 4, W - pad, iy0 - 4, { stroke: "rgba(242,241,236,.08)", w: 1 });
+      if (cs) { const r = 56, y1 = top + r + 2; tach(gxc, y1, r); mp(gxc, y1 + 2 * r + 16, r); Hh = y1 + 3 * r + 34; note(gxc, Hh - 8, "middle"); Hh = Math.max(Hh, top + sH + 76); }
+      else { const r = Math.min(64, gcw / 2 - 8), y1 = top + 8 + r; tach(gxc, y1, r); note(gxc, y1 + r + 26, "middle"); Hh = Math.max(top + sH + 76, y1 + r + 40); } }
+    else { const iy0 = top + sH + 78, r = 56, gy = iy0 + r + 6; L(g, pad, iy0 - 4, W - pad, iy0 - 4, { stroke: "rgba(242,241,236,.08)", w: 1 });
       if (cs) { tach(pad + r + 2, gy, r); mp(W - pad - r - 2, gy, r); Hh = gy + r + 32; note(W / 2, Hh - 10, "middle"); }
       else { tach(pad + r + 2, gy, r); const tx = pad + 2 * r + 20; note(tx, gy - 4, "start"); ["fixed pitch: RPM follows", "throttle and airspeed"].forEach((s2, j) => T(g, tx, gy + 14 + j * 15, s2, { size: 11, fill: GRAY })); Hh = gy + r + 12; } }
     let cap;
     const worst = Math.max(...stall), neg = Math.min(...stall);
     if (!twist && neg < 0) cap = ["No twist", "Same blade angle everywhere: the hub has a negative angle of attack while the tip works hard."];
-    else if (!cs && v < 5 && thr >= 0.99) cap = ["Static RPM", "Full throttle, no airspeed: the 172S should read 2,300 to 2,400 RPM. High angle of attack."];
+    else if (!cs && v < 5 && thr >= 0.99) cap = ["Static RPM", "Full throttle, no airspeed: the 172S POH gives a static RPM range of 2,300 to 2,400 RPM. High angle of attack."];
     else if (!cs && rpm > 2700) cap = ["Overspeed", "Airspeed is driving the prop past the red line. Reduce the throttle."];
     else if (!cs) cap = ["Fixed pitch", "More airspeed lowers the angle of attack, so RPM rises. The tachometer shows power."];
     else if (stop === "low") cap = ["On the low-pitch stop", "Too little airspeed or power to hold the set RPM: it acts like a fixed-pitch prop."];
