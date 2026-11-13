@@ -1,11 +1,13 @@
 export default {
   sections: [
     { id: "p3", label: "3P · PHAK Ch 2", title: "Perceive, Process, Perform",
-      body: `<p>3P is a simple loop for every phase of flight. Perceive hazards with PAVE, process them with CARE, and perform with TEAM. Then evaluate, and go around again. Most flight training decisions are time-critical: a quick mental check, on the fly. <span class="src">PHAK Ch 2, Fig 2-10</span></p>`,
+      body: `<p>3P is a simple loop for every phase of flight. Perceive hazards with PAVE, process them with CARE, and perform with TEAM. Then evaluate, and go around again. Most flight training decisions are time-critical: a quick mental check, on the fly. <span class="src">PHAK Ch 2, Fig 2-10</span></p>
+<p>In TEAM, Transfer asks whether the decision belongs to someone else, such as your CFI. Eliminate asks whether you can remove the hazard. Accept asks whether the benefits outweigh the risk. Mitigate asks what you can do to reduce it. <span class="src">PHAK Ch 2</span></p>`,
       viz: { type: "mnemo", opts: { set: "p3" } },
       kdr: { k: "ADM and single-pilot resource management.", d: "Manage risk with ADM.", r: "Distractions and loss of situational awareness.", codes: ["PA.I.H.K4", "PA.II.B.S4", "PA.I.H.R3"] } },
     { id: "dec", label: "DECIDE · PHAK Ch 2", title: "When something changes",
-      body: `<p>DECIDE is a six-step loop for the moment something changes. The PHAK warns that overreacting and fixating can rule out a safe outcome, so estimate the need to react before you act. <span class="src">PHAK Ch 2</span></p>`,
+      body: `<p>DECIDE is a six-step loop for the moment something changes. The PHAK warns that overreacting and fixating can rule out a safe outcome, so estimate the need to react before you act. <span class="src">PHAK Ch 2</span></p>
+<p>The six steps: Detect that a change has happened. Estimate the need to react to it. Choose a course of action, the outcome you want. Identify solutions that can get you there. Do the necessary actions. Evaluate the effect of what you did, then loop again. <span class="src">PHAK Ch 2, Fig 2-14</span></p>`,
       viz: { type: "mnemo", opts: { set: "decide" } },
       kdr: { k: "ADM models.", d: "Use a structured decision process.", r: "Confirmation and expectation bias.", codes: ["PA.I.H.K4", "PA.I.H.R4"] } },
     { id: "sbt", label: "Scenarios", title: "Practice on the ground",
