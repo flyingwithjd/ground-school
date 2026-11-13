@@ -1,7 +1,7 @@
 // ATC light gun signals (AIM 4-3-13; 14 CFR 91.125). Pick where you are, tap a signal, read its meaning.
-import { frame, chips, svg, loop, FAINT, FAINT2, INK } from "./base.js?v=ff9d939563";
-import { s, reduced } from "../core/util.js?v=ff9d939563";
-import { T } from "./shapes.js?v=ff9d939563";
+import { frame, chips, svg, loop, FAINT, FAINT2, INK } from "./base.js?v=2481aa7edd";
+import { s, reduced } from "../core/util.js?v=2481aa7edd";
+import { T } from "./shapes.js?v=2481aa7edd";
 const COL = { g: "#39D98A", r: "#FF4D4D", w: "#FFF7E0" };
 const SIG = {
   sg: ["Steady green", ["g"], "steady", "Cleared for takeoff", "Cleared to land"],
