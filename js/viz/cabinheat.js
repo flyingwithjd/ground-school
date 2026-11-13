@@ -35,7 +35,7 @@ export function mount(host) {
     if (bad) { for (let i = 0; i < 2; i++) { const x = x0 + (i + 2) * gap - 13; C(g, x, y + bh / 2 - 12, 3, { fill: COL.red }); C(g, x - 7, y + bh / 2 - 18, 2.5, { fill: COL.red }); } for (let i = 0; i < 3; i++) C(g, x0 + 3 * gap + 18 + i * 10, y + bh - 10 - (i % 2) * 5, 2.5, { fill: COL.red }); }
     // fresh air and defrost
     const cx = x0 + 3 * gap + 4, cw = gap - (wide ? 30 : 14);
-    L(g, cx + cw / 2, y - 36, cx + cw / 2, y - 4, { stroke: air ? ACC : DIM, w: air ? 3 : 1.2, arrow: air }); T(g, cx + cw / 2, y - 42, air ? "fresh air" : "cabin air closed", { size: 11, anchor: "middle", fill: air ? ACC : GRAY });
+    L(g, cx + cw / 2, y - 36, cx + cw / 2, y - 4, { stroke: air ? ACC : DIM, w: air ? 3 : 1.2, arrow: air }); T(g, wide ? cx + cw / 2 : cx + cw, y - 42, air ? "fresh air" : "cabin air closed", { size: 11, anchor: wide ? "middle" : "end", fill: air ? ACC : GRAY });
     L(g, cx + cw / 2, y + bh + 4, cx + cw / 2, y + bh + 30, { stroke: heat ? hot : DIM, w: heat ? 2 : 1, arrow: heat }); T(g, cx + cw / 2, y + bh + 44, "defroster", { size: 11, anchor: "middle", fill: GRAY });
     // CO detector
     const dy = y + bh + 74, alarm = ppm >= ALARM, dw = Math.min(w, 300);
@@ -44,7 +44,7 @@ export function mount(host) {
     if (alarm) T(g, x0 + dw - 12, dy + 46, "CO LVL HIGH", { size: 12, weight: 700, anchor: "end", fill: COL.red });
     T(g, x0 + dw + 14, dy + 46, wide ? `alarm at ${ALARM} ppm` : "", { size: 11, fill: GRAY });
     let cap;
-    if (alarm) cap = ["Carbon monoxide", "Exhaust is leaking into the heated air. Heat off, cabin air on, vents and windows open, then land."];
+    if (alarm) cap = ["Carbon monoxide", "Exhaust is leaking into the heated air. Heat off, cabin air on, vents and windows open."];
     else if (crack && heat) cap = ["CO rising", "A cracked muffler lets exhaust into the shroud air. Carbon monoxide has no smell or color."];
     else if (crack) cap = ["Heat off, air in", "Fresh air is flushing the cabin. If the alarm or the symptoms stay, land as soon as practical."];
     else if (heat) cap = ["Cabin heat on", "Outside air warms around the exhaust muffler, then flows into the cabin and the defroster."];

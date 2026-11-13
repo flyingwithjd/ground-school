@@ -37,10 +37,10 @@ export function mount(host) {
     L(g, gx + gw * (MAXD / 7), gy + 4, gx + gw * (MAXD / 7), gy + 28, { stroke: COL.red, w: 2 }); T(g, gx, gy + 44, d.toFixed(1) + " psid", { size: 13, fill: INK, weight: 600 }); T(g, gx + gw, gy + 44, "max " + MAXD, { size: 11, anchor: "end", fill: COL.red });
     const open = mode === "ok" ? Math.max(0.1, 1 - (d / MAXD) * 0.9) : 1, vy = gy + 86;
     T(g, gx, vy, "OUTFLOW VALVE", { size: 11, fill: GRAY }); R(g, gx, vy + 10, 60, 28, { stroke: GRAY, sw: 1.2 }); R(g, gx + 2, vy + 12, 56 * open, 24, { fill: DIM });
-    T(g, gx + 70, vy + 29, mode !== "ok" ? "no pressure left" : open > 0.95 ? "wide open" : d >= MAXD - 0.01 ? "at max differential" : "closing", { size: 11, fill: GRAY });
-    const ty = vy + 70, t = tucAt(cab);
+    T(g, wide ? gx + 70 : gx, wide ? vy + 29 : vy + 56, mode !== "ok" ? "no pressure left" : open > 0.95 ? "wide open" : d >= MAXD - 0.01 ? "at max differential" : "closing", { size: 11, fill: GRAY });
+    const ty = vy + (wide ? 70 : 88), t = tucAt(cab);
     T(g, gx, ty, "CABIN PRESSURE", { size: 11, fill: GRAY }); T(g, gx, ty + 18, psi(cab).toFixed(1) + " psi", { size: 13, fill: INK, weight: 600 });
-    if (t && mode !== "ok") { T(g, gx, ty + 46, "USEFUL CONSCIOUSNESS", { size: 11, fill: COL.red }); T(g, gx, ty + 64, t[1] + " at " + (t[0] / 1000) + "k ft", { size: 12, fill: INK }); }
+    if (t && mode !== "ok") { T(g, gx, ty + 46, "USEFUL CONSCIOUSNESS", { size: 11, fill: COL.red }); T(g, gx, ty + 64, wide ? t[1] + " at " + (t[0] / 1000) + "k ft" : t[1], { size: 12, fill: INK }); if (!wide) T(g, gx, ty + 80, "at " + (t[0] / 1000) + "k ft", { size: 12, fill: INK }); }
     let cap;
     if (mode === "expl") cap = ["Explosive decompression", "Faster than your lungs can empty, under half a second: noise, fog, flying debris. Oxygen mask on now."];
     else if (mode === "rapid") cap = ["Rapid decompression", "The cabin climbs to the airplane's altitude in seconds. Oxygen mask on first, then descend."];
