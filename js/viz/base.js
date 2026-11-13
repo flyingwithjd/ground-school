@@ -1,6 +1,6 @@
 // Shared building blocks for every visualization: frame, corner labels, caption, sliders, chips,
 // and the signature "point of light" line draw (a bright head with a glowing tail lays the line down).
-import { h, s, esc, ease, reduced, clamp } from "../core/util.js?v=dc3bb5b371";
+import { h, s, esc, ease, reduced, clamp } from "../core/util.js?v=ea4e112490";
 export const ACC = "#3B82F6", INK = "#F2F1EC";
 export const FAINT = "rgba(242,241,236,.22)", FAINT2 = "rgba(242,241,236,.4)";
 

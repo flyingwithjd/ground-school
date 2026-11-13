@@ -2,10 +2,10 @@
 // from the pages just read), and a 5-6 question wrap-up across the lesson at the end. Checks are never a gate: "Skip for
 // now" moves on, and a lesson counts as finished once its pages are read or its wrap-up is done or skipped.
 // Progress lives in lessons[id] inside ppg.v1 (additive): cp[key] = { done, ok, n } or { skip }, fin = time finished.
-import { get, isDue, isBlind } from "./srs.js?v=dc3bb5b371";
-import { QUESTIONS, secKey, lessonItems } from "../../data/index.js?v=dc3bb5b371";
-import { reachedSet, isReached, stats } from "./progress.js?v=dc3bb5b371";
-import { S, save } from "./store.js?v=dc3bb5b371";
+import { get, isDue, isBlind } from "./srs.js?v=ea4e112490";
+import { QUESTIONS, secKey, lessonItems } from "../../data/index.js?v=ea4e112490";
+import { reachedSet, isReached, stats } from "./progress.js?v=ea4e112490";
+import { S, save } from "./store.js?v=ea4e112490";
 const HOUR = 36e5;
 // Question ids by page key "lesson/sec", in bank order.
 let BY = null; export function byPage() { if (BY) return BY; BY = {}; for (const q of Object.values(QUESTIONS)) { const k = secKey(q); if (k) (BY[k] ||= []).push(q.id); } return BY; }
@@ -44,17 +44,17 @@ export function cpMark(lid, key, v) { const ls = (S().lessons[lid] ||= { visited
 export function finish(lid) { const ls = (S().lessons[lid] ||= { visited: 0, sec: 0, read: [] }); if (!ls.fin) { ls.fin = Date.now(); save(); } }
 // The one next step for the Now page: a quick check whose pages are read but which was neither done nor skipped, else the
 // lesson in progress (most recently opened, not finished), else the next lesson in course order.
-import PI from "../../data/pageindex.js?v=dc3bb5b371";
-import { LESSONS, ORDER } from "../../data/index.js?v=dc3bb5b371";
-import { lessonDone, nextLesson } from "./progress.js?v=dc3bb5b371";
+import PI from "../../data/pageindex.js?v=ea4e112490";
+import { LESSONS, ORDER } from "../../data/index.js?v=ea4e112490";
+import { lessonDone, nextLesson } from "./progress.js?v=ea4e112490";
 export const pagesOf = (lid) => (PI.lessons[lid] || []).map(([id, label, title]) => ({ id, label, title }));
 export const pageIndex = () => PI;
 export function nextStep() { const ls = S().lessons || {};
   const going = Object.entries(ls).filter(([lid, x]) => LESSONS[lid] && x && (x.read || []).length && !lessonDone(lid)).sort((a, b) => (b[1].visited || 0) - (a[1].visited || 0));
   if (going.length) { const [lid, x] = going[0]; const secs = pagesOf(lid); const steps = plan(lid, secs, !!LESSONS[lid].prep); const read = new Set(x.read);
-    const cp = steps.find((s) => s.kind === "cp" && s.pages.every((p) => read.has(p)) && !cpState(lid, s.key) && pick(s.pages.flatMap((p) => pageIds(lid, p)), s.size).length);
+    let left = 0; const cp = steps.find((s) => s.kind === "cp" && s.pages.every((p) => read.has(p)) && !cpState(lid, s.key) && (left = pick(s.pages.flatMap((p) => pageIds(lid, p)), s.size).length));
     const nRead = secs.filter((s) => read.has(s.id)).length;
-    if (cp) return { kind: "cp", lid, href: `#/lesson/${lid}/${cp.key}`, step: cp, nRead, nPages: secs.length };
+    if (cp) return { kind: "cp", lid, href: `#/lesson/${lid}/${cp.key}`, step: cp, left, nRead, nPages: secs.length };
     return { kind: "continue", lid, href: `#/lesson/${lid}`, nRead, nPages: secs.length }; }
   const nl = nextLesson(); if (nl) return { kind: "begin", lid: nl, href: `#/lesson/${nl}`, nRead: ((ls[nl] || {}).read || []).length, nPages: pagesOf(nl).length };
   return { kind: "exam", href: "#/check/s4" }; }
