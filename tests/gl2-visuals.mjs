@@ -34,7 +34,12 @@ for (const [w, h, touch] of SIZES) {
     await pg.evaluate((type) => { const v = document.querySelector(`[data-viz="${type}"]`); v && window.scrollTo(0, v.getBoundingClientRect().top + scrollY - 70); }, type);
     if (type === "carbice") await pg.evaluate(() => { const s = [...document.querySelectorAll('[data-viz="carbice"] input[type=range]')][1]; s.value = 30; s.dispatchEvent(new Event("input")); });
     await pg.waitForTimeout(type === "carbice" ? 3500 : 3000); const f0 = await pg.evaluate(() => window.__raf); await pg.waitForTimeout(1500); const f1 = await pg.evaluate(() => window.__raf);
-    ok(f1 - f0 <= 1, `${tag}: idle visual still drew ${f1 - f0} frames in 1.5 s`);
+    // live visuals (continuous airflow while on screen, data-live="1") must draw zero frames once scrolled offscreen
+    const live = await pg.evaluate((type) => { const v = document.querySelector(`[data-viz="${type}"]`); return v.dataset.live === "1" || !!v.querySelector('[data-live="1"]'); }, type);
+    if (!live) ok(f1 - f0 <= 1, `${tag}: idle visual still drew ${f1 - f0} frames in 1.5 s`);
+    else { const y1 = await pg.evaluate(() => scrollY); await pg.evaluate((type) => { const v = document.querySelector(`[data-viz="${type}"]`); window.scrollTo(0, v.getBoundingClientRect().bottom + scrollY + 40); }, type); await pg.waitForTimeout(700);
+      const g0 = await pg.evaluate(() => window.__raf); await pg.waitForTimeout(1500); const g1 = await pg.evaluate(() => window.__raf);
+      ok(g1 - g0 <= 1, `${tag}: live visual drew ${g1 - g0} frames in 1.5 s while offscreen`); await pg.evaluate((y) => window.scrollTo(0, y), y1); await pg.waitForTimeout(400); }
     if (touch && w === 744) { const r = await pg.evaluate((type) => { const s = document.querySelector(`[data-viz="${type}"] .stage`).getBoundingClientRect(); return { x: s.left + s.width * 0.08, y: Math.min(s.top + s.height * 0.6, innerHeight - 260) }; }, type);
       const y0 = await pg.evaluate(() => scrollY); await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: r.x, y: r.y }] });
       for (let k = 1; k <= 12; k++) { await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: r.x, y: r.y - k * 20 }] }); await pg.waitForTimeout(16); }

@@ -82,18 +82,21 @@ export function mount(host) {
   const band = () => { const sr = F.stage.getBoundingClientRect(); if (!sr.height) return; let b = 0; F.stage.querySelectorAll(".corner").forEach((c) => { if (c.textContent.trim()) b = Math.max(b, c.getBoundingClientRect().bottom - sr.top); }); S.setTopBand(b ? b + 6 : 0); fit(); };
   // fit the section and its airflow (about 15 x 6.5 ft) to the stage
   const fit = (dur = 1) => { const r = F.stage.getBoundingClientRect(), Hh = Math.max(1, r.height - (+F.stage.dataset.band || 0)), Ww = Math.max(1, r.width), TN = Math.tan(9 * D), ph = Ww < 560;
-    const wft = ph ? 9.6 : 10.8, hft = ph ? 6.2 : 5.4, d = Math.max(wft / (2 * TN * (Ww / Hh)), hft / (2 * TN)); S.setView({ tg: [ph ? -0.5 : -0.9, 0.45, -0.4], az: -66, el: 15, d, fov: 18 }, dur); };
+    const wft = ph ? 8.2 : 10.8, hft = ph ? 5.2 : 5.4, d = Math.max(wft / (2 * TN * (Ww / Hh)), hft / (2 * TN)); S.setView({ tg: [ph ? -0.5 : -0.9, 0.45, -0.4], az: -66, el: 15, d, fov: 18 }, dur); };
   const bro = new ResizeObserver(band); bro.observe(F.stage); F.on(() => bro.disconnect());
   // live readout band under the stage: three values, fixed slots so nothing moves
   const rb = h("div", { class: "readout sec-read" }); const cells = [0, 1, 2].map(() => { const b = h("b", {}, "–"), sp = h("span", {}); rb.append(h("div", {}, b, sp)); return [b, sp]; }); F.stage.after(rb);
   const setR = (i, v, lab) => { if (cells[i][0].textContent !== v) cells[i][0].textContent = v; if (cells[i][1].textContent !== lab) cells[i][1].textContent = lab; };
   // ---------- airflow cues (3D, model space) ----------
   const NP = 60, XA = 6.4, XB = -8.6;
-  const mk = (d, z, op, dash = [0.75, 0.5]) => ({ d, z, el: S.cueLine(NP, { dash, width: 1.4, opacity: op }) });
-  const ups = [0.2, 0.6, 1.15, 1.85].map((d, i) => mk(d, ZF, [0.7, 0.6, 0.5, 0.38][i])), los = [-0.22, -0.7, -1.35].map((d, i) => mk(d, ZF, [0.6, 0.48, 0.36][i]));
-  const back = [0.5, -0.45].map((d) => mk(d, ZB, 0.2, [0.8, 0.6]));
-  const jet = S.cueLine(30, { dash: [0.32, 0.26], width: 2.2, opacity: 0.95, color: 0x3b82f6 });
-  const eddies = Array.from({ length: 6 }, () => S.cueLine(20, { width: 1.3, opacity: 0.35 }));
+  // each streamline = a faint continuous line (so it reads as one line) + bright dashes drifting aft along it
+  const mk = (d, z, op, dash = [0.9, 0.55]) => { const base = S.cueLine(NP, { width: 1, opacity: op * 0.28 }), dl = S.cueLine(NP, { dash, width: 1.5, opacity: op });
+    return { d, z, el: { set(p) { base.set(p); dl.set(p); } } }; };
+  const ups = [0.2, 0.7, 1.45].map((d, i) => mk(d, ZF, [0.75, 0.6, 0.42][i])), los = [-0.24, -0.9].map((d, i) => mk(d, ZF, [0.6, 0.42][i]));
+  const back = [0.55].map((d) => mk(d, ZB, 0.22));
+  const jetB = S.cueLine(30, { width: 5, opacity: 0.25, color: 0x3b82f6 }), jetD = S.cueLine(30, { dash: [0.36, 0.24], width: 2.4, opacity: 1, color: 0x3b82f6 });
+  const jet = { set(p) { jetB.set(p); jetD.set(p); }, set opacity(o) { jetB.opacity = o * 0.25; jetD.opacity = o; } };
+  const eddies = Array.from({ length: 5 }, () => S.cueLine(22, { width: 1.2, opacity: 0.3 }));
   const liftA = S.cueArrow({ color: 0x3b82f6, width: 3.4, head: 0.5 }), dragA = S.cueArrow({ color: 0xf2f1ec, width: 2.8, head: 0.42 });
   const tabA = S.cueArrow({ color: 0xf2f1ec, width: 2.6, head: 0.32 }), tailA = S.cueArrow({ color: 0x3b82f6, width: 3.4, head: 0.45 });
   // world outline of a piece under the current pose (mirrors the three.js groups exactly)
@@ -149,7 +152,7 @@ export function mount(host) {
         sp.push([0, 1].map((j) => 0.5 * (2 * b[j] + (-a[j] + c[j]) * t + (2 * a[j] - 5 * b[j] + 4 * c[j] - d2[j]) * t2 + (-a[j] + 3 * b[j] - 3 * c[j] + d2[j]) * t3))); }
       sp.push(jp.at(-1)); jet.set(resample(sp, 30).map(([x, y]) => [x, y, ZF - 0.05])); jet.opacity = 0.95; } else jet.opacity = 0;
     // forces
-    if (!tail) { const q = rotP([QC[0], QC[1] + CH * 0.09], A, QC), L1 = 0.6 + 1.5 * st.liftV, y0 = q[1] + 1.0; liftA.set([q[0], y0, ZF], [q[0], y0 + L1, ZF]); liftA.opacity = 1;
+    if (!tail) { const q = rotP([QC[0], QC[1] + CH * 0.09], A, QC), L1 = 0.6 + 1.5 * st.liftV, y0 = q[1] + 0.75; liftA.set([q[0], y0, ZF], [q[0], y0 + L1, ZF]); liftA.opacity = 1;
       const L2 = 0.3 + 1.5 * st.dragV; dragA.set([xTE - 0.35, pTE[1], ZF], [xTE - 0.35 - L2, pTE[1], ZF]); dragA.opacity = 1; tabA.opacity = 0; tailA.opacity = 0; }
     else { liftA.opacity = 0; dragA.opacity = 0; const tn = cur === "anti" ? "atab" : "tab", sn = cur === "anti" ? "stabtor" : "elev";
       const tAng = (pose[tn] || [0, 0, 0])[2] + (pose[sn] || [0, 0, 0])[2] + A, mid = xf(tn, M([0.95, 0])), nrm = [-Math.sin(tAng), Math.cos(tAng)];   // tab mid and its upper-surface normal
@@ -160,11 +163,11 @@ export function mount(host) {
   }
   // eddies: slow open loops rolling aft in a wake region; top moves aft, so they turn with the flow above them
   function eddyDraw(now) { const ph = reduced() ? 0 : now / 1000; let e = 0;
-    for (const w of wake) { const n = w === wake[0] ? 4 : 2, L = w.x0 - w.x1; if (L <= 0.2) continue;
+    for (const w of wake) { const n = w === wake[0] ? 3 : 2, L = w.x0 - w.x1; if (L <= 0.2) continue;
       for (let j = 0; j < n && e < eddies.length; j++, e++) { const s0 = ((j + 0.5) / n + ph * 0.07) % 1, x = w.x0 - s0 * L, top = w.top(x), bot = w.bot(x), gap = Math.max(0, top - bot);
         const fade = Math.sin(Math.PI * s0) ** 0.8, r = Math.min(0.55, gap * 0.36) * (0.55 + 0.45 * fade), cy = bot + gap * 0.5, th0 = ph * 2.2 + j * 1.9;
-        const pts = Array.from({ length: 20 }, (_, i) => { const th = th0 + (i / 19) * 4.9, rr = r * (0.55 + 0.45 * (i / 19)); return [x + rr * Math.cos(th), cy + rr * Math.sin(th), ZF]; });
-        eddies[e].set(pts); eddies[e].opacity = 0.42 * w.str * fade; } }
+        const pts = Array.from({ length: 22 }, (_, i) => { const u = i / 21, th = th0 + u * 4.2, rr = r * (0.25 + 0.75 * u); return [x + rr * 1.35 * Math.cos(th), cy + rr * Math.sin(th), ZF]; });   // an open spiral, stretched along the flow
+        eddies[e].set(pts); eddies[e].opacity = 0.34 * w.str * fade; } }
     for (; e < eddies.length; e++) eddies[e].opacity = 0; }
   // ---------- state -> scene ----------
   function apply() { const cur = tail || dev, vis = new Set(SHOW[cur]); pose = poseOf(cur, cur === "slot" ? 1 : k); A = tail ? 0 : aoa * D;
