@@ -2,7 +2,7 @@
 export default {
   id: "gl2", code: "GL2", stage: 1, kind: "ground", title: "Flight Controls, Systems & Limitations", short: "Controls and trim, engine, fuel, electrical, instruments, the numbers you must not exceed",
   intro: "The airplane is a set of systems that each do one job. Learn what each one does, how it tells you it is failing, and the limits the manufacturer certified.",
-  refs: ["PHAK Ch 6, 7, 8", "C172S POH Sec 2, 7", "ACS PA.I.G, PA.II.A"],
+  refs: ["PHAK Ch 5, 6, 7, 8", "C172S POH Sec 1, 2, 3, 4, 7", "ACS PA.I.F, PA.I.G"],
   topics: { "gl2.ctrl": "Flight controls and trim", "gl2.eng": "Powerplant and ignition", "gl2.fuel": "Fuel system", "gl2.elec": "Electrical system", "gl2.inst": "Flight instruments", "gl2.lim": "Aircraft limitations" },
   questions: [
     { id: "gl2-01", t: "gl2.ctrl", q: "You turn the control wheel to the right. What do the ailerons do?", c: ["Right aileron goes up, left aileron goes down", "Right aileron goes down, left aileron goes up", "Both ailerons go up", "Both ailerons go down"], a: 0, why: "The up aileron on the right wing reduces that wing's lift; the down aileron on the left raises it, so the airplane rolls right.", src: "PHAK Ch 6" },

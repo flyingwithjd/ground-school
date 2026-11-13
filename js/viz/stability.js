@@ -1,7 +1,7 @@
 // CG and longitudinal stability (qualitative, PHAK 5). Slide the CG; tap Gust to see the response.
-import { frame, slider, readout, svg, loop, ACC, FAINT, FAINT2 } from "./base.js?v=2b1db0b3c1";
-import { s, h, reduced } from "../core/util.js?v=2b1db0b3c1";
-import { sidePlane, T, arrow, setArrow } from "./shapes.js?v=2b1db0b3c1";
+import { frame, slider, readout, svg, loop, ACC, FAINT, FAINT2 } from "./base.js?v=3bad3dc1c8";
+import { s, h, reduced } from "../core/util.js?v=3bad3dc1c8";
+import { sidePlane, T, arrow, setArrow } from "./shapes.js?v=3bad3dc1c8";
 const COL = 10; // center of lift x (illustrative)
 export function mount(host) {
   const F = frame(host, { corners: { tl: "CG and stability · qualitative", tr: "PHAK 5" } });

@@ -23,14 +23,19 @@ export const COVERAGE = {
     ["Landing gear, tires and brakes", "tire|brake", ["walk", "subs"]],
     ["Engine and propeller", "propeller|prop\\b|cowling|nicks|exhaust leak|air filter|bird nests", ["walk"]],
     ["Ground operations", "taxi|before-takeoff check|quartering (head|tail)wind|engine start|run-?up", ["ground", "wind", "runup"]] ] },
-  gl2: { refs: "PHAK 6, 7 · POH 2, 7 · ACS PA.I.G", units: ["gl2", "vs1"], items: [
+  gl2: { refs: "PHAK 5, 6, 7, 8 · POH 1, 2, 3, 4, 7 · ACS PA.I.F, PA.I.G", units: ["gl2", "vs1"], items: [
     ["Flight control systems", "flight control"], ["Primary flight controls", "aileron|elevator|rudder"], ["Secondary flight controls", "flaps?|trim"],
     ["Autopilot", "autopilot"], ["Powerplant", "reciprocating|four-stroke|cylinder"], ["Propeller", "propeller"],
     ["Induction systems", "induction|carburetor|fuel injection"], ["Ignition systems", "magneto|ignition"], ["Oil systems", "\\boil\\b"],
     ["Engine cooling systems", "cooling|cylinder head|cowl flap"], ["Starting systems", "starter|hand-?prop"], ["Combustion", "detonation|preignition|combustion"],
-    ["Turbine engines (introduction)", "turbine|turboprop|turbojet|turbofan"], ["Airframe systems", "airframe|landing gear|brakes?"],
+    ["Turbine engines (introduction)", "turbine|turboprop|turbojet|turbofan"], ["Airframe systems", "airframe|landing gear|tricycle|tailwheel"],
     ["Fuel systems", "fuel (system|selector|tank|pump)|gravity-feed|fuel-pump"], ["Refueling procedures", "refuel|ground(ing)? wire|bond"],
-    ["Heating systems", "cabin heat|heater|carbon monoxide"], ["Electrical systems", "alternator|battery|ammeter|electrical"], ["Hydraulic systems", "hydraulic"] ] },
+    ["Heating systems", "cabin heat|heater|carbon monoxide"], ["Electrical systems", "alternator|battery|ammeter|electrical"], ["Hydraulic systems", "hydraulic"],
+    ["Pressurized aircraft", "pressuriz|cabin altitude"],
+    ["Airspeed limitations", "\\bVNE\\b|\\bVNO\\b|never exceed|maneuvering speed"], ["Powerplant limitations", "2,700 RPM|static RPM|245 °F|50–90 PSI|tach(ometer)?'s green arc|green arc"],
+    ["Weight limits", "2,550 lb|2,200 lb|maximum weight|baggage area"], ["Maneuver limits", "load factor|limit load|abrupt|spins|chandelle|lazy eight"],
+    ["Kinds of operation limits", "kinds of operation|day VFR|known icing"], ["Fuel limitations", "unusable|level flight only|slips? or skids?|1/4 tank"],
+    ["Other limitations", "placard|flaps? 0–10|takeoff flap"] ] },
   gl3: { refs: "PHAK 4, 5 · ACS PA.I.H", units: ["gl3", "wx4"], items: [
     ["Structure of the atmosphere", "troposphere|stratosphere|nitrogen|tropopause"], ["Atmospheric pressure", "atmospheric pressure|29\\.92|inches of mercury"],
     ["Pressure altitude", "pressure altitude"], ["Density altitude", "density altitude"], ["Newton's laws of motion", "newton"],

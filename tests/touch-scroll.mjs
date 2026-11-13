@@ -20,8 +20,8 @@ async function open(route, sel) { await pg.goto(BASE + route); await pg.waitForT
 const errs = []; pg.on("pageerror", (e) => errs.push(e.message));
 if (!process.argv.includes("--audit-only")) {
   // GL2 "The numbers on the dial": swipe up starting on the dial face
-  await open("#/lesson/gl2/limits", ".viz.square .stage");
-  let r = await pg.locator(".viz.square .stage").boundingBox(); ok((await swipeFrom(r.x + r.width / 2, r.y + r.height * 0.45)) > 100, "GL2 airspeed dial: swipe on the dial scrolls the page");
+  await open("#/lesson/gl2/limits", ".viz.vspd .stage");
+  let r = await pg.locator(".viz.vspd .stage").boundingBox(); ok((await swipeFrom(r.x + r.width / 2, r.y + Math.min(r.height * 0.45, 500))) > 100, "GL2 airspeed dial (vspeeds): swipe on the dial scrolls the page");
   // Before start: blank stage area right of the item buttons
   await open("#/lesson/fw1/start", ".viz.chairfly .stage");
   const pt = await pg.evaluate(() => { const st = document.querySelector(".viz.chairfly .stage"), R = st.getBoundingClientRect();

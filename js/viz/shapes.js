@@ -1,6 +1,6 @@
 // Shared low-detail wireframe silhouettes (generic high-wing trainer, not traced from any drawing).
-import { s } from "../core/util.js?v=2b1db0b3c1";
-import { FAINT2 } from "./base.js?v=2b1db0b3c1";
+import { s } from "../core/util.js?v=3bad3dc1c8";
+import { FAINT2 } from "./base.js?v=3bad3dc1c8";
 // Side view, nose left. Origin near the CG; length ~600 units.
 export function sidePlane(parent, { stroke = FAINT2, w = 2, prop = true } = {}) {
   const g = s("g", { fill: "none", stroke, "stroke-width": w, "stroke-linejoin": "round", "stroke-linecap": "round" }, parent);
