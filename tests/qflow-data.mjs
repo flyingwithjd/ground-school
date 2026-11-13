@@ -19,7 +19,7 @@ const OLD = { v: 1, created: NOW - 30 * D, items: {
   "gl2-07": it([e(2, true, null, "exam")]),
   "gl2-08": it([e(4, false, "guess"), e(3, true, "guess")], { lapses: 1 }),                              // a guess never clears
   "zz-removed-9": it([e(2, false, "sure")], { reps: 0, ivl: 0 }) },
-  lessons: { gl2: { visited: NOW - D, sec: 3, read: ["controls"], total: 14 } }, notes: { gl2: "my debrief" }, sims: [{ t: NOW - D, n: 40, ok: 33, score: 0.825, title: "Stage 1 Check" }],
+  lessons: { gl2: { visited: NOW - D, sec: 3, read: ["controls"], total: 14 }, gl4: { visited: NOW - 2 * D, sec: 8, read: ["a", "b", "c", "d", "e", "f", "g", "h", "i"], total: 9 } }, notes: { gl2: "my debrief" }, sims: [{ t: NOW - D, n: 40, ok: 33, score: 0.825, title: "Stage 1 Check" }],
   settings: { confidence: true, newPerSession: 6 }, presolo: { airport: "KXYZ", ans: { 0: "x" } } };
 const ctx = await b.newContext({ viewport: { width: 744, height: 1133 } }); const pg = await ctx.newPage(); const errs = []; pg.on("pageerror", (x) => errs.push(x.message));
 await pg.addInitScript((old) => { try { localStorage.setItem("sqs.access", "1"); if (!sessionStorage.getItem("seeded")) { localStorage.setItem("ppg.v1", old); sessionStorage.setItem("seeded", "1"); } } catch (x) {} }, JSON.stringify(OLD));
@@ -28,8 +28,13 @@ const r = await pg.evaluate(async ({ OLD, NOW, D }) => { const v = document.quer
   const st = await imp("js/core/store.js"), srs = await imp("js/core/srs.js"), pr = await imp("js/core/progress.js"), data = await imp("data/index.js");
   const out = {}; st.save(true); const s = JSON.parse(localStorage.getItem("ppg.v1"));
   out.keys = Object.keys(localStorage).sort(); out.v = s.v; out.itemsSame = JSON.stringify(s.items) === JSON.stringify(OLD.items);
-  out.kept = JSON.stringify([s.lessons, s.notes, s.sims, s.settings, s.presolo]) === JSON.stringify([OLD.lessons, OLD.notes, OLD.sims, OLD.settings, OLD.presolo]);
+  const sk = (o) => JSON.stringify(Object.keys(o || {}).sort().map((k) => [k, o[k]]));
+  out.kept = JSON.stringify([s.lessons, s.notes, s.sims, s.presolo]) === JSON.stringify([OLD.lessons, OLD.notes, OLD.sims, OLD.presolo]) && sk(s.settings) === sk(OLD.settings); // old settings.confidence stays stored, ignored
   out.blind = s.blind; out.blindInit = s.blindInit; out.blindList = pr.blindList();
+  // pages reached: answered questions and finished lessons from before the rule count as read; nothing else does
+  out.reachInit = s.reachInit; out.reachAnswered = ["gl2-01", "gl2-05", "gl2-08"].every((id) => pr.isReached(id));
+  out.reachDone = data.lessonItems("gl4").every((id) => pr.isReached(id)); out.notReached = data.lessonItems("gl5").filter((id) => pr.isReached(id)).length;
+
   const N = data.lessonItems("gl2").length; out.ready = pr.lessonStats("gl2").readiness * N;
   out.lv = ["gl2-04", "gl2-05"].map((id) => srs.level(srs.get(id)));
   out.W = srs.READY_W; out.delay = srs.MISS_DELAY;
@@ -58,8 +63,11 @@ const r = await pg.evaluate(async ({ OLD, NOW, D }) => { const v = document.quer
   return out; }, { OLD, NOW, D });
 ok(r.v === 1 && r.keys.join() === "ppg.v1,sqs.access", "still one progress key ppg.v1 with v:1 (" + r.keys + ")");
 ok(r.itemsSame, "old item state and question ids are untouched by the migration");
-ok(r.kept, "lessons, notes, sims, settings and pre-solo answers are kept");
+ok(r.kept, "lessons, notes, sims, settings and pre-solo answers are kept ");
 ok(r.blindInit === 1, "migration marks itself done");
+ok(r.reachInit === 1 && r.reachAnswered, "pages behind questions answered before the change count as reached");
+ok(r.reachDone, "every page of a lesson finished before the change counts as reached");
+ok(r.notReached === 0, "a lesson never opened has no reached pages (" + r.notReached + ")");
 const B = r.blind; ok(B["gl2-01"] && !B["gl2-01"].done && B["gl2-01"].conf === "sure", "a Certain miss in history becomes an open Certain blind spot");
 ok(B["gl2-02"] && B["gl2-02"].done, "a miss later answered right on 2 different days is cleared");
 ok(B["gl2-03"] && !B["gl2-03"].done && B["gl2-03"].k === 2, "a Certain miss needs 3 days (2 so far)");

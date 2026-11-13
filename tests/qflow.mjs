@@ -12,18 +12,21 @@ const V = async () => pg.evaluate(() => document.querySelector('meta[name="build
 // id and correct index of the question on screen, read from the app's own data module (same URL, same instance)
 const cur = async () => pg.evaluate(async (v) => { const d = await import(`/data/index.js?v=${v}`); const m = await import(`/js/core/srs.js?v=${v}`);
   const txt = document.querySelector(".qtext").innerText.trim(); const strip = (s) => { const e = document.createElement("div"); e.innerHTML = s.replace(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g, "$1"); return e.innerText.trim(); };
-  const q = Object.values(d.QUESTIONS).find((x) => strip(x.q) === txt) || Object.values(d.ORAL).find((x) => strip(x.q) === txt);
-  return q ? { id: q.id, right: q.c ? strip(q.c[q.a]) : null, type: q.type || (q.kind === "oral" ? "oral" : "mc"), badge: !!document.querySelector(".blind-tag"), counter: document.querySelector(".qhead .label:last-child").textContent } : null; }, await V());
+  const q = Object.values(d.QUESTIONS).find((x) => strip(x.q) === txt);
+  return q ? { id: q.id, right: q.c ? strip(q.c[q.a]) : null, type: q.type || "mc", badge: !!document.querySelector(".blind-tag"), counter: document.querySelector(".qhead .label:last-child").textContent } : null; }, await V());
 const answer = async (miss, conf = 2) => { const c = await cur(); if (!c) return null;
   if (c.type === "mc") { const ch = pg.locator(".choice:not([disabled])"); const n = await ch.count(); let pick = 0;
     for (let k = 0; k < n; k++) { const t = (await ch.nth(k).innerText()).replace(/^[A-G]\s*/, "").trim(); if ((t === c.right) !== miss) { pick = k; break; } }
     await ch.nth(pick).click(); await pg.locator(".conf .chip").nth(conf).click(); }
   else if (c.type === "order") { await pg.locator(".conf .chip").nth(conf).click(); }
-  else { await pg.locator("button", { hasText: "Show model answer" }).click(); await pg.locator(".chips .chip").nth(miss ? 0 : 3).click(); }
   await pg.waitForTimeout(120); return c; };
 const nextQ = async () => { const nx = pg.locator(".verdict button", { hasText: /^(Next|Finish)$/ }); if (await nx.count()) { await nx.first().click(); await pg.waitForTimeout(150); return true; } return false; };
 const state = () => pg.evaluate(() => JSON.parse(localStorage.getItem("ppg.v1") || "null"));
 
+// Only pages the learner has opened are asked: read a lesson through to Check yourself first.
+const readAll = async (lid) => { await pg.goto(BASE + "#/lesson/" + lid + "/0"); await pg.waitForTimeout(700);
+  for (let i = 0; i < 60 && !(await pg.locator("h2", { hasText: "Answer, then trust" }).count()); i++) { await pg.locator(".secnav .pg.next").click(); await pg.waitForTimeout(120); } };
+await readAll("gl2");
 // ---- 1. a GL2 session: miss the first 3 (Certain), answer the rest right
 await pg.goto(BASE + "#/practice/gl2"); await pg.waitForSelector(".qtext"); await pg.waitForTimeout(400);
 const asked = []; const counters = []; let k = 0; const t0 = Date.now();
@@ -75,7 +78,7 @@ const card = await pg.evaluate(() => { const c = document.getElementById("blind-
 ok(card && /Blind spots/i.test(card.txt) && /^3/.test(card.num) && card.pri, "Now page shows the Blind spots card first: " + (card && card.txt.replace(/\s+/g, " ")));
 ok(!(await pg.evaluate(() => /within minutes/.test(document.body.innerText))), "no 'within minutes' text on the Now page");
 if (shot) { await pg.waitForTimeout(500); await pg.screenshot({ path: shot + "/qf_04_now_blind_card.png" }); }
-await pg.goto(BASE + "#/practice/gl3"); await pg.waitForSelector(".qtext"); await pg.waitForTimeout(300);
+await readAll("gl3"); await pg.goto(BASE + "#/practice/gl3"); await pg.waitForSelector(".qtext"); await pg.waitForTimeout(300);
 const seen3 = []; let badgeShot = false;
 while (await pg.locator(".qtext").count()) { const c = await cur(); if (!c) break; seen3.push(c);
   if (c.badge && !badgeShot && shot) { await pg.waitForTimeout(500); await pg.screenshot({ path: shot + "/qf_05_blind_badge.png" }); badgeShot = true; }

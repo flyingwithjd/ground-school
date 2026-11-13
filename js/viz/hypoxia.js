@@ -5,8 +5,8 @@
 // diluter-demand up to 40,000 ft, pressure-demand above 40,000 ft, systems certified above 18,000 ft need masks, not
 // cannulas; AC 61-107B: continuous-flow needs very careful attention above 25,000 ft; pulse-demand saves 50-85% of the oxygen.
 // AOPA Air Safety Institute hypoxia alert: below 90% SpO2 mental function begins to deteriorate.
-import { slider, chips, row } from "./base.js?v=2492b958a0";
-import { pxScene, T, L, R, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=2492b958a0";
+import { slider, chips, row } from "./base.js?v=310241b6ff";
+import { pxScene, T, L, R, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=310241b6ff";
 const SPO2 = [[0, 96], [5000, 94], [10000, 90], [15000, 70], [20000, 62]];
 export function spo2(a) { if (a > 20000) return null; for (let i = 1; i < SPO2.length; i++) if (a <= SPO2[i][0]) { const [a0, s0] = SPO2[i - 1], [a1, s1] = SPO2[i]; return Math.round(s0 + ((a - a0) / (a1 - a0)) * (s1 - s0)); } return 62; }
 const SYS = {
