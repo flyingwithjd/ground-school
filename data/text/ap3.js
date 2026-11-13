@@ -7,7 +7,8 @@ export default {
       kdr: { k: "Holding position markings; towered vs nontowered crossing.", d: "Hold short correctly; exit and clear the runway.", r: "Runway incursions.", codes: ["PA.II.D.K3", "PA.II.D.S8", "PA.II.D.R4"] } },
     { id: "twy", label: "Taxiway lines · AIM 2-3-4", title: "Yellow lines on the ground",
       body: `<p>Taxiway markings are yellow. Centered on the centerline you are on the path, but AIM says that <strong>doesn't guarantee wingtip clearance</strong>. Dashes on each side of the centerline (the enhanced centerline) warn of a runway hold line within 150 ft. A continuous double edge line means the pavement beyond isn't for aircraft; a dashed double line means it is. <span class="src">AIM 2-3-2; AIM 2-3-4</span></p>
-<p>The ILS critical area hold looks like a ladder. A single dashed line holds you short of another taxiway. <span class="src">AIM 2-3-5</span></p>`,
+<p>The ILS critical area hold looks like a ladder. A single dashed line holds you short of another taxiway. <span class="src">AIM 2-3-5</span></p>
+<p>The normal taxiway centerline is a single continuous yellow line. Taxiway edge markings define the edge of the taxiway where it doesn't match the edge of the pavement. A paved shoulder can look like full-strength pavement, but it isn't meant for aircraft and may not hold one up. <span class="src">AIM 2-3-4</span></p>`,
       viz: { type: "holdmarks" },
       kdr: { k: "Taxiway markings and their meaning.", d: "Taxi on the centerline with wingtip clearance.", r: "Collision with obstacles or other aircraft.", codes: ["PA.II.D.K3", "PA.II.D.S7", "PA.II.D.R1"] } },
     { id: "hs", label: "Hot spots · FAA Runway Safety", title: "Where pilots get lost",
