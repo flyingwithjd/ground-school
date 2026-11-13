@@ -42,3 +42,19 @@ export function pick(pool, n, { wrap = false, now = Date.now() } = {}) {
 export const cpState = (lid, key) => ((S().lessons[lid] || {}).cp || {})[key] || null;
 export function cpMark(lid, key, v) { const ls = (S().lessons[lid] ||= { visited: 0, sec: 0, read: [] }); (ls.cp ||= {})[key] = { ...v, t: Date.now() }; save(); }
 export function finish(lid) { const ls = (S().lessons[lid] ||= { visited: 0, sec: 0, read: [] }); if (!ls.fin) { ls.fin = Date.now(); save(); } }
+// The one next step for the Now page: a quick check whose pages are read but which was neither done nor skipped, else the
+// lesson in progress (most recently opened, not finished), else the next lesson in course order.
+import PI from "../../data/pageindex.js?v=310241b6ff";
+import { LESSONS, ORDER } from "../../data/index.js?v=310241b6ff";
+import { lessonDone, nextLesson } from "./progress.js?v=310241b6ff";
+export const pagesOf = (lid) => (PI.lessons[lid] || []).map(([id, label, title]) => ({ id, label, title }));
+export const pageIndex = () => PI;
+export function nextStep() { const ls = S().lessons || {};
+  const going = Object.entries(ls).filter(([lid, x]) => LESSONS[lid] && x && (x.read || []).length && !lessonDone(lid)).sort((a, b) => (b[1].visited || 0) - (a[1].visited || 0));
+  if (going.length) { const [lid, x] = going[0]; const secs = pagesOf(lid); const steps = plan(lid, secs, !!LESSONS[lid].prep); const read = new Set(x.read);
+    const cp = steps.find((s) => s.kind === "cp" && s.pages.every((p) => read.has(p)) && !cpState(lid, s.key) && pick(s.pages.flatMap((p) => pageIds(lid, p)), s.size).length);
+    const nRead = secs.filter((s) => read.has(s.id)).length;
+    if (cp) return { kind: "cp", lid, href: `#/lesson/${lid}/${cp.key}`, step: cp, nRead, nPages: secs.length };
+    return { kind: "continue", lid, href: `#/lesson/${lid}`, nRead, nPages: secs.length }; }
+  const nl = nextLesson(); if (nl) return { kind: "begin", lid: nl, href: `#/lesson/${nl}`, nRead: ((ls[nl] || {}).read || []).length, nPages: pagesOf(nl).length };
+  return { kind: "exam", href: "#/check/s4" }; }

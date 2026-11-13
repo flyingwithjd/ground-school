@@ -34,6 +34,9 @@ let nSec = 0; for (const q of Object.values(QUESTIONS)) { const k = secKey(q); i
   if (lid !== q.lesson && !(pos(lid) <= pos(q.lesson))) { console.log("SECTION LATER THAN LESSON", q.id, k); bad++; continue; } nSec++; }
 const QS = (await import("../data/qsec.js")).default; for (const id of Object.keys(QS)) if (!QUESTIONS[id]) { console.log("STALE qsec.js ENTRY", id); bad++; }
 console.log("section tags", nSec, "of", Object.keys(QUESTIONS).length);
+// The page index (Course search, Now page) must match the lesson text.
+{ const { execFileSync } = await import("child_process"); try { execFileSync("node", [new URL("../tools/build-pageindex.mjs", import.meta.url).pathname, "--check"], { stdio: "pipe" }); console.log("page index up to date"); } catch (e) { console.log("PAGE INDEX OUT OF DATE (run node tools/build-pageindex.mjs)"); bad++; } }
+{ const { SUBJECTS } = await import("../data/course.js"); for (const s of SUBJECTS) for (const l of s.lessons) if (!LESSONS[l]) { console.log("BAD SUBJECT LESSON", s.id, l); bad++; } }
 // Coverage: data/coverage.json must exist, be built from the current map, and every link must resolve to a real section.
 const cvPath = new URL("../data/coverage.json", import.meta.url);
 if (!fs.existsSync(cvPath)) { console.log("NO data/coverage.json (run node tools/build-coverage.mjs)"); bad++; }

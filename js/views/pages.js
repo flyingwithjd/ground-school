@@ -1,10 +1,12 @@
 import { h, esc, pct, fmtDue, toast, download, shuffle } from "../core/util.js?v=310241b6ff";
 import { S, save, exportJSON, importJSON, reset } from "../core/store.js?v=310241b6ff";
 import { get } from "../core/srs.js?v=310241b6ff";
-import { STAGES, MODULES, STAGE_CHECK } from "../../data/course.js?v=310241b6ff";
+import { STAGES, MODULES, STAGE_CHECK, SUBJECTS } from "../../data/course.js?v=310241b6ff";
 import { LESSONS, QUESTIONS, TOPICS, ORDER, lessonItems } from "../../data/index.js?v=310241b6ff";
 import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone, blindList, onlyReached } from "../core/progress.js?v=310241b6ff";
 import { session, practiceSet } from "./quiz.js?v=310241b6ff";
+import { nextStep, pagesOf, pageIndex, pageIds, pageStats } from "../core/flow.js?v=310241b6ff";
+import { blindPages, blindLesson } from "./blindlesson.js?v=310241b6ff";
 import { G, rich } from "../core/rich.js?v=310241b6ff";
 const page = (host) => { const p = h("div", { class: "page" }); host.append(p); return p; };
 const meter = (x, big) => `<div class="meter${big ? " big" : ""}"><i style="width:${Math.round(x * 100)}%"></i></div>`;
@@ -15,32 +17,35 @@ const curStage = () => { const nl = nextLesson(); const L = nl && LESSONS[nl]; r
 const foot = () => `<div class="footer">Squawk School is a study aid for ground training. It does not replace instruction from an authorized instructor, the FAA handbooks, the regulations, or your aircraft's Pilot's Operating Handbook. Figures for the Cessna 172S are stated from the manufacturer's published limitations for study; always use the POH for the airplane you fly. <a href="#/about">Sources and licenses</a></div>`;
 
 export function home(host) {
-  const p = page(host); const CS = curStage(); const st = stats(stageIds(CS)); const due = dueIds(); const weak = weakest(3); const nl = nextLesson(); const L = nl && LESSONS[nl];
+  const p = page(host); const CS = curStage(); const st = stats(stageIds(CS)); const due = dueIds(); const nl = nextLesson(); const L = nl && LESSONS[nl];
   // No progress = no question answered yet. Until then the page is just a clear way in: no empty progress cards.
   const answered = Object.values(S().items).some((it) => it && it.n > 0);
   if (!answered) {
-    const started = Object.keys(S().lessons).length > 0 && L;
-    const go = started ? `#/lesson/${L.id}` : `#/lesson/${ORDER.find((id) => LESSONS[id])}/0`;
+    const ns0 = nextStep(); const started = Object.values(S().lessons).some((x) => x && (x.read || []).length) && ns0.lid; const SL = started && LESSONS[ns0.lid];
+    const go = started ? ns0.href : `#/lesson/${ORDER.find((id) => LESSONS[id])}/0`;
     p.innerHTML = `<section class="hero hero-start"><span class="label">Private pilot ground school</span><h1>Learn it. Squawk it.</h1>
   <p>Short lessons, visuals you can play with, and questions that come back right before you would forget them.</p>
-  <div class="btns start-btns"><a class="btn pri arrow" id="begin" href="${go}">${started ? `Continue ${esc(L.code)}` : "Begin"}</a><a class="btn ghost" href="#/course">Browse the course</a></div></section>
+  <div class="btns start-btns"><a class="btn pri arrow" id="begin" href="${go}">${started ? (ns0.kind === "cp" ? `Quick check · ${esc(SL.code)}` : `Continue ${esc(SL.code)}`) : "Begin"}</a><a class="btn ghost" href="#/course">Browse the course</a></div></section>
   <section class="start-about"><span class="label">How it works</span><p>Squawk School is built on the FAA handbooks, the Airman Certification Standards and 14 CFR. Read a lesson, try the visuals, then answer. Every question is scheduled for review and the ones you are losing come back, so one right answer never counts as knowing it. Your review queue and weakest areas show up here once you have answered a few questions.</p></section>`;
     p.insertAdjacentHTML("beforeend", foot()); return;
   }
-  p.innerHTML = `<section class="hero"><span class="label">${esc(CS.title)} · ${esc(CS.sub)}</span><h1>What to work on now</h1>
-  <p>Reviews that are due come first, then the areas you are weakest in, then new material.</p></section>`;
-  // Cards appear only when they have something in them. The first card's button is the primary one.
+  p.innerHTML = `<section class="hero now-hero"><span class="label">${esc(CS.title)} · ${esc(CS.sub)}</span><h1>What to work on now</h1></section>`;
+  // 1. One clear next step: the quick check you reached, the lesson you are in, or the next lesson.
+  const ns = nextStep(); const NL = ns.lid && LESSONS[ns.lid];
+  const nx = h("section", { class: "nextstep", id: "next-step" });
+  if (ns.kind === "exam") nx.innerHTML = `<span class="label">Next</span><h2>End-of-course exam</h2><p>Every lesson is finished. Take the timed, mixed written exam.</p><div class="btns mt"><a class="btn pri arrow" href="#/check/s4">Start the exam</a></div>`;
+  else { const lab = ns.kind === "cp" ? `Next checkpoint · ${NL.code}` : ns.kind === "continue" ? `Continue lesson · ${NL.code}` : `Next lesson · ${NL.code}`;
+    const sub = ns.kind === "cp" ? `Quick check ${ns.step.n}: ${ns.step.size} questions on the pages you just read.` : NL.short || "";
+    const btn = ns.kind === "cp" ? "Start the quick check" : ns.kind === "continue" ? "Continue" : ns.nRead ? "Continue" : "Begin";
+    nx.innerHTML = `<span class="label">${esc(lab)}</span><h2>${esc(NL.title)}</h2><p>${esc(sub)}</p>${ns.nPages ? `<div class="ns-prog"><span class="label">${ns.nRead} of ${ns.nPages} pages</span>${meter(ns.nRead / ns.nPages)}</div>` : ""}<div class="btns mt"><a class="btn pri arrow" id="next-go" href="${ns.href}">${btn}</a>${ns.kind === "cp" ? `<a class="btn ghost" href="#/lesson/${NL.id}">Keep reading</a>` : ""}</div>`; }
+  p.append(nx);
+  // 2. Review blind spots (only when there are some), 3. due reviews.
   const open = blindList(); const ready = blindList({ ready: true }); const cells = [];
   const openSet = new Set(open); const dueOther = due.filter((id) => !openSet.has(id));   // ready blind spots are counted on their own card
   const nextBlind = () => Math.min(...open.map((id) => (get(id) ? get(id).due : Infinity)));
-  if (open.length) cells.push((pri) => `<a class="cell" href="#/blindspots" id="blind-card"><span class="label">Blind spots</span><div class="num">${open.length}<small>${open.length === 1 ? "question" : "questions"}</small></div><p>${ready.length ? `Questions you missed, back for another try. ${ready.length === open.length ? "All ready now." : `${ready.length} ready now.`}` : `Questions you missed. The next one is back ${fmtDue(nextBlind())}.`}</p><span class="go btn ${pri ? "pri" : ""} arrow">${ready.length ? "Review blind spots" : "Open blind spots"}</span></a>`);
-  if (dueOther.length) cells.push((pri) => `<a class="cell" href="#/review"><span class="label">Due for review</span><div class="num">${dueOther.length}<small>${dueOther.length === 1 ? "item" : "items"}</small></div><p>Answer these before they fade.</p><span class="go btn ${pri ? "pri" : ""} arrow">Start review</span></a>`);
-  if (weak.length) cells.push((pri) => `<a class="cell" href="#/drill/${weak[0].t.id}"><span class="label">Weakest area</span><h3>${esc(weak[0].t.title)}</h3><p>${{ over: "You answered certain and were wrong here. Fix this first.", weak: "Recent accuracy is low or items keep slipping.", fading: "You knew this, but reviews are overdue.", building: "Still early. A few more spaced reviews will lock it in." }[weak[0].c]} ${LESSONS[weak[0].t.lesson].code}.</p>${meter(weak[0].st.readiness)}<span class="go btn ${pri ? "pri" : ""} arrow">Drill it</span></a>`);
-  cells.push((pri) => L ? `<a class="cell" href="#/lesson/${L.id}"><span class="label">Next lesson · ${esc(L.code)}</span><h3>${esc(L.title)}</h3><p>${esc(L.short || "")}</p><span class="go btn ${pri ? "pri" : ""} arrow">${S().lessons[L.id] ? "Continue" : "Begin"}</span></a>` : `<a class="cell" href="#/check/s4"><span class="label">Next</span><h3>End-of-course exam</h3><p>Every lesson is read. Take the timed, mixed written exam.</p><span class="go btn ${pri ? "pri" : ""} arrow">Start</span></a>`);
-  // primary: ready blind spots, else due reviews, else the next lesson
-  const priAt = open.length && ready.length ? 0 : dueOther.length ? (open.length ? 1 : 0) : cells.length - 1;
-  const g = h("div", { class: "grid " + (cells.length === 3 ? "g3" : cells.length === 1 ? "" : "g2") }); p.append(g);
-  g.innerHTML = cells.map((c, k) => c(k === priAt)).join("");
+  if (open.length) { const pgs = blindPages().length; cells.push(`<a class="cell" href="#/blindspots" id="blind-card"><span class="label">Review blind spots</span><div class="num">${open.length}<small>${open.length === 1 ? "question" : "questions"}</small></div><p>Reread the ${pgs === 1 ? "page" : `${pgs} pages`} behind them, then answer${ready.length ? (ready.length === open.length ? ". All ready now." : `. ${ready.length} ready now.`) : `. The next one is back ${fmtDue(nextBlind())}.`}</p><span class="go btn arrow">Review blind spots</span></a>`); }
+  if (dueOther.length) cells.push(`<a class="cell" href="#/review" id="due-card"><span class="label">Due reviews</span><div class="num">${dueOther.length}<small>${dueOther.length === 1 ? "question" : "questions"}</small></div><p>Answer these before they fade.</p><span class="go btn arrow">Start review</span></a>`);
+  if (cells.length) { const g = h("div", { class: "grid now-cards " + (cells.length === 2 ? "g2" : "") }); g.innerHTML = cells.join(""); p.append(g); }
   const r = h("section", { class: "section-gap" }); p.append(r);
   r.innerHTML = `<div class="list-head"><span class="label">${esc(CS.title)} readiness</span><span class="pct">${pct(st.readiness)}</span></div>${meter(st.readiness, true)}
   <div class="grid g3 mt"><div class="cell"><span class="label">Seen</span><div class="num">${st.seen}<small>of ${st.total}</small></div><p>Questions you have answered at least once.</p></div>
@@ -49,21 +54,55 @@ export function home(host) {
   <p class="dim mt" style="font-size:15px">Readiness counts each question by your latest answer: Certain and correct counts fully, Fairly sure counts half, and a guess, a miss or an unseen question counts zero. <a href="#/coverage">Syllabus checklist</a></p>`;
   p.insertAdjacentHTML("beforeend", foot());
 }
-function row(L) { const st = lessonStats(L.id); const done = lessonDone(L.id);
-  return `<a class="row" href="#/lesson/${L.id}"><span class="code">${esc(L.code)}</span><span><div class="t">${esc(L.title)}${L.kind === "module" ? ' <span class="tag">Unit</span>' : ""}</div><div class="s">${esc(L.short || "")}${done ? " · read" : ""}</div></span><span><div class="meter"><i style="width:${Math.round(st.readiness * 100)}%"></i></div></span></a>`; }
+const lessonWeak = (id) => { const ids = lessonItems(id); const st = stats(ids); return st.blind > 0 || (st.seen >= 3 && st.readiness < 0.5); };
+const lessonStarted = (id) => ((S().lessons[id] || {}).read || []).length > 0;
+function row(L) { const st = lessonStats(L.id); const done = lessonDone(L.id); const started = lessonStarted(L.id);
+  return `<a class="row" href="#/lesson/${L.id}"><span class="code">${esc(L.code)}</span><span><div class="t">${esc(L.title)}${L.kind === "module" ? ' <span class="tag">Unit</span>' : ""}</div><div class="s">${esc(L.short || "")}${done ? ' · <span class="fin">Finished</span>' : ""}</div></span><span class="rd"><div class="meter"><i style="width:${Math.round(st.readiness * 100)}%"></i></div><span class="pr">${started || st.seen ? pct(st.readiness) : "–"}</span></span></a>`; }
+// Course: search (lessons, pages, glossary terms; a hit opens the page itself) and filter chips (stage, subject, weak or
+// not started). With nothing typed or picked it is the full course in stage order.
+const CF_KEY = "sqs.cf"; const cfLoad = () => { try { return JSON.parse(sessionStorage.getItem(CF_KEY)) || {}; } catch (e) { return {}; } };
 export function course(host) {
-  const p = page(host);
+  const p = page(host); const f = { q: "", stage: 0, subj: "", status: "", ...cfLoad() }; const keep = () => { try { sessionStorage.setItem(CF_KEY, JSON.stringify(f)); } catch (e) {} };
   const inc = (L) => (L.includes || []).map((u) => LESSONS[u]).filter(Boolean);
   const stageBlock = (S0) => `<section class="section-gap"><div class="list-head"><span class="label">${esc(S0.title)} · ground</span><span class="label">Readiness</span></div>
     <p class="dim" style="font-size:15.5px;margin:10px 6px 6px">${esc(S0.sub)}</p>
     ${S0.ground.map((id) => { const L = LESSONS[id]; const kids = inc(L); return row(L) + (kids.length ? `<div class="subrows">${kids.map((U) => row(U)).join("")}</div>` : ""); }).join("")}
     ${S0.flight.length ? `<div class="list-head section-gap"><span class="label">${esc(S0.title)} · flight lesson briefings</span><span class="label">Readiness</span></div>${S0.flight.map((id) => row(LESSONS[id])).join("")}` : ""}</section>`;
-  p.innerHTML = `<section class="hero"><span class="label">Course</span><h1>Four stages, nineteen ground lessons</h1><p>Sequenced like a Part 141 private pilot syllabus and keyed to the Private Pilot ACS. Indented rows are units taught inside the lesson above them. The bar on each row is readiness: what you would recall today.</p>
-  <div class="btns mt"><a class="btn pri arrow" href="#/coverage">Syllabus checklist</a><a class="btn arrow" href="#/presolo">Pre-solo written</a></div></section>
-  ${STAGES.map(stageBlock).join("")}
+  const full = () => `${STAGES.map(stageBlock).join("")}
   <div class="list-head section-gap"><span class="label">Modules · the same units grouped by subject</span><span class="label">Readiness</span></div>
-  ${MODULES.map((m) => { const st = stats(m.units.flatMap((u) => lessonItems(u))); return `<a class="row" href="#/module/${m.id}"><span class="code">${esc(m.id.toUpperCase().slice(0, 6))}</span><span><div class="t">${esc(m.title)}</div><div class="s">${esc(m.sub)}</div></span><span><div class="meter"><i style="width:${Math.round(st.readiness * 100)}%"></i></div></span></a>`; }).join("")}
-  ${foot()}`;
+  ${MODULES.map((m) => { const st = stats(m.units.flatMap((u) => lessonItems(u))); return `<a class="row" href="#/module/${m.id}"><span class="code">${esc(m.id.toUpperCase().slice(0, 6))}</span><span><div class="t">${esc(m.title)}</div><div class="s">${esc(m.sub)}</div></span><span class="rd"><div class="meter"><i style="width:${Math.round(st.readiness * 100)}%"></i></div><span class="pr">${st.seen ? pct(st.readiness) : "–"}</span></span></a>`; }).join("")}`;
+  p.innerHTML = `<section class="hero course-hero"><span class="label">Course</span><h1>Find a lesson</h1><p>Search or filter. The bar on each row is readiness: what you would recall today.</p></section>
+  <div class="finder"><div class="field search"><input type="search" id="cq" placeholder="Search lessons, pages and terms" aria-label="Search lessons, pages and terms" autocomplete="off" enterkeyhint="go"></div>
+  <div class="chips" id="cf-stage" role="group" aria-label="Stage"></div><div class="chips frow" id="cf-subj" role="group" aria-label="Subject"></div></div>
+  <div id="clist"></div>
+  <div class="btns mt2"><a class="btn arrow" href="#/coverage">Syllabus checklist</a><a class="btn arrow" href="#/presolo">Pre-solo written</a></div>${foot()}`;
+  const inp = p.querySelector("#cq"); inp.value = f.q; const list = p.querySelector("#clist");
+  const chip = (txt, on, fn, extra = "") => { const b = h("button", { class: "chip" + (on ? " on" : "") + extra, type: "button", "aria-pressed": on ? "true" : "false" }, txt); b.onclick = fn; return b; };
+  function chipsDraw() { const a = p.querySelector("#cf-stage"), b = p.querySelector("#cf-subj"); a.innerHTML = ""; b.innerHTML = "";
+    a.append(chip("All", !f.stage && !f.status && !f.subj, () => { f.stage = 0; f.status = ""; f.subj = ""; upd(); }));
+    [["weak", "Weak"], ["new", "Not started"]].forEach(([k, l]) => a.append(chip(l, f.status === k, () => { f.status = f.status === k ? "" : k; upd(); }, " st")));
+    STAGES.forEach((s) => a.append(chip(`Stage ${s.n}`, f.stage === s.n, () => { f.stage = f.stage === s.n ? 0 : s.n; upd(); })));
+    SUBJECTS.forEach((s) => b.append(chip(s.title, f.subj === s.id, () => { f.subj = f.subj === s.id ? "" : s.id; upd(); }))); }
+  const allLessons = () => [...ORDER.filter((id) => LESSONS[id]).flatMap((id) => [id, ...((LESSONS[id].includes) || [])]), ...Object.keys(LESSONS).filter((id) => !ORDER.includes(id) && !Object.values(LESSONS).some((L) => (L.includes || []).includes(id)))];
+  function filtered() { const sub = f.subj && SUBJECTS.find((s) => s.id === f.subj); return [...new Set(allLessons())].filter((id) => { const L = LESSONS[id];
+    if (f.stage && (L.stage || 1) !== f.stage) return false; if (sub && !sub.lessons.includes(id)) return false;
+    if (f.status === "weak" && !lessonWeak(id)) return false; if (f.status === "new" && lessonStarted(id)) return false; return true; }); }
+  function search(q) { const toks = q.toLowerCase().split(/\s+/).filter(Boolean); const has = (s) => { s = s.toLowerCase(); return toks.every((t) => s.includes(t)); }; const PI = pageIndex(); const out = [];
+    const ok = new Set(filtered());
+    for (const id of allLessons()) { const L = LESSONS[id]; if (ok.has(id) && has(`${L.code} ${L.title} ${L.short || ""}`)) out.push({ k: "Lesson", href: `#/lesson/${id}`, t: L.title, s: `${L.code}${L.short ? " · " + L.short : ""}`, w: has(L.title) ? 0 : 1 }); }
+    for (const id of allLessons()) { if (!ok.has(id)) continue; const L = LESSONS[id]; (PI.lessons[id] || []).forEach(([sid, label, title], i) => { if (has(`${title} ${label}`)) out.push({ k: "Page", href: `#/lesson/${id}/${sid}`, t: title || label, s: `${L.code} ${L.title} · page ${i + 1}`, w: has(title) ? 2 : 3 }); }); }
+    for (const k of Object.keys(G)) { const g = G[k]; if (!has(g.term || k)) continue; const at = PI.terms[Object.keys(PI.terms).find((x) => x.toLowerCase() === k)] || null; const [lid, sid] = at ? at.split("/") : [];
+      const pg = lid && (PI.lessons[lid] || []).find((x) => x[0] === sid); const def = String(g.def || "").replace(/<[^>]+>/g, "");
+      out.push({ k: "Term", href: pg ? `#/lesson/${lid}/${sid}` : `#/glossary/${encodeURIComponent(k)}`, t: g.term || k, s: `${def.length > 90 ? def.slice(0, 88) + "…" : def}${pg ? ` · ${LESSONS[lid].code} ${pg[2] || pg[1]}` : ""}`, w: (g.term || k).toLowerCase() === q.toLowerCase() ? -1 : 4 }); }
+    return out.sort((a, b) => a.w - b.w).slice(0, 30); }
+  function draw() { const q = f.q.trim(); const any = f.stage || f.subj || f.status;
+    if (q) { const r = search(q); list.innerHTML = `<div class="list-head section-gap"><span class="label">Results for “${esc(q)}”</span><span class="pct">${r.length}</span></div>` + (r.length ? r.map((x) => `<a class="row srow" href="${x.href}"><span class="code">${x.k}</span><span><div class="t">${esc(x.t)}</div><div class="s">${esc(x.s)}</div></span></a>`).join("") : `<p class="dim mt">No match. Try a shorter word, or clear the filters.</p>`); return; }
+    if (any) { const ids = filtered(); list.innerHTML = `<div class="list-head section-gap"><span class="label">${ids.length} lesson${ids.length === 1 ? "" : "s"}</span><span class="label">Readiness</span></div>` + (ids.length ? ids.map((id) => row(LESSONS[id])).join("") : `<p class="dim mt">${f.status === "weak" ? "Nothing weak here. Weak means a blind spot or low readiness after a few answers." : "Nothing matches these filters."}</p>`); return; }
+    list.innerHTML = full(); }
+  function upd() { keep(); chipsDraw(); draw(); }
+  inp.oninput = () => { f.q = inp.value; keep(); draw(); };
+  inp.onkeydown = (e) => { if (e.key === "Enter") { const a = list.querySelector("a.row"); if (a) { e.preventDefault(); location.hash = a.getAttribute("href"); } } };
+  chipsDraw(); draw();
 }
 export function moduleView(host, id) { const m = MODULES.find((x) => x.id === id); const p = page(host); if (!m) { p.innerHTML = "<h2>Module not found.</h2>"; return; }
   const ids = m.units.flatMap((u) => lessonItems(u));
@@ -75,10 +114,8 @@ export function review(host) { const due = dueIds(); const pool = onlyReached(al
   const b = new Set(blindList({ ready: true })); const queue = [...due.filter((id) => b.has(id)).slice(0, 10), ...due.filter((id) => !b.has(id))].slice(0, 25);
   return runSession(host, { queue, more: (ex) => [...due, ...seen].filter((id) => !ex.has(id)).slice(0, 10), mode: "review", title: "Review", label: `Review · ${due.length} due`, intro: due.length ? "" : (seen.length ? `Next review ${fmtDue(nextDue())}. You can keep going ahead of schedule; early correct answers do not stretch your schedule.` : "Nothing is scheduled yet. Open a lesson and answer its questions to start your review schedule."), onExit: () => (location.hash = "#/") }); }
 // Every open blind spot whose 12-hour wait is over, Certain misses first.
-export function blindspots(host) { const open = blindList(); const ready = () => blindList({ ready: true });
-  const next = Math.min(...open.map((id) => (get(id) ? get(id).due : Infinity)));
-  return runSession(host, { queue: ready().slice(0, 25), more: (ex) => ready().filter((id) => !ex.has(id)).slice(0, 10), mode: "review", title: "Blind spots", label: `Blind spots · ${open.length}`,
-    intro: open.length ? `Your ${open.length} blind spot${open.length > 1 ? "s are" : " is"} waiting out the 12 hours. The next one is back ${fmtDue(next)}.` : "No blind spots right now. A question you miss lands here and comes back 12 hours later.", onExit: () => (location.hash = "#/") }); }
+// The Review blind spots lesson: reread the pages behind your blind spots, then answer only those (js/views/blindlesson.js).
+export function blindspots(host, at) { return blindLesson(host, at); }
 export function practice(host, id) {
   let ids, title;
   if (id.startsWith("mod-")) { const m = MODULES.find((x) => "mod-" + x.id === id); if (!m) return; ids = m.units.flatMap((u) => lessonItems(u)); title = m.title; }

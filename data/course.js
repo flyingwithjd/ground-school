@@ -29,3 +29,15 @@ export const STAGE_CHECK = {
   s3: { id: "gl18", title: "Stage 3 check", covers: "GL13–GL17", pool: [...S3, "gl18"], n: 40, minutes: 60, pass: 0.8 },
   s4: { id: "gl19", title: "End-of-course exam", covers: "Stages 1–3", pool: [...S1, "gl6", ...S2, "gl12", ...S3, "gl18", "gl19"], n: 60, minutes: 120, pass: 0.8 },
 };
+// Subjects for the Course page filters. A lesson can sit under more than one subject.
+export const SUBJECTS = [
+  { id: "aircraft", title: "Aircraft", lessons: ["gl1", "gl2", "vs1", "fw1", "gl5", "gl13", "wx4"] },
+  { id: "aero", title: "Aerodynamics", lessons: ["gl3", "gl5", "wx3"] },
+  { id: "weather", title: "Weather", lessons: ["gl7", "gl8", "wx1", "wx2", "wx3", "wx4"] },
+  { id: "nav", title: "Navigation", lessons: ["gl14", "gl10"] },
+  { id: "regs", title: "Regulations", lessons: ["gl11", "rg1", "rg2", "rg3", "gl10", "mn1"] },
+  { id: "airport", title: "Airport/Radio", lessons: ["gl4", "ap1", "ap2", "ap3", "ap4", "ap5", "ap6", "ap7", "rc1", "gl15"] },
+  { id: "emerg", title: "Emergencies", lessons: ["gl9", "em1", "em2"] },
+  { id: "human", title: "Pilot & safety", lessons: ["gl16", "ad1", "ad2", "gl17", "gl15", "mn1"] },
+  { id: "flight", title: "Flight lessons", lessons: ["fl1", "fl2", "fl3", "fl4", "fl5", "fl6", "fl7", "fw1"] },
+];
