@@ -1,6 +1,8 @@
 // Global glossary. Every [[term]] in lesson text opens one of these. Definitions are plain-language
 // paraphrases of the cited FAA source (mostly the PHAK glossary). Keys are case-insensitive.
 export const GLOSSARY = {
+  "Wind shear": { def: "A sudden change in wind speed or direction over a short distance. Near the ground it can suddenly change airspeed and lift on takeoff or landing.", src: "PHAK Ch 12" },
+  "Wake turbulence": { def: "Turbulence behind an airplane, mostly from its wingtip vortices. It is strongest behind a heavy, clean, slow airplane.", src: "AIM 7-4" },
   "BasicMed": { def: "An alternative to holding an FAA medical certificate for eligible pilots who meet its medical, course and operating conditions. It is not automatic eligibility for a new student pilot.", src: "14 CFR 61.23(c)(3), 61.113(i) · Part 68" },
   "Throttle": { def: "The cockpit control that sets engine power. In a piston trainer, moving it forward increases power and pulling it back reduces power.", src: "PHAK Ch 7" },
   "Rudder pedals": { def: "The foot controls that move the rudder. On a 172 they also steer the nosewheel, and pressing their tops applies the toe brakes.", src: "PHAK Ch 3 \u00b7 C172S POH Sec 7" },

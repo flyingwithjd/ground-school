@@ -2,7 +2,8 @@ export default {
   sections: [
     { id: "dec", label: "The decision · AFH 9", title: "Decide early",
       body: `<p>Any approach can end in a go-around. The dangerous part is waiting. Two things delay the decision: <strong>landing expectancy</strong>, the belief that it will work out, and <strong>pride</strong>, the feeling that going around is a failure. <span class="src">AFH 9</span></p>
-<p>Typically, go around if the approach is not stabilized by 500 ft above the airport in VMC, and right away if it becomes unstabilized below 300 ft AGL. <span class="src">AFH 9</span></p>`,
+<p>Typically, go around if the approach is not stabilized by 500 ft above the airport in VMC, and right away if it becomes unstabilized below 300 ft AGL. <span class="src">AFH 9</span></p>
+<p>Anything that makes the landing unsafe is a reason too: an animal, vehicle or airplane on the runway, [[wind shear]], [[wake turbulence]], or an instruction from the tower. Go around right away; it only gets dangerous when it is delayed. <span class="src">AFH 9</span></p>`,
       kdr: { k: "Stabilized approach; reasons to go around.", d: "Make a timely decision.", r: "Delayed recognition; landing expectancy.", codes: ["PA.IV.N.K1", "PA.IV.N.S3", "PA.IV.N.R1"] } },
     { id: "exec", label: "Execution · AFH 9, POH 4", title: "Power, attitude, configuration",
       body: `<p><strong>Power:</strong> full, smoothly, without hesitation. <strong>Attitude:</strong> the trim is set for a slow glide, so the nose will rise and yaw left. Hold forward pressure and right rudder, then rough-trim. <strong>Configuration:</strong> raise the flaps in steps. <span class="src">AFH 9</span></p>

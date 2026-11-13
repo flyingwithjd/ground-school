@@ -20,8 +20,4 @@ export default {
     Q("gl4x-14", "gl4.incursion", "When should you run checklists during taxi?", ["With the airplane stopped", "While crossing runways", "While taxiing at speed", "Only after takeoff"], "Keep your eyes outside while moving.", "PHAK 14"),
     Q("gl4x-15", "gl4.incursion", "ATC gives you an instruction you can't safely follow. You should:", ["Say \"unable\" and get amended instructions", "Comply anyway", "Ignore it", "Change frequency"], "91.123 requires compliance, but you have the final authority.", "PHAK 14 · 14 CFR 91.123"),
   ],
-  oral: [
-    { id: "gl4x-o1", t: "gl4.incursion", acs: "PA.II.D.K6c", q: "How do you avoid a runway incursion at an unfamiliar towered airport?", a: "<p>Study the airport diagram and NOTAMs before I go, then trace the taxi route. I'll write down the clearance and read back every hold-short with the runway and call sign. Do checklists stopped, keep my head outside, and ask for progressive taxi if unsure. Never cross a hold line without explicit clearance, and scan the runway and final first even when cleared.</p>", src: "PHAK 14" },
-    { id: "gl4x-o2", t: "gl4.radar", acs: "PA.III.A.K7", q: "What do you get from VFR flight following, and what don't you get?", a: "<p>Traffic advisories, safety alerts, limited vectors on request and help if something goes wrong, all workload permitting. I don't get guaranteed separation, and it doesn't relieve me of see and avoid, weather minimums or terrain clearance. Traffic is called relative to my track.</p>", src: "AIM 4-1-15, 4-1-18" },
-  ],
 };

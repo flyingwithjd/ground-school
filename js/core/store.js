@@ -1,6 +1,6 @@
 // Local-only persistence. One key, versioned. No network.
 const KEY = "ppg.v1";
-const blank = () => ({ v: 1, created: Date.now(), items: {}, lessons: {}, notes: {}, sims: [], blind: {}, settings: { confidence: true, newPerSession: 12 } });
+const blank = () => ({ v: 1, created: Date.now(), items: {}, lessons: {}, notes: {}, sims: [], blind: {}, settings: { newPerSession: 12 } });   // an old saved settings.confidence is ignored: confidence is always asked
 let state = load();
 function load() {
   try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 1) return { ...blank(), ...s, settings: { ...blank().settings, ...(s.settings || {}) } }; } catch (e) {}

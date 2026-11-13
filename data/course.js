@@ -24,8 +24,8 @@ const S1 = ["gl1", "gl2", "vs1", "gl3", "gl4", "gl5", "fw1", "ap1", "ap2", "ap3"
 const S2 = ["gl7", "gl8", "gl9", "gl10", "gl11", "em1", "em2", "rg1", "rg2", "rg3"];
 const S3 = ["gl13", "gl14", "gl15", "gl16", "gl17", "ad1", "ad2", "mn1"];
 export const STAGE_CHECK = {
-  s1: { id: "gl6", title: "Stage 1 check", covers: "GL1–GL5", pool: [...S1, "gl6"], n: 40, minutes: 60, pass: 0.8, oralN: 12 },
-  s2: { id: "gl12", title: "Stage 2 check", covers: "GL7–GL11", pool: [...S2, "gl12"], n: 40, minutes: 60, pass: 0.8, oralN: 12 },
-  s3: { id: "gl18", title: "Stage 3 check", covers: "GL13–GL17", pool: [...S3, "gl18"], n: 40, minutes: 60, pass: 0.8, oralN: 12 },
-  s4: { id: "gl19", title: "End-of-course exam", covers: "Stages 1–3", pool: [...S1, "gl6", ...S2, "gl12", ...S3, "gl18", "gl19"], n: 60, minutes: 120, pass: 0.8, oralN: 20 },
+  s1: { id: "gl6", title: "Stage 1 check", covers: "GL1–GL5", pool: [...S1, "gl6"], n: 40, minutes: 60, pass: 0.8 },
+  s2: { id: "gl12", title: "Stage 2 check", covers: "GL7–GL11", pool: [...S2, "gl12"], n: 40, minutes: 60, pass: 0.8 },
+  s3: { id: "gl18", title: "Stage 3 check", covers: "GL13–GL17", pool: [...S3, "gl18"], n: 40, minutes: 60, pass: 0.8 },
+  s4: { id: "gl19", title: "End-of-course exam", covers: "Stages 1–3", pool: [...S1, "gl6", ...S2, "gl12", ...S3, "gl18", "gl19"], n: 60, minutes: 120, pass: 0.8 },
 };

@@ -21,8 +21,4 @@ export default {
     Q("gl8x-15", "gl8.atcwx", "Datalink NEXRAD in the cockpit may be how much older than the time shown?", ["15 to 20 minutes", "Less than 10 seconds", "Exactly 1 minute", "It's always real time"], "It shows where the weather was.", "AIM 7-1"),
     Q("gl8x-16", "gl8.atcwx", "The right way to use datalink weather around thunderstorms is:", ["Strategically, to plan a route that avoids them entirely", "Tactically, to pick a path between cells", "To find the thinnest part of the line", "Not at all"], "Stay at least 20 miles from severe storms.", "AIM 7-1"),
   ],
-  oral: [
-    { id: "gl8x-o1", t: "gl8.atcwx", acs: "PA.I.C.R2a", q: "Your tablet shows a gap in a line of storms ahead. Do you fly through it?", a: "<p>No. Datalink NEXRAD can be 15–20 minutes older than its time stamp, so the gap may have closed. I'd use it strategically: divert around the whole area, staying at least 20 miles from severe cells, or land and wait. I'd ask ATC or Flight Service for help and listen for PIREPs.</p>", src: "AIM 7-1" },
-    { id: "gl8x-o2", t: "gl8.obs", acs: "PA.I.C.K2", q: "Why look at a satellite image if you already have radar?", a: "<p>Radar shows precipitation only. Satellite shows the clouds themselves, including fog and stratus that produce no rain. Visible imagery works in daylight; infrared shows cloud-top temperatures day and night, so cold tops mean high, possibly convective clouds.</p>", src: "AWH 24.6–24.7" },
-  ],
 };

@@ -20,7 +20,4 @@ export default {
     { id: "fl2-13", t: "fl2.climb", q: "What are VY and VX in the 172S at sea level?", c: ["74 and 62 KIAS", "62 and 74 KIAS", "68 and 55 KIAS", "85 and 74 KIAS"], a: 0, why: "Best rate 74 KIAS (most altitude per time); best angle 62 KIAS (most altitude per distance).", src: "C172S POH Sec 4" },
     { id: "fl2-14", t: "fl2.climb", q: "In a descent at a constant airspeed, what mainly controls the rate of descent?", c: ["Power", "Ailerons", "Rudder", "Trim alone"], a: 0, why: "Pitch holds the airspeed; power sets how fast you climb or descend. The AFH: pitch plus power controls the energy state.", src: "AFH Ch 3, 4" },
   ],
-  oral: [
-    { id: "fl2-o1", t: "fl2.att", acs: "PA.I.F.K3", q: "Explain how you enter and hold a level medium-bank turn, and why each input is needed.", a: "<p>Look for traffic, roll in with aileron and coordinated rudder (to cancel adverse yaw), stop the roll at the bank you want and neutralize aileron (a medium bank holds itself). Add back pressure because lift is tilted and the vertical part must still equal weight. Hold the nose on a spot relative to the horizon, check altitude. Lead the rollout by about half the bank angle in degrees of heading, a common rule your instructor may use.</p>", src: "AFH Ch 3" },
-  ],
 };

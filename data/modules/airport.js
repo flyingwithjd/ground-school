@@ -19,9 +19,7 @@ export default [
       A("ap1-11", "ap1.lay", "Before taxiing at an unfamiliar airport, the best single preparation is:", ["Study the airport diagram, the hot spots and your expected route", "Ask the passenger to navigate", "Taxi fast to reduce time on the movement area", "Rely on the taxiway signs alone"], "ACS PA.II.D expects you to use an airport diagram and to plan the route before you move.", "ACS PA.II.D.S2, K6a"),
       A("ap1-12", "ap1.num", "Wind from the tower is reported in:", ["Magnetic degrees and knots", "True degrees and mph", "Magnetic degrees and mph", "True degrees and knots"], "Tower and ATIS winds are magnetic; METAR and TAF winds are true.", "AIM 4-3-6"),
     ],
-    oral: [
-      { id: "ap1-o1", t: "ap1.num", acs: "PA.III.B.S4", q: "How is a runway numbered, and how would you know which way runway 22 points?", a: "<p>The number is the magnetic azimuth of the centerline to the nearest 10°, with the last zero dropped. Runway 22 points about 220° magnetic, roughly southwest. Its other end is 04, 180° away. Parallels add L, C or R, read left to right from the approach. The tower's winds are magnetic too, so I can compare them directly.</p>", src: "AIM 4-3-6; AIM 2-3-3" },
-    ] },
+},
   { id: "ap2", code: "AP2", stage: 1, kind: "module", title: "Runway Markings", short: "Visual, nonprecision and precision runways; displaced thresholds; blast pads",
     intro: "Runway paint tells you how the runway is used, where to touch down, and where you may not land.",
     refs: ["AIM 2-3-2, 2-3-3", "AC 150/5340-1M"],
@@ -42,9 +40,7 @@ export default [
       A("ap2-13", "ap2.disp", "A closed runway is marked with:", ["A yellow X at each end", "Red chevrons", "White arrows", "A flashing white light"], "Yellow crosses mark closed runways and taxiways: at each end if temporary, and every 1,000 ft too if permanent.", "AIM 2-3 (FIG 2-3-22)"),
       A("ap2-14", "ap2.disp", "A relocated threshold differs from a displaced one because:", ["The pavement before a relocated threshold is closed, usually by NOTAM", "It is permanent", "You may land on the pavement before it", "It is marked in blue"], "Relocation closes part of the runway, often temporarily, and shortens the opposite direction too.", "AIM 2-3-3"),
     ],
-    oral: [
-      { id: "ap2-o1", t: "ap2.disp", acs: "PA.III.B.S1", q: "You see arrows leading to a white bar and yellow chevrons before them. What may you do on each part?", a: "<p>The chevrons mark a blast pad or stopway: unusable for landing, takeoff or taxiing. The arrows are runway behind a displaced threshold: I may use it for takeoff in either direction, and for rollout when landing from the other direction, but I don't touch down on it from this side. Landing starts at the white threshold bar.</p>", src: "AIM 2-3-3" },
-    ] },
+},
   { id: "ap3", code: "AP3", stage: 1, kind: "module", title: "Taxiway Markings", short: "Centerlines, edges, hold short lines, ILS areas and hot spots",
     intro: "Most runway incursions start with a pilot who didn't know which side of a yellow line they were on.",
     refs: ["AIM 2-3-4 to 2-3-6", "FAA Hot Spots"],
@@ -64,10 +60,7 @@ export default [
       A("ap3-12", "ap3.hs", "Surface-painted red signs with white numbers on a taxiway are found:", ["Left of the centerline on the holding side, before the holding position marking", "Right of the centerline, after the hold line", "On the runway centerline", "Only on the ramp"], "Surface-painted location signs (black with yellow) are right of the centerline.", "AIM 2-3-4"),
       A("ap3-13", "ap3.twy", "What color are taxiway markings?", ["Yellow", "White", "Blue", "Green"], "Runway markings are white; taxiway and holding markings are yellow.", "AIM 2-3-2"),
     ],
-    oral: [
-      { id: "ap3-o1", t: "ap3.hold", acs: "PA.II.D.S8", q: "Describe the runway hold short marking and how you use it going to and coming from the runway.", a: "<p>Four yellow lines across the taxiway: two solid and two dashed. The solid lines face me on the way to the runway, and I stop with no part of the airplane beyond them until I'm cleared (towered) or I've made sure the runway and approach are clear (nontowered). Leaving the runway I meet the dashed side first, and I'm not clear until every part of the airplane has crossed. I don't stop on the lines.</p>", src: "AIM 2-3-5" },
-      { id: "ap3-o2", t: "ap3.hs", acs: "PA.II.D.R4", q: "How do you guard against a runway incursion on taxi?", a: "<p>Brief the route on the airport diagram before moving, noting hot spots and every runway crossing. Write down and read back the taxi instructions, including all hold-short instructions. Keep heads-down tasks for when stopped. Look for the hold line, the red sign and the guard lights. If unsure, stop and ask.</p>", src: "AIM 2-3-5; ACS PA.II.D; FAA Hot Spots" },
-    ] },
+},
   { id: "ap4", code: "AP4", stage: 1, kind: "module", title: "Airport Signs", short: "Six sign types: what each means and what you do",
     intro: "Colors come first. Red means you are at an entrance you need permission or caution for. Black says where you are. Yellow says where to go.",
     refs: ["AIM 2-3-7 to 2-3-13", "AC 150/5340-18H"],
@@ -88,9 +81,7 @@ export default [
       A("ap4-13", "ap4.dir", "Information signs (yellow with black) give things like:", ["Radio frequencies, noise abatement, areas the tower cannot see", "Clearances", "Hold short instructions", "Runway closures only"], "They inform; they don't command.", "AIM 2-3-12"),
       A("ap4-14", "ap4.mand", "On a taxiway at the beginning of the takeoff runway, the red holding sign may show:", ["Only the takeoff runway's number", "Both runway numbers always", "The taxiway letter", "The word STOP"], "Elsewhere, signs show both runway directions.", "AIM 2-3-8"),
     ],
-    oral: [
-      { id: "ap4-o1", t: "ap4.mand", acs: "PA.II.D.K3", q: "Walk me through the sign colors and what you do at each.", a: "<p>White on red is mandatory: a runway holding position, an approach area, an ILS critical area or no entry. I stop and need a clearance or a clear runway. Yellow on black is a location sign: where I am, including the boundary signs I must pass to be clear of the runway or ILS area. Black on yellow is direction, destination or information: where to go. White on black beside the runway is distance remaining in thousands of feet.</p>", src: "AIM 2-3-7 to 2-3-13" },
-    ] },
+},
   { id: "ap5", code: "AP5", stage: 1, kind: "module", title: "Airport Lighting", short: "Beacons, runway and taxi lights, PAPI and VASI, pilot-controlled lighting",
     intro: "At night an airport is only lights. Each color and flash has one meaning.",
     refs: ["AIM 2-1", "PHAK Ch 14"],
@@ -112,10 +103,7 @@ export default [
       A("ap5-14", "ap5.bcn", "Pilot-controlled lights stay on for:", ["15 minutes from the most recent activation", "5 minutes", "1 hour", "Until you key off"], "Key again before final even if they are already on.", "AIM 2-1-8"),
       A("ap5-15", "ap5.bcn", "Airport beacons flash about:", ["24 to 30 times per minute", "60 times per minute", "10 times per minute", "Once every 10 seconds"], "Heliport beacons: 30 to 45.", "AIM 2-1-9"),
     ],
-    oral: [
-      { id: "ap5-o1", t: "ap5.gs", acs: "PA.XI.A.K2", q: "You're on a night approach with a PAPI. Describe what you see and how you use it.", a: "<p>Four lights in a row, normally left of the runway. Two white and two red is on a typical 3° path; three white slightly high; four white high; three red slightly low; four red low. I don't start down on it until I'm aligned with the runway, and I treat four red as a must-fix right now because obstacle clearance is only guaranteed on the path, within ±10° and 3.4 NM.</p>", src: "PHAK Fig 14-30; AIM 2-1-2" },
-      { id: "ap5-o2", t: "ap5.bcn", acs: "PA.XI.A.K2", q: "How do you turn on the lights at a nontowered field at night?", a: "<p>Find the pilot-controlled lighting frequency in the Chart Supplement; it's often the CTAF. Key the mic 7 times within 5 seconds for full intensity, then 5 or 3 if I want it dimmer. The lights run 15 minutes from the last activation, so I key again before final.</p>", src: "AIM 2-1-8" },
-    ] },
+},
   { id: "ap6", code: "AP6", stage: 1, kind: "module", title: "Wind Indicators & Light Signals", short: "Wind sock, tetrahedron, segmented circle and the tower's light gun",
     intro: "No radio, no tower? The ground still tells you the wind, the runway and which way to turn.",
     refs: ["AIM 4-3-4", "AIM 4-3-13", "PHAK Ch 14"],
@@ -136,10 +124,7 @@ export default [
       A("ap6-13", "ap6.gun", "On the ground, a flashing red light means:", ["Taxi clear of the runway in use", "Stop", "Airport unsafe", "Cleared to cross"], "Steady red on the ground: stop.", "AIM 4-3-13"),
       A("ap6-14", "ap6.gun", "On the ground in daylight, how do you acknowledge a light signal?", ["Move the ailerons or rudder", "Flash the beacon", "Key the mic 3 times", "Rock the wings"], "At night, blink the landing or navigation lights.", "AIM 4-3-13"),
     ],
-    oral: [
-      { id: "ap6-o1", t: "ap6.gun", acs: "PA.III.A.K3", q: "Your radio fails in the pattern at a towered airport. What light signals might you see, and what do they mean?", a: "<p>In flight: steady green, cleared to land; flashing green, return for landing; steady red, give way and keep circling; flashing red, airport unsafe, don't land; alternating red and green, extreme caution. On the ground: steady green takeoff, flashing green taxi, steady red stop, flashing red taxi clear of the runway, flashing white return to the starting point. I watch the tower and acknowledge as published.</p>", src: "AIM 4-3-13" },
-      { id: "ap6-o2", t: "ap6.seg", acs: "PA.II.D.K4", q: "Arriving at a nontowered field with no one on the radio, how do you pick the runway and the pattern direction?", a: "<p>Overfly well above pattern altitude and read the wind sock: its big end points into the wind. Pick the runway most nearly into the wind. Check the segmented circle: a traffic pattern indicator for that runway shows right traffic; otherwise it's left. A tetrahedron's small end shows landing direction but can be hand-set, so the sock wins. Then go well clear, descend, and enter on the 45 at pattern altitude.</p>", src: "AIM 4-3-4; AC 90-66C 11.2, 11.3, 11.5" },
-    ] },
+},
   { id: "ap7", code: "AP7", stage: 1, kind: "module", title: "Towered & Nontowered", short: "CTAF, UNICOM, runway choice, the 45° entry and calls",
     intro: "At a towered field, ATC sequences you. At a nontowered field, everyone sequences themselves, so everyone must fly the same pattern and say the same things.",
     refs: ["AIM 4-1-9", "AIM 4-3", "AC 90-66C"],
@@ -159,8 +144,5 @@ export default [
       A("ap7-12", "ap7.pat", "Maintain pattern altitude on downwind until at least:", ["Abeam the approach end of the landing runway", "Midfield", "Turning base", "Crossing the departure end"], "Then turn base about 45° relative bearing from the approach end.", "AC 90-66C 11.4"),
       A("ap7-13", "ap7.ctaf", "At a part-time tower that is closed, you:", ["Use the CTAF to self-announce", "Call the closed tower anyway", "Use 121.5", "Need not talk at all"], "AIM 4-1-9.", "AIM 4-1-9"),
     ],
-    oral: [
-      { id: "ap7-o1", t: "ap7.ctaf", acs: "PA.III.A.S2", q: "Give me your calls arriving at a nontowered airport.", a: "<p>Frequency from the chart or Chart Supplement. About 10 miles out: \"[Airport] traffic, Skyhawk [N-number], 10 miles south, [altitude], inbound for left downwind runway [number], [airport].\" Then entering downwind, base and final, and clear of the runway, each starting and ending with the airport name. Runway numbers, not \"active.\" Never \"traffic in the area, please advise.\"</p>", src: "AIM 4-1-9" },
-      { id: "ap7-o2", t: "ap7.pat", acs: "PA.III.B.S2", q: "How do you enter the pattern at a nontowered airport?", a: "<p>Figure out the runway and pattern direction from above pattern altitude or from the radio. Go well clear, descend to pattern altitude, and enter on a 45° to the downwind abeam midfield, level. Hold pattern altitude until at least abeam the approach end, then turn base about 45° from it. Midfield crossing at pattern altitude is an alternative from the upwind side when it isn't congested.</p>", src: "AC 90-66C 11.2 to 11.4, App A" },
-    ] },
+},
 ];

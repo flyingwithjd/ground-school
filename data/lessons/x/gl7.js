@@ -21,7 +21,4 @@ export default {
     Q("gl7x-15", "gl7.mass", "A maritime tropical air mass is:", ["Warm and moist", "Cold and dry", "Warm and dry", "Cold and moist"], "Maritime = moist; tropical = warm.", "PHAK 12"),
     Q("gl7x-16", "gl7.mass", "An air mass moving over a colder surface typically brings:", ["Stable air, poor visibility, low stratus or fog", "Cumulus, showers and good visibility", "Thunderstorms", "Strong turbulence"], "Cooling from below makes the air stable.", "PHAK 12"),
   ],
-  oral: [
-    { id: "gl7x-o1", t: "gl7.llws", acs: "PA.I.C.K3h", q: "You see virga and a ring of blowing dust near the departure end. What could it be, and what do you do?", a: "<p>Possibly a microburst: a downdraft up to 6,000 fpm and a 30–90 knot headwind-to-tailwind shift, over in 5–15 minutes. I wouldn't take off or land through it. I'd wait it out or go elsewhere. The initial headwind gain is a trap; it reverses. The FAA's Pilot Wind Shear Guide (AC 00-54) covers recognition, avoidance and escape.</p>", src: "PHAK 12" },
-  ],
 };

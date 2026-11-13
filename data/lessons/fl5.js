@@ -18,7 +18,4 @@ export default {
     { id: "fl5-11", t: "fl5.risk", q: "Why is a slipping stall less likely to lead to a spin than a skidding stall?", c: ["A slipping stall has little tendency to spin", "A slip is coordinated", "A slip raises stall speed", "Slips cannot stall"], a: 0, why: "AFH: a stalled slip shows very little of the yaw that turns a skidding stall into a spin; it may do little more than roll toward wings level.", src: "AFH Ch 5, 9" },
     { id: "fl5-12", t: "fl5.risk", q: "Which risk does the ACS list specifically for forward slips?", c: ["Fuel flowage, tail stalls with flaps, and airspeed control", "Carburetor ice only", "Vortex ring state", "Hydroplaning"], a: 0, why: "PA.IV.M.R7. AFH: some airplanes limit slips in duration or by fuel quantity. Check your POH.", src: "ACS PA.IV.M.R7" },
   ],
-  oral: [
-    { id: "fl5-o1", t: "fl5.fwd", acs: "PA.IV.M.K4", q: "When and why would you use a forward slip?", a: "<p>When you are high on final and need to lose altitude without gaining airspeed, especially without flaps or when flaps are already full. Idle power, upwind wing low with aileron, opposite rudder to yaw the nose off the path, pitch for the approach speed. Recover before the flare by leveling the wings and centering the rudder, or transition into a sideslip for a crosswind. Watch airspeed errors and the POH limits.</p>", src: "AFH Ch 9; ACS PA.IV.M" },
-  ],
 };

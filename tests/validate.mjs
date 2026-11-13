@@ -1,9 +1,9 @@
 // Validates content: ACS codes exist, question shape, counts per lesson, glossary keys,
-// unique question ids, known topics, the syllabus coverage map and the pre-solo topic list. Exits 1 on any problem.
+// unique question ids, known topics, every question's section (page) tag, the syllabus coverage map and the pre-solo topic list. Exits 1 on any problem.
 import fs from "fs";
 const warns = []; const ow = console.warn, oe = console.error; console.warn = (...a) => warns.push(a.join(" ")); console.error = (...a) => warns.push(a.join(" "));
 const acs = JSON.parse(fs.readFileSync("/workspace/refs/acs_all.json", "utf8"));
-const { LESSONS, QUESTIONS, ORAL, TOPICS } = await import("../data/index.js");
+const { LESSONS, QUESTIONS, TOPICS, ORDER, secKey } = await import("../data/index.js");
 console.warn = ow; console.error = oe;
 const G0 = (await import("../data/glossary.js")).default || {}; const nk = (k) => k.toLowerCase().replace(/[’']/g, "'").trim();
 const G = Object.fromEntries(Object.keys(G0).map((k) => [nk(k), 1])); const hasG = (k) => [k, k.replace(/s$/, ""), k.replace(/es$/, ""), k.replace(/ies$/, "y")].some((x) => G[x]);
@@ -11,19 +11,29 @@ let bad = 0; const missingG = new Set(); const report = [];
 const chk = (c, where) => { if (!acs[c]) { console.log("BAD ACS", c, where); bad++; } };
 for (const id of Object.keys(LESSONS)) {
   const L = LESSONS[id]; let t = null; try { t = (await import(`../data/text/${id}.js`)).default; } catch (e) { console.log("NO TEXT", id, e.message); }
-  for (const o of L.oral || []) chk(o.acs, id + " oral " + o.id);
+  if (L.oral && L.oral.length) { console.log("ORAL ITEMS LEFT", id); bad++; }   // oral items were retired
   for (const q of L.questions || []) { if (q.type === "order") { if (!q.items || q.items.length < 3) { console.log("BAD ORDER", q.id); bad++; } } else if (!q.c || q.c.length < 2 || q.a !== 0 || !q.why || !q.src) { console.log("BAD Q", q.id); bad++; } }
   if (t) for (const s of t.sections || []) { [].concat(s.kdr?.codes || []).flatMap((x) => String(x).split(/,\s*/)).filter(Boolean).forEach((c) => chk(c, id + " " + s.id)); const txt = (s.body || "") + (s.body2 || ""); for (const m of txt.matchAll(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g)) { const k = nk(m[2] || m[1]); if (!hasG(k)) missingG.add(k); } }
-  report.push([id, (L.questions || []).length, (L.oral || []).length, t ? (t.sections || []).length : 0]);
+  report.push([id, (L.questions || []).length, t ? (t.sections || []).length : 0]);
 }
-console.table(report.map(([id, q, o, s]) => ({ id, q, o, s })));
-console.log("questions", Object.keys(QUESTIONS).length, "oral", Object.keys(ORAL).length, "bad", bad);
+console.table(report.map(([id, q, s]) => ({ id, q, s })));
+console.log("questions", Object.keys(QUESTIONS).length, "bad", bad);
 console.log("missing glossary", [...missingG].sort().join(" | "));
 
 // Unique ids and known topics (index.js warns while merging).
 for (const w of warns) { console.log("INDEX", w); bad++; }
 const seen = new Set();
 for (const L of Object.values(LESSONS)) for (const q of L.questions || []) { if (seen.has(q.id)) { console.log("DUP Q", q.id); bad++; } seen.add(q.id); if (TOPICS && !TOPICS[q.t]) { console.log("BAD TOPIC", q.t, q.id); bad++; } }
+// Section tags: every question names the page it comes from ("sec", or "lesson/sec" for a stage-check review question),
+// that page exists, and a cross-lesson page is in a lesson that comes earlier in the course. Practice only asks questions
+// whose page the learner has opened, so a missing or wrong tag would hide a question or ask about an unread page.
+const secsOf = {}; const pages = async (lid) => { if (secsOf[lid]) return secsOf[lid]; let s = []; try { s = [...((await import(`../data/text/${lid}.js`)).default.sections || [])]; } catch {} try { s.push(...((await import(`../data/text/x/${lid}.js`)).default.sections || [])); } catch {} return (secsOf[lid] = new Set(s.map((x) => x.id))); };
+const pos = (lid) => { const k = ORDER.indexOf(lid); return k >= 0 ? k : ORDER.indexOf(LESSONS[lid]?.parent); };
+let nSec = 0; for (const q of Object.values(QUESTIONS)) { const k = secKey(q); if (!k) { console.log("NO SECTION", q.id); bad++; continue; }
+  const [lid, sid] = k.split("/"); if (!LESSONS[lid] || !(await pages(lid)).has(sid)) { console.log("BAD SECTION", q.id, k); bad++; continue; }
+  if (lid !== q.lesson && !(pos(lid) <= pos(q.lesson))) { console.log("SECTION LATER THAN LESSON", q.id, k); bad++; continue; } nSec++; }
+const QS = (await import("../data/qsec.js")).default; for (const id of Object.keys(QS)) if (!QUESTIONS[id]) { console.log("STALE qsec.js ENTRY", id); bad++; }
+console.log("section tags", nSec, "of", Object.keys(QUESTIONS).length);
 // Coverage: data/coverage.json must exist, be built from the current map, and every link must resolve to a real section.
 const cvPath = new URL("../data/coverage.json", import.meta.url);
 if (!fs.existsSync(cvPath)) { console.log("NO data/coverage.json (run node tools/build-coverage.mjs)"); bad++; }

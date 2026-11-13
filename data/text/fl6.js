@@ -2,6 +2,7 @@ export default {
   sections: [
     { id: "point", label: "Turns around a point · AFH 6", title: "Bank follows groundspeed",
       body: `<p>Pick a point and fly a circle of constant radius around it at 600 to 1,000 ft AGL. Wind pushes you around the circle, so you change bank to hold the track: <strong>steepest headed downwind</strong>, where groundspeed is highest, and shallowest headed upwind. <span class="src">AFH 6</span></p>
+<p>The real skill is division of attention: hold the track and altitude while you keep scanning for traffic, a place to land and the engine gauges. <span class="src">AFH 6</span></p>
 <p>Change the wind and watch the bank on the track.</p>`,
       viz: { type: "groundref", opts: { mode: "point" } },
       kdr: { k: "Wind effect on ground track; bank, groundspeed and radius.", d: "Hold altitude ±100 ft, airspeed ±10 kt.", r: "Division of attention; low-altitude maneuvering.", codes: ["PA.V.B.K2", "PA.V.B.K3", "PA.V.B.S7", "PA.V.B.R1"] } },

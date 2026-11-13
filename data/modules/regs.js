@@ -22,10 +22,7 @@ export default [
       A("rg1-14", "rg1.docs", "On a solo cross-country, a student pilot must carry:", ["The pilot logbook and the student pilot certificate", "Only a photo ID", "Only the medical certificate", "The instructor's certificate"], "61.51(i)(2): logbook, student certificate and any other required record.", "14 CFR 61.51(i)"),
       A("rg1-15", "rg1.docs", "Who may ask to see your pilot certificate, medical and logbook?", ["The FAA, the NTSB, or any federal, state or local law enforcement officer", "Only the FAA", "Only your instructor", "Any airport employee"], "On a reasonable request by any of them.", "14 CFR 61.51(i)"),
     ],
-    oral: [
-      { id: "rg1-o1", t: "rg1.lim", acs: "PA.I.A.K2", q: "As a student pilot, what may you not do as pilot in command?", a: "<p>Carry a passenger; carry property for compensation or hire; fly for compensation or hire or in furtherance of a business; fly internationally (with one Alaska exception); fly with less than 3 SM visibility by day or 5 SM at night; fly without visual reference to the surface; or fly contrary to any limitation your instructor wrote in your logbook. <span class=\"src\">14 CFR 61.89(a)</span></p>", src: "14 CFR 61.89" },
-      { id: "rg1-o2", t: "rg1.solo", acs: "PA.I.A.K1", q: "What must happen before you can fly your first solo?", a: "<p>Pass a knowledge test given by your instructor on Parts 61 and 91, the solo airport's airspace and procedures, and the airplane; your instructor reviews every wrong answer. Receive and log the pre-solo training in 61.87(d) and show proficiency. Hold an endorsement for the make and model from an instructor who trained you, within the last 90 days. You also need a student pilot certificate and a medical (or BasicMed) as applicable. <span class=\"src\">14 CFR 61.87; 61.23</span></p>", src: "14 CFR 61.87" },
-    ] },
+},
   { id: "rg2", code: "RG2", stage: 1, kind: "module", title: "Airworthiness and Documents", short: "ARROW, AV1ATE and who decides the airplane is safe",
     intro: "Before every flight, you decide whether the airplane is airworthy. The documents and inspections are how you prove it, to yourself first.",
     refs: ["14 CFR 91.3, 91.7, 91.9, 91.203", "14 CFR 91.207, 91.409, 91.411, 91.413"],
@@ -44,9 +41,7 @@ export default [
       A("rg2-11", "rg2.insp", "The ELT must be inspected within:", ["12 calendar months of the last inspection", "24 calendar months", "100 hours", "6 calendar months"], "And its battery replaced after 1 cumulative hour of use or 50% of its useful life.", "14 CFR 91.207(c), (d)"),
       A("rg2-12", "rg2.insp", "The altimeter and static system check every 24 calendar months is required for:", ["IFR flight in controlled airspace", "All VFR flights", "Flights above 3,000 ft AGL", "Night flight only"], "91.411(a).", "14 CFR 91.411"),
     ],
-    oral: [
-      { id: "rg2-o1", t: "rg2.insp", acs: "PA.I.B.K1b", q: "How do you determine that this airplane is airworthy?", a: "<p>Documents on board (ARROW): airworthiness certificate displayed, registration, the approved manual or POH with markings and placards, and weight and balance data; a radio station license only if flying internationally. Inspections in the logbooks (AV1ATE): annual within 12 calendar months, 100-hour if used for hire or instruction, transponder within 24 calendar months, ELT within 12 calendar months with a current battery; the VOR and altimeter/static checks matter for IFR. Required equipment works (91.205), and a thorough preflight shows no defects. As PIC, the final decision is mine. <span class=\"src\">14 CFR 91.7, 91.203, 91.205, 91.207, 91.409, 91.413</span></p>", src: "14 CFR 91.7" },
-    ] },
+},
   { id: "rg3", code: "RG3", stage: 1, kind: "module", title: "Equipment, Fuel and Fitness", short: "91.205, preflight action, fuel reserves, alcohol and minimum altitudes",
     intro: "These rules decide whether today's flight is legal. Then you decide whether it's smart.",
     refs: ["14 CFR 91.103, 91.119, 91.151", "14 CFR 91.17, 91.205"],
@@ -68,8 +63,5 @@ export default [
       A("rg3-14", "rg3.alt", "Over sparsely populated areas, you may not fly closer than ____ to any person, vessel, vehicle or structure.", ["500 ft", "1,000 ft", "200 ft", "2,000 ft"], "91.119(c).", "14 CFR 91.119(c)"),
       A("rg3-15", "rg3.alt", "Anywhere, 91.119(a) requires an altitude that allows:", ["An emergency landing without undue hazard to people or property if the engine fails", "At least 3,000 ft AGL", "Radio contact with ATC", "Visual reference to a road"], "That's why gliding distance matters on every flight.", "14 CFR 91.119(a)"),
     ],
-    oral: [
-      { id: "rg3-o1", t: "rg3.eq", acs: "PA.I.B.K3", q: "What equipment is required for day VFR, and what does night add?", a: "<p>Day (ATOMATOFLAMES): airspeed indicator, tachometer, oil pressure gauge, manifold pressure gauge (altitude engines), altimeter, temperature gauge (liquid-cooled), oil temperature gauge (air-cooled), fuel gauges, landing gear position indicator (retractable), anticollision lights (airplanes certificated after March 11, 1996), magnetic compass, ELT if required, and safety belts and shoulder harnesses. Night adds FLAPS: fuses, a landing light if for hire, anticollision lights, position lights and an adequate source of electrical energy. <span class=\"src\">14 CFR 91.205(b), (c)</span></p>", src: "14 CFR 91.205" },
-      { id: "rg3-o2", t: "rg3.alc", acs: "PA.I.H.K2", q: "What are the alcohol rules, and is that enough?", a: "<p>No acting as a crewmember within 8 hours of drinking, while under the influence, with 0.04 or more, or on drugs that affect your faculties. Those are legal minimums. The PHAK's IMSAFE check asks about the last 24 hours too, because effects can last longer than 8 hours. <span class=\"src\">14 CFR 91.17; PHAK Ch 2</span></p>", src: "14 CFR 91.17" },
-    ] },
+},
 ];

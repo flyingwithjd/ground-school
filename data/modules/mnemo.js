@@ -17,7 +17,5 @@ export default [
       A("mn1-09", "mn1.adm", "Which mnemonic helps you process hazards in the 3P model?", ["CARE", "PAVE", "TEAM", "IMSAFE"], "PAVE perceives, CARE processes, TEAM performs.", "PHAK Ch 2"),
       A("mn1-10", "mn1.adm", "The resignation attitude's antidote is:", ["I'm not helpless. I can make a difference.", "Follow the rules.", "Not so fast.", "It could happen to me."], "\"What's the use?\"", "PHAK Ch 2, Fig 2-4"),
     ],
-    oral: [
-      { id: "mn1-o1", t: "mn1.reg", acs: "PA.I.B.K3", q: "Your night flight's position light is burned out. Can you go?", a: "<p>No. Position lights are required for night VFR under 91.205(c)(2): the P in FLAPS. Day VFR doesn't require them, so a day flight may be possible if the inoperative equipment is handled properly; ask your CFI how your school does that. <span class=\"src\">14 CFR 91.205(c)</span></p>", src: "14 CFR 91.205" },
-    ] },
+},
 ];

@@ -1,7 +1,7 @@
-// The practice engine UI: multiple choice, ordered sequences, oral self-rating; learn/review/exam modes.
+// The practice engine UI: multiple choice and ordered sequences, each followed by a one-tap confidence rating; learn/review/exam modes.
 import { h, esc, shuffle, fmtDue, toast } from "../core/util.js?v=2492b958a0";
 import { review, get, CONF, isBlind, MISS_DELAY } from "../core/srs.js?v=2492b958a0";
-import { nextDue, buildQueue, nextChunk } from "../core/progress.js?v=2492b958a0";
+import { nextDue, buildQueue, nextChunk, onlyReached } from "../core/progress.js?v=2492b958a0";
 import { S, save } from "../core/store.js?v=2492b958a0";
 import { item } from "../../data/index.js?v=2492b958a0";
 import { TOPICS, LESSONS } from "../../data/index.js?v=2492b958a0";
@@ -27,7 +27,7 @@ export function session(host, opts) {
   function show() { progress(); body.innerHTML = ""; const it = item(q[i]); if (!it) return next(); const topic = TOPICS[it.t];
     const lb = h("div", { class: "label mb qlab" }, h("span", {}, [topic ? topic.title : "", it.lesson && LESSONS[it.lesson] ? " · " + LESSONS[it.lesson].code : ""].join("")));
     if (!exam && isBlind(it.id)) lb.append(h("span", { class: "tag acc blind-tag" }, "Blind spot")); body.append(lb);
-    if (it.kind === "oral") return oral(it); if (it.type === "order") return order(it); return mc(it); }
+    if (it.type === "order") return order(it); return mc(it); }
   // An answer to a question that is not due yet counts as practice ahead: it never stretches the schedule (misses always count).
   function record(it, ok, conf, quality, pick) { const before = get(it.id); const now = Date.now(); const src = !exam && before && before.n && before.due > now ? "ahead" : mode;
     const r = review(it.id, { ok, conf, q: quality, source: src, now }); seen.add(it.id); results.push({ id: it.id, ok, conf, q: quality, t: it.t, pick }); onAnswer && onAnswer(it.id); return { r, before }; }
@@ -42,9 +42,9 @@ export function session(host, opts) {
     const order = shuffle(it.c.map((_, k) => k)); let sel = null; const list = h("div", { class: "choices", role: "radiogroup" });
     const btns = order.map((k, n) => { const b = h("button", { class: "choice", type: "button", role: "radio", "aria-checked": "false" }, h("span", { class: "k" }, KEYS[n]), h("span", {})); b.lastChild.innerHTML = rich(it.c[k]); b.onclick = (e) => { if (e.target.closest(".gl")) return; sel = k; btns.forEach((x) => { x.classList.toggle("sel", x === b); x.setAttribute("aria-checked", x === b); }); confBox.hidden = false; check.disabled = false; }; list.append(b); return b; });
     body.append(list);
-    const useConf = S().settings.confidence && !exam;
+    const useConf = true;   // confidence is asked on every answer, timed checks included (no feedback there until the end)
     const confBox = h("div", { class: "conf", hidden: true }); const check = h("button", { class: "btn pri", type: "button", "data-primary": "", disabled: true }, exam ? "Next" : "Check");
-    if (useConf) { confBox.append(h("span", { class: "label" }, "How sure are you?")); const cc = h("div", { class: "chips" }); Object.entries(CONF).forEach(([k, v]) => { const b = h("button", { class: "chip", type: "button" }, v.label); b.onclick = () => submit(k); cc.append(b); }); confBox.append(cc); body.append(confBox); }
+    if (useConf) { confBox.append(h("span", { class: "label" }, "How sure are you?")); const cc = h("div", { class: "chips" }); Object.entries(CONF).forEach(([k, v]) => { const b = h("button", { class: "chip", type: "button" }, v.label); b.onclick = () => submit(k); cc.append(b); }); confBox.append(cc); body.append(confBox); if (exam) body.append(h("div", { class: "btns mt" }, quitBtn())); }
     else { confBox.append(h("div", { class: "btns" }, check, quitBtn())); body.append(confBox); check.onclick = () => submit(null); }
     function submit(conf) { if (sel == null) return; const ok = sel === it.a; const { r } = record(it, ok, conf, null, sel); confBox.remove(); btns.forEach((b, n) => { b.disabled = true; const k = order[n]; if (k === it.a) b.classList.add("right"); else if (k === sel) b.classList.add("wrong"); else b.classList.add("mute"); });
       if (exam) return next(); verdict(it, ok, r, "", ok && conf === "guess"); }
@@ -55,23 +55,13 @@ export function session(host, opts) {
     const draw = () => { list.innerHTML = ""; items.forEach((o, n) => { const up = h("button", { type: "button", "aria-label": "Move up" }, "↑"), dn = h("button", { type: "button", "aria-label": "Move down" }, "↓"); up.disabled = n === 0; dn.disabled = n === items.length - 1;
       up.onclick = () => { [items[n - 1], items[n]] = [items[n], items[n - 1]]; draw(); }; dn.onclick = () => { [items[n + 1], items[n]] = [items[n], items[n + 1]]; draw(); };
       const row = h("div", { class: "order-item" }, h("span", { class: "n" }, String(n + 1).padStart(2, "0")), h("span", {}, o.x), h("span", { class: "mv" }, up, dn)); list.append(row); }); };
-    draw(); const useConf = S().settings.confidence && !exam;
+    draw(); const useConf = true;
     const go = (conf) => { const ok = items.every((o, n) => o.k === n); const { r } = record(it, ok, conf, null, items.map((o) => o.k)); [...list.children].forEach((row, n) => { row.classList.add(items[n].k === n ? "ok" : "bad"); row.querySelectorAll("button").forEach((b) => (b.disabled = true)); }); ctl.remove();
       verdict(it, ok, r, ok ? "" : `<ol class="prose mt">${it.items.map((x) => `<li>${esc(x)}</li>`).join("")}</ol>`, ok && conf === "guess"); };
     const ctl = h("div", { class: "conf" });
-    if (useConf) { ctl.append(h("span", { class: "label" }, "How sure are you?")); const cc = h("div", { class: "chips" }); Object.entries(CONF).forEach(([k, v]) => { const b = h("button", { class: "chip", type: "button" }, v.label); b.onclick = () => go(k); cc.append(b); }); ctl.append(cc); }
+    if (useConf) { ctl.append(h("span", { class: "label" }, "How sure are you?")); const cc = h("div", { class: "chips" }); Object.entries(CONF).forEach(([k, v]) => { const b = h("button", { class: "chip", type: "button" }, v.label); b.onclick = () => go(k); cc.append(b); }); ctl.append(cc); if (exam) ctl.append(h("div", { class: "btns mt" }, quitBtn())); }
     else { const b = h("button", { class: "btn pri", type: "button", "data-primary": "" }, "Check order"); b.onclick = () => go(null); ctl.append(h("div", { class: "btns" }, b)); }
     body.append(ctl);
-  }
-  function oral(it) {
-    body.append(h("p", { class: "qtext" })); body.lastChild.innerHTML = rich(it.q);
-    if (it.acs) body.append(h("p", { class: "label" }, "ACS " + it.acs));
-    const notes = h("textarea", { placeholder: "Say it out loud first, or jot your answer here. It is not graded; you grade yourself.", "aria-label": "Your answer" }); body.append(notes);
-    const reveal = h("button", { class: "btn pri", type: "button", "data-primary": "" }, "Show model answer"); const bx = h("div", { class: "btns mt" }, reveal, quitBtn()); body.append(bx);
-    reveal.onclick = () => { bx.remove(); const v = h("div", { class: "verdict" }); v.innerHTML = `<span class="label">Model answer</span><div class="prose mt">${rich(it.a)}</div>${it.src ? `<p class="src">${esc(it.src)}</p>` : ""}<p class="label mt">How did your answer compare?</p>`; autoTerms(v.querySelector(".prose"));
-      const cc = h("div", { class: "chips" }); [["Missed it", 1], ["Partly", 3], ["Got it", 4], ["Nailed it, easy", 5]].forEach(([t, qq]) => { const b = h("button", { class: "chip", type: "button" }, t); b.onclick = () => { const { r } = record(it, qq >= 3, null, qq, qq); cc.querySelectorAll("button").forEach((x) => (x.disabled = true)); b.classList.add("on");
-        const nb = h("button", { class: "btn pri arrow mt", type: "button", "data-primary": "" }, i + 1 >= q.length ? "Finish" : "Next"); nb.onclick = next; v.append(h("p", { class: "label mt" }, check ? "" : scheduleNote(r, qq >= 3, qq === 3 ? "Partly" : false)), nb); nb.focus({ preventScroll: true }); }; cc.append(b); });
-      v.append(cc); body.append(v); };
   }
   function finish() { destroy(); bar.firstChild.style.width = "100%"; body.innerHTML = ""; right.textContent = "";
     const firstTry = new Map(); results.forEach((r) => { if (!firstTry.has(r.id)) firstTry.set(r.id, r); }); const fr = [...firstTry.values()];
@@ -97,8 +87,7 @@ export function session(host, opts) {
     el.append(nextButtons(true));
     const missed = fr.filter((r) => !r.ok); if (missed.length) { const box = h("div", { class: "missed mt2" }); box.innerHTML = `<h3>Missed · ${missed.length}</h3>` + missed.map(missCard).join(""); autoTerms(box); el.append(box); } }
   function missCard(r) { const it = item(r.id); let mine = "", right = "";
-    if (it.kind === "oral") right = `<div class="prose dim" style="font-size:16px">${rich(it.a || "")}</div>`;
-    else if (it.type === "order") { right = `<p class="lab2">Correct order</p><ol class="prose" style="font-size:16px;margin:0">${it.items.map((x) => `<li>${esc(x)}</li>`).join("")}</ol>`; if (Array.isArray(r.pick)) mine = `<p class="lab2">Your order</p><ol class="prose dim" style="font-size:16px;margin:0 0 10px">${r.pick.map((k) => `<li>${esc(it.items[k])}</li>`).join("")}</ol>`; }
+    if (it.type === "order") { right = `<p class="lab2">Correct order</p><ol class="prose" style="font-size:16px;margin:0">${it.items.map((x) => `<li>${esc(x)}</li>`).join("")}</ol>`; if (Array.isArray(r.pick)) mine = `<p class="lab2">Your order</p><ol class="prose dim" style="font-size:16px;margin:0 0 10px">${r.pick.map((k) => `<li>${esc(it.items[k])}</li>`).join("")}</ol>`; }
     else { if (r.pick != null && it.c[r.pick] != null) mine = `<p class="ans no"><span class="lab2">Your answer</span>${rich(it.c[r.pick])}</p>`; right = `<p class="ans yes"><span class="lab2">Correct</span>${rich(it.c[it.a])}</p>`; }
     return `<div class="card mt miss"><p class="mq">${rich(it.q)}</p>${mine}${right}${it.why ? `<p class="dim" style="margin:10px 0 0;font-size:16px">${rich(it.why)}</p>` : ""}${it.src ? `<p class="src" style="margin-top:8px">${esc(it.src)}</p>` : ""}</div>`; }
   // One stable button group: Keep going (primary while there is more), All N, Done.
@@ -115,7 +104,7 @@ export function session(host, opts) {
 // (S().qa[key] = next position, an additive field inside ppg.v1).
 export function allLabel(key, n) { const at = (S().qa || {})[key] || 0; return at > 0 && at < n ? `All questions · ${at} / ${n}` : `All ${n} questions`; }
 export function practiceSet(host, { ids, key, title, label, onExit, all = false, blindMax = 3 }) {
-  ids = ids.filter((id) => item(id) && item(id).kind !== "oral");
+  ids = onlyReached(ids.filter((id) => item(id)));   // only pages the learner has opened
   const allPath = { get label() { return allLabel(key, ids.length); }, start: () => runAll() };
   if (all) return runAll();
   const seen = new Set(); let { queue } = buildQueue(ids, { max: 20, blindMax });

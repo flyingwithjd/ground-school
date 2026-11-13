@@ -18,7 +18,4 @@ export default {
     { id: "fl4-11", t: "fl4.dec", q: "Which is a good reason to go around?", c: ["An airplane or vehicle on the runway, or an unstable approach", "The landing will be a little firm", "A go-around is embarrassing so avoid it", "You are slightly left of centerline at 1,000 ft"], a: 0, why: "Any condition that makes the landing doubtful or hazardous. A go-around is always an option.", src: "AFH Ch 9" },
     { id: "fl4-12", t: "fl4.exec", q: "If airspeed is low when you start the go-around, the AFH says:", c: ["Resist pitching up; you may need to lower the nose briefly to gain speed", "Pull up to stop the descent", "Retract all flaps at once", "Reduce power"], a: 0, why: "An airplane cannot fly below stall speed or climb below minimum-power speed.", src: "AFH Ch 9" },
   ],
-  oral: [
-    { id: "fl4-o1", t: "fl4.exec", acs: "PA.IV.N.K1", q: "You are on short final and a deer runs onto the runway. Talk me through it.", a: "<p>Go around immediately. Power full, smoothly; right rudder and forward pressure as the nose rises; pitch for the balked-landing climb (60 KIAS in the 172S); flaps to 20°, then 10° and up in steps as speed builds and obstacles are cleared; rough trim. Move to the side of the runway if needed to see traffic, climb at VY, make a radio call, and re-enter the pattern.</p>", src: "AFH Ch 9; POH Sec 4" },
-  ],
 };

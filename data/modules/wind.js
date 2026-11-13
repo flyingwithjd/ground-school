@@ -19,9 +19,7 @@ export default [
       A("wx1-11", "wx1.perf", "Why take off and land into the wind?", ["Lower groundspeed, shorter roll and better control", "It is the only legal direction", "Engine cooling", "To keep the windsock in view"], "Use the runway most nearly into the wind.", "AFH 6; AC 90-66C 11.5"),
       A("wx1-12", "wx1.comp", "Tower winds are magnetic. METAR winds are:", ["True", "Magnetic", "Grid", "Relative"], "Convert before comparing a METAR wind with a runway heading where variation is large.", "AIM 4-3-6; AIM 7-1-28"),
     ],
-    oral: [
-      { id: "wx1-o1", t: "wx1.comp", acs: "PA.IV.A.K1", q: "Wind is 240 at 15, you're landing runway 27. What's the crosswind, and are you within the airplane's demonstrated value?", a: "<p>30° off, so the crosswind is half the wind: about 7–8 kt from the left, with a headwind of about 13. The C172S demonstrated crosswind is 15 kt landing with full flaps and 20 with flaps 10°, so yes. That's a demonstrated number, not a limit. My own limits and my solo endorsement come first.</p>", src: "PHAK Ch 16; C172S POH 4" },
-    ] },
+},
   { id: "wx2", code: "WX2", stage: 1, kind: "module", title: "Drift & Correction", short: "Wind correction angle, crab vs slip, pattern drift",
     intro: "Wind moves the whole airmass and you with it. To fly a line over the ground, you point slightly into the wind.",
     refs: ["PHAK Ch 16", "AFH 6, 9"],
@@ -39,9 +37,7 @@ export default [
       A("wx2-10", "wx2.pat", "With wind blowing toward the runway on base, you tend to:", ["Overshoot the turn to final", "Undershoot the final", "Land long only", "No effect"], "A tailwind on base pushes you through the centerline. Begin the turn earlier.", "AFH 8"),
       A("wx2-11", "wx2.pat", "On downwind with a crosswind from the field side, you will:", ["Crab toward the runway to hold the downwind track", "Crab away from the runway", "Fly the runway heading's reciprocal exactly", "Climb"], "Crab into the wind on each leg to keep a rectangular ground track.", "AFH 7, 8"),
     ],
-    oral: [
-      { id: "wx2-o1", t: "wx2.crab", acs: "PA.IV.B.K3", q: "Explain the crab and wing-low methods for a crosswind approach and why one is preferred.", a: "<p>In a crab, I turn the heading into the wind so my track follows the extended centerline. It's easy on final, but I have to remove the crab with rudder right before touchdown, and the timing is hard. In the wing-low method I lower the upwind wing to stop drift and hold opposite rudder to keep the nose aligned. That lets me touch down aligned with no side load, so the AFH recommends it in most cases. Many pilots crab on final and switch to wing-low before the roundout.</p>", src: "AFH 9" },
-    ] },
+},
   { id: "wx3", code: "WX3", stage: 1, kind: "module", title: "Shear, Turbulence & Wake", short: "Low-level wind shear, microbursts, obstructions and wake vortices",
     intro: "The most dangerous air near an airport is the air you can't see moving.",
     refs: ["PHAK Ch 12", "AIM 7-4", "AFH 8"],
@@ -63,10 +59,7 @@ export default [
       A("wx3-14", "wx3.wake", "After a larger airplane's low approach or touch-and-go, wait at least:", ["2 minutes", "30 seconds", "10 minutes", "No wait is needed"], "Vortices settle and drift along the runway.", "AIM 7-4-6"),
       A("wx3-15", "wx3.wake", "Near the ground, vortices move laterally at about:", ["2–3 kt", "20–30 kt", "They don't move", "100 kt"], "A 1–5 kt crosswind can hold the upwind vortex over the touchdown zone.", "AIM 7-4-4"),
     ],
-    oral: [
-      { id: "wx3-o1", t: "wx3.wake", acs: "PA.III.B.R3", q: "A regional jet just landed ahead of you. How do you avoid its wake?", a: "<p>Its vortices are strongest heavy, clean and slow, and they sink several hundred feet per minute behind it, ending where it touched down. I stay at or above its approach path, note its touchdown point and land beyond it. I'm most careful with a light quartering tailwind or a light crosswind, which can hold a vortex over the runway. If it did a touch-and-go or low approach, I wait at least 2 minutes.</p>", src: "AIM 7-4-3, 7-4-4, 7-4-6" },
-      { id: "wx3-o2", t: "wx3.shear", acs: "PA.I.C.K3h", q: "What is a microburst and how would you recognize one?", a: "<p>The most severe low-level wind shear: a downdraft 1–2 miles across, lasting 5–15 minutes, with downdrafts up to 6,000 fpm. On takeoff I'd see a headwind and better performance first, then a downdraft, then a growing tailwind that can put me in the ground. Clues are an intense rain shaft, virga and a ring of blowing dust. I avoid them; I don't plan to fly through one.</p>", src: "PHAK Ch 12" },
-    ] },
+},
   { id: "wx4", code: "WX4", stage: 1, kind: "module", title: "Density Altitude", short: "Hot, high and humid: what the airplane feels",
     intro: "The airplane doesn't care what the altimeter says. It performs at the altitude its wings and engine feel.",
     refs: ["PHAK Ch 4, 11", "C172S POH 5"],
@@ -83,7 +76,5 @@ export default [
       A("wx4-09", "wx4.eff", "On a hot afternoon at a high field, a good risk control is:", ["Fly in the cooler morning, reduce weight and compute the numbers with a margin", "Take off with the same plan as at sea level", "Use a tailwind runway to save time", "Climb steeper"], "Hot, high and heavy compound each other.", "PHAK Ch 11; ACS PA.I.F.R3"),
       A("wx4-10", "wx4.eff", "Leaning the mixture for takeoff at high density altitude may be:", ["Recommended by the POH to get best power", "Never allowed", "Only for landing", "Required at sea level"], "Follow the POH procedure for high elevation.", "C172S POH 4; PHAK Ch 7"),
     ],
-    oral: [
-      { id: "wx4-o1", t: "wx4.eff", acs: "PA.I.F.K2a", q: "What is density altitude and how does it affect your takeoff?", a: "<p>It's pressure altitude corrected for nonstandard temperature, the altitude the airplane actually feels. High elevation, low pressure, heat and humidity raise it. The engine makes less power, the propeller less thrust and the wing needs a higher true airspeed, so the takeoff roll is longer and climb is weaker even though the indicated speeds don't change. I compute it and check the POH Section 5 charts with the wind and surface notes, and I add a margin.</p>", src: "PHAK Ch 4, 11; C172S POH 5" },
-    ] },
+},
 ];

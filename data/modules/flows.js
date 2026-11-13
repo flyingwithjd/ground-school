@@ -23,7 +23,5 @@ export default [
       A("fw1-14", "fw1.sec", "Why is the fuel selector set to LEFT or RIGHT when securing the airplane?", ["To prevent crossfeeding between tanks", "To drain the tanks evenly", "To lock the controls", "To save the battery"], "Securing Airplane, item 10.", "C172S POH 4"),
       O("fw1-15", "fw1.sec", "Put the first steps of Securing Airplane in order.", ["Parking brake: SET", "Throttle: IDLE", "Electrical equipment: OFF", "Avionics: OFF", "Mixture: IDLE CUTOFF", "Magnetos: OFF", "Master: OFF"], "Avionics off before shutdown; the mixture stops the engine before the magnetos go off.", "C172S POH 4"),
     ],
-    oral: [
-      { id: "fw1-o1", t: "fw1.start", acs: "PA.II.B.K2", q: "Why use a checklist if you've memorized the flow?", a: "<p>The flow gets things done quickly in a logical pattern; the checklist confirms nothing was missed. The ACS expects you to use the appropriate checklists, and the POH is the authority for your airplane's procedures. Confirm with your CFI and your aircraft's POH. <span class=\"src\">ACS PA.II.B; C172S POH 4</span></p>", src: "C172S POH 4" },
-    ] },
+},
 ];

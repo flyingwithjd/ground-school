@@ -1,7 +1,7 @@
-// GL12 · Stage 2 check (ground). Mixed cumulative review of GL7–GL11 and the Stage 2 units; timed written and oral draw from all of them.
+// GL12 · Stage 2 check (ground). Mixed cumulative review of GL7–GL11 and the Stage 2 units; the timed written draws from all of them.
 const Q = (id, t, q, c, why, src) => ({ id, t, q, c, a: 0, why, src });
 export default {
-  id: "gl12", code: "GL12", stage: 2, kind: "ground", title: "Stage 2 Check", short: "Mixed review of weather, emergencies, airspace and regulations, with a timed written and an oral",
+  id: "gl12", code: "GL12", stage: 2, kind: "ground", title: "Stage 2 Check", short: "Mixed review of weather, emergencies, airspace and regulations, with a timed written",
   intro: "Stage 2 knowledge only pays off when you combine it: a forecast, the airspace you'll be in, and the rules that apply. These questions mix topics the way a check instructor does.",
   refs: ["14 CFR Part 141 App. B", "FAA-S-ACS-6C"],
   topics: { "gl12.wx": "Mixed: weather and decisions", "gl12.air": "Mixed: airspace and minimums", "gl12.emer": "Mixed: emergencies", "gl12.regs": "Mixed: rules and airworthiness" },
@@ -22,5 +22,4 @@ export default {
     Q("gl12-14", "gl12.regs", "After an off-airport landing, the airplane has a bent wing spar but no one is hurt. What's required?", ["Immediate NTSB notification, and a written report within 10 days", "Nothing, no one was hurt", "A report within 30 days only", "Only the insurer must be told"], "Substantial damage makes it an accident under 49 CFR 830.", "49 CFR 830.5, 830.15"),
     Q("gl12-15", "gl12.regs", "You're about to fly a rented airplane. Which documents must be on board?", ["Airworthiness certificate, registration, and the operating limitations (POH/AFM with its weight and balance data)", "Only the registration", "Your logbook and the maintenance records", "The pilot's medical and the annual inspection sticker"], "Maintenance records stay with the owner; the airworthiness certificate must be displayed.", "14 CFR 91.9, 91.203"),
   ],
-  oral: [],
 };

@@ -1,37 +1,33 @@
-// Stage checks (written + oral), the pre-solo written practice exam, and the syllabus coverage checklist.
+// Stage checks (timed written), the pre-solo written practice exam, and the syllabus coverage checklist.
 import { h, esc, shuffle } from "../core/util.js?v=2492b958a0";
 import { S, save } from "../core/store.js?v=2492b958a0";
 import { STAGES, STAGE_CHECK } from "../../data/course.js?v=2492b958a0";
-import { LESSONS, QUESTIONS, ORAL, TOPICS, lessonItems } from "../../data/index.js?v=2492b958a0";
-import { stats } from "../core/progress.js?v=2492b958a0";
+import { LESSONS, QUESTIONS, TOPICS, lessonItems } from "../../data/index.js?v=2492b958a0";
+import { stats, reachedSet, isReached } from "../core/progress.js?v=2492b958a0";
 import { session } from "./quiz.js?v=2492b958a0";
 import { rich } from "../core/rich.js?v=2492b958a0";
 const page = (host) => { const p = h("div", { class: "page" }); host.append(p); return p; };
 const foot = `<div class="footer">Squawk School is a study aid. Your school's syllabus, your instructor and the FAA sources decide what a stage check covers and how it is graded.</div>`;
 const sid = (k) => STAGES.find((s) => s.id === k);
-// stratified draw: proportional to each lesson's bank, at least one from each
-function draw(pool, n, filter = () => true) {
-  const groups = pool.map((id) => shuffle((LESSONS[id]?.questions || []).filter(filter).map((q) => q.id))).filter((g) => g.length);
+// stratified draw: proportional to each lesson's bank, at least one from each; only questions from pages already read
+function draw(pool, n, filter = () => true) { const R = reachedSet();
+  const groups = pool.map((id) => shuffle((LESSONS[id]?.questions || []).filter((q) => filter(q) && isReached(q.id, R)).map((q) => q.id))).filter((g) => g.length);
   const total = groups.reduce((a, g) => a + g.length, 0); let qs = [];
   groups.forEach((g) => qs.push(...g.slice(0, Math.max(1, Math.round((g.length / total) * n)))));
   return shuffle(qs).slice(0, n);
 }
 export function sim(host) { const p = page(host); const hist = (S().sims || []).slice(-6).reverse();
-  p.innerHTML = `<section class="hero"><span class="label">Stage checks</span><h1>Prove it, then move on</h1><p>Each stage ends with a check by a different instructor. Practice both halves here: a timed written test with no hints, and an oral exam you answer out loud and grade honestly. The standard is 80%, and every miss is reviewed. Misses go straight into your review schedule.</p></section>
-  <div class="grid g2">${Object.entries(STAGE_CHECK).map(([k, c]) => { const L = LESSONS[c.id]; const n = c.pool.flatMap((id) => (LESSONS[id]?.questions || [])).length; const o = c.pool.flatMap((id) => (LESSONS[id]?.oral || [])).length;
-    return `<div class="cell"><span class="label">${esc(L ? L.code : "")} · covers ${esc(c.covers)}</span><h3>${esc(c.title)}</h3><p>Written: ${c.n} questions in ${c.minutes} minutes from a bank of ${n}. Oral: ${c.oralN} prompts from ${o}.</p><div class="btns"><a class="btn pri arrow" href="#/check/${k}/written">Written</a><a class="btn arrow" href="#/check/${k}/oral">Oral</a></div></div>`; }).join("")}</div>
+  p.innerHTML = `<section class="hero"><span class="label">Stage checks</span><h1>Prove it, then move on</h1><p>Each stage ends with a check by a different instructor. Practice the written here: a timed test with no hints, drawn only from pages you have read. The standard is 80%, and every miss is reviewed. Misses go straight into your review schedule.</p></section>
+  <div class="grid g2">${Object.entries(STAGE_CHECK).map(([k, c]) => { const L = LESSONS[c.id]; const R = reachedSet(); const all = c.pool.flatMap((id) => (LESSONS[id]?.questions || [])); const n = all.filter((q) => isReached(q.id, R)).length;
+    return `<div class="cell"><span class="label">${esc(L ? L.code : "")} · covers ${esc(c.covers)}</span><h3>${esc(c.title)}</h3><p>${c.n} questions in ${c.minutes} minutes. ${n ? `${n} of ${all.length} questions come from pages you have read.` : `Read the ${esc(c.covers)} lessons first; questions come only from pages you have read.`}</p><div class="btns"><a class="btn pri arrow" href="#/check/${k}/written">Written</a></div></div>`; }).join("")}</div>
   ${hist.length ? `<div class="list-head section-gap"><span class="label">Recent attempts</span><span class="label">Score</span></div>${hist.map((x) => `<div class="row"><span class="code">${new Date(x.t).toLocaleDateString()}</span><span><div class="t">${esc(x.title || "Stage 1 check")} · ${x.ok} of ${x.n}</div></span><span class="pct">${Math.round(x.score * 100)}%</span></div>`).join("")}` : ""}${foot}`; }
 export function check(host, k, mode) { const c = STAGE_CHECK[k]; if (!c) { const p = page(host); p.innerHTML = "<h2>Not found.</h2>"; return; }
   if (!mode) { location.hash = "#/sim"; return; }
-  const p = page(host); const oral = mode === "oral";
-  p.innerHTML = `<section class="hero"><span class="label">${esc(c.title)} · ${oral ? "oral" : "written"} · covers ${esc(c.covers)}</span><h1>${oral ? "Answer out loud." : "No hints. Timed."}</h1><p>${oral
-    ? `${c.oralN} open questions across ${esc(c.covers)}, like the table talk with a check instructor. Say your answer before you reveal the model answer, then grade yourself. "Partly" counts as a miss for the score. 80% passes, and every miss is listed at the end.`
-    : `${c.n} questions across ${esc(c.covers)}, ${c.minutes} minutes, no feedback until the end. 80% passes. Then review every miss: the explanation, the source, and why the wrong answer looked right.`}</p></section>`;
-  const b = h("button", { class: "btn pri arrow", type: "button" }, "Begin"); p.append(h("div", { class: "btns" }, b, h("a", { class: "btn ghost", href: "#/sim" }, "All checks")));
+  const p = page(host); const queue = draw(c.pool, c.n);
+  p.innerHTML = `<section class="hero"><span class="label">${esc(c.title)} · written · covers ${esc(c.covers)}</span><h1>No hints. Timed.</h1><p>${queue.length < c.n ? `${queue.length ? `${queue.length} questions` : "No questions yet"}: only pages you have read are asked, and you haven't read all of ${esc(c.covers)} yet. ` : `${c.n} questions across ${esc(c.covers)}, `}${c.minutes} minutes, no feedback until the end. 80% passes. Then review every miss: the explanation, the source, and why the wrong answer looked right.</p></section>`;
+  const b = h("button", { class: "btn pri arrow", type: "button" }, "Begin"); p.append(h("div", { class: "btns" }, ...(queue.length ? [b] : []), h("a", { class: "btn ghost", href: "#/sim" }, "All checks")));
   b.onclick = () => { p.innerHTML = "";
-    if (oral) { const ids = shuffle(c.pool.flatMap((id) => (LESSONS[id]?.oral || []).map((o) => o.id))).slice(0, c.oralN);
-      session(p, { queue: ids, mode: "oral", check: true, passMark: c.pass, title: c.title + " · oral", label: c.title + " · oral", onExit: () => (location.hash = "#/sim"), onFinish: (r) => { S().sims.push({ t: Date.now(), n: r.total, ok: r.correct, score: r.score, title: c.title + " oral" }); save(); } }); }
-    else session(p, { queue: draw(c.pool, c.n), mode: "exam", title: c.title, label: c.title + " · written", minutes: c.minutes, passMark: c.pass, onExit: () => (location.hash = "#/sim"), onFinish: (r) => { S().sims.push({ t: Date.now(), n: r.total, ok: r.correct, score: r.score, title: c.title }); save(); } }); };
+    session(p, { queue, mode: "exam", title: c.title, label: c.title + " · written", minutes: c.minutes, passMark: c.pass, onExit: () => (location.hash = "#/sim"), onFinish: (r) => { S().sims.push({ t: Date.now(), n: r.total, ok: r.correct, score: r.score, title: c.title }); save(); } }); };
 }
 // ---------- Pre-solo written (14 CFR 61.87(b)) ----------
 // The regulation: the test covers the applicable sections of Parts 61 and 91, the airspace rules and procedures for the airport
@@ -48,7 +44,7 @@ export const AIRPORT_Q = [
   ["Lost-communication plan for this airport (light gun signals if towered)", "AIM 4-2-13, 4-3-13"], ["Your solo limitations as endorsed: wind, visibility, ceiling, runways", "Your instructor's endorsement (61.87(n))"],
 ];
 export function presolo(host) { const p = page(host); const st = S(); st.presolo ||= { airport: "", ans: {} };
-  const pool = Object.values(QUESTIONS).filter((q) => PRESOLO_TOPICS.includes(q.t)).map((q) => q.id);
+  const R = reachedSet(); const pool = Object.values(QUESTIONS).filter((q) => PRESOLO_TOPICS.includes(q.t) && isReached(q.id, R)).map((q) => q.id);
   p.innerHTML = `<section class="hero"><span class="label">Pre-solo written · 14 CFR 61.87(b)</span><h1>Before your first solo</h1><p>Before you solo, your instructor must give you a knowledge test on the applicable parts of 14 CFR 61 and 91, the airspace rules and procedures at the airport where you will solo, and the flight characteristics and operational limitations of your airplane. Your instructor grades it and reviews every incorrect answer with you. This is practice for it. <span class="src">14 CFR 61.87(b)</span></p></section>`;
   const c1 = h("div", { class: "card" }); c1.innerHTML = `<span class="label">Your solo airport</span><p class="dim mt" style="font-size:16px">Type the airport where you will solo. It's saved only in this browser and fills in the worksheet below. The practice test stays generic, because only your instructor and the current Chart Supplement can answer the local questions.</p>`;
   const inp = h("input", { type: "text", value: st.presolo.airport, placeholder: "e.g. airport name or identifier", "aria-label": "Solo airport", maxlength: 60 }); c1.append(h("div", { class: "field mt", style: "max-width:28rem" }, inp)); p.append(c1);
@@ -57,8 +53,8 @@ export function presolo(host) { const p = page(host); const st = S(); st.presolo
     AIRPORT_Q.forEach(([q, src], i) => { const ta = h("textarea", { "aria-label": q, rows: 2, placeholder: "Your answer" }); ta.value = st.presolo.ans[i] || ""; ta.oninput = () => { st.presolo.ans[i] = ta.value; save(); };
       const wrap = h("div", { class: "mt" }); wrap.innerHTML = `<p style="margin:0 0 6px;font-weight:600">${i + 1}. ${esc(q.replace(/your airport/g, ap))}</p><p class="src" style="margin:0 0 8px">${esc(src)}</p>`; wrap.append(ta); c2.append(wrap); }); };
   inp.oninput = () => { st.presolo.airport = inp.value; save(); clearTimeout(inp._t); inp._t = setTimeout(drawWS, 400); }; drawWS();
-  const c3 = h("div", { class: "card mt" }); c3.innerHTML = `<span class="label">Practice test · ${Math.min(30, pool.length)} questions</span><p class="dim mt" style="font-size:16px">Drawn from ${pool.length} questions on student pilot rules, airworthiness and equipment, airspace and weather minimums, pattern and airport procedures, and the 172S's limitations. No timer. Aim for 100% after review: that is the real standard.</p>`;
-  const b = h("button", { class: "btn pri arrow", type: "button" }, "Start the practice test"); c3.append(h("div", { class: "btns mt" }, b)); p.append(c3);
+  const c3 = h("div", { class: "card mt" }); c3.innerHTML = `<span class="label">Practice test · ${Math.min(30, pool.length)} questions</span><p class="dim mt" style="font-size:16px">Drawn from ${pool.length} questions on student pilot rules, airworthiness and equipment, airspace and weather minimums, pattern and airport procedures, and the 172S's limitations. No timer. Aim for 100% after review: that is the real standard.${pool.length ? "" : " Questions come only from pages you have read: start with the student pilot rules units."}</p>`;
+  const b = h("button", { class: "btn pri arrow", type: "button" }, "Start the practice test"); if (pool.length) c3.append(h("div", { class: "btns mt" }, b)); p.append(c3);
   b.onclick = () => { p.innerHTML = ""; session(p, { queue: shuffle(pool).slice(0, 30), mode: "exam", passMark: 0.8, title: "Pre-solo written (practice)", label: "Pre-solo written · practice", onExit: () => (location.hash = "#/presolo"), onFinish: (r) => { S().sims.push({ t: Date.now(), n: r.total, ok: r.correct, score: r.score, title: "Pre-solo written" }); save(); } }); };
   p.insertAdjacentHTML("beforeend", foot); }
 // ---------- Syllabus coverage checklist ----------

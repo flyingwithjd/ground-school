@@ -14,16 +14,16 @@ export const BLIND_CLEAR = { sure: 3, other: 2 };
 export const LEVELS = ["New", "Learning", "Reviewing", "Strong", "Mastered"];
 const fresh = () => ({ ef: 2.5, reps: 0, ivl: 0, due: 0, lapses: 0, n: 0, ok: 0, last: 0, h: [] });
 export function get(id) { return item(id) || null; }
-// quality 5/4/3 = Certain / Fairly sure / Guessed (oral: Nailed / Got it / Partly). No confidence = 4.
+// quality 5/4/3 = Certain / Fairly sure / Guessed. No confidence (old answers, timed exams) = 4.
 const confOf = (q) => (q >= 5 ? "sure" : q === 4 ? "unsure" : "guess");
-// grade: q 0-5 (SM-2). ok: boolean, conf: 'guess'|'unsure'|'sure'|null. source: the session mode ('learn', 'review', 'ahead', 'exam', 'oral', ...)
+// grade: q 0-5 (SM-2). ok: boolean, conf: 'guess'|'unsure'|'sure'|null. source: the session mode ("learn", "review", "ahead", "exam", ...)
 export function review(id, { ok, conf = null, q = null, now = Date.now(), source = "quiz" }) {
   const it = { ...fresh(), ...(item(id) || {}) };
   if (q == null) q = ok ? (conf ? CONF[conf].q : 4) : (conf === "sure" ? 0 : 1);
   const prevW = it.n ? readyW(it) : null;
   it.n++; if (ok) it.ok++;
   it.h = [...it.h, { t: now, ok: !!ok, c: conf, s: source, q }].slice(-12);
-  // Readiness credit from this answer. An exam answer without a confidence rating keeps an earlier rating's credit.
+  // Readiness credit from this answer. An old exam answer saved without a confidence rating keeps an earlier rating's credit.
   it.rw = !ok || q < 3 ? 0 : conf ? READY_W[conf] ?? 0 : source === "exam" && prevW != null ? prevW : READY_W[confOf(q)];
   blindUpdate(id, { t: now, ok: !!ok, c: conf, q });
   // Practicing ahead of schedule: a correct early answer is logged but does not stretch the interval (that would fake retention).

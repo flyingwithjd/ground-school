@@ -1,6 +1,6 @@
 // GL6 · Stage 1 check (ground). Mixed cumulative review; the timed simulator draws from every Stage 1 lesson.
 export default {
-  id: "gl6", code: "GL6", stage: 1, kind: "ground", title: "Stage 1 Check", short: "Mixed cumulative review, timed written simulator and oral practice",
+  id: "gl6", code: "GL6", stage: 1, kind: "ground", title: "Stage 1 Check", short: "Mixed cumulative review and a timed written simulator",
   intro: "The stage check asks you to connect ideas, not repeat them. These questions mix topics the way an examiner does.",
   refs: ["14 CFR Part 141 App. B", "FAA-S-ACS-6C"],
   topics: { "gl6.sys": "Mixed: airplane and limits", "gl6.aero": "Mixed: aerodynamics", "gl6.ops": "Mixed: airport and pattern", "gl6.perf": "Mixed: W&B and performance", "gl6.regs": "Mixed: rules" },
@@ -26,5 +26,4 @@ export default {
     { id: "gl6-19", t: "gl6.regs", q: "May a student pilot carry a passenger?", c: ["No", "Yes, during the day", "Yes, with an endorsement", "Yes, if the passenger is a pilot"], a: 0, why: "61.89(a)(1).", src: "14 CFR 61.89" },
     { id: "gl6-20", t: "gl6.sys", q: "Usable fuel in the standard-tank 172S is:", c: ["53 gallons of 56 total", "56 gallons", "40 gallons", "38 gallons"], a: 0, why: "Total capacity 56.0 gal, usable 53.0 gal (28.0 per tank).", src: "C172S POH Sec 1" },
   ],
-  oral: [],
 };

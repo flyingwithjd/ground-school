@@ -6,7 +6,7 @@ export default {
       kdr: { k: "Everything in GL7–GL11 and the Stage 2 units.", d: "Explain it in your own words and apply it to a scenario.", r: "Knowing answers without knowing why.", codes: ["PA.I.C.K1", "PA.I.E.K1", "PA.IX.A.K1"] } },
     { id: "how", label: "How to use this", title: "Practice like the real one",
       body: `<p><strong>Timed written.</strong> <a href="#/check/s2/written">Start the Stage 2 written</a>: 40 questions from GL7–GL11 and their units, 60 minutes. <strong>80% passes.</strong> There's no feedback until the end; then every miss is listed with its explanation and source, and fed into your review schedule.</p>
-<p><strong>Oral.</strong> <a href="#/check/s2/oral">Start the oral</a>: 12 ACS-keyed prompts. Answer out loud before you reveal the model answer, then grade yourself honestly. "Partly" counts as a miss.</p>
+<p><strong>Rate every answer.</strong> After each question, tap how sure you were. A miss you were Certain about becomes a blind spot right away, so the check shows where you are overconfident, not just what you missed.</p>
 <p><strong>Mixed questions.</strong> The next step mixes topics on purpose, the way an examiner connects them. Mixed practice feels harder than lesson-by-lesson practice, and that's what makes it stick.</p>
 <p class="note">Your school's syllabus sets the real format and who gives the check. Use this to find your weak spots first.</p>`,
       kdr: { k: "Your blind spots.", d: "Score 80% or better on the timed written, then review every miss.", r: "Over-confidence: check the progress map for topics marked confident but wrong.", codes: ["PA.I.H.R4"] } },

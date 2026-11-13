@@ -1,7 +1,7 @@
-// GL19 · End-of-course test (ground). Mixed review across all stages; the timed written (60 questions) and oral draw from every lesson.
+// GL19 · End-of-course test (ground). Mixed review across all stages; the timed written (60 questions) draws from every lesson.
 const Q = (id, t, q, c, why, src) => ({ id, t, q, c, a: 0, why, src });
 export default {
-  id: "gl19", code: "GL19", stage: 4, kind: "ground", title: "End-of-Course Test", short: "Whole-course mixed review, a 60-question timed written and an ACS oral",
+  id: "gl19", code: "GL19", stage: 4, kind: "ground", title: "End-of-Course Test", short: "Whole-course mixed review, and a 60-question timed written",
   intro: "This is the dress rehearsal for the FAA knowledge test and the oral part of your checkride. Every question here links two or more parts of the course.",
   refs: ["14 CFR Part 141 App. B", "14 CFR 61.35", "FAA-S-ACS-6C"],
   topics: { "gl19.plane": "Mixed: airplane and performance", "gl19.wx": "Mixed: weather and airspace", "gl19.xc": "Mixed: cross-country", "gl19.pilot": "Mixed: the pilot" },
@@ -25,5 +25,4 @@ export default {
     Q("gl19-17", "gl19.pilot", "You're 35 with a third-class medical issued 30 months ago in June. Can you act as pilot in command?", ["Yes, until the end of the 60th calendar month after the exam month", "No, it expired after 24 months", "No, it expired after 12 months", "Only with a CFI on board"], "Under 40, a third-class lasts 60 calendar months; at 40 or older, 24.", "14 CFR 61.23(d)"),
     Q("gl19-18", "gl19.pilot", "You haven't flown in 4 months and your last flight review was 23 calendar months ago. What do you need before flying passengers in daytime?", ["Three takeoffs and landings in the same category and class within the preceding 90 days; the flight review is still current this month", "Nothing", "A new flight review only", "An instrument proficiency check"], "61.57(a) passenger currency, and 61.56 flight review every 24 calendar months.", "14 CFR 61.56, 61.57"),
   ],
-  oral: [],
 };

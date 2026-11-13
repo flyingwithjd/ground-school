@@ -10,23 +10,27 @@ import x1 from "./lessons/x/gl1.js?v=2492b958a0"; import x2 from "./lessons/x/gl
 import c1 from "./lessons/c/gl1.js?v=2492b958a0"; import c2 from "./lessons/c/gl2.js?v=2492b958a0"; import c3 from "./lessons/c/gl3.js?v=2492b958a0"; import c4 from "./lessons/c/gl4.js?v=2492b958a0"; import c5 from "./lessons/c/gl5.js?v=2492b958a0"; import c7 from "./lessons/c/gl7.js?v=2492b958a0"; import c8 from "./lessons/c/gl8.js?v=2492b958a0"; import c9 from "./lessons/c/gl9.js?v=2492b958a0"; import c10 from "./lessons/c/gl10.js?v=2492b958a0"; import c11 from "./lessons/c/gl11.js?v=2492b958a0"; import c13 from "./lessons/c/gl13.js?v=2492b958a0"; import c14 from "./lessons/c/gl14.js?v=2492b958a0"; import c15 from "./lessons/c/gl15.js?v=2492b958a0"; import c16 from "./lessons/c/gl16.js?v=2492b958a0"; import c17 from "./lessons/c/gl17.js?v=2492b958a0";
 import airport from "./modules/airport.js?v=2492b958a0"; import wind from "./modules/wind.js?v=2492b958a0"; import radio from "./modules/radio.js?v=2492b958a0"; import regs from "./modules/regs.js?v=2492b958a0";
 import emerg from "./modules/emerg.js?v=2492b958a0"; import adm from "./modules/adm.js?v=2492b958a0"; import flows from "./modules/flows.js?v=2492b958a0"; import mnemo from "./modules/mnemo.js?v=2492b958a0"; import vspeeds from "./modules/vspeeds.js?v=2492b958a0";
+// Questions written from the retired oral items, and the page (section) every question comes from.
+import oralmc from "./lessons/oralmc.js?v=2492b958a0"; import QSEC from "./qsec.js?v=2492b958a0";
 const SUPP = { gl1: x1, gl2: x2, gl3: x3, gl4: x4, gl5: x5, gl6: x6, gl7: x7, gl8: x8 };
 for (const [id, X] of Object.entries(SUPP)) { const L = { gl1, gl2, gl3, gl4, gl5, gl6, gl7, gl8 }[id];
   if (L.__merged) continue; L.__merged = true;   // idempotent even if this module is ever evaluated twice
-  L.topics = { ...(L.topics || {}), ...(X.topics || {}) }; L.questions = [...(L.questions || []), ...(X.questions || [])]; L.oral = [...(L.oral || []), ...(X.oral || [])];
+  L.topics = { ...(L.topics || {}), ...(X.topics || {}) }; L.questions = [...(L.questions || []), ...(X.questions || [])];
   for (const k of ["title", "short", "intro", "refs", "includes", "stage"]) if (X[k]) L[k] = X[k];
   if (X.textx) L.textx = true; }
-// Merge coverage batches into their ground lessons (questions and orals only; topics must already exist).
+// Merge coverage batches into their ground lessons (questions only; topics must already exist).
 const COV = { gl1: [gl1, c1], gl2: [gl2, c2], gl3: [gl3, c3], gl4: [gl4, c4], gl5: [gl5, c5], gl7: [gl7, c7], gl8: [gl8, c8], gl9: [gl9, c9], gl10: [gl10, c10], gl11: [gl11, c11], gl13: [gl13, c13], gl14: [gl14, c14], gl15: [gl15, c15], gl16: [gl16, c16], gl17: [gl17, c17] };
 for (const [L, C] of Object.values(COV)) { if (L.__cmerged) continue; L.__cmerged = true;
-  L.questions = [...(L.questions || []), ...(C.questions || [])]; L.oral = [...(L.oral || []), ...(C.oral || [])]; }
+  L.questions = [...(L.questions || []), ...(C.questions || [])]; }
 const ALL = [gl1, gl2, gl3, gl4, gl5, gl6, fl1, fl2, fl3, fl4, fl5, fl6, fl7, gl7, gl8, gl9, gl10, gl11, gl12, gl13, gl14, gl15, gl16, gl17, gl18, gl19, ...airport, ...wind, ...radio, ...regs, ...emerg, ...adm, ...flows, ...mnemo, ...vspeeds];
-export const LESSONS = {}; export const QUESTIONS = {}; export const ORAL = {}; export const TOPICS = {};
+for (const L of ALL) if (oralmc[L.id] && !L.__omerged) { L.__omerged = true; L.questions = [...(L.questions || []), ...oralmc[L.id]]; }
+// Oral (say-it-out-loud) items were retired: confidence on every answer now carries that signal. Old answers to them stay
+// in saved progress, harmlessly ignored.
+export const LESSONS = {}; export const QUESTIONS = {}; export const TOPICS = {};
 for (const L of ALL) {
   if (LESSONS[L.id]) console.error("duplicate lesson", L.id); LESSONS[L.id] = L;
   for (const [tid, title] of Object.entries(L.topics || {})) TOPICS[tid] = { id: tid, title, lesson: L.id };
-  for (const q of L.questions || []) { if (QUESTIONS[q.id]) console.error("duplicate question id", q.id); if (!TOPICS[q.t]) console.warn("unknown topic", q.t, q.id); QUESTIONS[q.id] = { ...q, lesson: L.id }; }
-  for (const o of L.oral || []) { if (ORAL[o.id]) console.error("duplicate oral id", o.id); ORAL[o.id] = { ...o, lesson: L.id, kind: "oral" }; }
+  for (const q of L.questions || []) { if (QUESTIONS[q.id]) console.error("duplicate question id", q.id); if (!TOPICS[q.t]) console.warn("unknown topic", q.t, q.id); QUESTIONS[q.id] = { ...q, lesson: L.id, sec: q.sec || QSEC[q.id] || null }; }
 }
 for (const m of MODULES) for (const u of m.units) if (LESSONS[u]) LESSONS[u].module = m.id;
 // A module unit belongs to the stage of the ground lesson that includes it.
@@ -36,7 +40,9 @@ export const SYLLABUS = STAGES.flatMap((s) => [...s.ground, ...s.flight].map((id
 export const ORDER = ["gl1", "fw1", "fl1", "gl2", "vs1", "gl3", "fl2", "fl3", "gl4", "ap1", "ap2", "ap3", "ap4", "ap5", "ap6", "ap7", "rc1", "wx1", "wx2", "wx3", "fl4", "fl5", "gl5", "wx4", "fl6", "gl6", "fl7",
   "gl7", "gl8", "gl9", "em1", "em2", "gl10", "gl11", "rg1", "rg2", "rg3", "gl12",
   "gl13", "gl14", "gl15", "gl16", "ad1", "ad2", "gl17", "mn1", "gl18", "gl19"];
-export const item = (id) => QUESTIONS[id] || ORAL[id];
-export function lessonItems(id, { deep = true, oral = true } = {}) { const L = LESSONS[id]; if (!L) return [];
-  let ids = (L.questions || []).map((q) => q.id); if (oral) ids = ids.concat((L.oral || []).map((o) => o.id));
-  if (deep && L.includes) L.includes.forEach((u) => (ids = ids.concat(lessonItems(u, { deep, oral })))); return ids; }
+export const item = (id) => QUESTIONS[id];
+export function lessonItems(id, { deep = true } = {}) { const L = LESSONS[id]; if (!L) return [];
+  let ids = (L.questions || []).map((q) => q.id);
+  if (deep && L.includes) L.includes.forEach((u) => (ids = ids.concat(lessonItems(u, { deep })))); return ids; }
+// A question's page as "lesson/section" (a stage-check review question points at the page in the lesson that teaches it).
+export const secKey = (q) => (!q || !q.sec ? null : q.sec.includes("/") ? q.sec : q.lesson + "/" + q.sec);

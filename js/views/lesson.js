@@ -1,11 +1,13 @@
 import { h, esc, pct } from "../core/util.js?v=2492b958a0";
 import { S, save, lessonState } from "../core/store.js?v=2492b958a0";
 import { LESSONS, lessonItems } from "../../data/index.js?v=2492b958a0";
-import { lessonStats, buildQueue } from "../core/progress.js?v=2492b958a0";
+import { lessonStats, buildQueue, onlyReached } from "../core/progress.js?v=2492b958a0";
 import { get } from "../core/srs.js?v=2492b958a0";
 import { rich, autoTerms } from "../core/rich.js?v=2492b958a0";
 import { mountViz, destroyAll } from "../viz/index.js?v=2492b958a0";
 import { practiceSet, allLabel } from "./quiz.js?v=2492b958a0";
+import { mergeSections } from "./merge-sections.js?v=2492b958a0";
+export { mergeSections };
 const KIND = { ground: "Ground lesson", flight: "Flight lesson briefing", module: "Module unit" };
 export function lessonView(host, id, secIdx) {
   const L0 = LESSONS[id]; const p = h("div", { class: "page" }); host.append(p);
@@ -20,11 +22,6 @@ export function lessonView(host, id, secIdx) {
     .catch((e) => { p.innerHTML = `<h2>Could not load this lesson.</h2><p class="dim mt">${esc(e.message)}</p>`; });
   return { destroy() { dead = true; api.destroy(); } };
 }
-export function mergeSections(base, extra) { const out = base.slice(); const last = {};
-  // a later supplement with the same anchor goes after the earlier one, so runs keep the order written
-  for (const s of extra) { if (s.at === "^") { const k = last["^"] ? out.indexOf(last["^"]) + 1 : 0; out.splice(k, 0, s); last["^"] = s; continue; }
-    const a = last[s.at] || out.find((b) => b.id === s.at); const k = s.at && a ? out.indexOf(a) : -1; if (k >= 0) out.splice(k + 1, 0, s); else out.push(s); if (s.at) last[s.at] = s; }
-  return out; }
 function build(p, L, id, secIdx) {
   const ls = lessonState(id); ls.visited = Date.now(); ls.total = L.sections.length;
   const sections = L.sections.slice(); const hasPrep = !!L.prep; const steps = [...sections.map((s) => s.label), ...(hasPrep ? ["Briefing card"] : []), "Check yourself"];
@@ -76,13 +73,15 @@ function build(p, L, id, secIdx) {
     <div class="cards2 mt">${[["What to expect", P.expect], ["Chair-fly this", P.chairfly], ["Common mistakes", P.mistakes], ["Debrief questions", P.debrief]].filter((x) => x[1]).map(([t, list]) => `<div class="card"><span class="label">${t}</span><ul class="prose mt" style="font-size:16.5px">${list.map((x) => `<li>${rich(x)}</li>`).join("")}</ul></div>`).join("")}</div>
     ${P.note ? `<div class="note cfi">${rich(P.note)}</div>` : ""}<h3 class="mt2">Your debrief notes</h3><p class="dim" style="font-size:16px">Saved only on this device. Write what went well, what to fix, and what your instructor said.</p>`;
     const ta = h("textarea", { "aria-label": "Debrief notes" }); ta.value = S().notes[id] || ""; ta.oninput = () => { S().notes[id] = ta.value; save(); }; sec.append(ta); }
-  function checkYourself(sec) { const ids = lessonItems(id, { oral: false, deep: !L.includes ? true : false });
+  // Only questions from pages the learner has opened are asked (a page counts once it has been shown).
+  function checkYourself(sec) { const all = lessonItems(id, { deep: !L.includes ? true : false }); const ids = onlyReached(all);
     const { queue, dueCount, blindCount } = buildQueue(ids, { max: 20, blindMax: 3 }); const answered = ids.filter((q) => get(q) && get(q).n).length; const nNew = Math.max(0, queue.length - dueCount - blindCount);
     const parts = [dueCount && `${dueCount} due`, nNew && `${nNew} new`, blindCount && `${blindCount} blind spot${blindCount > 1 ? "s" : ""}`].filter(Boolean).join(", ");
-    sec.innerHTML = `<span class="label">Check yourself</span><h2>Answer, then trust the schedule</h2><p class="dim mt" style="max-width:48rem">${ids.length} questions${L.includes ? " (the units have their own sets)" : ""} · ${answered} answered · readiness ${pct(lessonStats(id).readiness)}.${queue.length ? ` This session: ${queue.length} (${parts}).` : " Nothing is due here right now."} A miss comes back 12 hours later as a blind spot.</p>`;
+    const scope = ids.length < all.length ? `${ids.length} of ${all.length} questions so far: only pages you've opened are asked` : `${ids.length} questions${L.includes ? " (the units have their own sets)" : ""}`;
+    sec.innerHTML = `<span class="label">Check yourself</span><h2>Answer, then trust the schedule</h2><p class="dim mt" style="max-width:48rem">${scope} · ${answered} answered · readiness ${pct(lessonStats(id).readiness)}.${!ids.length ? " Open the pages of this lesson first; their questions show up here." : queue.length ? ` This session: ${queue.length} (${parts}).` : " Nothing is due here right now."} After each answer, tap how sure you are. A miss comes back 12 hours later as a blind spot.</p>`;
     const go2 = h("button", { class: "btn pri arrow", type: "button" }, queue.length ? "Start" : "Keep going");
     const allB = h("button", { class: "btn", type: "button" }, allLabel(id, ids.length));
-    const box = h("div", { class: "mt" }); const bt = h("div", { class: "btns mt" }, go2, allB); if ((L.oral || []).length) bt.append(h("a", { class: "btn", href: `#/oral/${id}` }, `Oral questions · ${L.oral.length}`)); sec.append(bt, box);
+    const box = h("div", { class: "mt" }); const bt = h("div", { class: "btns mt" }, go2, allB); if (ids.length) sec.append(bt, box);
     const begin = (all) => { bt.remove(); sec.querySelector("p").remove(); sec.parentNode && sec.parentNode.querySelectorAll(".secnav").forEach((n) => n.remove());
       sess = practiceSet(box, { ids, key: id, all, title: L.code, label: L.code, onExit: () => (location.hash = L.module ? "#/module/" + L.module : "#/course") }); };
     go2.onclick = () => begin(false); allB.onclick = () => begin(true); }

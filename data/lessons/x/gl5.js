@@ -22,8 +22,4 @@ export default {
     Q("gl5x-16", "gl5.runway", "You lift off 10% faster than the POH speed. Takeoff distance increases by about:", ["21%", "10%", "5%", "50%"], "Distance varies with the square of the lift-off speed.", "PHAK 11"),
     Q("gl5x-17", "gl5.runway", "Performance charts usually assume a runway that is:", ["Paved, level, smooth and dry", "Grass", "Wet", "Upsloping"], "Correct for anything else, using the chart notes.", "PHAK 11"),
   ],
-  oral: [
-    { id: "gl5x-o1", t: "gl5.speeds", acs: "PA.I.F.K1", q: "Hot day, high field, full airplane. Walk me through how you decide whether you can take off and clear the trees.", a: "<p>Find pressure altitude and temperature, then the density altitude. Enter the 172S takeoff table for pressure altitude, temperature and weight, and correct with the notes for wind and surface. Compare the over-50-ft distance with the runway available, adding margin, because the chart assumes an airplane in good condition and average technique. Check the climb rate from the climb chart and plan a Vx climb if there are obstacles. If it's marginal, lighten the load or wait for cooler air.</p>", src: "PHAK 11 · POH 5" },
-    { id: "gl5x-o2", t: "gl5.cruise", acs: "PA.I.D.K3c", q: "What's the difference between range and endurance, and when would you fly for each?", a: "<p>Range is distance per fuel; it's best near L/D max. Endurance is time aloft; it's best at minimum power required, a slower speed. I'd fly for range to stretch fuel to an airport, and for endurance if I had to hold or wait for weather to clear.</p>", src: "PHAK 11" },
-  ],
 };

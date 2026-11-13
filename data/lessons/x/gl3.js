@@ -22,7 +22,4 @@ export default {
     Q("gl3x-16", "gl3.plan", "Aspect ratio is:", ["The ratio of wingspan to chord", "The angle of sweep", "Chord at the root divided by chord at the tip", "Wing area divided by weight"], "Higher aspect ratio reduces drag, especially at high angles of attack.", "PHAK 5"),
     Q("gl3x-17", "gl3.plan", "Controllability is:", ["How the airplane responds to the pilot's control inputs, regardless of its stability", "Its tendency to return to trim", "Its strength under load", "Its cruise speed"], "Maneuverability is how easily it can be maneuvered and withstand the stresses.", "PHAK 5"),
   ],
-  oral: [
-    { id: "gl3x-o1", t: "gl3.vortex", acs: "PA.III.B.R3", q: "A large airplane just landed ahead of you on the same runway. How do you avoid its wake?", a: "<p>Its vortices are strongest because it was heavy, clean and slow, and they sink below its flight path. I'll stay at or above its approach path and touch down beyond its touchdown point. If I'm not sure, I'll extend or delay and give the wake time to drift and decay. A light crosswind can hold the upwind vortex over the runway.</p>", src: "PHAK 5 · AIM 7-4" },
-  ],
 };

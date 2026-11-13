@@ -22,8 +22,5 @@ export default [
       A("rc1-14", "rc1.ctaf", "Departing a nontowered airport, when should you announce?", ["Before taxiing and before taxiing onto the runway for departure", "Only once airborne", "Only if there's traffic in sight", "Never; departures are silent"], "Announce your intentions before taxiing and again before you take the runway.", "AIM 4-1-9"),
       A("rc1-15", "rc1.lost", "Your radio receiver fails as you approach a Class D airport. What should you do?", ["Remain outside or above the Class D airspace until you know the traffic, advise the tower, call about 3 to 5 miles out and watch for light signals", "Enter the pattern and land without calling", "Squawk 7700 and orbit the field", "Land at the nearest highway"], "AIM's receiver-inoperative procedure.", "AIM 4-2-13"),
     ],
-    oral: [
-      { id: "rc1-o1", t: "rc1.ctaf", acs: "PA.III.A.S2", q: "You are 10 miles south of a nontowered airport and plan to land on runway 27. What do you say, and where?", a: "<p>On the CTAF: \"[Airport] traffic, Skyhawk [call sign], one zero miles south, [altitude], inbound for left traffic runway two seven, [airport].\" Then call on the 45° entry or downwind, base, final and clear of the runway. Start and end with the airport name. <span class=\"src\">AIM 4-1-9</span></p>", src: "AIM 4-1-9" },
-      { id: "rc1-o2", t: "rc1.lost", acs: "PA.III.A.K5", q: "Your radio fails on the way to a towered airport. What do you do?", a: "<p>Check the obvious causes first: volume, squelch, frequency, the audio panel, the headset jack and the circuit breakers. If you can't fix it and only the receiver has failed, stay outside or above the Class D, tell the tower who and where you are, and call 3 to 5 miles out. Then watch the tower for light signals. Stay out of the traffic pattern until you know the flow of traffic. <span class=\"src\">AIM 4-2-13, 4-3-13</span></p>", src: "AIM 4-2-13" },
-    ] },
+},
 ];

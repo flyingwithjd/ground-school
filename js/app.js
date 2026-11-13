@@ -12,14 +12,14 @@ const routes = [
   [/^#\/lesson\/([\w-]+)(?:\/([\w-]+))?$/, (m) => lessonView(main, m[1], m[2] == null ? null : /^\d+$/.test(m[2]) ? +m[2] : m[2]), "course"],
   [/^#\/coverage$/, () => pages.coverage(main), "course"],
   [/^#\/presolo$/, () => pages.presolo(main), "tools"],
-  [/^#\/check\/(s[1-4])(?:\/(written|oral))?$/, (m) => pages.check(main, m[1], m[2]), "tools"],
+  [/^#\/check\/(s[1-4])(?:\/(written|oral))?$/, (m) => pages.check(main, m[1], m[2] && "written"), "tools"],   // an old oral link opens the written
   [/^#\/review$/, () => pages.review(main), "review"],
   [/^#\/blindspots$/, () => pages.blindspots(main), "map"],
   [/^#\/practice\/([\w-]+)$/, (m) => pages.practice(main, m[1]), "review"],
   [/^#\/drill\/([\w.-]+)$/, (m) => pages.drill(main, m[1]), "map"],
   [/^#\/map$/, () => pages.map(main), "map"],
   [/^#\/tools$/, () => pages.tools(main), "tools"],
-  [/^#\/oral(?:\/([\w-]+))?$/, (m) => pages.oral(main, m[1]), "tools"],
+  [/^#\/oral(?:\/([\w-]+))?$/, () => pages.tools(main), "tools"],   // oral practice was retired; old links land on Tools
   [/^#\/sim$/, () => pages.sim(main), "tools"],
   [/^#\/sim\/(s[1-4])$/, (m) => pages.check(main, m[1]), "tools"],
   [/^#\/glossary(?:\/([^/]+))?$/, (m) => pages.glossary(main, m[1] ? decodeURIComponent(m[1]) : null), "tools"],

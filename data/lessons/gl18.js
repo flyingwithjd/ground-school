@@ -1,7 +1,7 @@
 // GL18 · Stage 3 check (ground). Mixed cumulative review of GL13–GL17 and the Stage 3 units.
 const Q = (id, t, q, c, why, src) => ({ id, t, q, c, a: 0, why, src });
 export default {
-  id: "gl18", code: "GL18", stage: 3, kind: "ground", title: "Stage 3 Check", short: "Mixed review of instruments, navigation, night, ADM and aeromedical factors, with a timed written and an oral",
+  id: "gl18", code: "GL18", stage: 3, kind: "ground", title: "Stage 3 Check", short: "Mixed review of instruments, navigation, night, ADM and aeromedical factors, with a timed written",
   intro: "Stage 3 is the cross-country stage. These questions put instruments, navigation, night, decision making and your own body into the same flight.",
   refs: ["14 CFR Part 141 App. B", "FAA-S-ACS-6C"],
   topics: { "gl18.inst": "Mixed: instruments", "gl18.nav": "Mixed: navigation and planning", "gl18.night": "Mixed: night", "gl18.adm": "Mixed: ADM and aeromedical" },
@@ -22,5 +22,4 @@ export default {
     Q("gl18-14", "gl18.adm", "During a night cross-country, you look down for a dropped chart during a long turn and suddenly feel you're tumbling. What's happening?", ["Coriolis illusion; trust the instruments", "Hypoxia; descend", "Autokinesis; look away", "The leans; lean the other way"], "A head movement in a prolonged turn sets the inner-ear fluid moving on another axis.", "PHAK 17"),
     Q("gl18-15", "gl18.inst", "Turning from north to east using only the magnetic compass in the Northern Hemisphere, the compass will initially...", ["Lag, or show a turn in the opposite direction", "Lead the turn", "Show the correct heading", "Freeze"], "Northerly turning error: undershoot south, overshoot north is the rule for rollouts.", "PHAK 8"),
   ],
-  oral: [],
 };

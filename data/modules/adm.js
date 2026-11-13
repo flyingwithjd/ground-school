@@ -21,10 +21,7 @@ export default [
       A("ad1-13", "ad1.att", "The PHAK's three steps for a hazardous thought are:", ["Recognize it, label it hazardous, state the antidote", "Ignore it, fly on, debrief later", "Tell ATC, divert, land", "Write it down, sleep on it, decide tomorrow"], "Antidotes should be memorized so they come to mind automatically.", "PHAK Ch 2"),
       A("ad1-14", "ad1.att", "\"I can do it. I'll show them.\" The antidote is:", ["Taking chances is foolish.", "Not so fast. Think first.", "Follow the rules.", "I can make a difference."], "Macho.", "PHAK Ch 2, Fig 2-4"),
     ],
-    oral: [
-      { id: "ad1-o1", t: "ad1.pave", acs: "PA.I.H.S2", q: "How do you decide you're fit to fly today?", a: "<p>IMSAFE: illness, medication, stress, alcohol (within 8 and 24 hours), fatigue and emotion. Then PAVE: am I current and proficient for this flight (pilot), is the airplane airworthy and capable (aircraft), what are the weather, terrain, airports and airspace (environment), and what pressures are pushing me (external). I compare all of it with my personal minimums, which are based on my own experience, not just the regulations. <span class=\"src\">PHAK Ch 2</span></p>", src: "PHAK Ch 2" },
-      { id: "ad1-o2", t: "ad1.att", acs: "PA.I.H.R2", q: "Name the five hazardous attitudes and their antidotes.", a: "<p>Anti-authority, \"Don't tell me\": follow the rules, they are usually right. Impulsivity, \"Do it quickly\": not so fast, think first. Invulnerability, \"It won't happen to me\": it could happen to me. Macho, \"I can do it\": taking chances is foolish. Resignation, \"What's the use?\": I'm not helpless, I can make a difference. <span class=\"src\">PHAK Ch 2, Fig 2-4</span></p>", src: "PHAK Ch 2" },
-    ] },
+},
   { id: "ad2", code: "AD2", stage: 1, kind: "module", title: "Decision Models", short: "3P with PAVE, CARE and TEAM; DECIDE; scenario practice",
     intro: "A model gives your thinking a shape when you're busy. Use 3P continuously, and DECIDE when something changes.",
     refs: ["PHAK Ch 2"],
@@ -43,7 +40,5 @@ export default [
       A("ad2-11", "ad2.sbt", "Scenario: during the runup, one magneto shows a larger RPM drop than the POH allows. Your best decision is:", ["Don't fly; have it checked", "Take off and see if it clears", "Skip that check next time", "Lean the mixture and go"], "Legal and smart both say no. Ask your CFI about the troubleshooting steps your school allows.", "C172S POH 4; PHAK Ch 2"),
       A("ad2-12", "ad2.sbt", "Which is an example of mitigating a risk rather than eliminating it?", ["Flying the trip, but with a higher personal-minimum ceiling and an alternate planned", "Cancelling the flight", "Ignoring the forecast", "Letting someone else fly and riding along"], "Mitigate reduces the risk; eliminate removes it.", "PHAK Ch 2"),
     ],
-    oral: [
-      { id: "ad2-o1", t: "ad2.p3", acs: "PA.I.H.K4", q: "Describe a decision-making model you use in flight.", a: "<p>3P: Perceive hazards with PAVE, Process them with CARE (consequences, alternatives, reality, external factors), and Perform with TEAM (transfer, eliminate, accept, mitigate), then evaluate and repeat. DECIDE is another loop: detect the change, estimate the need to react, choose an outcome, identify actions, do them, evaluate the result. <span class=\"src\">PHAK Ch 2</span></p>", src: "PHAK Ch 2" },
-    ] },
+},
 ];
