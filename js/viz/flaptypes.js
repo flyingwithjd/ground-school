@@ -13,10 +13,10 @@
 // Servo tab: the cockpit control moves only the tab, and the tab's force moves the surface. Antiservo tab: moves in the
 // same direction as the stabilator's trailing edge, making it less sensitive (more feel); it also trims.
 // Lift/drag values, deflection angles and stall angles are illustrative, not published values.
-import { frame, chips, slider, row } from "./base.js?v=58985d3f52";
-import { planeStage } from "./planestage.js?v=58985d3f52";
-import { sectionModel, airfoil, rotP } from "./section-models.js?v=58985d3f52";
-import { h, clamp, reduced } from "../core/util.js?v=58985d3f52";
+import { frame, chips, slider, row } from "./base.js?v=2492b958a0";
+import { planeStage } from "./planestage.js?v=2492b958a0";
+import { sectionModel, airfoil, rotP } from "./section-models.js?v=2492b958a0";
+import { h, clamp, reduced } from "../core/util.js?v=2492b958a0";
 const D = Math.PI / 180;
 export const WING = {
   plain: { name: "Plain flap", dl: 0.5, dd: 0.6, crit: 16, say: ["Plain flap", "The simplest flap: more camber, more lift and a lot more drag. The nose tends to pitch down."] },
@@ -97,7 +97,7 @@ export function mount(host) {
   const fit = (dur = 1) => { const r = F.stage.getBoundingClientRect(), Hh = Math.max(1, r.height - (+F.stage.dataset.band || 0)), Ww = Math.max(1, r.width), TN = Math.tan(9 * D), ph = Ww < 560;
     const wft = ph ? 8.2 : 10.8, hft = ph ? 5.2 : 5.4, d = Math.max(wft / (2 * TN * (Ww / Hh)), hft / (2 * TN)); const tl = !!tail, d2 = tl ? d * 0.78 : d;   // tail tabs: closer and lower, framed on the elevator and tab so their deflections read
     const lv = !tl && (dev === "slot" || dev === "slat");   // slot and slat: nearly side-on, so the gap and the flow through it read
-    S.setView(lv ? { tg: [ph ? -0.3 : -0.4, ph ? 0.6 : 0.2, -0.6], az: -89, el: 3, d: d * (ph ? 1.04 : 0.9), fov: 18 } : tl ? { tg: [ph ? -1.0 : -1.3, 0.1, -0.8], az: -70, el: 9, d: d2, fov: 18 } : { tg: [ph ? -0.5 : -0.9, 0.45, -0.4], az: -66, el: 15, d, fov: 18 }, dur); };
+    S.setView(lv ? { tg: [ph ? -0.3 : -0.4, ph ? 0.25 : 0.2, -0.6], az: -89, el: 3, d: d * (ph ? 1.04 : 0.9), fov: 18 } : tl ? { tg: [ph ? -1.0 : -1.3, 0.1, -0.8], az: -70, el: 9, d: d2, fov: 18 } : { tg: [ph ? -0.5 : -0.9, 0.45, -0.4], az: -66, el: 15, d, fov: 18 }, dur); };
   const bro = new ResizeObserver(band); bro.observe(F.stage); F.on(() => bro.disconnect());
   // live readout band under the stage: three values, fixed slots so nothing moves
   const rb = h("div", { class: "readout sec-read" }); const cells = [0, 1, 2].map(() => { const b = h("b", {}, "–"), sp = h("span", {}); rb.append(h("div", {}, b, sp)); return [b, sp]; }); F.stage.after(rb);
