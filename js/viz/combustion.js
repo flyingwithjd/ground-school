@@ -9,13 +9,13 @@
 // Preignition is ignition before the normally timed spark, from residual hot spots: a carbon deposit on a spark plug, a
 // cracked spark plug insulator or other cylinder damage; it causes power loss and high temperatures. The two can occur
 // together, and one can cause the other. Spark timing, flame speeds and the pressure curves are illustrative.
-import { frame, chips, row } from "./base.js?v=7534528db0";
-import { planeStage } from "./planestage.js?v=7534528db0";
-import { modelKit, fitView } from "./section-models.js?v=7534528db0";
-import { h, s, reduced } from "../core/util.js?v=7534528db0";
+import { frame, chips, row } from "./base.js?v=5436de0cbc";
+import { planeStage } from "./planestage.js?v=5436de0cbc";
+import { modelKit, fitView } from "./section-models.js?v=5436de0cbc";
+import { h, s, reduced } from "../core/util.js?v=5436de0cbc";
 import * as THREE from "three";
-import { T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=7534528db0";
-import { anim, COL } from "./dial.js?v=7534528db0";
+import { T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=5436de0cbc";
+import { anim, COL } from "./dial.js?v=5436de0cbc";
 const A0 = -90, A1 = 90, SPARK = -20, KNOCK = 14, HOT = -55;
 // cylinder pressure (0-1 scale) at crank angle a (deg after top dead center) for each case
 export function press(kind, a) {

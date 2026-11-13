@@ -1,6 +1,6 @@
 // Workload management (PHAK 2): move tasks out of the busy pattern into quieter phases. Bar heights are illustrative, not measured.
-import { chips } from "./base.js?v=7534528db0";
-import { pxScene, T, L, R, hit, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=7534528db0";
+import { chips } from "./base.js?v=5436de0cbc";
+import { pxScene, T, L, R, hit, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=5436de0cbc";
 const PH = [["Preflight", 2], ["Climb", 4], ["Cruise", 2], ["Descent", 4], ["Pattern", 6]];
 const TASKS = [
   ["Review the airport diagram", 2, 0], ["Set frequencies", 1, 0], ["Get ATIS / ASOS", 1, 2], ["Before-landing checklist", 2, 3],

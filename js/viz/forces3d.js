@@ -1,10 +1,10 @@
 // The four forces in 3D on the 172 (GL1 "aero"). Pick a flight condition: arrow lengths show which force is winning
 // (qualitative, not to scale). Pick a force to light it and read what it does. Weight always points to the earth and lift
 // and drag follow the relative wind, so on "Pitch up" they stay put while the nose (and thrust) rises. Sources: PHAK Ch 5.
-import { frame, chips } from "./base.js?v=7534528db0";
-import { planeStage } from "./planestage.js?v=7534528db0";
-import { h } from "../core/util.js?v=7534528db0";
-import { INFO, STATES } from "./forces.js?v=7534528db0";
+import { frame, chips } from "./base.js?v=5436de0cbc";
+import { planeStage } from "./planestage.js?v=5436de0cbc";
+import { h } from "../core/util.js?v=5436de0cbc";
+import { INFO, STATES } from "./forces.js?v=5436de0cbc";
 const CG = [-1.2, 4.6, 0], D = Math.PI / 180, ACC = 0x3b82f6;
 const BASE = { lift: [[-0.6, 7.5, 0], [0, 1, 0], 5.2], weight: [[-1.2, 3.0, 0], [0, -1, 0], 5.2], thrust: [[6.6, 4.1, 0], [1, 0, 0], 4.4], drag: [[-19.4, 5.0, 0], [-1, 0, 0], 4.4] };
 export function mount(host) {
