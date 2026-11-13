@@ -18,7 +18,18 @@ export function frame(host, { cls = "", corners = {}, caption = null, explain = 
     on(fn) { api.cleanup.push(fn); }, destroy() { api.cleanup.forEach((f) => { try { f(); } catch (e) {} }); root.remove(); } };
   if (caption) api.caption(caption[0], caption[1]); api.explain(explain);
   if (!ctrl.childNodes.length) queueMicrotask(() => { if (!ctrl.childNodes.length) ctrl.style.display = "none"; });
+  const vt = host.closest && host.closest("[data-viz]"); if (vt && LIVE_FIRST.has(vt.dataset.viz)) { root.classList.add("slfirst"); queueMicrotask(() => liveFirst(root, stage, ctrl, cap, ex)); }
   return api;
+}
+// Play-while-you-watch layout (GL2 systems visuals): the live sliders sit directly under the stage so the visual and every
+// slider fit on one phone screen; then any strip drawn under the stage, the option chips (one compact row per group), and
+// the headline below the controls. Runs once after mount, when the controls exist; nothing moves afterwards.
+export const LIVE_FIRST = new Set(["flaptypes", "prop", "mixture", "carbice", "combustion", "magcheck", "starter", "vg", "fuellim", "elecsys", "enginegauges", "icing", "hypoxia", "koel", "pressurization", "cabinheat", "autopilot", "gear"]);
+function liveFirst(root, stage, ctrl, cap, ex) {
+  const items = [...ctrl.children].filter((c) => c.classList.contains("slider") || (c.classList.contains("ctrl-row") && c.querySelector(".slider")));
+  if (items.length) { const live = h("div", { class: "ctrl ctrl-live" }); items.forEach((c) => live.append(c)); stage.after(live); }
+  if (!ctrl.children.length) ctrl.style.display = "none";
+  if (root.classList.contains("capin")) root.insertBefore(cap, ex);
 }
 // A control row that always takes its own full line in the controls bar, with a small mono label in front.
 // Groups placed in separate rows never end up side by side, whatever the selection.

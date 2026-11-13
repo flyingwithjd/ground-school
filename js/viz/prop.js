@@ -23,7 +23,7 @@ export const fixedRpm = (thr, v) => 600 + thr * (1750 + 2.2 * v) + v * 0.8; // t
 export const phi = (v, rpm, r) => Math.atan2(v * KT, (Math.max(rpm, 1) / 60) * 2 * Math.PI * r) / D;
 export const betaFixed = (r, twist = true) => (twist ? Math.atan(PITCH / (2 * Math.PI * r)) : Math.atan(PITCH / (2 * Math.PI * 0.75 * RAD))) / D;
 // ---------- 3D propeller on the nose of the C172 model (feet; x forward, y up, z right). Only the cowling and engine are
-// kept from the airplane; the propeller is our own: a smooth-shaded spinner and two twisted blades with lit station bands. ----------
+// kept from the airplane; the propeller is the model's own (see propModel). ----------
 const RF = 38 / 12, F0 = 0.17, NR = 30, PX = 7.36, PY = 4.12;
 const chordAt = (f) => 1.15 * (0.27 + 0.26 * Math.sin(Math.PI * Math.min(1, (f - F0) / (1 - F0) * 0.78 + 0.12)) - 0.12 * Math.max(0, (f - 0.9) / 0.1) ** 2);   // chord drawn a little wide for clarity
 const ringAt = (f, be, grow = 1) => { const c = chordAt(f) * grow, [U, Lo] = airfoil(16, Math.max(0.085, 0.22 - 0.14 * f) * (grow > 1 ? 1.25 : 1), 0.03), pts = [...U, ...Lo.slice(1, -1).reverse()], b = be * D, cd = [-Math.sin(b), -Math.cos(b)], nn = [Math.cos(b), -Math.sin(b)];
@@ -34,57 +34,27 @@ function blurTex(THREE) { const N = 256, cv = document.createElement("canvas"); 
     const th = Math.atan2(x, y); let a = 0.05; for (const b0 of [0, Math.PI]) { let dl = ((b0 - th) % (2 * Math.PI) + 4 * Math.PI) % (2 * Math.PI); a += 0.32 * Math.exp(-dl / 0.55) * (dl > 0.04 ? 1 : 0); }
     const edge = Math.min(1, (1 - r) / 0.05) * Math.min(1, (r - F0) / 0.08); const k = (j * N + i) * 4; im.data[k] = im.data[k + 1] = im.data[k + 2] = 225; im.data[k + 3] = Math.round(255 * Math.min(0.6, a) * edge * (0.55 + 0.45 * r)); }
   cx.putImageData(im, 0, 0); const tx = new THREE.CanvasTexture(cv); tx.colorSpace = THREE.SRGBColorSpace; return tx; }
-function propModel(THREE) { const P = buildPlane(THREE), keep = new Set(["cowling", "engine", "fuselage", "gear"]), XC = 0.9, NOSE = new Set(["wheel0", "pant0", "leg0"]);   // the fuselage is cut just aft of the windshield base; only the nose gear is kept
-  for (const [nm, pt] of Object.entries(P.parts)) if (!keep.has(nm)) { pt.subs.forEach((sb) => (sb.obj.visible = false)); delete P.parts[nm]; }
-  P.parts.gear.subs = P.parts.gear.subs.filter((sb) => { let nose = false; sb.obj.traverse((o) => { if (o.isMesh && NOSE.has(o.userData.tag)) nose = true; }); if (!nose) sb.obj.visible = false; else sb.segs = []; return nose; });
-  P.meshes.splice(0, P.meshes.length, ...P.meshes.filter((m) => keep.has(m.userData.part) && (m.userData.part !== "gear" || NOSE.has(m.userData.tag))));
-  // the cowling is shaded paint too (no ink grid), with a dark nose bowl behind the spinner
-  const cowlMat = new THREE.MeshStandardMaterial({ color: 0xd2cfc6, metalness: 0.12, roughness: 0.46, side: THREE.DoubleSide });   // Cessna white paint
-  const clip = [new THREE.Plane(new THREE.Vector3(1, 0, 0), -XC)]; cowlMat.clippingPlanes = clip;
-  P.parts.engine.subs.forEach((sb) => (sb.segs = []));
-  for (const nm of ["cowling", "fuselage"]) P.parts[nm].subs.forEach((sb) => { const m = sb.obj.children.find((o) => o.isMesh), a = m ? Array.from(new THREE.EdgesGeometry(m.geometry, 38).attributes.position.array) : [], keepS = [];
-    for (let i = 0; i < a.length; i += 6) if (a[i] > XC + 0.05 && a[i + 3] > XC + 0.05) keepS.push(...a.slice(i, i + 6)); sb.segs = keepS; });
-  const tire = new THREE.MeshStandardMaterial({ color: 0x1d1e22, roughness: 0.8 });
-  P.meshes.forEach((m) => { if (m.userData.part === "gear") { m.material = m.userData.tag === "wheel0" ? tire : cowlMat; m.userData.mat0 = m.material; } });
-  // windshield (from the model's own surface) and the two cooling-air inlets on the nose bowl, so the nose reads as a 172
-  { const glass = new THREE.MeshStandardMaterial({ color: 0x18222e, metalness: 0.5, roughness: 0.16, side: THREE.DoubleSide }), nx = 10, nt = 12, pos = [], idx = [];
-    for (let i = 0; i <= nx; i++) for (let j = 0; j <= nt; j++) { const x = 3.3 - (1.8 * i) / nx, th = 0.62 + ((Math.PI - 1.24) * j) / nt; pos.push(...P.surf(x, th, 0.03).toArray()); }
-    for (let i = 0; i < nx; i++) for (let j = 0; j < nt; j++) { const a = i * (nt + 1) + j; idx.push(a, a + 1, a + nt + 1, a + 1, a + nt + 2, a + nt + 1); }
-    const wg = new THREE.BufferGeometry(); wg.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); wg.setIndex(idx); wg.computeVertexNormals(); const wm = new THREE.Mesh(wg, glass); P.root.add(wm);
-    const inl = new THREE.MeshBasicMaterial({ color: 0x050506, side: THREE.DoubleSide });
-    for (const sd of [1, -1]) { const ring = Array.from({ length: 20 }, (_, i) => { const a = (i / 20) * 2 * Math.PI; return P.surf(6.75 + 0.22 * Math.cos(a), (sd > 0 ? 0.55 : Math.PI - 0.55) + 0.12 * Math.sin(a), 0.03); });
-      const c = ring.reduce((s2, v) => s2.add(v), new THREE.Vector3()).divideScalar(ring.length), pp = [], ii = []; pp.push(...c.toArray()); ring.forEach((v) => pp.push(...v.toArray())); for (let i = 0; i < 20; i++) ii.push(0, 1 + i, 1 + ((i + 1) % 20));
-      const g2 = new THREE.BufferGeometry(); g2.setAttribute("position", new THREE.Float32BufferAttribute(pp, 3)); g2.setIndex(ii); P.root.add(new THREE.Mesh(g2, inl)); } }
-  const cb = new THREE.Box3(); P.meshes.forEach((m) => { if (m.userData.part === "cowling" || m.userData.part === "fuselage") { m.material = cowlMat; m.userData.mat0 = cowlMat; } if (m.userData.part === "cowling") cb.expandByObject(m); });
-  { const bowl = new THREE.Mesh(new THREE.CircleGeometry(1, 40), new THREE.MeshBasicMaterial({ color: 0x050506, side: THREE.DoubleSide })); bowl.rotation.y = Math.PI / 2; bowl.position.set(cb.max.x - 0.06, PY, 0); bowl.scale.set(0.78, 0.78, 1); P.root.add(bowl);
-    const lip = new THREE.LineLoop(new THREE.BufferGeometry().setFromPoints(Array.from({ length: 48 }, (_, i) => new THREE.Vector3(0, Math.cos(i / 48 * 2 * Math.PI), Math.sin(i / 48 * 2 * Math.PI)))), new THREE.LineBasicMaterial({ color: 0xf2f1ec, transparent: true, opacity: 0.35 })); lip.position.copy(bowl.position); lip.scale.set(1, 0.8, 0.8); P.root.add(lip); }
-  const metal = new THREE.MeshStandardMaterial({ color: 0xa3a8b0, metalness: 0.3, roughness: 0.36 }), paint = new THREE.MeshStandardMaterial({ color: 0xdedbd2, metalness: 0.15, roughness: 0.32 });
-  const band = new THREE.MeshBasicMaterial({ color: 0x3b82f6 }), sc = new THREE.Scene();
-  const hub = new THREE.Group(); hub.position.set(PX, PY, 0); P.root.add(hub);
-  const prof = Array.from({ length: 24 }, (_, i) => { const u = i / 23; return new THREE.Vector2(Math.max(0.002, 0.6 * Math.pow(1 - u, 0.55) * (1 - 0.08 * u)), 0.82 * u); });
-  const sg = new THREE.LatheGeometry(prof, 48); sg.rotateZ(-Math.PI / 2); sg.translate(-0.24, 0, 0); hub.add(new THREE.Mesh(sg, paint));
-  const blades = [], bands = [];
-  for (let b = 0; b < 2; b++) { const bg = new THREE.Group(); bg.rotation.x = b * Math.PI; hub.add(bg); const pg = new THREE.Group(); bg.add(pg); const vars = {};
-    for (const [key, tw] of [["tw", true], ["fl", false]]) { const vg = new THREE.Group(); pg.add(vg); vars[key] = vg;
-      const fs = Array.from({ length: NR }, (_, i) => F0 + ((1 - F0) * i) / (NR - 1)), rings = fs.map((f) => ringAt(f, betaFixed(f * RAD, tw)));
-      const geo = loftGeo(THREE, rings); geo.computeVertexNormals(); vg.add(new THREE.Mesh(geo, metal));
-      if (b === 0) ST.forEach((f, i) => { const rr = [f - 0.014, f + 0.014].map((ff) => ringAt(ff, betaFixed(ff * RAD, tw), 1.07)); const m = new THREE.Mesh(loftGeo(THREE, rr), band); vg.add(m); m.userData.st = i; if (tw) bands.push(m); }); }
-    blades.push({ pg, vars }); }
-  const disc = new THREE.Mesh(new THREE.CircleGeometry(RF, 72), new THREE.MeshBasicMaterial({ map: blurTex(THREE), transparent: true, depthWrite: false, side: THREE.DoubleSide }));
-  disc.rotation.y = Math.PI / 2; disc.position.x = 0.02; hub.add(disc);
-  // light only the propeller and spinner (the rest of the model is unlit ink-on-black)
-  const hemi = new THREE.HemisphereLight(0xf4f2ec, 0x1a1c22, 0.9), key = new THREE.DirectionalLight(0xffffff, 2.2), rim = new THREE.DirectionalLight(0xc9d6ff, 1.1);
-  key.position.set(6, 14, -16); rim.position.set(-6, 8, 14); P.root.add(hemi, key, rim);
+// the airplane's own propeller (c172-model.js) in the standard ink look: its blades turn via pose({ prop }) and are lit in
+// the accent; the three station bands are thin white overlays on one blade; the governor's pitch change turns each blade
+// about its own axis.
+function propModel(THREE) { const P = buildPlane(THREE), blades = [], bands = [], band = new THREE.MeshBasicMaterial({ color: 0xf2f1ec });
+  P.parts.propeller.subs.forEach((sb) => { let bl = false; sb.obj.traverse((o) => { if (o.isMesh && o.userData.tag === "blade") bl = true; }); if (bl) blades.push({ pg: sb.obj, vars: { tw: new THREE.Group(), fl: new THREE.Group() } }); });
+  const hub = blades[0].pg.parent;
+  // station r (ft) on the model's blade: chord lerp(0.42, 0.26), blade angle atan(5 / 2 pi r), 0.15 ft ahead of the hub plane
+  ST.forEach((f, i) => { const r = 0.45 + f * 2.72, c = (0.42 - 0.16 * f) * 1.25, ph = Math.atan(5.0 / (2 * Math.PI * r));
+    const m = new THREE.Mesh(new THREE.BoxGeometry(c, 0.07, 0.09), band); m.position.set(0.15, r, 0); m.rotation.y = Math.atan2(-Math.cos(ph), Math.sin(ph)); m.userData.st = i; blades[0].pg.add(m); bands.push(m); });
+  const disc = new THREE.Mesh(new THREE.CircleGeometry(RF, 72), new THREE.MeshBasicMaterial({ map: blurTex(THREE), transparent: true, opacity: 0.5, depthWrite: false, side: THREE.DoubleSide }));
+  disc.rotation.y = Math.PI / 2; disc.position.x = 0.17; hub.add(disc);
   return Object.assign(P, { hub, blades, bands, disc }); }
 export function mount(host) {
   let mode = "fixed", twist = true, v = 0, thr = 1, set = 2400, b75 = betaFixed(0.75 * RAD), rpmCS = 2400;
   const F = frame(host, { cls: "capin sec3d prop3d", corners: { tl: "Propeller", tr: "PHAK 7 · POH 2" } });
   F.root.dataset.live = "1";   // the prop turns slowly while on screen; zero frames offscreen
   const S = planeStage(F.stage, { model: propModel, cg: [PX, PY, 0], orbit: false, maxFps: 30, fov: 24, view: { tg: [PX - 1, PY, 0], az: -42, el: 12, d: 20, fov: 24 } });
-  const M3 = S.P; S.renderer.localClippingEnabled = true;
+  const M3 = S.P; S.highlight(["propeller"]);
   // camera: three-quarter front from the left so the twist from hub to tip reads; framed to the propeller disk and the cowling
   const VZ = { az: -54, el: 14, fov: 24 }, fitPts = []; { for (let i = 0; i < 48; i++) { const a = (i / 48) * 2 * Math.PI; fitPts.push([PX, PY + Math.cos(a) * RF, Math.sin(a) * RF]); }
-    M3.meshes.forEach((m) => { if (!["cowling", "fuselage", "gear"].includes(m.userData.part)) return; m.updateWorldMatrix(true, false); const pa = m.geometry.attributes.position, v = new THREE.Vector3(); for (let i = 0; i < pa.count; i += 3) { v.fromBufferAttribute(pa, i).applyMatrix4(m.matrixWorld); if (v.x > 0.9) fitPts.push(v.toArray()); } }); }
+    M3.meshes.forEach((m) => { if (m.userData.part !== "cowling" && !["wheel0", "pant0", "leg0"].includes(m.userData.tag)) return; m.updateWorldMatrix(true, false); const pa = m.geometry.attributes.position, v = new THREE.Vector3(); for (let i = 0; i < pa.count; i += 3) { v.fromBufferAttribute(pa, i).applyMatrix4(m.matrixWorld); if (v.x > 2.2) fitPts.push(v.toArray()); } }); }
   function fit(aspect) { const cam = new THREE.PerspectiveCamera(VZ.fov, aspect, 0.1, 500), tg = new THREE.Vector3(PX - 1.2, PY, 0); let d = 20;
     for (let it = 0; it < 6; it++) { const az = VZ.az * D, el = VZ.el * D; cam.position.set(tg.x + d * Math.cos(el) * Math.cos(az), tg.y + d * Math.sin(el), tg.z + d * Math.cos(el) * Math.sin(az)); cam.lookAt(tg); cam.updateMatrixWorld();
       let x0 = 9, x1 = -9, y0 = 9, y1 = -9; const v3 = new THREE.Vector3(); fitPts.forEach((q) => { v3.set(...q).project(cam); x0 = Math.min(x0, v3.x); x1 = Math.max(x1, v3.x); y0 = Math.min(y0, v3.y); y1 = Math.max(y1, v3.y); });
@@ -131,7 +101,7 @@ export function mount(host) {
     M3.blades.forEach((bl) => { bl.vars.tw.visible = twist; bl.vars.fl.visible = !twist; bl.pg.rotation.y = dB * D; }); S.kick(); }
   const spin = reduced() ? 0 : 0.2 * 2 * Math.PI;   // 0.2 rev/s: slow enough to follow the lit stations; the blur disc stands in for the real speed
   M3.disc.visible = spin > 0;
-  let t0 = null; S.setFlow(true, (now) => { t0 ??= now; M3.hub.rotation.x = ((now - t0) / 1000) * spin; labels(); });
+  let t0 = null; S.setFlow(true, (now) => { t0 ??= now; M3.pose({ prop: ((now - t0) / 1000) * spin }); labels(); });
   const FO = (() => { const [U, Lo] = airfoil(30, 0.12, 0.04); return [...U, ...Lo.slice(1, -1).reverse()]; })();
   function draw(g, W) {
     const wide = W >= 600, [rpm, stop] = rpmNow(), cs = mode === "cs";
@@ -186,7 +156,7 @@ export function mount(host) {
     F.caption(cap[0], cap[1]);
     return Hh;
   }
-  F.explain(`<p>The numbered blue bands are the three stations in the insets below. The spin is slowed way down so you can follow them; the soft disc shows the area the blades sweep. Rotation speed grows toward the tip, so the relative wind there is flatter. The twist lowers the blade angle toward the tip to keep the angle of attack about the same along the blade. On a constant-speed prop, watch both blades turn about their own axes as the governor changes the blade angle. Your airplane's POH gives the static RPM range.</p>`);
+  F.explain(`<p>The numbered white bands on the blue blade are the three stations in the insets below. The spin is slowed way down so you can follow them; the soft disc shows the area the blades sweep. Rotation speed grows toward the tip, so the relative wind there is flatter. The twist lowers the blade angle toward the tip to keep the angle of attack about the same along the blade. On a constant-speed prop, watch both blades turn about their own axes as the governor changes the blade angle. Your airplane's POH gives the static RPM range.</p>`);
   band(); upd();
   return { destroy: () => { A.stop(); S.destroy(); F.destroy(); } };
 }

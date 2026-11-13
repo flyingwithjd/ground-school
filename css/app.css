@@ -655,3 +655,21 @@ html.locked #gate { display: flex; }
 @media (max-width:700px){.viz.mag3d .stage{aspect-ratio:1/1}}
 .viz.px.starter .stage{aspect-ratio:16/11}
 @media (max-width:700px){.viz.px.starter .stage{aspect-ratio:3/4}}
+
+/* play-while-you-watch layout (base.js liveFirst): sliders right under the stage, compact chip rows, headline after the controls */
+.viz.slfirst > .ctrl-live{display:flex;flex-direction:column;align-items:stretch;gap:6px;padding:10px clamp(14px,2.6vw,26px);border-top:1px solid var(--line)}
+.viz.slfirst > .ctrl-live .ctrl-row{flex-wrap:wrap;gap:6px 18px}
+.viz.slfirst > .ctrl-live .ctrl-row > .ctrl-lab{display:none}
+.viz.slfirst > .ctrl-live .slider{flex:1 1 260px;min-width:0;gap:10px;grid-template-columns:96px minmax(0,1fr) 78px}
+.viz.slfirst > .ctrl-live .slider label{white-space:normal;line-height:1.2}
+.viz.slfirst > .ctrl-live .slider input{min-height:28px}
+.viz.slfirst > .ctrl:not(.ctrl-live){padding-top:12px;padding-bottom:12px;gap:8px}
+.viz.slfirst.capin > .caption{border-top:1px solid var(--line);padding-bottom:6px}
+.viz.slfirst.capin > .caption .big{font-size:clamp(18px,2.6vw,28px)}
+@media (max-width:700px){
+  .viz.slfirst .ctrl-row{flex-wrap:nowrap;gap:10px}
+  .viz.slfirst .ctrl-row > .ctrl-lab{flex:0 0 64px;min-width:0;flex-basis:64px;white-space:normal;line-height:1.2}
+  .viz.slfirst .ctrl-row > .chips{flex:1 1 0;min-width:0;flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;touch-action:pan-x pan-y;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
+  .viz.slfirst .ctrl-row > .chips::-webkit-scrollbar{display:none}
+  .viz.slfirst .ctrl-row > .chips > .chip{flex:0 0 auto;white-space:nowrap}
+}
