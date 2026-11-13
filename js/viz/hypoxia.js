@@ -17,7 +17,7 @@ const SYS = {
   pressure: ["Pressure-demand", 45000, "Like diluter-demand, but oxygen is delivered under pressure above 34,000 ft; safe above 40,000 ft."],
   pulse: ["Pulse-demand", 0, "Portable; a pulse at the start of each breath uses 50–85% less oxygen than continuous flow. Check the unit's approved altitude."],
 };
-const TUC = [[20000, "30 min or more"], [22000, "5–10 min"], [25000, "3–5 min"], [28000, "2½–3 min"], [30000, "1–2 min"], [35000, "30–60 s"], [40000, "15–20 s"], [45000, "9–15 s"]];
+export const TUC = [[20000, "30 min or more"], [22000, "5–10 min"], [25000, "3–5 min"], [28000, "2½–3 min"], [30000, "1–2 min"], [35000, "30–60 s"], [40000, "15–20 s"], [45000, "9–15 s"]];
 const MAX = 30000;
 function info(a) {
   const reg = a > 15000 ? "Every occupant must be provided with oxygen; crew uses it at all times." : a > 14000 ? "Required crew must use oxygen at all times." : a > 12500 ? "Required crew must use oxygen after 30 minutes." : "No oxygen required by 91.211.";
