@@ -16,14 +16,14 @@
 import { frame, chips, slider, row } from "./base.js?v=2481aa7edd";
 import { planeStage } from "./planestage.js?v=2481aa7edd";
 import { sectionModel, airfoil, rotP } from "./section-models.js?v=2481aa7edd";
-import { h, clamp, reduced } from "../core/util.js?v=2481aa7edd";
+import { h, s, clamp, reduced } from "../core/util.js?v=2481aa7edd";
 const D = Math.PI / 180;
 export const WING = {
   plain: { name: "Plain flap", dl: 0.5, dd: 0.6, crit: 16, say: ["Plain flap", "The simplest flap: more camber, more lift and a lot more drag. The nose tends to pitch down."] },
   split: { name: "Split flap", dl: 0.55, dd: 0.9, crit: 16, say: ["Split flap", "Only the lower surface hinges down: a little more lift than a plain flap, but even more drag."] },
   slotted: { name: "Slotted flap", dl: 0.7, dd: 0.45, crit: 16, say: ["Slotted flap", "Air from below flows through the slot and keeps the flow attached: more lift than plain or split."] },
   fowler: { name: "Fowler flap", dl: 0.9, dd: 0.35, crit: 16, say: ["Fowler flap", "It slides aft, then down: more camber and more wing area. The most lift for the least drag."] },
-  slot: { name: "Slot", dl: 0, dd: 0.05, crit: 22, say: ["Fixed slot", "A gap near the leading edge feeds fast air over the top, so the wing stalls at a higher angle."] },
+  slot: { name: "Slot", dl: 0, dd: 0.05, crit: 22, say: ["Fixed slot", "High-pressure air from under the wing flows up through the slot and over the top, re-energizing the airflow there. It stays attached longer, so the wing stalls at a higher angle of attack."] },
   slat: { name: "Slat", dl: 0.15, dd: 0.1, crit: 22, say: ["Slat", "The leading edge moves forward to open a slot, delaying the stall to a higher angle of attack."] },
   spoiler: { name: "Spoiler", dl: -0.6, dd: 0.8, crit: 16, say: ["Spoiler", "A panel on top spoils the airflow: less lift, more drag. Descend without speeding up."] },
 };
@@ -55,6 +55,7 @@ const PIECES = [
   { name: "stabtor", pts: sec(SU, SL, 0, 0.9) , pivot: M([0.25, 0]) },
   { name: "atab", pts: sec(SU, SL, 0.903, 1, true), pivot: M([0.9, 0]), parent: "stabtor" },
 ];
+const WALL_S = [[0.105, yAt(FU, 0.105)], [0.085, 0.03], [0.052, 0.006], [0.045, yAt(FL, 0.045)]], WALL_W = [[0.055, yAt(FL, 0.055)], [0.07, 0.004], [0.12, yAt(FU, 0.12)]];   // the two walls of the slot (piece vertices)
 const SHOW = { plain: ["wingTE", "flap"], split: ["wing", "plate"], slotted: ["wingTE", "flap"], fowler: ["wingTE", "flap"], slot: ["wingLE", "slat"], slat: ["wingLE", "slat"], spoiler: ["wing", "spoiler"],
   trim: ["stab", "elev", "tab"], balance: ["stab", "elev", "tab"], servo: ["stab", "elev", "tab"], anti: ["stabtor", "atab"] };
 const FOCUS = { plain: ["flap"], split: ["plate"], slotted: ["flap"], fowler: ["flap"], slot: [], slat: ["slat"], spoiler: ["spoiler"], trim: ["tab"], balance: ["tab"], servo: ["tab"], anti: ["atab"] };
@@ -67,14 +68,25 @@ function poseOf(dev, k) { const p = {};
   else if (dev === "split") p.plate = [0, 0, 50 * D * k];
   else if (dev === "spoiler") p.spoiler = [0, 0, -50 * D * k];
   else if (dev === "slat") p.slat = [0.075 * CH * k, -0.045 * CH * k, 0.12 * k];
-  else if (dev === "slot") p.slat = [0.045 * CH, -0.03 * CH, 0.07];   // fixed gap: the slot is always open
+  else if (dev === "slot") p.slat = [0.07 * CH, -0.045 * CH, 0.11];   // fixed gap: the slot is always open
   else if (dev === "trim") { p.tab = [0, 0, 22 * D * k]; p.elev = [0, 0, -10 * D * k]; }
   else if (dev === "balance") { p.elev = [0, 0, -18 * D * k]; p.tab = [0, 0, 16 * D * k]; }
   else if (dev === "servo") { p.tab = [0, 0, 20 * D * k]; p.elev = [0, 0, -14 * D * k]; }
   else if (dev === "anti") { p.stabtor = [0, 0, -12 * D * k]; p.atab = [0, 0, -10 * D * k]; }
   return p; }
+export function flowState(dev, aoa, k) {
+  if (!dev) return { regime: "tail", stalled: false, sepU: 1.02, str: 0, liftV: 0.5, dragV: 0.2 };
+  const Wd = WING[dev], crit = Wd.crit - (dev === "slat" ? (1 - k) * 6 : 0), stalled = aoa > crit;
+  let sepU = aoa <= crit - 4 ? 1.02 : aoa <= crit ? 1 - (0.2 * (aoa - crit + 4)) / 4 : Math.max(0.12, 0.6 - (aoa - crit) * 0.1), str = stalled ? 1 : aoa > crit - 4 ? 0.3 * (aoa - crit + 4) / 4 : 0;
+  if (!stalled && dev === "plain" && k > 0.55) { sepU = Math.min(sepU, 0.86); str = Math.max(str, Math.min(0.3, (k - 0.55) * 0.7)); }
+  const spoiled = !stalled && dev === "spoiler" && k > 0.08;
+  if (spoiled) { sepU = Math.min(sepU, 0.6); str = Math.max(str, Math.min(0.6, k * 0.8)); }
+  const regime = stalled ? "stalled" : spoiled ? "spoiled" : sepU < 0.99 ? "separating" : "attached";
+  const liftV = Math.max(0.05, (stalled ? 0.6 : 1) * (0.35 + aoa / 30 + Wd.dl * k * 0.6)), dragV = 0.2 + aoa / 60 + Wd.dd * k * 0.6 + (stalled ? 0.3 : 0);
+  return { crit, stalled, regime, sepU, str: clamp(str, 0, 1), liftV, dragV, nearStall: !stalled && aoa > crit - 4 };
+}
 export function mount(host) {
-  let tail0 = false, dev = "plain", tail = null, tgt = 0.7, k = 0, aoaT = 6, aoa = 6, first = true;
+  let tail0 = false, le0 = false, dev = "plain", tail = null, tgt = 0.7, k = 0, aoaT = 6, aoa = 6, first = true;
   const F = frame(host, { cls: "capin sec3d", corners: { tl: "Secondary flight controls", tr: "PHAK 6" } });
   F.root.dataset.live = "1";   // airflow drifts while on screen; zero frames offscreen
   const S = planeStage(F.stage, { model: (THREE) => sectionModel(THREE, PIECES, { stations: 3, spanEvery: 5 }), cg: [0, 0, 0], orbit: false, maxFps: 30, fov: 18, view: { tg: [-0.6, 0.2, 0], az: -112, el: 13, d: 60, fov: 18 } });
@@ -84,7 +96,8 @@ export function mount(host) {
   // fit the section and its airflow (about 15 x 6.5 ft) to the stage
   const fit = (dur = 1) => { const r = F.stage.getBoundingClientRect(), Hh = Math.max(1, r.height - (+F.stage.dataset.band || 0)), Ww = Math.max(1, r.width), TN = Math.tan(9 * D), ph = Ww < 560;
     const wft = ph ? 8.2 : 10.8, hft = ph ? 5.2 : 5.4, d = Math.max(wft / (2 * TN * (Ww / Hh)), hft / (2 * TN)); const tl = !!tail, d2 = tl ? d * 0.78 : d;   // tail tabs: closer and lower, framed on the elevator and tab so their deflections read
-    S.setView(tl ? { tg: [ph ? -1.0 : -1.3, 0.1, -0.8], az: -70, el: 9, d: d2, fov: 18 } : { tg: [ph ? -0.5 : -0.9, 0.45, -0.4], az: -66, el: 15, d, fov: 18 }, dur); };
+    const lv = !tl && (dev === "slot" || dev === "slat");   // slot and slat: nearly side-on, so the gap and the flow through it read
+    S.setView(lv ? { tg: [ph ? -0.4 : -0.6, ph ? -0.9 : -0.5, -0.6], az: -82, el: 6, d: d * (ph ? 1.08 : 0.95), fov: 18 } : tl ? { tg: [ph ? -1.0 : -1.3, 0.1, -0.8], az: -70, el: 9, d: d2, fov: 18 } : { tg: [ph ? -0.5 : -0.9, 0.45, -0.4], az: -66, el: 15, d, fov: 18 }, dur); };
   const bro = new ResizeObserver(band); bro.observe(F.stage); F.on(() => bro.disconnect());
   // live readout band under the stage: three values, fixed slots so nothing moves
   const rb = h("div", { class: "readout sec-read" }); const cells = [0, 1, 2].map(() => { const b = h("b", {}, "–"), sp = h("span", {}); rb.append(h("div", {}, b, sp)); return [b, sp]; }); F.stage.after(rb);
@@ -97,7 +110,9 @@ export function mount(host) {
   const ups = [0.2, 0.7, 1.45].map((d, i) => mk(d, ZF, [0.75, 0.6, 0.42][i])), los = [-0.24, -0.9].map((d, i) => mk(d, ZF, [0.6, 0.42][i]));
   const back = [0.55].map((d) => mk(d, ZB, 0.22));
   const jetB = S.cueLine(30, { width: 4, opacity: 0.2, color: 0x3b82f6 }), jetD = S.cueLine(30, { dash: [0.4, 0.26], width: 2, opacity: 1, color: 0x3b82f6 });
-  const jet = { set(p) { jetB.set(p); jetD.set(p); }, set opacity(o) { jetB.opacity = o * 0.25; jetD.opacity = o; } };
+  let jetW = 0; const jet = { set(p) { jetB.set(p); jetD.set(p); }, set opacity(o) { jetB.opacity = o * 0.25; jetD.opacity = o; }, bold(on) { if (on === jetW) return; jetW = on; jetB.obj.material.linewidth = on ? 8 : 4; jetD.obj.material.linewidth = on ? 3.4 : 2; } };
+  // the slot itself: its two walls (the back of the leading-edge piece and the nose of the wing) traced in the accent
+  const gapA = S.cueLine(4, { width: 3.4, opacity: 0, color: 0x3b82f6 }), gapB = S.cueLine(3, { width: 3.4, opacity: 0, color: 0x3b82f6 });
   const eddies = Array.from({ length: 5 }, () => S.cueLine(22, { width: 1.2, opacity: 0.3 }));
   const liftA = S.cueArrow({ color: 0x3b82f6, width: 3.4, head: 0.5 }), dragA = S.cueArrow({ color: 0xf2f1ec, width: 2.8, head: 0.42 });
   const tabA = S.cueArrow({ color: 0xf2f1ec, width: 3.2, head: 0.36 }), tailA = S.cueArrow({ color: 0x3b82f6, width: 3.8, head: 0.5 });
@@ -113,20 +128,40 @@ export function mount(host) {
   const resample = (pts, n) => { const L = [0]; for (let i = 1; i < pts.length; i++) L.push(L[i - 1] + Math.hypot(pts[i][0] - pts[i - 1][0], pts[i][1] - pts[i - 1][1])); const out = [];
     for (let i = 0; i < n; i++) { const t = (L.at(-1) * i) / (n - 1); let j = 1; while (j < L.length - 1 && L[j] < t) j++; const k2 = (t - L[j - 1]) / (L[j] - L[j - 1] || 1); out.push([pts[j - 1][0] + (pts[j][0] - pts[j - 1][0]) * k2, pts[j - 1][1] + (pts[j][1] - pts[j - 1][1]) * k2]); } return out; };
   let wake = [], st = {};
-  function physics() { const cur = tail || dev, isTail = !!tail;
-    if (isTail) { st = { stalled: false, sepX: null, str: 0 }; return; }
-    const Wd = WING[dev], crit = Wd.crit - (dev === "slat" ? (1 - k) * 6 : 0), stalled = aoa > crit && dev !== "spoiler";
-    let sepU = aoa <= crit - 4 ? 1.02 : aoa <= crit ? 1 - (0.2 * (aoa - crit + 4)) / 4 : Math.max(0.12, 0.6 - (aoa - crit) * 0.1), str = stalled ? 1 : aoa > crit - 4 ? 0.35 * (aoa - crit + 4) / 4 : 0;
-    if (dev === "plain" && k > 0.55) { sepU = Math.min(sepU, 0.86); str = Math.max(str, (k - 0.55) * 1.6); }
-    if (dev === "spoiler" && k > 0.08) { sepU = Math.min(sepU, 0.6); str = Math.max(str, Math.min(1, k * 1.3)); }
-    const liftV = Math.max(0.05, (stalled ? 0.6 : 1) * (0.35 + aoa / 30 + Wd.dl * k * 0.6)), dragV = 0.2 + aoa / 60 + Wd.dd * k * 0.6 + (stalled ? 0.3 : 0);
-    st = { crit, stalled, sepU, str: clamp(str, 0, 1), liftV, dragV, cur }; }
+  // ONE flow state for both the drawing and the text: physics() runs on every frame of the ease (and on every input), and
+  // cues() and text() both read st, so the drawn separation and the words always describe the same state. Regimes:
+  // attached; separating (trailing-edge separation starting, within 4° of the critical angle, or over a plain flap at a big
+  // deflection: drawn faint, never a full wake); spoiled (spoiler panel up); stalled (past the critical angle: full wake).
+  function physics() { st = flowState(tail ? null : dev, aoa, k); }
+  // the slot close-up: a 2D cut of the leading edge in the corner of the stage, the gap walls in the accent, the air from
+  // under the wing curving up through the slot (blue) and the airflow over the top (white), all from the same section and
+  // streamline geometry as the 3D view, so it pitches with the angle of attack and shows separation the same way
+  const cu = s("svg", { class: "ft-close", role: "img", "aria-label": "Close-up of the slot" }, F.stage); let cuG = null;
+  s("defs", {}, cu).innerHTML = `<marker id="ftcb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3B82F6"/></marker><marker id="ftcw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#F2F1EC"/></marker><clipPath id="ftclip"><rect x="1" y="1" width="1" height="1" rx="10"/></clipPath>`;
+  function closeUp(jetPts, lines) { if (cuG) { cuG.remove(); cuG = null; } cu.style.display = jetPts ? "" : "none"; if (!jetPts) return;
+    const r = F.stage.getBoundingClientRect(), W = Math.min(r.width * (r.width < 560 ? 0.5 : 0.34), 260), H = Math.round(W * 0.66); cu.setAttribute("width", W); cu.setAttribute("height", H); cu.setAttribute("viewBox", `0 0 ${W} ${H}`);
+    const cr = cu.querySelector("#ftclip rect"); cr.setAttribute("width", W - 2); cr.setAttribute("height", H - 2);
+    const g0 = xf("slat", M([0.085, 0.03])), m0 = xf("wingLE", M([0.07, 0.004])), gc = [(g0[0] + m0[0]) / 2, (g0[1] + m0[1]) / 2], sc = W / 1.9, cx = W * 0.36, cy = H * 0.52;
+    const P2 = (q) => [cx - (q[0] - gc[0]) * sc, cy - (q[1] - gc[1]) * sc], d = (pts) => "M" + pts.map((q) => P2(q).map((v) => v.toFixed(1)).join(",")).join("L");
+    cuG = s("g", {}, cu); s("rect", { x: 0.5, y: 0.5, width: W - 1, height: H - 1, rx: 10, fill: "#0A0A0B", stroke: "rgba(242,241,236,.28)", "stroke-width": 1 }, cuG);
+    const g = s("g", { "clip-path": "url(#ftclip)" }, cuG);
+    lines.forEach((ln, i) => s("path", { d: d(ln), fill: "none", stroke: "#F2F1EC", "stroke-width": 1.3, opacity: [0.75, 0.45, 0.55][i], "stroke-dasharray": "5 4", "marker-end": "url(#ftcw)" }, g));
+    for (const n of ["wingLE", "slat"]) s("path", { d: d(byName[n].pts.map((q) => xf(n, q))) + "Z", fill: "#141417", stroke: "#F2F1EC", "stroke-width": 1.3, "stroke-linejoin": "round" }, g);
+    const wall = (name, uv) => uv.map((q) => xf(name, M(q)));
+    s("path", { d: d([...wall("slat", WALL_S), ...wall("wingLE", WALL_W)]) + "Z", fill: "rgba(59,130,246,.22)", stroke: "none" }, g);   // the gap itself
+    s("path", { d: d(wall("slat", WALL_S)), fill: "none", stroke: "#3B82F6", "stroke-width": 2.6, "stroke-linecap": "round" }, g);
+    s("path", { d: d(wall("wingLE", WALL_W)), fill: "none", stroke: "#3B82F6", "stroke-width": 2.6, "stroke-linecap": "round" }, g);
+    let jp2 = resample(jetPts, 60); for (let pass = 0; pass < 3; pass++) jp2 = jp2.map((q, i) => (i === 0 || i === jp2.length - 1 ? q : [(jp2[i - 1][0] + 2 * q[0] + jp2[i + 1][0]) / 4, (jp2[i - 1][1] + 2 * q[1] + jp2[i + 1][1]) / 4]));
+    s("path", { d: d(jp2), fill: "none", stroke: "#3B82F6", "stroke-width": 3, "stroke-linecap": "round", "marker-end": "url(#ftcb)" }, g);
+    const lab = (x, y, str, fill, anchor = "start") => { const e = s("text", { x, y, "text-anchor": anchor, "font-family": "IBM Plex Mono, ui-monospace, monospace", "font-size": 11, "font-weight": 600, fill }, cuG); e.textContent = str; e.setAttribute("stroke", "#0A0A0B"); e.setAttribute("stroke-width", "3"); e.setAttribute("paint-order", "stroke"); };
+    lab(8, 15, "SLOT, CLOSE UP", "rgba(242,241,236,.55)"); lab(W - 8, H - 9, "air from below", "#3B82F6", "end"); lab(W * 0.36 + 14, H * 0.52 + 16, "slot", "#3B82F6"); }
+  F.on(() => closeUp(null));
   function cues(now = performance.now()) {
     const cur = tail || dev, vis = SHOW[cur];
     segsW = []; for (const n of vis) { const w = byName[n].pts.map((q) => xf(n, q)); for (let i = 0; i < w.length; i++) segsW.push([w[i], w[(i + 1) % w.length]]); }
     let xLE = -Infinity, xTE = Infinity, pLE = null, pTE = null; for (const [a] of segsW) { if (a[0] > xLE) { xLE = a[0]; pLE = a; } if (a[0] < xTE) { xTE = a[0]; pTE = a; } }
     const Ls = st.liftV || 0.5, dw = tail ? 0 : 0.3 * Ls;
-    const sepP = !tail && st.sepU < 1 ? xf(vis[0], M([Math.min(1, st.sepU), yAt(FU, Math.min(1, st.sepU))])) : null;
+    const sepP = !tail && st.sepU < 0.99 ? xf(vis[0], M([Math.min(1, st.sepU), yAt(FU, Math.min(1, st.sepU))])) : null;
     const line = (d) => { const pts = []; const up = d > 0, h0 = d + (up ? 0.15 : -0.1);
       for (let i = 0; i < NP; i++) { const x = XA - ((XA - XB) * i) / (NP - 1); let y;
         const e = env(x);
@@ -137,23 +172,35 @@ export function mount(host) {
           y = Math.max(y, y + (det - y) * wd * fade); }
         pts.push([x, y]); }
       return smooth(pts, 4); };
-    ups.forEach((l) => l.el.set(line(l.d).map(([x, y]) => [x, y, l.z]))); los.forEach((l) => l.el.set(line(l.d).map(([x, y]) => [x, y, l.z])));
+    const upLine = line(ups[0].d), loLine = line(los[0].d), up2 = line(ups[1].d); ups.forEach((l) => l.el.set(line(l.d).map(([x, y]) => [x, y, l.z]))); los.forEach((l) => l.el.set(line(l.d).map(([x, y]) => [x, y, l.z])));
     back.forEach((l) => l.el.set(line(l.d).map(([x, y]) => [x, y, l.z])));
     // wake regions for eddies: behind the separation point, and behind a lowered split flap
     wake = [];
     if (sepP && st.str > 0.05) { const top = line(ups[0].d); wake.push({ x0: sepP[0], x1: xTE - 2.2, str: st.str, top: (x) => { const i = clamp(Math.round(((XA - x) / (XA - XB)) * (NP - 1)), 0, NP - 1); return top[i][1]; }, bot: (x) => { const e = env(x); return e ? e[1] : pTE[1]; } }); }
     if (dev === "split" && !tail && k > 0.25) { const tip = xf("plate", M([1, yAt(FL, 1)])), wte = xf("wing", M([1, yAt(FL, 1)])); wake.push({ x0: wte[0] + 0.6, x1: tip[0] - 2.4, str: clamp((k - 0.25) * 1.6, 0, 1), top: () => wte[1] + 0.05, bot: () => tip[1] + 0.05 }); }
     eddyDraw(now);
+    // what the drawing shows, for the consistency test: a full wake = stalled; a spoiler panel up = spoiled; any separation point = separating
+    const mainStr = sepP && wake.length ? wake[0].str : 0, panel = dev === "spoiler" && Math.abs((pose.spoiler || [0, 0, 0])[2]) > 4 * D;
+    F.root.dataset.flowDrawn = tail ? "tail" : mainStr >= 0.9 ? "stalled" : panel && sepP ? "spoiled" : sepP ? "separating" : "attached";
     // the teaching flow: through a slot, a slat gap or a slotted flap's gap
     let jp = null;
-    if (!tail && (dev === "slot" || (dev === "slat" && k > 0.25))) { const g = xf("slat", M([0.085, 0.03])), m = xf("wingLE", M([0.07, 0.004]));
-      jp = [xf("wingLE", M([-0.1, -0.11])), xf("wingLE", M([0.0, -0.075])), [(g[0] + m[0]) / 2 + 0.15, (g[1] + m[1]) / 2 - 0.08], [(g[0] + m[0]) / 2 - 0.05, (g[1] + m[1]) / 2 + 0.05], xf("wingLE", M([0.2, yAt(FU, 0.2) + 0.025])), xf("wingLE", M([0.4, yAt(FU, 0.4) + 0.035])), xf("wingLE", M([0.62, yAt(FU, 0.62) + 0.04]))]; }
+    const lePiece = !tail && (dev === "slot" || (dev === "slat" && k > 0.25));
+    if (lePiece) { const z = ZF - 0.06, wall = (name, uv) => uv.map((q) => [...xf(name, M(q)), z]);
+      gapA.set(wall("slat", WALL_S));
+      gapB.set(wall("wingLE", WALL_W));
+      gapA.opacity = gapB.opacity = 1; } else gapA.opacity = gapB.opacity = 0;
+    jet.bold(lePiece && dev === "slot");
+    if (lePiece) {   // through the gap: in at the mouth between the two lower edges, out between the two upper edges, then along the top
+      const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], inn = mid(xf("slat", M([0.045, yAt(FL, 0.045)])), xf("wingLE", M([0.055, yAt(FL, 0.055)]))), out = mid(xf("slat", M([0.105, yAt(FU, 0.105)])), xf("wingLE", M([0.12, yAt(FU, 0.12)])));
+      const dx = out[0] - inn[0], dy = out[1] - inn[1], n = Math.hypot(dx, dy) || 1;
+      jp = [[inn[0] + 0.9, inn[1] - 1.2], [inn[0] + 0.3, inn[1] - 0.55], [inn[0] - dx / n * 0.15, inn[1] - dy / n * 0.15], inn, mid(xf("slat", M([0.085, 0.03])), xf("wingLE", M([0.07, 0.004]))), out, xf("wingLE", M([0.2, yAt(FU, 0.2) + 0.03])), xf("wingLE", M([0.4, yAt(FU, 0.4) + 0.035])), xf("wingLE", M([0.62, yAt(FU, 0.62) + 0.04])), ...(dev === "slot" ? [xf("wingLE", M([0.85, yAt(FU, 0.85) + 0.035]))] : [])]; }
     if (!tail && dev === "slotted" && k > 0.15) { const mt = xf("wingTE", M([HF, yAt(FU, HF)])), fn = xf("flap", M([HF, (yAt(FU, HF) + yAt(FL, HF)) / 2]));
       jp = [xf("wingTE", M([0.55, yAt(FL, 0.55) - 0.05])), xf("wingTE", M([0.7, yAt(FL, 0.7) - 0.025])), [(mt[0] + fn[0]) / 2, (mt[1] + fn[1]) / 2 - 0.02], xf("flap", M([0.84, yAt(FU, 0.84) + 0.03])), xf("flap", M([0.94, yAt(FU, 0.94) + 0.03])), xf("flap", M([1.06, yAt(FU, 1) + 0.03])), xf("flap", M([1.25, yAt(FU, 1) + 0.03]))]; }
     if (jp) { const sp = []; for (let i = 0; i + 1 < jp.length; i++) for (let t = 0; t < 1; t += 0.1) { const a = jp[Math.max(0, i - 1)], b = jp[i], c = jp[i + 1], d2 = jp[Math.min(jp.length - 1, i + 2)], t2 = t * t, t3 = t2 * t;   // Catmull-Rom
         sp.push([0, 1].map((j) => 0.5 * (2 * b[j] + (-a[j] + c[j]) * t + (2 * a[j] - 5 * b[j] + 4 * c[j] - d2[j]) * t2 + (-a[j] + 3 * b[j] - 3 * c[j] + d2[j]) * t3))); }
       sp.push(jp.at(-1)); let rs = resample(sp, 30); for (let pass = 0; pass < 4; pass++) rs = rs.map((q, i) => (i === 0 || i === rs.length - 1 ? q : [(rs[i - 1][0] + 2 * q[0] + rs[i + 1][0]) / 4, (rs[i - 1][1] + 2 * q[1] + rs[i + 1][1]) / 4]));   // calm the bends
-      jet.set(resample(rs, 30).map(([x, y]) => [x, y, ZF - 0.05])); jet.opacity = 0.95; } else jet.opacity = 0;
+      jet.set(resample(rs, 30).map(([x, y]) => [x, y, ZF - 0.05])); jet.opacity = 0.95; if (lePiece && dev === "slot") closeUp(rs, [upLine, up2, loLine]); } else jet.opacity = 0;
+    if (!(lePiece && dev === "slot")) closeUp(null);
     // forces
     if (!tail) { const sp2 = dev === "spoiler" && k > 0.05, q = rotP([QC[0] - (sp2 ? CH * 0.57 : 0), QC[1] + CH * 0.09], A, QC), L1 = 0.6 + 1.5 * st.liftV, y0 = q[1] + (sp2 ? 0.95 : 0.75), zl = ZF;   // with a spoiler up, the (small) lift arrow stands behind the panel, never on it
       liftA.set([q[0], y0, zl], [q[0], y0 + L1, zl]); liftA.opacity = 1;
@@ -186,8 +233,10 @@ export function mount(host) {
       setR(0, `${Math.round(force * 100)}%`, "control force"); setR(1, k < 0.03 ? "neutral" : tail === "anti" ? "same way" : "opposite", "tab vs surface"); setR(2, `${Math.round(k * 100)}%`, tail === "trim" ? "trim" : "pilot input");
       const key = "t" + tail; if (key !== lastCap) { lastCap = key; F.caption(Tl.say[0], Tl.say[1]); } return; }
     const Wd = WING[dev]; setR(0, `${Math.round((st.liftV / (0.35 + 6 / 30)) * 100)}%`, "lift"); setR(1, `${Math.round((st.dragV / (0.2 + 0.1)) * 100)}%`, "drag");
-    setR(2, st.stalled ? "stalled" : st.sepU < 0.99 ? (dev === "spoiler" && k > 0.08 ? "spoiled" : "separating") : "attached", "airflow on top");
-    const say = st.stalled ? ["Stalled", dev === "slot" || dev === "slat" ? "Even with the leading-edge device, past the critical angle of attack it stalls." : "Past the critical angle of attack. Try a slot or slat: they delay the stall."] : Wd.say;
+    setR(2, st.regime, "airflow on top");
+    const say = st.stalled ? ["Stalled", dev === "slot" || dev === "slat" ? "Even with the leading-edge device, past the critical angle of attack it stalls." : "Past the critical angle of attack. Try a slot or slat: they delay the stall."]
+      : st.nearStall && dev !== "spoiler" ? ["Close to the stall", (dev === "slot" || dev === "slat" ? "The slot is holding the flow on, but it is starting to separate near the trailing edge." : "The flow is starting to separate near the trailing edge.") + " A little more angle of attack and the wing stalls."] : Wd.say;
+    F.root.dataset.flowText = st.regime;
     const key = say[0] + say[1]; if (key !== lastCap) { lastCap = key; F.caption(say[0], say[1]); } }
   // ---------- controls: every row stays in place; rows that do not apply are disabled, not hidden ----------
   const r0 = row(F.ctrl, "Wing"); const wc = chips(r0, Object.entries(WING).map(([kk, v]) => [kk, v.name]), dev, (kk) => { if (!kk) return; pick(kk, null); }, { label: "Wing" });
@@ -195,7 +244,7 @@ export function mount(host) {
   const r2 = row(F.ctrl, "Move"); const sd = slider(r2, { label: "Deflection", min: 0, max: 100, value: tgt * 100, fmt: (x) => x + "%", oninput: (x) => { tgt = x / 100; go(); } });
   const ra = row(F.ctrl, "Wing angle"); const sa = slider(ra, { label: "Angle of attack", min: 0, max: 26, value: aoa, fmt: (x) => x + "°", oninput: (x) => { aoaT = x; go(); } });
   function pick(d, t) { dev = d; tail = t; wc.set(d); tc.set(t); sa.input.disabled = !!t; ra.classList.toggle("off", !!t); sd.input.disabled = d === "slot"; r2.classList.toggle("off", d === "slot");
-    const wasTail = tail0; tail0 = !!t; k = 0; const f = FOCUS[t || d], fl = [...f, ...(ALSO[t] || [])]; if (first) { S.highlight(fl); first = false; } else S.focus(fl); S.tint(f); if (wasTail !== tail0) fit(1100); apply(); go(); }
+    const wasTail = tail0, wasLE = le0; tail0 = !!t; le0 = !t && (d === "slot" || d === "slat"); k = 0; const f = FOCUS[t || d], fl = [...f, ...(ALSO[t] || [])]; if (first) { S.highlight(fl); first = false; } else S.focus(fl); S.tint(f); if (wasTail !== tail0 || wasLE !== le0) fit(1100); apply(); go(); }
   // motion: deflection and angle of attack ease to their targets, then the surfaces stop (the airflow keeps drifting on screen)
   let last = 0, running = false;
   const tick = (now) => { const dt = Math.min(0.064, (now - (last || now)) / 1000); last = now; let busy = false;
