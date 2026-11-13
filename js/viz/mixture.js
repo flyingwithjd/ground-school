@@ -81,10 +81,10 @@ export function mount(host) {
       R(g, sx - 6, sy - 2, sw2 + 12, sh + 4, { fill: "#1b1b1f", stroke: "rgba(242,241,236,.18)", sw: 1, rx: 10 }); R(g, sx, sy + 4, sw2, sh - 8, { fill: "#050506", rx: 4 });
       const ix = sx + 12, iwx = sw2 - 24; T(g, sx + sw2 / 2, sy + 22, "ENGINE", { size: 11, anchor: "middle", fill: COL.cyan, weight: 600 });
       eisCell(g, ix, sy + 46, iwx, { label: "RPM", min: 0, max: 3000, bands: [[2100, 2500 + alt / 50, "green"], [2700, 3000, "red"]], value: rpm, fmt: (v) => String(Math.round(v / 10) * 10), focus: true });
-      const ds = OFF.map((o) => d + o), first = 1, past = (peaked = peaked || ds[first] < 0) && m < 95, bw = Math.min(20, iwx / 9), gap = (iwx - 24 - 4 * bw) / 3, bx0 = ix + 12, bTop = sy + 96, bBot = sy + sh - 34;
+      const ds = OFF.map((o) => d + o), first = 1, past = (peaked = peaked || ds[first] < 0) && m < 95, bw = Math.min(12, iwx / 14), gap = (iwx - 48 - 4 * bw) / 3, bx0 = ix + 24, bTop = sy + 96, bBot = sy + sh - 34;
       T(g, ix, sy + 86, "EGT °F", { size: 11, fill: GRAY });
       ds.forEach((dd, i) => { const v = pw ? Math.max(0.1, Math.min(1, egtV(dd))) : 0.1, x = bx0 + i * (bw + gap), hh = (bBot - bTop) * v, hot = i === first;
-        R(g, x, bTop, bw, bBot - bTop, { stroke: DIM, sw: 1 }); R(g, x + 2, bBot - hh, bw - 4, hh, { fill: hot && past ? COL.cyan : "rgba(242,241,236,.6)" }); T(g, x + bw / 2, bBot + 16, String(i + 1), { size: 11, anchor: "middle", fill: hot && past ? COL.cyan : GRAY }); });
+        R(g, x, bTop, bw, bBot - bTop, { stroke: "rgba(242,241,236,.12)", sw: 1, rx: 2 }); R(g, x + 2, bBot - hh, bw - 4, hh, { fill: hot && past ? COL.cyan : "rgba(242,241,236,.34)", rx: 1 }); L(g, x - 3, bBot - hh, x + bw + 3, bBot - hh, { stroke: hot && past ? COL.cyan : INK, w: 2 }); T(g, x + bw / 2, bBot + 16, String(i + 1), { size: 11, anchor: "middle", fill: hot && past ? COL.cyan : GRAY }); });
       T(g, ix + iwx, sy + 86, pw && past ? `ΔPEAK ${Math.round(dEgt(ds[first]))} °F` : pw ? "peak not reached" : "", { size: 12, anchor: "end", fill: past ? COL.cyan : GRAY, weight: 600 });
       if (wide) knob(ix0 + 6, iy1 - 30, iw - 30);
     }

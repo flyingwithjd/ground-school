@@ -58,6 +58,7 @@ const PIECES = [
 const SHOW = { plain: ["wingTE", "flap"], split: ["wing", "plate"], slotted: ["wingTE", "flap"], fowler: ["wingTE", "flap"], slot: ["wingLE", "slat"], slat: ["wingLE", "slat"], spoiler: ["wing", "spoiler"],
   trim: ["stab", "elev", "tab"], balance: ["stab", "elev", "tab"], servo: ["stab", "elev", "tab"], anti: ["stabtor", "atab"] };
 const FOCUS = { plain: ["flap"], split: ["plate"], slotted: ["flap"], fowler: ["flap"], slot: [], slat: ["slat"], spoiler: ["spoiler"], trim: ["tab"], balance: ["tab"], servo: ["tab"], anti: ["atab"] };
+const ALSO = { trim: ["elev"], balance: ["elev"], servo: ["elev"], anti: ["stabtor"] };   // the surface the tab moves gets accent lines too (tint stays on the tab)
 // pose of every piece for a device at deflection k (0-1): [dx, dy] in feet, angle in rad (+ = trailing edge down)
 function poseOf(dev, k) { const p = {};
   if (dev === "plain") p.flap = [0, 0, 40 * D * k];
@@ -73,7 +74,7 @@ function poseOf(dev, k) { const p = {};
   else if (dev === "anti") { p.stabtor = [0, 0, -12 * D * k]; p.atab = [0, 0, -10 * D * k]; }
   return p; }
 export function mount(host) {
-  let dev = "plain", tail = null, tgt = 0.7, k = 0, aoaT = 6, aoa = 6, first = true;
+  let tail0 = false, dev = "plain", tail = null, tgt = 0.7, k = 0, aoaT = 6, aoa = 6, first = true;
   const F = frame(host, { cls: "capin sec3d", corners: { tl: "Secondary flight controls", tr: "PHAK 6" } });
   F.root.dataset.live = "1";   // airflow drifts while on screen; zero frames offscreen
   const S = planeStage(F.stage, { model: (THREE) => sectionModel(THREE, PIECES, { stations: 3, spanEvery: 5 }), cg: [0, 0, 0], orbit: false, maxFps: 30, fov: 18, view: { tg: [-0.6, 0.2, 0], az: -112, el: 13, d: 60, fov: 18 } });
@@ -82,7 +83,8 @@ export function mount(host) {
   const band = () => { const sr = F.stage.getBoundingClientRect(); if (!sr.height) return; let b = 0; F.stage.querySelectorAll(".corner").forEach((c) => { if (c.textContent.trim()) b = Math.max(b, c.getBoundingClientRect().bottom - sr.top); }); S.setTopBand(b ? b + 6 : 0); fit(); };
   // fit the section and its airflow (about 15 x 6.5 ft) to the stage
   const fit = (dur = 1) => { const r = F.stage.getBoundingClientRect(), Hh = Math.max(1, r.height - (+F.stage.dataset.band || 0)), Ww = Math.max(1, r.width), TN = Math.tan(9 * D), ph = Ww < 560;
-    const wft = ph ? 8.2 : 10.8, hft = ph ? 5.2 : 5.4, d = Math.max(wft / (2 * TN * (Ww / Hh)), hft / (2 * TN)); S.setView({ tg: [ph ? -0.5 : -0.9, 0.45, -0.4], az: -66, el: 15, d, fov: 18 }, dur); };
+    const wft = ph ? 8.2 : 10.8, hft = ph ? 5.2 : 5.4, d = Math.max(wft / (2 * TN * (Ww / Hh)), hft / (2 * TN)); const tl = !!tail, d2 = tl ? d * 0.78 : d;   // tail tabs: closer and lower, framed on the elevator and tab so their deflections read
+    S.setView(tl ? { tg: [ph ? -1.0 : -1.3, 0.1, -0.8], az: -70, el: 9, d: d2, fov: 18 } : { tg: [ph ? -0.5 : -0.9, 0.45, -0.4], az: -66, el: 15, d, fov: 18 }, dur); };
   const bro = new ResizeObserver(band); bro.observe(F.stage); F.on(() => bro.disconnect());
   // live readout band under the stage: three values, fixed slots so nothing moves
   const rb = h("div", { class: "readout sec-read" }); const cells = [0, 1, 2].map(() => { const b = h("b", {}, "–"), sp = h("span", {}); rb.append(h("div", {}, b, sp)); return [b, sp]; }); F.stage.after(rb);
@@ -94,11 +96,11 @@ export function mount(host) {
     return { d, z, el: { set(p) { base.set(p); dl.set(p); } } }; };
   const ups = [0.2, 0.7, 1.45].map((d, i) => mk(d, ZF, [0.75, 0.6, 0.42][i])), los = [-0.24, -0.9].map((d, i) => mk(d, ZF, [0.6, 0.42][i]));
   const back = [0.55].map((d) => mk(d, ZB, 0.22));
-  const jetB = S.cueLine(30, { width: 5, opacity: 0.25, color: 0x3b82f6 }), jetD = S.cueLine(30, { dash: [0.36, 0.24], width: 2.4, opacity: 1, color: 0x3b82f6 });
+  const jetB = S.cueLine(30, { width: 4, opacity: 0.2, color: 0x3b82f6 }), jetD = S.cueLine(30, { dash: [0.4, 0.26], width: 2, opacity: 1, color: 0x3b82f6 });
   const jet = { set(p) { jetB.set(p); jetD.set(p); }, set opacity(o) { jetB.opacity = o * 0.25; jetD.opacity = o; } };
   const eddies = Array.from({ length: 5 }, () => S.cueLine(22, { width: 1.2, opacity: 0.3 }));
   const liftA = S.cueArrow({ color: 0x3b82f6, width: 3.4, head: 0.5 }), dragA = S.cueArrow({ color: 0xf2f1ec, width: 2.8, head: 0.42 });
-  const tabA = S.cueArrow({ color: 0xf2f1ec, width: 2.6, head: 0.32 }), tailA = S.cueArrow({ color: 0x3b82f6, width: 3.4, head: 0.45 });
+  const tabA = S.cueArrow({ color: 0xf2f1ec, width: 3.2, head: 0.36 }), tailA = S.cueArrow({ color: 0x3b82f6, width: 3.8, head: 0.5 });
   // world outline of a piece under the current pose (mirrors the three.js groups exactly)
   let pose = {}, A = 0;
   const xf = (name, q) => { const pc = byName[name], pv = pc.pivot || [0, 0]; let p = q;
@@ -150,9 +152,11 @@ export function mount(host) {
       jp = [xf("wingTE", M([0.55, yAt(FL, 0.55) - 0.05])), xf("wingTE", M([0.7, yAt(FL, 0.7) - 0.025])), [(mt[0] + fn[0]) / 2, (mt[1] + fn[1]) / 2 - 0.02], xf("flap", M([0.84, yAt(FU, 0.84) + 0.03])), xf("flap", M([0.94, yAt(FU, 0.94) + 0.03])), xf("flap", M([1.06, yAt(FU, 1) + 0.03])), xf("flap", M([1.25, yAt(FU, 1) + 0.03]))]; }
     if (jp) { const sp = []; for (let i = 0; i + 1 < jp.length; i++) for (let t = 0; t < 1; t += 0.1) { const a = jp[Math.max(0, i - 1)], b = jp[i], c = jp[i + 1], d2 = jp[Math.min(jp.length - 1, i + 2)], t2 = t * t, t3 = t2 * t;   // Catmull-Rom
         sp.push([0, 1].map((j) => 0.5 * (2 * b[j] + (-a[j] + c[j]) * t + (2 * a[j] - 5 * b[j] + 4 * c[j] - d2[j]) * t2 + (-a[j] + 3 * b[j] - 3 * c[j] + d2[j]) * t3))); }
-      sp.push(jp.at(-1)); jet.set(resample(sp, 30).map(([x, y]) => [x, y, ZF - 0.05])); jet.opacity = 0.95; } else jet.opacity = 0;
+      sp.push(jp.at(-1)); let rs = resample(sp, 30); for (let pass = 0; pass < 4; pass++) rs = rs.map((q, i) => (i === 0 || i === rs.length - 1 ? q : [(rs[i - 1][0] + 2 * q[0] + rs[i + 1][0]) / 4, (rs[i - 1][1] + 2 * q[1] + rs[i + 1][1]) / 4]));   // calm the bends
+      jet.set(resample(rs, 30).map(([x, y]) => [x, y, ZF - 0.05])); jet.opacity = 0.95; } else jet.opacity = 0;
     // forces
-    if (!tail) { const q = rotP([QC[0], QC[1] + CH * 0.09], A, QC), L1 = 0.6 + 1.5 * st.liftV, y0 = q[1] + 0.75; liftA.set([q[0], y0, ZF], [q[0], y0 + L1, ZF]); liftA.opacity = 1;
+    if (!tail) { const sp2 = dev === "spoiler" && k > 0.05, q = rotP([QC[0] - (sp2 ? CH * 0.57 : 0), QC[1] + CH * 0.09], A, QC), L1 = 0.6 + 1.5 * st.liftV, y0 = q[1] + (sp2 ? 0.95 : 0.75), zl = ZF;   // with a spoiler up, the (small) lift arrow stands behind the panel, never on it
+      liftA.set([q[0], y0, zl], [q[0], y0 + L1, zl]); liftA.opacity = 1;
       const L2 = 0.3 + 1.5 * st.dragV; dragA.set([xTE - 0.35, pTE[1], ZF], [xTE - 0.35 - L2, pTE[1], ZF]); dragA.opacity = 1; tabA.opacity = 0; tailA.opacity = 0; }
     else { liftA.opacity = 0; dragA.opacity = 0; const tn = cur === "anti" ? "atab" : "tab", sn = cur === "anti" ? "stabtor" : "elev";
       const tAng = (pose[tn] || [0, 0, 0])[2] + (pose[sn] || [0, 0, 0])[2] + A, mid = xf(tn, M([0.95, 0])), nrm = [-Math.sin(tAng), Math.cos(tAng)];   // tab mid and its upper-surface normal
@@ -191,7 +195,7 @@ export function mount(host) {
   const r2 = row(F.ctrl, "Move"); const sd = slider(r2, { label: "Deflection", min: 0, max: 100, value: tgt * 100, fmt: (x) => x + "%", oninput: (x) => { tgt = x / 100; go(); } });
   const ra = row(F.ctrl, "Wing angle"); const sa = slider(ra, { label: "Angle of attack", min: 0, max: 26, value: aoa, fmt: (x) => x + "°", oninput: (x) => { aoaT = x; go(); } });
   function pick(d, t) { dev = d; tail = t; wc.set(d); tc.set(t); sa.input.disabled = !!t; ra.classList.toggle("off", !!t); sd.input.disabled = d === "slot"; r2.classList.toggle("off", d === "slot");
-    k = 0; const f = FOCUS[t || d]; if (first) { S.highlight(f); first = false; } else S.focus(f); S.tint(f); apply(); go(); }
+    const wasTail = tail0; tail0 = !!t; k = 0; const f = FOCUS[t || d], fl = [...f, ...(ALSO[t] || [])]; if (first) { S.highlight(fl); first = false; } else S.focus(fl); S.tint(f); if (wasTail !== tail0) fit(1100); apply(); go(); }
   // motion: deflection and angle of attack ease to their targets, then the surfaces stop (the airflow keeps drifting on screen)
   let last = 0, running = false;
   const tick = (now) => { const dt = Math.min(0.064, (now - (last || now)) / 1000); last = now; let busy = false;
