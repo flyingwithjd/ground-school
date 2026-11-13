@@ -27,8 +27,8 @@ const PARTS = {
 };
 const MAP = { fuselage: "fuselage", fairing: "fuselage", wing: "wing", ailerons: "ailerons", flaps: "flaps", struts: "struts", fuel: "fuel", fin: "fin", hstab: "hstab", rudder: "rudder", elevator: "elevator", trimtab: "trimtab", gear: "gear", engine: "engine", propeller: "propeller", cowling: "cowling" };
 const TOUR = [
-  { key: "fuselage", label: "Four seats · high wing", big: "Cessna 172S", hl: ["fuselage", "fairing"], view: "iso" },
-  { key: "wing", label: "Strut-braced · 174 sq ft", big: "High wing", hl: ["wing"], view: "wingL" },
+  { key: "fuselage", label: "Four seats · high wing", big: "Cessna 172S", hl: ["fuselage", "fairing", "wing", "flaps", "ailerons", "struts", "cowling", "propeller", "gear", "fin", "rudder", "hstab", "elevator", "trimtab"], view: "iso" },
+  { key: "wing", label: "Strut-braced · 174 sq ft", big: "High wing", hl: ["wing", "flaps", "ailerons", "struts"], view: "wingL" },
   { key: "engine", label: "4 cylinders · fuel injected", big: "180 HP", hl: ["engine"], view: "nose", hideCowl: true },
   { key: "propeller", label: "Two blades · fixed pitch", big: "76 in prop", hl: ["propeller", "propDim"], view: "front", spin: true },
   { key: "flaps", label: "Single-slot · 10° · 20° · 30°", big: "Electric flaps", hl: ["flaps"], view: "wingL", flapCycle: true },

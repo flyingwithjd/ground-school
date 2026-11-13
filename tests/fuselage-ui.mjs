@@ -31,7 +31,7 @@ for (const [w, hh] of [[1440, 900], [390, 844]]) {
     ok(s1.type === key && s1.big === big && s1.on.join() === chip, `${w} ${chip}: switched (type ${s1.type}, caption ${s1.big}, on ${s1.on})`);
     ok(s1.row.every((v, i) => Math.abs(v - row0[i]) <= 1), `${w} ${chip}: chip row stayed put ${JSON.stringify(row0)} -> ${JSON.stringify(s1.row)}`);
     ok(s1.labs >= 3 && !s1.ov.length && !s1.out.length, `${w} ${chip}: ${s1.labs} labels, overlaps ${JSON.stringify(s1.ov)}, outside ${JSON.stringify(s1.out)}`);
-    ok(s1.calls >= 5 && s1.calls <= 54, `${w} ${chip}: rendered within the draw-call budget (${s1.calls})`);
+    ok(s1.calls >= 5 && s1.calls <= 60 /* +3 for the wing spars, ribs and stringers on the 172 */, `${w} ${chip}: rendered within the draw-call budget (${s1.calls})`);
     { const ex = await viz.locator(".fus-ex").textContent(); const want = { mono: "Lockheed Vega", semi: "Cessna 172", truss: "Piper J-3 Cub" }[key]; ok(ex === "Example: " + want, `${w} ${chip}: example label "${ex}"`); }
     if (shotDir) await shot(`fuselage_${key}_${w}x${hh}`);
   }

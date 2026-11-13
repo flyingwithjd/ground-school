@@ -4,7 +4,7 @@ export default {
     { id: "forces", label: "The four forces · PHAK 4, 5", title: "Four forces, one balance",
       body: `<p>[[Lift]] opposes [[weight]]; [[thrust]] opposes [[drag]]. In steady flight (climbing, level or descending at constant speed) the opposing forces cancel. That does not make all four equal: lift and weight are many times larger than thrust and drag. <span class="src">PHAK 5</span></p>
 <p>Change one force and the airplane accelerates until a new balance is reached. Add power and the airplane speeds up or climbs; raise the nose without power and it slows.</p>`,
-      viz: { type: "forces" },
+      viz: { type: "forces3d" },
       kdr: { k: "The four forces and how they balance in steady flight.", d: "Use pitch and power together to change speed or altitude.", r: "Pitch without power trades airspeed for altitude, toward the stall.", codes: ["PA.I.G.K1a"] } },
     { id: "lift", label: "Lift and angle of attack · PHAK 5", title: "Angle of attack makes lift",
       body: `<p>[[Angle of attack]] is the angle between the wing's [[chord line]] and the [[relative wind]], the airflow meeting the wing. It is not the pitch attitude: a wing can be at a high AOA with the nose level, for example when slow or heavily loaded. <span class="src">PHAK 5</span></p>
