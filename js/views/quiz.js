@@ -80,11 +80,11 @@ export function session(host, opts) {
   function summary(el, fr, correct) {
     const cal = Object.entries(CONF).map(([k, v]) => { const a = fr.filter((r) => r.conf === k); return a.length ? `${v.label} ${a.filter((r) => r.ok).length}/${a.length}` : ""; }).filter(Boolean);
     const nd = nextDue();
-    el.innerHTML = `<span class="label">Session complete</span><h2 class="mt">${fr.length ? `${correct} of ${fr.length} correct` : "Nothing answered"}</h2>
+    el.innerHTML = `<span class="label">${esc(opts.doneLabel || "Session complete")}</span><h2 class="mt">${fr.length ? `${correct} of ${fr.length} correct` : "Nothing answered"}</h2>
       ${cal.length ? `<p class="label mt cal" title="Correct out of answered, by how sure you were">Right by confidence · ${esc(cal.join(" · "))}</p>` : ""}
       ${isFinite(nd) ? `<p class="dim mt" style="font-size:17px">Next review ${esc(fmtDue(nd))}.</p>` : ""}`;
     if (opts.finishedAll && opts.finishedAll()) el.insertAdjacentHTML("beforeend", `<p class="dim mt" style="font-size:17px">That's all ${total} questions. Starting again begins at the first one.</p>`);
-    el.append(nextButtons(true));
+    el.append(opts.endButtons ? opts.endButtons({ correct, total: fr.length, results: fr }) : nextButtons(true));
     const missed = fr.filter((r) => !r.ok); if (missed.length) { const box = h("div", { class: "missed mt2" }); box.innerHTML = `<h3>Missed · ${missed.length}</h3>` + missed.map(missCard).join(""); autoTerms(box); el.append(box); } }
   function missCard(r) { const it = item(r.id); let mine = "", right = "";
     if (it.type === "order") { right = `<p class="lab2">Correct order</p><ol class="prose" style="font-size:16px;margin:0">${it.items.map((x) => `<li>${esc(x)}</li>`).join("")}</ol>`; if (Array.isArray(r.pick)) mine = `<p class="lab2">Your order</p><ol class="prose dim" style="font-size:16px;margin:0 0 10px">${r.pick.map((k) => `<li>${esc(it.items[k])}</li>`).join("")}</ol>`; }
@@ -95,7 +95,7 @@ export function session(host, opts) {
     if (nx.length) { const k = h("button", { class: "btn pri arrow", type: "button", "data-primary": "" }, `Keep going · ${nx.length} more`); k.onclick = () => { host.innerHTML = ""; session(host, { ...opts, queue: nx, seen, mode: mode === "ahead" ? "learn" : mode, count: count ? { base: base + results.length, total } : null }); }; b.append(k); }
     if (all) { const a = h("button", { class: "btn" + (nx.length ? "" : " pri"), type: "button" }, all.label); a.onclick = () => { host.innerHTML = ""; all.start(); }; b.append(a); }
     const d = h("button", { class: "btn" + (nx.length || all ? " ghost" : " pri"), type: "button" }, afterSession ? "Done" : "Back"); d.onclick = () => onExit && onExit(); b.append(d); return b; }
-  if (!q.length) { body.innerHTML = `<h3>Nothing due here right now.</h3><p class="dim mt">${intro || "Everything in this set is scheduled for later."}</p>`; body.append(nextButtons(false)); destroy(); return { destroy }; }
+  if (!q.length) { body.innerHTML = `<h3>Nothing due here right now.</h3><p class="dim mt">${intro || "Everything in this set is scheduled for later."}</p>`; body.append(opts.endButtons ? opts.endButtons({ correct: 0, total: 0, results: [] }) : nextButtons(false)); destroy(); return { destroy }; }
   show(); return { destroy };
 }
 

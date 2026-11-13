@@ -42,7 +42,7 @@ export function classify(t, st = stats(t.ids)) {
 }
 export function dueIds(now = Date.now()) { const R = reachedSet(); return allIds().filter((id) => isDue(get(id), now) && isReached(id, R)).sort((a, b) => get(a).due - get(b).due); }
 export function nextDue() { let m = Infinity; for (const id of allIds()) { const it = get(id); if (it && it.n && it.due < m) m = it.due; } return m; }
-export function lessonDone(id) { const L = LESSONS[id]; const ls = S().lessons[id]; return !!(ls && L && ls.total && ls.read && ls.read.length >= ls.total); }
+export function lessonDone(id) { const L = LESSONS[id]; const ls = S().lessons[id]; return !!(ls && L && (ls.fin || (ls.total && ls.read && ls.read.length >= ls.total))); }
 export function nextLesson() { for (const id of ORDER) { if (!LESSONS[id]) continue; if (!lessonDone(id)) return id; const st = lessonStats(id); if (st.coverage < 0.5) return id; } return null; }
 export function weakest(k = 3) {
   return topicList().map((t) => { const st = stats(t.ids); return { t, st, c: classify(t, st) }; }).filter((x) => x.st.seen && ["weak", "over", "fading", "building"].includes(x.c))
