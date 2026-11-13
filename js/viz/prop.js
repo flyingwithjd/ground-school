@@ -1,6 +1,6 @@
 // The propeller as a rotating wing, on a 3D two-blade propeller (planeStage) that turns slowly while on screen, with the
-// three blade stations lit on one blade; under it, a section inset for each station and the gauges strip. Three blade stations (near the hub, mid-blade, near the tip) show the blade angle, the
-// relative wind made by airspeed plus rotation, and the angle of attack between them. Fixed pitch: airspeed and throttle
+// chosen blade station (hub, mid, tip) lit as a white band on one blade; under the controls, one big blade section at that
+// station: blade speed + airspeed make the relative wind, and the angle of attack is the arc between it and the chord. Fixed pitch: airspeed and throttle
 // set the RPM. Constant speed: the governor changes the blade angle to hold the RPM set with the prop control, and the
 // throttle sets manifold pressure. A "No twist" toggle shows why blades are twisted.
 // Facts, PHAK 7 (Propeller): a propeller is a rotating airfoil; blade angle is greatest at the hub and smallest at the
@@ -47,7 +47,7 @@ function propModel(THREE) { const P = buildPlane(THREE), blades = [], bands = []
   disc.rotation.y = Math.PI / 2; disc.position.x = 0.17; hub.add(disc);
   return Object.assign(P, { hub, blades, bands, disc }); }
 export function mount(host) {
-  let mode = "fixed", twist = true, v = 0, thr = 1, set = 2400, b75 = betaFixed(0.75 * RAD), rpmCS = 2400;
+  let stn = 2, mode = "fixed", twist = true, v = 0, thr = 1, set = 2400, b75 = betaFixed(0.75 * RAD), rpmCS = 2400;
   const F = frame(host, { cls: "capin sec3d prop3d", corners: { tl: "Propeller", tr: "PHAK 7 · POH 2" } });
   F.root.dataset.live = "1";   // the prop turns slowly while on screen; zero frames offscreen
   const S = planeStage(F.stage, { model: propModel, cg: [PX, PY, 0], orbit: false, maxFps: 30, fov: 24, view: { tg: [PX - 1, PY, 0], az: -42, el: 12, d: 20, fov: 24 } });
@@ -72,18 +72,20 @@ export function mount(host) {
   const lab = s("svg", { class: "full lab3d", role: "img" }, F.stage); let lg = s("g", {}, lab);
   const wp = new THREE.Vector3();
   function labels() { const r = F.stage.getBoundingClientRect(); lab.setAttribute("viewBox", `0 0 ${r.width} ${r.height}`); lg.remove(); lg = s("g", {}, lab);
-    M3.bands.forEach((m, i) => { m.updateWorldMatrix(true, false); m.geometry.boundingSphere || m.geometry.computeBoundingSphere(); wp.copy(m.geometry.boundingSphere.center).applyMatrix4(m.matrixWorld); const q = S.project([wp.x, wp.y, wp.z], false), c0 = S.project([PX, PY, 0], false);
-      const dx = q.x - c0.x, dy = q.y - c0.y, n = Math.hypot(dx, dy) || 1, ox = (-dy / n) * 15, oy = (dx / n) * 15;
-      const tx = T(lg, q.x + ox, q.y + oy + 4, String(i + 1), { size: 12, anchor: "middle", fill: "#ffffff", weight: 700 }); tx.setAttribute("stroke", "#000"); tx.setAttribute("stroke-width", "3"); tx.setAttribute("paint-order", "stroke"); }); }
-  // section insets + gauges: their own SVG strip under the stage, drawn in screen pixels
+    M3.bands.forEach((m, i) => { if (i !== stn) return; m.updateWorldMatrix(true, false); m.geometry.boundingSphere || m.geometry.computeBoundingSphere(); wp.copy(m.geometry.boundingSphere.center).applyMatrix4(m.matrixWorld); const q = S.project([wp.x, wp.y, wp.z], false), c0 = S.project([PX, PY, 0], false);
+      const dx = q.x - c0.x, dy = q.y - c0.y, n = Math.hypot(dx, dy) || 1, ox = (-dy / n) * 22, oy = (dx / n) * 22;
+      const tx = T(lg, q.x + ox, q.y + oy + 4, ["hub", "mid", "tip"][i], { size: 12, anchor: "middle", fill: "#ffffff", weight: 700 }); tx.setAttribute("stroke", "#000"); tx.setAttribute("stroke-width", "3"); tx.setAttribute("paint-order", "stroke"); }); }
+  const showBand = () => { M3.bands.forEach((m, i) => { m.visible = i === stn; }); S.kick(); };
+  // the blade section + gauges: their own SVG strip under the controls, drawn in screen pixels
   const strip = h("div", { class: "vstrip" }); F.stage.after(strip);
-  const svgEl = s("svg", { class: "full", role: "img" }, strip); s("defs", {}, svgEl).innerHTML = `<marker id="pkahg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${GRAY}"/></marker>`;
+  const svgEl = s("svg", { class: "full", role: "img" }, strip); s("defs", {}, svgEl).innerHTML = `<marker id="pkahg" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${GRAY}"/></marker><marker id="pkahw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="${INK}"/></marker>`;
   let gEl = s("g", {}, svgEl);
   const redraw = () => { const W = strip.clientWidth || 600; gEl.remove(); gEl = s("g", {}, svgEl); const H = draw(gEl, W); svgEl.setAttribute("viewBox", `0 0 ${W} ${H}`); svgEl.setAttribute("height", H); strip.style.height = H + "px"; apply3d(); };
   const sro = new ResizeObserver(() => redraw()); sro.observe(strip); F.on(() => sro.disconnect());
   const S0 = { F, redraw };
   const r0 = row(F.ctrl, "Prop"); chips(r0, [["fixed", "Fixed pitch"], ["cs", "Constant speed"]], mode, (k) => { mode = k || "fixed"; glide(mode === "cs" ? -28 : -54, mode === "cs" ? 18 : 14); r4.classList.toggle("off", mode !== "cs"); rs.input.disabled = mode !== "cs"; b75 = targetB(); rpmCS = set; upd(); }, { label: "Prop" });
   const r1 = row(F.ctrl, "Blade"); chips(r1, [["tw", "Twisted"], ["flat", "No twist"]], "tw", (k) => { twist = k !== "flat"; glide(twist ? -54 : -40, twist ? 14 : 26); upd(); }, { label: "Blade" });
+  const r5 = row(F.ctrl, "Station"); chips(r5, [["0", "Hub"], ["1", "Mid"], ["2", "Tip"]], String(stn), (k) => { if (k == null) return; stn = +k; showBand(); redraw(); }, { label: "Blade station" });
   const r2 = row(F.ctrl, "Fly"); const sv = slider(r2, { label: "Airspeed", min: 0, max: 150, value: v, fmt: (x) => x + " KIAS", oninput: (x) => { v = x; pre.set(null); upd(); } });
   const st = slider(r2, { label: "Throttle", min: 0, max: 100, value: thr * 100, fmt: (x) => (x >= 100 ? "Full" : x <= 0 ? "Idle" : x + "%"), oninput: (x) => { thr = x / 100; pre.set(null); upd(); } });
   const r3 = row(F.ctrl, "Try"); const pre = chips(r3, [["static", "Full-throttle static"], ["climb", "Climb"], ["cruise", "Cruise"], ["dive", "Dive"]], "static", (k) => {
@@ -95,7 +97,7 @@ export function mount(host) {
   function rpmNow() { if (mode === "fixed") return [fixedRpm(thr, v), null];
     const free = phi(v, set, 0.75 * RAD) + 3 + 9 * thr;
     if (free < LOW) return [Math.min(set, fixedRpm(thr, v) * 1.1), "low"]; if (free > HIGH) return [Math.max(set, fixedRpm(thr, v) * 0.9), "high"];
-    return [set + (targetB() - b75) * 60, null]; }
+    return [set + Math.max(-400, Math.min(400, (targetB() - b75) * 60)), null]; }
   const A = anim(F, (dt) => { if (mode !== "cs") return false; let m; [b75, m] = toward(b75, targetB(), 1.6, dt, 0.02); redraw(); return m; });
   function upd() { redraw(); A.kick(); }
   // 3D: twist variant, and on a constant-speed prop the governor's blade-angle change turns both blades about their own axes
@@ -108,30 +110,54 @@ export function mount(host) {
   function draw(g, W) {
     const wide = W >= 600, [rpm, stop] = rpmNow(), cs = mode === "cs";
     const beta = (r) => (cs ? b75 + (betaFixed(r, twist) - betaFixed(0.75 * RAD, twist)) : betaFixed(r, twist));
-    // wide: the three insets and a gauge column share one row; phone: bigger insets, then a compact gauge row
-    const pad = 14, n = 3, gcw = wide ? Math.max(150, W * 0.25) : 0, sw = (W - pad * 2 - gcw) / n, top = 14;
-    // a section at each station: the airfoil at its blade angle, the plane of rotation (dashed), the relative wind (gray
-    // arrow: airspeed + rotation) and the angle of attack between chord and wind (blue wedge). The blade turns to the left; the airplane flies up the page.
-    const sH = wide ? (cs ? 166 : Math.min(sw * 0.86, 140)) : sw * 1.12, c = wide ? Math.min(sw * 0.56, 112) : sw * 0.64;
-    const stall = [];
-    ST.forEach((f, i) => { const r = f * RAD, cx = pad + sw * i + sw / 2, cy = top + sH * 0.6, ph = phi(v, rpm, r), be = beta(r), aoa = be - ph, bad = aoa > 15 || aoa < 0; stall.push(aoa);
-      const col = bad ? COL.red : ACC, cb = Math.cos(be * D), sb = Math.sin(be * D), le = [cx - cb * c * 0.4, cy - sb * c * 0.4];
-      if (i) L(g, pad + sw * i, top + 4, pad + sw * i, top + sH + 40, { stroke: "rgba(242,241,236,.07)", w: 1 });
-      L(g, cx - sw * 0.46, cy, cx + sw * 0.46, cy, { stroke: DIM, w: 1, dash: "3 5" });
-      // angle-of-attack wedge between the relative wind and the chord line, at the leading edge
-      const wl = Math.min(sw * 0.4, c * 0.9), ar = Math.min(wl * 0.7, (le[1] - top + 4) * 0.9), a0 = Math.PI + ph * D, a1 = Math.PI + be * D, p0 = [le[0] + Math.cos(a0) * ar, le[1] + Math.sin(a0) * ar], p1 = [le[0] + Math.cos(a1) * ar, le[1] + Math.sin(a1) * ar];
-      if (Math.abs(aoa) > 0.5) { const sweep = aoa > 0 ? 1 : 0; P(g, `M${le[0].toFixed(1)},${le[1].toFixed(1)} L${p0[0].toFixed(1)},${p0[1].toFixed(1)} A${ar.toFixed(1)},${ar.toFixed(1)} 0 0 ${sweep} ${p1[0].toFixed(1)},${p1[1].toFixed(1)} Z`, { fill: bad ? "rgba(217,73,62,.22)" : "rgba(59,130,246,.24)", stroke: "none" });
-        P(g, `M${p0[0].toFixed(1)},${p0[1].toFixed(1)} A${ar.toFixed(1)},${ar.toFixed(1)} 0 0 ${sweep} ${p1[0].toFixed(1)},${p1[1].toFixed(1)}`, { stroke: col, w: 2.6 }); }
-      const roof = (k, sn) => Math.min(k, (le[1] - top + 8) / Math.max(0.05, sn));   // keep the lines inside the strip at steep angles
-      L(g, le[0], le[1], le[0] - cb * roof(wl, sb), le[1] - sb * roof(wl, sb), { stroke: "rgba(242,241,236,.5)", w: 1.1, dash: "4 3" });
-      const pts = FO.map(([x, y]) => [le[0] + cb * x * c + sb * y * c, le[1] + sb * x * c - cb * y * c]);
-      P(g, "M" + pts.map((q) => q[0].toFixed(1) + "," + q[1].toFixed(1)).join("L") + "Z", { fill: "#141417", stroke: bad ? COL.red : INK, w: 1.8 });
-      const wc = Math.cos(ph * D), ws = Math.sin(ph * D); L(g, le[0] - wc * roof(wl * 1.15, ws), le[1] - ws * roof(wl * 1.15, ws), le[0] - wc * 4, le[1] - ws * 4, { stroke: GRAY, w: 1.6, arrow: "pkahg" });
-      const ly = top + sH + 14;
-      T(g, cx, ly, wide ? ["1 · near hub", "2 · mid-blade", "3 · near tip"][i] : ["1 · hub", "2 · mid", "3 · tip"][i], { size: wide ? 11 : 12, anchor: "middle", fill: GRAY });
-      T(g, cx, ly + 20, `AoA ${Math.round(aoa)}°`, { size: 15, anchor: "middle", fill: col, weight: 600 });
-      T(g, cx, ly + 37, `blade ${Math.round(be)}°`, { size: wide ? 11 : 12, anchor: "middle", fill: GRAY }); });
-    T(g, pad, top + sH + 68, "blade and wind angles are illustrative", { size: 11, fill: DIM });
+    const stall = ST.map((f0) => beta(f0 * RAD) - phi(v, rpm, f0 * RAD));
+    const pad = 14, gcw = wide ? Math.max(170, W * 0.26) : 0, pw = W - pad * 2 - gcw, x0 = pad, top = 14;
+    // One big blade section at the chosen station (PHAK 7). The blade moves left along the plane of rotation (blade speed,
+    // which grows toward the tip) and forward with the airplane (airspeed, up the page); the air meets it from the opposite
+    // direction (relative wind). Angle of attack = blade angle minus the angle of the relative wind. Same scale at every station.
+    const r = ST[stn] * RAD, u = (Math.max(rpm, 1) / 60) * 2 * Math.PI * r, va = v * KT, ph = phi(v, rpm, r), be = beta(r), aoa = be - ph, bad = aoa > 15 || aoa < 0, col = bad ? COL.red : ACC;
+    const hv = Math.min(110, pw * 0.3), k = Math.min((pw * 0.56) / u, va > 1 ? hv / va : 9), c = Math.min(pw * 0.34, 170), le = [x0 + pw * 0.62, top + 40 + hv + 14];   // each station fills the panel; the angles are true
+    const cb = Math.cos(be * D), sb = Math.sin(be * D), f2 = (n) => n.toFixed(1), rot = (el, x, y, a) => el.setAttribute("transform", `rotate(${f2(a)} ${f2(x)} ${f2(y)})`);
+    T(g, x0, top + 8, ["Near the hub", "Mid-blade", "Near the tip"][stn], { size: 13, weight: 600 });
+    T(g, x0, top + 25, `blade angle ${Math.round(be)}°`, { size: 11.5, fill: GRAY });
+    T(g, x0 + pw, top + 8, `angle of attack ${Math.round(aoa)}°`, { size: 13, weight: 600, anchor: "end", fill: col });
+    if (bad) T(g, x0 + pw, top + 25, aoa < 0 ? "negative: no useful thrust" : "very high: the blade may stall", { size: 11.5, anchor: "end", fill: COL.red });
+    L(g, x0, le[1], x0 + pw, le[1], { stroke: DIM, w: 1, dash: "3 5" }); T(g, x0, le[1] + 32, "plane of rotation", { size: 11, fill: DIM });
+    // the velocity triangle: blade speed (left), airspeed (up), and the relative wind that results, pointing at the blade
+    const qx = le[0] - u * k, qy = le[1] - va * k, hyp = Math.hypot(u, va) * k, ah = va * k;
+    if (ah > 5) {
+      L(g, le[0], le[1], qx + 3, le[1], { stroke: GRAY, w: 1.8, arrow: "pkahg" }); T(g, le[0] - 8, le[1] + 17, "blade speed", { size: 11, anchor: "end", fill: GRAY });
+      L(g, qx, le[1], qx, qy + 3, { stroke: GRAY, w: 1.8, arrow: "pkahg" });
+      if (ah >= 56) rot(T(g, qx - 6, (le[1] + qy) / 2, "airspeed", { size: 11, anchor: "middle", fill: GRAY }), qx - 6, (le[1] + qy) / 2, -90);
+      else if (qx - x0 >= 62) T(g, qx - 6, (le[1] + qy) / 2 + 8, "airspeed", { size: 11, anchor: "end", fill: GRAY });
+      else T(g, qx - 4, qy - 8, "airspeed", { size: 11, fill: GRAY });
+      const ex = le[0] - (le[0] - qx) * 5 / hyp, ey = le[1] - (le[1] - qy) * 5 / hyp; L(g, qx, qy, ex, ey, { stroke: INK, w: 2.4, arrow: "pkahw" });
+      const mx = (qx + le[0]) / 2, my = (qy + le[1]) / 2, nx = (le[1] - qy) / hyp, ny = -(le[0] - qx) / hyp;
+      const sd = aoa < 0 ? -1 : 1, lx = mx - sd * nx * (sd > 0 ? 7 : 5), ly = my - sd * ny * (sd > 0 ? 7 : 5) + (sd > 0 ? 9 : 0);   // on the side away from the angle-of-attack wedge
+      if (hyp >= 120 && ah >= 22) rot(T(g, lx, ly, "relative wind", { size: 11.5, anchor: "middle", fill: INK }), lx, ly, ph);
+      else T(g, qx - 6, qy - (ah >= 56 || qx - x0 < 62 ? 8 : 0) + 4, "relative wind", { size: 11.5, anchor: ah >= 56 || qx - x0 >= 62 ? "end" : "start", fill: INK });
+    } else { L(g, qx, le[1], le[0] - 5, le[1], { stroke: INK, w: 2.4, arrow: "pkahw" }); T(g, le[0] - 8, le[1] + 17, "relative wind", { size: 11.5, anchor: "end", fill: INK }); }
+    // the blade section, its chord line run forward, and the angle of attack between chord and relative wind
+    const roof = Math.min(1, (le[1] - top - 36) / Math.max(1, c * 1.05 * sb)), ext = c * 1.05 * roof, ar = Math.max(44, Math.min(c * 0.95, ext * 0.92, 130));
+    L(g, le[0], le[1], le[0] - cb * ext, le[1] - sb * ext, { stroke: "rgba(242,241,236,.6)", w: 1.2, dash: "5 4" });
+    if (hyp < ar + 12) { const wc = Math.cos(ph * D), ws = Math.sin(ph * D); L(g, le[0], le[1], le[0] - wc * (ar + 12), le[1] - ws * (ar + 12), { stroke: "rgba(242,241,236,.4)", w: 1, dash: "2 4" }); }
+    const pts = FO.map(([x, y]) => [le[0] + cb * x * c + sb * y * c, le[1] + sb * x * c - cb * y * c]);
+    P(g, "M" + pts.map((q) => f2(q[0]) + "," + f2(q[1])).join("L") + "Z", { fill: "#141417", stroke: bad ? COL.red : INK, w: 1.8 });
+    L(g, le[0], le[1], le[0] + cb * c, le[1] + sb * c, { stroke: "rgba(242,241,236,.35)", w: 1, dash: "3 3" });
+    T(g, Math.min(le[0] + cb * c + 6, x0 + pw - 34), le[1] + sb * c + 14, "chord", { size: 11, fill: GRAY });
+    const a0 = Math.PI + ph * D, a1 = Math.PI + be * D;
+    if (Math.abs(aoa) > 0.4) { const p0 = [le[0] + Math.cos(a0) * ar, le[1] + Math.sin(a0) * ar], p1 = [le[0] + Math.cos(a1) * ar, le[1] + Math.sin(a1) * ar], sw = aoa > 0 ? 1 : 0;
+      P(g, `M${f2(le[0])},${f2(le[1])} L${f2(p0[0])},${f2(p0[1])} A${f2(ar)},${f2(ar)} 0 0 ${sw} ${f2(p1[0])},${f2(p1[1])} Z`, { fill: bad ? "rgba(217,73,62,.3)" : "rgba(59,130,246,.34)", stroke: "none" });
+      P(g, `M${f2(p0[0])},${f2(p0[1])} A${f2(ar)},${f2(ar)} 0 0 ${sw} ${f2(p1[0])},${f2(p1[1])}`, { stroke: col, w: 3.4 }); }
+    const la = Math.PI + (be + (aoa < 0 ? -6 : 6)) * D, lt = T(g, le[0] + Math.cos(la) * (ar + 2), le[1] + Math.sin(la) * (ar + 2), `${Math.round(aoa)}°`, { size: 13, anchor: "end", fill: col, weight: 700 });
+    lt.setAttribute("stroke", "#0A0A0B"); lt.setAttribute("stroke-width", "4"); lt.setAttribute("paint-order", "stroke");
+    // one line on what the station shows
+    const by = Math.max(le[1] + 56, le[1] + sb * c + 38), spread = Math.max(...stall) - Math.min(...stall);
+    const l1 = !twist ? "No twist: the same blade angle at every station." : ["Slowest part of the blade: steepest blade angle.", "Middle speed: middle blade angle.", "Fastest part of the blade: flattest blade angle."][stn];
+    const l2 = twist && spread < 7 && Math.max(...stall) <= 15 ? "Twist keeps the angle of attack about the same." : !twist && Math.min(...stall) < 0 ? "So the hub meets the air at a negative angle." : "";
+    T(g, x0, by, l1, { size: 13, fill: INK, mono: false }); if (l2) T(g, x0, by + 18, l2, { size: 12, fill: GRAY, mono: false });
+    T(g, x0, by + (l2 ? 36 : 18), "angles illustrative", { size: 11, fill: DIM });
+    const sH = by + (l2 ? 36 : 18) + 4 - top;
     // instruments: tachometer, and on a constant-speed prop manifold pressure plus what the governor is doing
     const tilt = cs ? Math.max(-1, Math.min(1, (rpm - set) / 120)) : 0, gov = Math.abs(tilt) > 0.15 ? (tilt > 0 ? "flyweights out: more pitch" : "flyweights in: less pitch") : "governor holding RPM";
     const tach = (x, y, r) => dial(g, x, y, r, { min: 0, max: 3500, arcs: [[2100, 2500, "green"]], reds: [2700], ticks: [0, 500, 1000, 1500, 2000, 2500, 3000, 3500], nums: [[1000, "10"], [2000, "20"], [3000, "30"]], title: "RPM ×100", focus: true, value: rpm, fmt: (x2) => String(Math.round(x2 / 10) * 10) });
@@ -139,14 +165,14 @@ export function mount(host) {
     const note = (x, y, anchor) => { if (cs) T(g, x, y, gov, { size: 11, anchor, fill: Math.abs(tilt) > 0.15 ? ACC : GRAY });
       else T(g, x, y, rpm > 2700 ? "Over the red line" : "Tach = power", { size: 12, anchor, fill: rpm > 2700 ? COL.red : INK, weight: 600 }); };
     let Hh;
-    if (wide) { const gx0 = W - pad - gcw, gxc = gx0 + gcw / 2; L(g, gx0, top + 4, gx0, top + sH + 44, { stroke: "rgba(242,241,236,.07)", w: 1 });
-      if (cs) { const r = 56, y1 = top + r + 2; tach(gxc, y1, r); mp(gxc, y1 + 2 * r + 16, r); Hh = y1 + 3 * r + 34; note(gxc, Hh - 8, "middle"); Hh = Math.max(Hh, top + sH + 76); }
-      else { const r = Math.min(64, gcw / 2 - 8), y1 = top + 8 + r; tach(gxc, y1, r); note(gxc, y1 + r + 26, "middle"); Hh = Math.max(top + sH + 76, y1 + r + 40); } }
-    else { const iy0 = top + sH + 78, r = 56, gy = iy0 + r + 6; L(g, pad, iy0 - 4, W - pad, iy0 - 4, { stroke: "rgba(242,241,236,.08)", w: 1 });
+    if (wide) { const gx0 = W - pad - gcw, gxc = gx0 + gcw / 2; L(g, gx0, top + 4, gx0, top + sH, { stroke: "rgba(242,241,236,.07)", w: 1 });
+      if (cs) { const r = 56, y1 = top + r + 2; tach(gxc, y1, r); mp(gxc, y1 + 2 * r + 16, r); Hh = y1 + 3 * r + 34; note(gxc, Hh - 8, "middle"); Hh = Math.max(Hh, top + sH + 10); }
+      else { const r = Math.min(64, gcw / 2 - 8), y1 = top + 8 + r; tach(gxc, y1, r); note(gxc, y1 + r + 26, "middle"); Hh = Math.max(top + sH + 10, y1 + r + 40); } }
+    else { const iy0 = top + sH + 18, r = 56, gy = iy0 + r + 6; L(g, pad, iy0 - 4, W - pad, iy0 - 4, { stroke: "rgba(242,241,236,.08)", w: 1 });
       if (cs) { tach(pad + r + 2, gy, r); mp(W - pad - r - 2, gy, r); Hh = gy + r + 32; note(W / 2, Hh - 10, "middle"); }
       else { tach(pad + r + 2, gy, r); const tx = pad + 2 * r + 20; note(tx, gy - 4, "start"); ["fixed pitch: RPM follows", "throttle and airspeed"].forEach((s2, j) => T(g, tx, gy + 14 + j * 15, s2, { size: 11, fill: GRAY })); Hh = gy + r + 12; } }
     let cap;
-    const worst = Math.max(...stall), neg = Math.min(...stall);
+    const neg = Math.min(...stall);
     if (!twist && neg < 0) cap = ["No twist", "Same blade angle everywhere: the hub has a negative angle of attack while the tip works hard."];
     else if (!cs && v < 5 && thr >= 0.99) cap = ["Static RPM", "Full throttle, no airspeed: the 172S POH gives a static RPM range of 2,300 to 2,400 RPM. High angle of attack."];
     else if (!cs && rpm > 2700) cap = ["Overspeed", "Airspeed is driving the prop past the red line. Reduce the throttle."];
@@ -158,7 +184,7 @@ export function mount(host) {
     F.caption(cap[0], cap[1]);
     return Hh;
   }
-  F.explain(`<p>The numbered white bands on the blue blade are the three stations in the insets below. The spin is slowed way down so you can follow them; the soft disc shows the area the blades sweep. Rotation speed grows toward the tip, so the relative wind there is flatter. The twist lowers the blade angle toward the tip to keep the angle of attack about the same along the blade. On a constant-speed prop, watch both blades turn about their own axes as the governor changes the blade angle. Your airplane's POH gives the static RPM range.</p>`);
-  band(); upd();
+  F.explain(`<p>Pick a station: the white band on the blue blade shows where the section below is cut. A propeller blade is a wing turning in a circle, so it meets the air from two motions at once: forward with the airplane (airspeed) and around the hub (blade speed). Together they make the relative wind, and the angle of attack is the angle between it and the blade's chord. The tip travels much farther each turn than the hub, so the blade is twisted to a flatter angle there; that keeps the angle of attack about the same from hub to tip. On a fixed-pitch prop, more airspeed tilts the relative wind and shrinks the angle of attack, so the prop speeds up: that's why RPM rises in a dive. A constant-speed prop changes the blade angle instead, to hold the RPM you set. The spin is slowed way down. Your airplane's POH gives the static RPM range.</p>`);
+  showBand(); band(); upd();
   return { destroy: () => { A.stop(); S.destroy(); F.destroy(); } };
 }

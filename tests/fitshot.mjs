@@ -8,5 +8,5 @@ const errs = []; pg.on("pageerror", (e) => errs.push(e.message)); pg.on("console
 await pg.goto((process.env.BASE || "http://localhost:8765/index.html") + "#/lesson/gl2/" + sec); await pg.waitForTimeout(1500);
 const top = () => pg.evaluate((t) => { const v = document.querySelector(`[data-viz="${t}"]`); const f = v.querySelector("figure.viz") || v; const tb = document.querySelector(".top"); window.scrollTo(0, f.getBoundingClientRect().top + scrollY - (tb ? tb.getBoundingClientRect().height : 0)); }, type);
 await top(); await pg.waitForTimeout(800);
-if (pre) { await pg.evaluate(pre); await pg.waitForTimeout(+process.env.WAIT || 1800); await top(); await pg.waitForTimeout(600); }
+if (pre) { await pg.evaluate(pre); await pg.waitForTimeout(+process.env.WAIT || 1800); if (!process.env.NOTOP) await top(); await pg.waitForTimeout(600); }
 await pg.screenshot({ path: out }); console.log(out, errs.join("; ") || "ok"); await b.close();
