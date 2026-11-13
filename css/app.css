@@ -653,3 +653,5 @@ html.locked #gate { display: flex; }
 @media (max-width:700px){.viz.cyl3d .stage{aspect-ratio:16/10}}
 .viz.mag3d .stage{aspect-ratio:16/10}
 @media (max-width:700px){.viz.mag3d .stage{aspect-ratio:1/1}}
+.viz.px.starter .stage{aspect-ratio:16/11}
+@media (max-width:700px){.viz.px.starter .stage{aspect-ratio:3/4}}
