@@ -51,7 +51,7 @@ export function mount(host) {
     ST.forEach((f, i) => { const x = bx0 + f * bl, cx = stX[i]; L(g, x, py - cw(f) - 5, x, py + cw(f) * 1.15 + 5, { stroke: ACC, w: 1.6 }); T(g, x, py + cw(f) * 1.15 + 18, String(i + 1), { size: 11, anchor: "middle", fill: ACC }); });
     // 2) a section at each station: the blade airfoil at its blade angle, the plane of rotation (dashed), the relative wind
     // (airspeed + rotation, gray arrow) and the angle of attack between them (blue arc). The blade turns to the left; the airplane flies up the page.
-    const sTop = py + 40, sH = Math.min(sw * 0.82, wide ? 170 : 132), c = Math.min(sw * 0.5, wide ? 118 : 86);
+    const sTop = py + 40, sH = wide ? Math.min(sw * 0.82, 170) : sw * 1.2, c = wide ? Math.min(sw * 0.5, 118) : sw * 0.62;
     const stall = [];
     ST.forEach((f, i) => { const r = f * RAD, cx = stX[i], cy = sTop + sH * 0.56, ph = phi(v, rpm, r), be = beta(r), aoa = be - ph, bad = aoa > 15 || aoa < 0; stall.push(aoa);
       const cb = Math.cos(be * D), sb = Math.sin(be * D), le = [cx - cb * c * 0.42, cy - sb * c * 0.42];
