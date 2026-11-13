@@ -5,7 +5,7 @@
 // Facts: PHAK 7 (Mixture Control): air density falls with altitude while fuel flow does not, so the mixture gets richer;
 // too rich = rough running, lost power, fouled spark plugs; too lean = roughness, power loss, overheating, detonation;
 // lean by EGT or, with a fixed-pitch prop and no EGT, by RPM (lean until RPM peaks, then enrich slightly).
-// C172S POH 4: recommended lean is 50 °F rich of peak EGT; best economy is peak EGT. Standard-atmosphere density ratios.
+// C172S POH 4 (Leaning Using EGT table): recommended lean 50 °F rich of peak EGT; best economy peak EGT. Standard-atmosphere density ratios.
 // Curve shapes, RPM values and the per-cylinder spread are illustrative, not published numbers.
 import { chips, slider, row } from "./base.js?v=da5a58a7ab";
 import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=da5a58a7ab";
@@ -26,7 +26,7 @@ const SAY = {
   fullrich: ["Full rich", "Normal near sea level. As you climb, the same fuel meets thinner air and it gets rich."],
   rich: ["Rich", "Leaning from here raises EGT and RPM."],
   rop: ["Rich of peak", "Leaning raises EGT toward its peak. RPM peaks a little rich of peak EGT."],
-  rec: ["Recommended lean", "About 50 °F rich of peak EGT: the 172S POH's recommended cruise mixture."],
+  rec: ["Recommended lean", "About 50 °F rich of peak EGT: the 172S POH's recommended lean setting."],
   peak: ["Peak EGT", "Best economy per the 172S POH. Lean any further and power starts to fall."],
   lop: ["Lean of peak", "EGT falls, power drops and roughness starts. Enrich back to the rich side."],
   toolean: ["Too lean", "Rough running and lost power; too lean at high power risks detonation. Enrich."],

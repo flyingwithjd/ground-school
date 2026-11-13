@@ -413,6 +413,24 @@ export const GLOSSARY = {
   "Antiservo tab": { def: "A tab on a stabilator that moves in the same direction as the trailing edge, making the stabilator less sensitive and adding feel. It also works as a trim tab.", src: "PHAK Ch 6" },
   "Stabilator": { def: "A one-piece horizontal tail that pivots as a whole, replacing a stabilizer and elevator. It is very sensitive, so it usually has an antiservo tab.", src: "PHAK Ch 6" },
   "Ground-adjustable tab": { def: "A small metal tab on a control surface, often the rudder, bent on the ground to correct a steady out-of-trim condition in flight.", src: "PHAK Ch 6" },
-  "Adjustable stabilizer": { def: "A horizontal stabilizer whose angle is changed for trim, usually by a jackscrew, instead of using a trim tab.", src: "PHAK Ch 6" }
+  "Adjustable stabilizer": { def: "A horizontal stabilizer whose angle is changed for trim, usually by a jackscrew, instead of using a trim tab.", src: "PHAK Ch 6" },
+  "Anti-ice": { def: "Ice protection that keeps ice from forming, such as heated leading edges, a heated pitot tube or a weeping wing. Turn it on before entering icing.", src: "PHAK Ch 7" },
+  "Deice": { def: "Ice protection that removes ice after it has formed, such as pneumatic deice boots.", src: "PHAK Ch 7" },
+  "Deice boots": { def: "Rubber sheets on a leading edge that are inflated by a pneumatic pump or bleed air to crack ice off. Cycle them as soon as ice is seen; some residual ice may remain.", src: "PHAK Ch 7" },
+  "Thermal anti-ice": { def: "Ice protection that heats a surface, with engine bleed air or electrically heated foil, so ice can't form. Turn it on before entering icing.", src: "PHAK Ch 7" },
+  "Weeping wing": { def: "Ice protection that pumps antifreeze out through tiny holes in the leading edge. It prevents ice and can also loosen ice that has formed.", src: "PHAK Ch 7" },
+  "Runback ice": { def: "Water that runs back past a heated area and refreezes behind it, where the ice protection can't remove it. Exit the icing conditions.", src: "AC 91-74B" },
+  "Known icing": { def: "Flight into icing conditions that are known to exist. Only airplanes certified for it may do so; most trainers are not, and their POH prohibits it.", src: "PHAK Ch 7 · POH Sec 2" },
+  "Pitot heat": { def: "An electric heater in the pitot tube that keeps ice from blocking it. Most light airplanes have no other ice protection.", src: "PHAK Ch 7" },
+  "Continuous-flow oxygen": { def: "An oxygen system that sends a steady flow to a cannula or a mask with a reservoir bag. Common for passengers.", src: "PHAK Ch 7" },
+  "Diluter-demand oxygen": { def: "An oxygen system that flows only when you inhale and mixes cabin air with oxygen. Its sealed mask is safe up to 40,000 ft.", src: "PHAK Ch 7" },
+  "Pressure-demand oxygen": { def: "An oxygen system that delivers oxygen under pressure above 34,000 ft; safe above 40,000 ft.", src: "PHAK Ch 7" },
+  "Pulse-demand oxygen": { def: "A portable oxygen system that gives a pulse of oxygen at the start of each breath, using 50 to 85 percent less oxygen than continuous flow.", src: "PHAK Ch 7" },
+  "Pulse oximeter": { def: "A clip, usually on a finger, that reads blood-oxygen saturation (SpO2) and pulse rate. Don't rely on it alone; know your hypoxia symptoms.", src: "PHAK Ch 7 · AC 61-107B" },
+  "Cannula": { def: "Light tubing that delivers oxygen under the nose. Oxygen systems certified above 18,000 ft must use masks instead.", src: "PHAK Ch 7" },
+  "Aviator's breathing oxygen": { def: "Oxygen that meets SAE AS8010 for purity and dryness, used in aircraft oxygen systems.", src: "PHAK Ch 7" },
+  "Kinds of operation": { def: "The types of flight an airplane is approved for, such as day VFR, night VFR, IFR and flight into known icing, listed in Section 2 of its POH.", src: "POH Sec 2" },
+  "KOEL": { def: "Kinds of Operations Equipment List: the part of an airplane's equipment list that shows which equipment must work for each kind of operation.", src: "POH Sec 2 · 14 CFR 91.213" },
+  "Equipment list": { def: "The list of equipment installed in a particular airplane, with weights and arms; it marks which items are required.", src: "POH Sec 6 · 14 CFR 91.213" }
 };
 export default GLOSSARY;

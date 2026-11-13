@@ -31,10 +31,10 @@ export const COVERAGE = {
     ["Turbine engines (introduction)", "turbine|turboprop|turbojet|turbofan"], ["Airframe systems", "airframe|landing gear|tricycle|tailwheel"],
     ["Fuel systems", "fuel (system|selector|tank|pump)|gravity-feed|fuel-pump"], ["Refueling procedures", "refuel|ground(ing)? wire|bond"],
     ["Heating systems", "cabin heat|heater|carbon monoxide"], ["Electrical systems", "alternator|battery|ammeter|electrical"], ["Hydraulic systems", "hydraulic"],
-    ["Pressurized aircraft", "pressuriz|cabin altitude"],
+    ["Pressurized aircraft", "pressuriz|cabin altitude"], ["Anti-ice and deice", "anti-ice|deice|weeping wing"], ["Oxygen systems", "diluter-demand|pulse-demand|continuous-flow|pulse oximeter"],
     ["Airspeed limitations", "\\bVNE\\b|\\bVNO\\b|never exceed|maneuvering speed"], ["Powerplant limitations", "2,700 RPM|static RPM|245 °F|50–90 PSI|tach(ometer)?'s green arc|green arc"],
     ["Weight limits", "2,550 lb|2,200 lb|maximum weight|baggage area"], ["Maneuver limits", "load factor|limit load|abrupt|spins|chandelle|lazy eight"],
-    ["Kinds of operation limits", "kinds of operation|day VFR|known icing"], ["Fuel limitations", "unusable|level flight only|slips? or skids?|1/4 tank"],
+    ["Kinds of operation limits", "kinds of operation|KOEL|day VFR|known icing"], ["Fuel limitations", "unusable|level flight only|slips? or skids?|1/4 tank"],
     ["Other limitations", "placard|flaps? 0–10|takeoff flap"] ] },
   gl3: { refs: "PHAK 4, 5 · ACS PA.I.H", units: ["gl3", "wx4"], items: [
     ["Structure of the atmosphere", "troposphere|stratosphere|nitrogen|tropopause"], ["Atmospheric pressure", "atmospheric pressure|29\\.92|inches of mercury"],
