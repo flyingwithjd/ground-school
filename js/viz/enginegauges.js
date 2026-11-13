@@ -6,10 +6,10 @@
 // CHT green 200-500 F and red arcs (tach 2,700-3,000, oil temp 245-250, oil pressure 0-20 and 115-120). The round-dial 172S
 // has no CHT gauge (POH 7). Low oil pressure procedure: POH 3. Temperature causes and fixes: PHAK 7.
 // Needle values for each situation are examples, not published numbers.
-import { chips, row } from "./base.js?v=310241b6ff";
-import { h } from "../core/util.js?v=310241b6ff";
-import { pxScene, T, R, C, hit, INK, GRAY, DIM, ACC } from "./kit.js?v=310241b6ff";
-import { dial, eisCell, anim, toward, COL } from "./dial.js?v=310241b6ff";
+import { chips, row } from "./base.js?v=0080002776";
+import { h } from "../core/util.js?v=0080002776";
+import { pxScene, T, R, C, hit, INK, GRAY, DIM, ACC } from "./kit.js?v=0080002776";
+import { dial, eisCell, anim, toward, COL } from "./dial.js?v=0080002776";
 const SC = {
   cruise: { name: "Cruise", v: { rpm: 2400, ff: 8.5, op: 70, ot: 190, cht: 360, egt: 0.6, vac: 5 }, say: ["Normal cruise", "Every needle in the green."] },
   climb: { name: "Long slow climb", v: { rpm: 2500, ff: 11.5, op: 66, ot: 238, cht: 470, egt: 0.45, vac: 5 }, fix: { name: "Lower the nose, enrich", v: { rpm: 2450, ff: 12, op: 70, ot: 205, cht: 390, egt: 0.4, vac: 5 } },

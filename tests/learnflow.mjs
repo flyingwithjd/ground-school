@@ -8,7 +8,7 @@ const b = await chromium.launch({ executablePath: "/usr/bin/google-chrome", args
 const fails = []; const ok = (c, m) => { if (!c) fails.push(m); else console.log("  ok", m); };
 const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }); const pg = await ctx.newPage();
 await pg.addInitScript(() => { try { localStorage.setItem("sqs.access", "1"); } catch (e) {} }); const errs = []; pg.on("pageerror", (e) => errs.push(e.message));
-const shot = async (n) => SHOTS && pg.screenshot({ path: `${SHOTS}/${n}.png` });
+const shot = async (n) => { if (!SHOTS) return; await pg.waitForTimeout(900); await pg.screenshot({ path: `${SHOTS}/${n}.png` }); };
 const V = async () => pg.evaluate(() => document.querySelector('meta[name="build"]').content);
 const D = async (fn, arg) => pg.evaluate(async ([v, src, arg]) => { const d = await import(`/data/index.js?v=${v}`); const pi = (await import(`/data/pageindex.js?v=${v}`)).default; return new Function("d", "pi", "arg", src)(d, pi, arg); }, [await V(), fn, arg]);
 const st = async () => (await pg.waitForTimeout(300), pg.evaluate(() => JSON.parse(localStorage.getItem("ppg.v1") || "{}")));
@@ -96,6 +96,9 @@ await pg.goto(BASE + "#/course"); await pg.waitForTimeout(600); await pg.fill("#
 ok(await pg.locator("#clist a.row", { hasText: "Wind shear" }).count() >= 1, "search finds a glossary term");
 await pg.fill("#cq", ""); await pg.waitForTimeout(200);
 const listIds = async () => pg.evaluate(() => [...document.querySelectorAll("#clist a.row")].map((a) => a.getAttribute("href").split("/")[2]));
+const rects = () => pg.evaluate(() => [...document.querySelectorAll(".finder .chip, #cq")].map((e) => { const r = e.getBoundingClientRect(); return [Math.round(r.left), Math.round(r.top), Math.round(r.width)].join(","); }).join("|"));
+const r0 = await rects(); await pg.locator("#cf-stage .chip", { hasText: /^Stage 1$/ }).click(); await pg.waitForTimeout(200); const r1 = await rects(); await pg.locator("#cf-stage .chip", { hasText: /^Stage 1$/ }).click(); await pg.waitForTimeout(200);
+ok(r0 === r1, "filter chips stay put when one is toggled");
 await pg.locator("#cf-subj .chip", { hasText: /^Weather$/ }).click(); await pg.waitForTimeout(250); let ids = await listIds();
 const wx = await pg.evaluate(async (v) => (await import(`/data/course.js?v=${v}`)).SUBJECTS.find((s) => s.id === "weather").lessons, await V());
 ok(ids.length === wx.length && ids.every((i) => wx.includes(i)), `Weather filter shows the ${wx.length} weather lessons`); await shot("learnB-course-filter");

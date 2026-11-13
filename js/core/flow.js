@@ -2,18 +2,18 @@
 // from the pages just read), and a 5-6 question wrap-up across the lesson at the end. Checks are never a gate: "Skip for
 // now" moves on, and a lesson counts as finished once its pages are read or its wrap-up is done or skipped.
 // Progress lives in lessons[id] inside ppg.v1 (additive): cp[key] = { done, ok, n } or { skip }, fin = time finished.
-import { get, isDue, isBlind } from "./srs.js?v=310241b6ff";
-import { QUESTIONS, secKey, lessonItems } from "../../data/index.js?v=310241b6ff";
-import { reachedSet, isReached, stats } from "./progress.js?v=310241b6ff";
-import { S, save } from "./store.js?v=310241b6ff";
+import { get, isDue, isBlind } from "./srs.js?v=0080002776";
+import { QUESTIONS, secKey, lessonItems } from "../../data/index.js?v=0080002776";
+import { reachedSet, isReached, stats } from "./progress.js?v=0080002776";
+import { S, save } from "./store.js?v=0080002776";
 const HOUR = 36e5;
 // Question ids by page key "lesson/sec", in bank order.
 let BY = null; export function byPage() { if (BY) return BY; BY = {}; for (const q of Object.values(QUESTIONS)) { const k = secKey(q); if (k) (BY[k] ||= []).push(q.id); } return BY; }
 export const pageIds = (lid, sid) => byPage()[lid + "/" + sid] || [];
 export const pageStats = (lid, sid) => stats(pageIds(lid, sid));
 export const pageBlind = (lid, sid) => pageIds(lid, sid).filter((id) => isBlind(id)).length;
-// Split n pages into groups of 2-3 (fewer than 4 pages: one group, so no quick check before the wrap-up).
-export function groups(n) { if (n < 4) return [Array.from({ length: n }, (_, i) => i)]; const k = Math.ceil(n / 3), base = Math.floor(n / k), extra = n % k; const out = []; let at = 0;
+// Split n pages into groups of 2-3 (3 pages: a check after the first 2; 1-2 pages: no quick check, only the wrap-up).
+export function groups(n) { if (n === 3) return [[0, 1], [2]]; if (n < 3) return [Array.from({ length: n }, (_, i) => i)]; const k = Math.ceil(n / 3), base = Math.floor(n / k), extra = n % k; const out = []; let at = 0;
   for (let g = 0; g < k; g++) { const sz = base + (g < extra ? 1 : 0); out.push(Array.from({ length: sz }, (_, i) => at + i)); at += sz; } return out; }
 // Steps of a lesson: { kind: "sec" | "cp" | "prep" | "wrap", key, label }. Section keys stay their index so old links keep working.
 export function plan(lid, sections, hasPrep) { const steps = []; let n = 0; const g = groups(sections.length);
@@ -44,9 +44,9 @@ export function cpMark(lid, key, v) { const ls = (S().lessons[lid] ||= { visited
 export function finish(lid) { const ls = (S().lessons[lid] ||= { visited: 0, sec: 0, read: [] }); if (!ls.fin) { ls.fin = Date.now(); save(); } }
 // The one next step for the Now page: a quick check whose pages are read but which was neither done nor skipped, else the
 // lesson in progress (most recently opened, not finished), else the next lesson in course order.
-import PI from "../../data/pageindex.js?v=310241b6ff";
-import { LESSONS, ORDER } from "../../data/index.js?v=310241b6ff";
-import { lessonDone, nextLesson } from "./progress.js?v=310241b6ff";
+import PI from "../../data/pageindex.js?v=0080002776";
+import { LESSONS, ORDER } from "../../data/index.js?v=0080002776";
+import { lessonDone, nextLesson } from "./progress.js?v=0080002776";
 export const pagesOf = (lid) => (PI.lessons[lid] || []).map(([id, label, title]) => ({ id, label, title }));
 export const pageIndex = () => PI;
 export function nextStep() { const ls = S().lessons || {};

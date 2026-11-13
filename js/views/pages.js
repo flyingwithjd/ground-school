@@ -1,13 +1,13 @@
-import { h, esc, pct, fmtDue, toast, download, shuffle } from "../core/util.js?v=310241b6ff";
-import { S, save, exportJSON, importJSON, reset } from "../core/store.js?v=310241b6ff";
-import { get } from "../core/srs.js?v=310241b6ff";
-import { STAGES, MODULES, STAGE_CHECK, SUBJECTS } from "../../data/course.js?v=310241b6ff";
-import { LESSONS, QUESTIONS, TOPICS, ORDER, lessonItems } from "../../data/index.js?v=310241b6ff";
-import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone, blindList, onlyReached } from "../core/progress.js?v=310241b6ff";
-import { session, practiceSet } from "./quiz.js?v=310241b6ff";
-import { nextStep, pagesOf, pageIndex, pageIds, pageStats } from "../core/flow.js?v=310241b6ff";
-import { blindPages, blindLesson } from "./blindlesson.js?v=310241b6ff";
-import { G, rich } from "../core/rich.js?v=310241b6ff";
+import { h, esc, pct, fmtDue, toast, download, shuffle } from "../core/util.js?v=0080002776";
+import { S, save, exportJSON, importJSON, reset } from "../core/store.js?v=0080002776";
+import { get } from "../core/srs.js?v=0080002776";
+import { STAGES, MODULES, STAGE_CHECK, SUBJECTS } from "../../data/course.js?v=0080002776";
+import { LESSONS, QUESTIONS, TOPICS, ORDER, lessonItems } from "../../data/index.js?v=0080002776";
+import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone, blindList, onlyReached } from "../core/progress.js?v=0080002776";
+import { session, practiceSet } from "./quiz.js?v=0080002776";
+import { nextStep, pagesOf, pageIndex, pageIds, pageStats } from "../core/flow.js?v=0080002776";
+import { blindPages, blindLesson } from "./blindlesson.js?v=0080002776";
+import { G, rich } from "../core/rich.js?v=0080002776";
 const page = (host) => { const p = h("div", { class: "page" }); host.append(p); return p; };
 const meter = (x, big) => `<div class="meter${big ? " big" : ""}"><i style="width:${Math.round(x * 100)}%"></i></div>`;
 const stageLessons = (s) => [...s.ground, ...s.flight].flatMap((id) => [id, ...((LESSONS[id] && LESSONS[id].includes) || [])]);
@@ -151,7 +151,7 @@ export function tools(host) { const p = page(host); const sims = S().sims || [];
   <a class="cell" href="#/lesson/vs1"><span class="label">V-speeds · POH Sec 2</span><h3>What V<sub>FE</sub>, V<sub>NO</sub> and V<sub>Y</sub> mean</h3><p>Every V-speed on the 172S airspeed indicator and the ones that are not on it. Tap a speed to light up its arc or line.</p><span class="go btn arrow">Open</span></a>
   <a class="cell" href="#/glossary"><span class="label">Glossary</span><h3>${Object.keys(G).length} terms</h3><p>Every underlined term in a lesson opens its definition. Browse or search them all here.</p><span class="go btn arrow">Open</span></a>
   <a class="cell" href="#/settings"><span class="label">Progress and settings</span><h3>Your data stays here</h3><p>Progress is saved only in this browser. Export it to a file to move devices or keep a backup.</p><span class="go btn arrow">Open</span></a></div>${foot()}`; }
-export { sim, check } from "./checks.js?v=310241b6ff";
+export { sim, check } from "./checks.js?v=0080002776";
 export function glossary(host, focus) { const p = page(host); const keys = Object.keys(G).sort(); const slug = (k) => k.replace(/\s+/g, "-");
   p.innerHTML = `<section class="hero"><span class="label">Glossary</span><h1>Terms, plainly</h1><p>Every underlined term in a lesson opens its definition. Airspeed symbols like V<sub>FE</sub> are explained with the dial in <a href="#/lesson/vs1">V-speeds</a>.</p></section>`;
   const inp = h("input", { type: "search", placeholder: "Search terms", "aria-label": "Search terms" }); p.append(h("div", { class: "field", style: "max-width:28rem" }, inp)); const list = h("div", { class: "mt" }); p.append(list);
@@ -168,7 +168,7 @@ export function settings(host) { const p = page(host); const st = S();
   file.onchange = async () => { const f = file.files[0]; if (!f) return; try { const t = await f.text(); if (!confirm("Replace the progress in this browser with the file's progress?")) return; importJSON(t); toast("Progress imported."); location.hash = "#/"; } catch (e) { toast(e.message || "Import failed."); } };
   const rs = h("button", { class: "btn ghost", type: "button" }, "Reset everything"); rs.onclick = () => { if (confirm("Erase all progress in this browser? Export first if you want a backup.")) { reset(); toast("Progress erased."); location.hash = "#/"; } };
   c3.append(h("div", { class: "btns mt" }, ex, im, rs, file));
-  p.append(c2, c3); p.insertAdjacentHTML("beforeend", `<div class="card"><span class="label">How review scheduling works</span><div class="prose mt" style="font-size:16px"><p>Each question has its own schedule (a variant of the SM-2 spaced repetition algorithm). A question is never repeated in the same session. A miss resets its schedule and brings it back 12 hours later as a blind spot; a correct guess also comes back in 12 hours. A correct answer pushes it out to 1 day, then 3 days, then longer intervals that grow with how easily you recall it.</p><p>Blind spots also come back inside later lessons' sessions, up to 3 at a time. One clears after correct answers on two different days, or three if you had marked it Certain.</p><p>Every answer asks how sure you were: Guessed, Fairly sure or Certain. Readiness counts each question by your latest answer: Certain and correct counts 100%, Fairly sure and correct 50%, a guess or a miss 0%. A lesson reaches 100% only when every question has been answered Certain and correct. An item counts as mastered only when its next review is three weeks or more away and its latest answer was Certain.</p></div></div>`);
+  p.append(c2, c3); p.insertAdjacentHTML("beforeend", `<div class="card"><span class="label">How review scheduling works</span><div class="prose mt" style="font-size:16px"><p>Each question has its own schedule (a variant of the SM-2 spaced repetition algorithm). A question is never repeated in the same session. A miss resets its schedule and brings it back 12 hours later as a blind spot; a correct guess also comes back in 12 hours. A correct answer pushes it out to 1 day, then 3 days, then longer intervals that grow with how easily you recall it.</p><p>Blind spots also come back inside later lessons' sessions, up to 3 at a time. One clears after correct answers on two different days, or three if you had marked it Certain.</p><p>Inside a lesson, a quick check of 4 or 5 questions follows every 2 or 3 pages, and a short wrap-up ends it. Each asks only about pages you have opened, and any of them can be skipped: a lesson counts as finished once you have been through it, whatever the score.</p><p>Every answer asks how sure you were: Guessed, Fairly sure or Certain. Readiness counts each question by your latest answer: Certain and correct counts 100%, Fairly sure and correct 50%, a guess or a miss 0%. A lesson reaches 100% only when every question has been answered Certain and correct. An item counts as mastered only when its next review is three weeks or more away and its latest answer was Certain.</p></div></div>`);
   p.insertAdjacentHTML("beforeend", foot()); }
 export function about(host) { const p = page(host);
   p.innerHTML = `<section class="hero"><span class="label">About Squawk School</span><h1>Sources and licenses</h1><p>Squawk School is private pilot ground school you can study anywhere: every lesson, visual and check below is built from the FAA sources listed here.</p></section><div class="prose">
@@ -176,4 +176,4 @@ export function about(host) { const p = page(host);
   <p>Citations name the chapter, section or regulation. Procedures are marked to confirm with your instructor and your aircraft's POH, because flight schools and airplanes differ.</p>
   <h4>Software and fonts</h4><ul><li>three.js r181, MIT License</li><li>GSAP 3.14, GreenSock Standard "No Charge" License (vendored, not loaded in this build)</li><li>Inter and IBM Plex Mono, SIL Open Font License 1.1</li></ul><p>License texts are in the LICENSES folder.</p>
   <h4>Not affiliated</h4><p>Squawk School is an independent study aid. Not affiliated with or endorsed by the FAA or Textron Aviation. Cessna and Skyhawk are trademarks of their owner.</p></div>`; }
-export { coverage, presolo } from "./checks.js?v=310241b6ff";
+export { coverage, presolo } from "./checks.js?v=0080002776";
