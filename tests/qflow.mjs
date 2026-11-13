@@ -23,9 +23,9 @@ const answer = async (miss, conf = 2) => { const c = await cur(); if (!c) return
 const nextQ = async () => { const nx = pg.locator(".verdict button", { hasText: /^(Next|Finish)$/ }); if (await nx.count()) { await nx.first().click(); await pg.waitForTimeout(150); return true; } return false; };
 const state = () => pg.evaluate(() => JSON.parse(localStorage.getItem("ppg.v1") || "null"));
 
-// Only pages the learner has opened are asked: read a lesson through to Check yourself first.
+// Only pages the learner has opened are asked: read a lesson through to its Wrap-up first.
 const readAll = async (lid) => { await pg.goto(BASE + "#/lesson/" + lid + "/0"); await pg.waitForTimeout(700);
-  for (let i = 0; i < 60 && !(await pg.locator("h2", { hasText: "Answer, then trust" }).count()); i++) { await pg.locator(".secnav .pg.next").click(); await pg.waitForTimeout(120); } };
+  for (let i = 0; i < 60 && !(await pg.locator("h2", { hasText: "Wrap-up" }).count()); i++) { await pg.locator(".secnav .pg.next").click(); await pg.waitForTimeout(120); } };
 await readAll("gl2");
 // ---- 1. a GL2 session: miss the first 3 (Certain), answer the rest right
 await pg.goto(BASE + "#/practice/gl2"); await pg.waitForSelector(".qtext"); await pg.waitForTimeout(400);
@@ -57,15 +57,15 @@ s = await state(); ok(more.every((id) => s.items[id].rw === 0.5), "Fairly sure a
 
 // ---- 3. All N questions path remembers its place
 await pg.goto(BASE + "#/lesson/gl2"); await pg.waitForTimeout(900);
-for (let i = 0; i < 40 && !(await pg.locator("h2", { hasText: "Answer, then trust" }).count()); i++) { await pg.locator(".secnav .pg.next").click(); await pg.waitForTimeout(150); }
-const allBtn = pg.locator("button", { hasText: /^All \d+ questions$/ }); ok(await allBtn.count() === 1, "lesson Check yourself offers All N questions");
+for (let i = 0; i < 40 && !(await pg.locator("h2", { hasText: "Wrap-up" }).count()); i++) { await pg.locator(".secnav .pg.next").click(); await pg.waitForTimeout(150); }
+const allBtn = pg.locator("button", { hasText: /^All \d+ questions$/ }); ok(await allBtn.count() === 1, "lesson Wrap-up offers All N questions");
 const N = +(await allBtn.textContent()).match(/\d+/)[0]; await allBtn.click(); await pg.waitForSelector(".qtext");
 let c2 = await cur(); ok(c2.counter === `Answered 0 / ${N}`, "All path counter: " + c2.counter);
 for (let i = 0; i < 4; i++) { await answer(false); await nextQ(); }
 c2 = await cur(); ok(c2.counter === `Answered 4 / ${N}`, "All path advances: " + c2.counter);
 if (shot) { await pg.waitForTimeout(500); await pg.screenshot({ path: shot + "/qf_03_all_path.png" }); }
 await pg.goto(BASE + "#/lesson/gl2"); await pg.waitForTimeout(900);
-for (let i = 0; i < 40 && !(await pg.locator("h2", { hasText: "Answer, then trust" }).count()); i++) { await pg.locator(".secnav .pg.next").click(); await pg.waitForTimeout(150); }
+for (let i = 0; i < 40 && !(await pg.locator("h2", { hasText: "Wrap-up" }).count()); i++) { await pg.locator(".secnav .pg.next").click(); await pg.waitForTimeout(150); }
 const resume = pg.locator("button", { hasText: /^All questions · 4 \/ \d+$/ }); ok(await resume.count() === 1, "All path remembers its place (All questions · 4 / N)");
 await resume.click(); await pg.waitForSelector(".qtext"); c2 = await cur(); ok(c2.counter === `Answered 4 / ${N}`, "resumes at 4: " + c2.counter);
 ok(!(await pg.locator(".secnav").count()), "no lesson pager under a running session");
@@ -74,8 +74,8 @@ ok(!(await pg.locator(".secnav").count()), "no lesson pager under a running sess
 // edit storage from a same-origin page without the app, so the running app cannot write its in-memory state back over it
 await pg.goto(BASE + "robots.txt"); await pg.evaluate((ids) => { const s = JSON.parse(localStorage.getItem("ppg.v1")); for (const id of ids) s.items[id].due = Date.now() - 1000; localStorage.setItem("ppg.v1", JSON.stringify(s)); }, missed);
 await pg.goto(BASE + "#/"); await pg.waitForTimeout(1000);
-const card = await pg.evaluate(() => { const c = document.getElementById("blind-card"); return c ? { txt: c.innerText, num: c.querySelector(".num").textContent, pri: !!c.querySelector(".btn.pri") } : null; });
-ok(card && /Blind spots/i.test(card.txt) && /^3/.test(card.num) && card.pri, "Now page shows the Blind spots card first: " + (card && card.txt.replace(/\s+/g, " ")));
+const card = await pg.evaluate(() => { const c = document.getElementById("blind-card"); const ns = document.getElementById("next-step"); return c ? { txt: c.innerText, num: c.querySelector(".num").textContent, after: !!ns && !!(ns.compareDocumentPosition(c) & Node.DOCUMENT_POSITION_FOLLOWING), nsPri: !!ns.querySelector(".btn.pri") } : null; });
+ok(card && /Review blind spots/i.test(card.txt) && /^3/.test(card.num) && card.after && card.nsPri, "Now page: one primary next step, then the Review blind spots card: " + (card && card.txt.replace(/\s+/g, " ")));
 ok(!(await pg.evaluate(() => /within minutes/.test(document.body.innerText))), "no 'within minutes' text on the Now page");
 if (shot) { await pg.waitForTimeout(500); await pg.screenshot({ path: shot + "/qf_04_now_blind_card.png" }); }
 await readAll("gl3"); await pg.goto(BASE + "#/practice/gl3"); await pg.waitForSelector(".qtext"); await pg.waitForTimeout(300);

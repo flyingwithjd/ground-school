@@ -1,5 +1,5 @@
 // Never asked about an unread page: a fresh learner who has opened only the first page of a lesson is asked only questions
-// tagged with that page, in the lesson's Check yourself, practice, review, a topic drill and the stage-check written.
+// tagged with that page, in the lesson's quick checks and wrap-up, practice, review, a topic drill and the stage-check written.
 // Every answer shows the Guessed / Fairly sure / Certain step.  Usage: node tests/reach-only.mjs  (390x844 phone)
 import { createRequire } from "module";
 const { chromium } = createRequire("/workspace/pgs-build/")("playwright-core");
@@ -25,11 +25,11 @@ const pages = await pg.evaluate(async ({ v, L }) => {
   return { first, read: s.lessons?.[L]?.read || [], mine: Object.values(d.QUESTIONS).filter((q) => d.secKey(q) === `${L}/${first}`).length, all: d.lessonItems(L).length }; }, { v: v0, L });
 ok(pages.read.length === 1, `only the first page is recorded as read (${pages.read.join(",")})`);
 const page1 = `${L}/${pages.first}`; console.log(`  page 1 = ${page1}: ${pages.mine} questions of ${pages.all} in ${L}`);
-// lesson Check yourself (jump straight there with the last step dash: pages in between stay unread)
+// lesson wrap-up (jump straight there with the last step dash: pages in between stay unread)
 await pg.locator(".steps button").last().click(); await pg.waitForTimeout(500);
-const info = await pg.locator(".sec p.dim").first().innerText(); ok(new RegExp(`^${pages.mine} of ${pages.all} questions so far`).test(info), "Check yourself counts only page-1 questions: " + info.slice(0, 80));
-await pg.locator("button", { hasText: /^(Start|Keep going)$/ }).click(); await pg.waitForSelector(".qtext");
-let r = await runAll(); ok(r.asked.length > 0 && r.asked.every((c) => c.page === page1), `Check yourself asked ${r.asked.length}, all from ${page1}: ${[...new Set(r.asked.map((c) => c.page))].join(",")}`);
+const info = await pg.locator(".sec p.dim").first().innerText(); const m = info.match(/(\d+) of (\d+) questions so far/); ok(m && +m[1] === pages.mine, "the wrap-up counts only page-1 questions: " + (m ? m[0] : info.slice(0, 120)));
+await pg.locator(".cp-btns .btn.pri").click(); await pg.waitForSelector(".qtext");
+let r = await runAll(); ok(r.asked.length > 0 && r.asked.every((c) => c.page === page1), `wrap-up asked ${r.asked.length}, all from ${page1}: ${[...new Set(r.asked.map((c) => c.page))].join(",")}`);
 ok(r.conf === r.asked.length, `every answer showed the 3-choice confidence step (${r.conf}/${r.asked.length})`);
 await pg.goto(BASE + `#/practice/${L}`); await pg.waitForTimeout(800); r = await runAll(); const r2 = await runAll();
 ok([...r.asked, ...r2.asked].every((c) => c.page === page1), `practice asks only ${page1} (${r.asked.length + r2.asked.length})`);

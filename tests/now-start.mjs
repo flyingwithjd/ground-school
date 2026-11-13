@@ -9,7 +9,7 @@ const fails = []; const ok = (c, m) => { if (!c) fails.push(m); };
 const sizes = [[1440, 900], [1024, 768], [820, 1180], [390, 844]];
 const mk = async (W, H) => { const ctx = await b.newContext({ viewport: { width: W, height: H }, hasTouch: W < 1100, isMobile: W < 500 }); const pg = await ctx.newPage();
   await pg.addInitScript(() => { try { localStorage.setItem("sqs.access", "1"); } catch (e) {} }); const errs = []; pg.on("pageerror", (e) => errs.push(e.message)); return { ctx, pg, errs }; };
-const cards = (pg) => pg.evaluate(() => [...document.querySelectorAll("main .label")].map((e) => e.textContent.trim()).filter((t) => /Due for review|Weakest area|Next lesson|readiness/i.test(t)));
+const cards = (pg) => pg.evaluate(() => [...document.querySelectorAll("main .label")].map((e) => e.textContent.trim()).filter((t) => /Due for review|Due reviews|Weakest area|Next lesson|Continue lesson|Next checkpoint|readiness/i.test(t)));
 for (const [W, H] of sizes) {
   const { ctx, pg, errs } = await mk(W, H); await pg.goto(BASE + "#/"); await pg.waitForSelector("#begin"); await pg.waitForTimeout(900);
   const r = await pg.evaluate(() => { const b = document.getElementById("begin").getBoundingClientRect(); const n = document.getElementById("nav"); const nr = n ? n.getBoundingClientRect() : null;
@@ -27,9 +27,9 @@ for (const [W, H] of sizes) {
     await pg.locator(".choice:not([disabled])").first().click(); const conf = pg.locator(".conf .chip"); if (await conf.count()) await conf.first().click(); else await pg.locator("button", { hasText: "Check" }).click();
     await pg.waitForTimeout(500); await pg.goto(BASE + "#/"); await pg.reload(); await pg.waitForTimeout(1200);
     ok(await pg.evaluate(() => Object.values(JSON.parse(localStorage.getItem("ppg.v1")).items).some((i) => i.n > 0)), "answer not stored");
-    const c2 = await cards(pg); ok(c2.some((t) => /Next lesson/.test(t)) && c2.some((t) => /readiness/i.test(t)), "progress cards missing after an answer: " + c2.join(", "));
+    const c2 = await cards(pg); ok(c2.some((t) => /Next lesson|Continue lesson|Next checkpoint/.test(t)) && c2.some((t) => /readiness/i.test(t)), "progress cards missing after an answer: " + c2.join(", "));
     // empty cards stay hidden: right after one answer nothing is due yet, so there is no Due for review card
-    ok(!c2.some((t) => /Due for review/.test(t)), "empty Due for review card shown: " + c2.join(", "));
+    ok(!c2.some((t) => /Due for review|Due reviews/.test(t)), "empty Due for review card shown: " + c2.join(", "));
     ok(!(await pg.locator("#begin").count()), "first-visit hero still shown after an answer");
     if (shotDir) await pg.screenshot({ path: `${shotDir}/now_progress_${W}x${H}.png` });
   }
