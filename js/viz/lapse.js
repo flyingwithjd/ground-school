@@ -1,6 +1,6 @@
 // Standard atmosphere column: drag altitude, read standard temperature and pressure (PHAK 4: 2 °C and about 1 "Hg per 1,000 ft near the surface; half the pressure by about 18,000 ft).
-import { slider, readout } from "./base.js?v=e4c491e0c8";
-import { pxScene, T, L, R, P, C, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=e4c491e0c8";
+import { slider, readout } from "./base.js?v=c8fe6c3cee";
+import { pxScene, T, L, R, P, C, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=c8fe6c3cee";
 const isaT = (h) => 15 - 2 * h / 1000;                                  // °C, troposphere
 const isaP = (h) => 29.92 * Math.pow(1 - 6.8756e-6 * h, 5.2559);            // "Hg
 const MAX = 20000;

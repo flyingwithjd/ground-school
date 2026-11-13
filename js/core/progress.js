@@ -1,7 +1,7 @@
 // Mastery, readiness and blind-spot analytics, all derived from per-item SRS state.
-import { get, recall, level, isDue, recentAcc, readyW, blindIds, DAY } from "./srs.js?v=e4c491e0c8";
-import { LESSONS, QUESTIONS, ORAL, TOPICS, ORDER, item, lessonItems } from "../../data/index.js?v=e4c491e0c8";
-import { S } from "./store.js?v=e4c491e0c8";
+import { get, recall, level, isDue, recentAcc, readyW, blindIds, DAY } from "./srs.js?v=c8fe6c3cee";
+import { LESSONS, QUESTIONS, ORAL, TOPICS, ORDER, item, lessonItems } from "../../data/index.js?v=c8fe6c3cee";
+import { S } from "./store.js?v=c8fe6c3cee";
 export const allIds = () => [...Object.keys(QUESTIONS), ...Object.keys(ORAL)];
 // Readiness = average readiness credit per item from its latest graded answer (READY_W in srs.js):
 // Certain and correct = 1, Fairly sure and correct = 0.5, a guess or a miss = 0, unseen = 0. 100% only when every item is Certain and correct.

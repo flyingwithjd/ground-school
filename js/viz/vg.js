@@ -4,9 +4,9 @@
 // KCAS: VNE 160, VNO 126, VA 102 at 2,550, 95 at 2,200, 88 at 1,900; stall flaps up, 2,550 lb, aft CG, wings level 53 KCAS.
 // Positive stall line n = (V/Vs)^2 with Vs scaled by sqrt(weight/2,550) (PHAK 5: stall speed rises with the square root
 // of load factor). The negative stall line is not published for the 172S, so it is drawn as a shape with no number.
-import { slider, chips, row } from "./base.js?v=e4c491e0c8";
-import { pxScene, T, L, P, C, R, hit, INK, GRAY, DIM, ACC, ACCF, r1 } from "./kit.js?v=e4c491e0c8";
-import { COL } from "./dial.js?v=e4c491e0c8";
+import { slider, chips, row } from "./base.js?v=c8fe6c3cee";
+import { pxScene, T, L, P, C, R, hit, INK, GRAY, DIM, ACC, ACCF, r1 } from "./kit.js?v=c8fe6c3cee";
+import { COL } from "./dial.js?v=c8fe6c3cee";
 const VNE = 160, VNO = 126, VA = { 2550: 102, 2200: 95, 1900: 88 }, VAI = { 2550: 105, 2200: 98, 1900: 90 }, VS = 53;
 const CAT = { normal: { up: 3.8, dn: -1.52, w: ["2550", "2200", "1900"] }, utility: { up: 4.4, dn: -1.76, w: ["2200", "1900"] } };
 const VMAX = 175, NMIN = -2.5, NMAX = 5.6;

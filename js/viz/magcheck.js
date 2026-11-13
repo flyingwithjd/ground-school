@@ -6,9 +6,9 @@
 // PHAK 7: no drop is not normal; if the engine quits on one magneto or the drop exceeds limits, don't fly; a broken
 // magneto ground wire can let the engine fire with the switch OFF, and only idle cutoff stops it.
 // The RPM drops shown for each case are examples, not published values.
-import { chips, row } from "./base.js?v=e4c491e0c8";
-import { pxScene, T, L, C, R, hit, INK, GRAY, DIM, ACC } from "./kit.js?v=e4c491e0c8";
-import { dial, anim, toward, COL } from "./dial.js?v=e4c491e0c8";
+import { chips, row } from "./base.js?v=c8fe6c3cee";
+import { pxScene, T, L, C, R, hit, INK, GRAY, DIM, ACC } from "./kit.js?v=c8fe6c3cee";
+import { dial, anim, toward, COL } from "./dial.js?v=c8fe6c3cee";
 const POS = ["OFF", "R", "L", "BOTH", "START"], ANG = { OFF: -84, R: -42, L: 0, BOTH: 42, START: 84 };
 const FAULT = {
   normal: { name: "Normal", dR: 75, dL: 100 },

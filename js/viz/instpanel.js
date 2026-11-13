@@ -2,9 +2,9 @@
 // Faces are simplified from the PHAK Ch 8 figures and a round-gauge C172S panel. Nothing is interactive or highlighted.
 // Example readings: level cruise, 100 KIAS, 4,500 ft, 0 fpm, heading 120, wings level, 2,300 RPM.
 // Airspeed markings reuse the V-speeds dial (C172S POH Fig 2-2); tachometer markings are C172S POH Fig 2-3 (sea-level green arc).
-import { frame, FAINT, FAINT2 } from "./base.js?v=e4c491e0c8";
-import { s, h } from "../core/util.js?v=e4c491e0c8";
-import { rich } from "../core/rich.js?v=e4c491e0c8";
+import { frame, FAINT, FAINT2 } from "./base.js?v=c8fe6c3cee";
+import { s, h } from "../core/util.js?v=c8fe6c3cee";
+import { rich } from "../core/rich.js?v=c8fe6c3cee";
 const INK = "#F2F1EC", DIM = "rgba(242,241,236,.6)", FACE = "#111113";
 const COL = { white: "#F2F1EC", green: "#3FA66B", yellow: "#D9B23A", red: "#D9493E", sky: "#2E4D6B", ground: "#634631" };
 const P = (a, r) => { const t = (a * Math.PI) / 180; return [+(Math.sin(t) * r).toFixed(2), +(-Math.cos(t) * r).toFixed(2)]; };

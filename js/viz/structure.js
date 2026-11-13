@@ -5,10 +5,10 @@
 // with leader lines to the part they name.
 import * as THREE from "three";
 import { OrbitControls } from "three/addons/controls/OrbitControls.js";
-import { buildPlane } from "./c172-model.js?v=e4c491e0c8";
-import { buildClassic } from "./classic-models.js?v=e4c491e0c8";
-import { frame, chips } from "./base.js?v=e4c491e0c8";
-import { h, s, reduced, clamp } from "../core/util.js?v=e4c491e0c8";
+import { buildPlane } from "./c172-model.js?v=c8fe6c3cee";
+import { buildClassic } from "./classic-models.js?v=c8fe6c3cee";
+import { frame, chips } from "./base.js?v=c8fe6c3cee";
+import { h, s, reduced, clamp } from "../core/util.js?v=c8fe6c3cee";
 
 const ACC = 0x3b82f6, INK = 0xf2f1ec, BG = 0x0a0a0b, D = Math.PI / 180;
 const TYPES = {

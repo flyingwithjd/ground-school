@@ -1,6 +1,6 @@
 // Basic VFR weather minimums (14 CFR 91.155): pick the airspace and day or night; the cloud-clearance box and visibility redraw.
-import { chips } from "./base.js?v=e4c491e0c8";
-import { pxScene, T, L, R, P, C, planeTop, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=e4c491e0c8";
+import { chips } from "./base.js?v=c8fe6c3cee";
+import { pxScene, T, L, R, P, C, planeTop, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=c8fe6c3cee";
 // [vis SM, below ft, above ft, horizontal label, clearOfClouds]
 const M = {
   B: { n: "Class B", day: [3, 0, 0, "", true] },

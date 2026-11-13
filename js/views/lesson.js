@@ -1,11 +1,11 @@
-import { h, esc, pct } from "../core/util.js?v=e4c491e0c8";
-import { S, save, lessonState } from "../core/store.js?v=e4c491e0c8";
-import { LESSONS, lessonItems } from "../../data/index.js?v=e4c491e0c8";
-import { lessonStats, buildQueue } from "../core/progress.js?v=e4c491e0c8";
-import { get } from "../core/srs.js?v=e4c491e0c8";
-import { rich, autoTerms } from "../core/rich.js?v=e4c491e0c8";
-import { mountViz, destroyAll } from "../viz/index.js?v=e4c491e0c8";
-import { practiceSet, allLabel } from "./quiz.js?v=e4c491e0c8";
+import { h, esc, pct } from "../core/util.js?v=c8fe6c3cee";
+import { S, save, lessonState } from "../core/store.js?v=c8fe6c3cee";
+import { LESSONS, lessonItems } from "../../data/index.js?v=c8fe6c3cee";
+import { lessonStats, buildQueue } from "../core/progress.js?v=c8fe6c3cee";
+import { get } from "../core/srs.js?v=c8fe6c3cee";
+import { rich, autoTerms } from "../core/rich.js?v=c8fe6c3cee";
+import { mountViz, destroyAll } from "../viz/index.js?v=c8fe6c3cee";
+import { practiceSet, allLabel } from "./quiz.js?v=c8fe6c3cee";
 const KIND = { ground: "Ground lesson", flight: "Flight lesson briefing", module: "Module unit" };
 export function lessonView(host, id, secIdx) {
   const L0 = LESSONS[id]; const p = h("div", { class: "page" }); host.append(p);
@@ -13,7 +13,7 @@ export function lessonView(host, id, secIdx) {
   let api = { destroy() {} }; let dead = false;
   // Lesson text is code-split: question banks load up front (the review engine needs them); prose loads when the lesson opens.
   // Supplement sections (data/text/x/<id>.js) slot in after the section named by `at` ("^" = first), else at the end.
-  Promise.all([import(`../../data/text/${id}.js?v=e4c491e0c8`), L0.textx ? import(`../../data/text/x/${id}.js?v=e4c491e0c8`) : null]).then(([m, x]) => { if (dead) return;
+  Promise.all([import(`../../data/text/${id}.js?v=c8fe6c3cee`), L0.textx ? import(`../../data/text/x/${id}.js?v=c8fe6c3cee`) : null]).then(([m, x]) => { if (dead) return;
     const T = { ...L0, ...m.default, sections: mergeSections(m.default.sections || [], x ? x.default.sections || [] : []) };
     if (typeof secIdx === "string") { const k = T.sections.findIndex((s) => s.id === secIdx); secIdx = k >= 0 ? k : null; }
     api = build(p, T, id, secIdx); })
