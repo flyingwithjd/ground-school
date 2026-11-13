@@ -6,7 +6,7 @@ import { createRequire } from "module"; const { chromium } = createRequire("/wor
 const BASE = process.env.BASE || "http://localhost:8765/index.html";
 const ALL = { catlim: "vg", ignition: "magcheck", fuellim: "fuellim", induct: "carbice", elec: "elecsys", oilcool: "enginegauges", mixture: "mixture", combust: "combustion", prop: "prop", secctl: "flaptypes", icing: "icing", oxygen: "hypoxia", koel: "koel", press: "pressurization", heat: "cabinheat", ap: "autopilot", airframe: "gear", starting: "starter" };
 // GL1 papers visuals are addressed as lesson/section
-Object.assign(ALL, { "gl1/design": "certs", "gl1/papers": "airworthy", "gl1/cert": "pilotpath" });
+Object.assign(ALL, { "gl1/design": "certs", "gl1/papers": "airworthy", "gl1/cert": "pilotpath", "gl1/walk": "plane3d", "gl1/walk:fuelcheck": "fuelcheck" });
 const want = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(ALL);
 let bad = 0; const ok = (c, m) => { if (!c) bad++; console.log((c ? "   ok   " : "   FAIL ") + m); };
 const b = await chromium.launch({ executablePath: "/usr/bin/google-chrome", args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
@@ -15,7 +15,7 @@ for (const [w, hh] of [[390, 844], [744, 1133]]) {
   await pg.addInitScript(() => { try { localStorage.setItem("sqs.access", "1"); } catch (e) {} });
   const errs = []; pg.on("pageerror", (e) => errs.push(e.message)); const cdp = await ctx.newCDPSession(pg);
   for (const sec of want) { const type = ALL[sec], tag = `${type} @ ${w}x${hh}`;
-    await pg.goto("about:blank"); await pg.goto(BASE + "#/lesson/" + (sec.includes("/") ? sec : "gl2/" + sec)); await pg.waitForTimeout(1300);
+    await pg.goto("about:blank"); await pg.goto(BASE + "#/lesson/" + (sec.includes("/") ? sec.split(":")[0] : "gl2/" + sec)); await pg.waitForTimeout(1300);
     const r = await pg.evaluate((type) => { const v = document.querySelector(`[data-viz="${type}"]`); if (!v) return null; const fig = v.querySelector("figure.viz") || v;
       const top = document.querySelector(".top"), nav = document.querySelector(".nav"); const hb = top ? top.getBoundingClientRect().height : 0;
       window.scrollTo(0, fig.getBoundingClientRect().top + scrollY - hb);

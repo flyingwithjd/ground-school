@@ -3,6 +3,7 @@ import { frame, chips } from "./base.js?v=3c9cdbaed9";
 import { planeStage } from "./planestage.js?v=3c9cdbaed9";
 import { h, reduced } from "../core/util.js?v=3c9cdbaed9";
 import { mount as taxiWind } from "./taxiwind.js?v=3c9cdbaed9";
+import { mount as walkaround } from "./walkaround.js?v=3c9cdbaed9";
 // Pose sign conventions (model): ail>0 rolls right, elev<0 = trailing edge up (nose up), rud>0 = right rudder, steer>0 = nose wheel left.
 const PARTS = {
   fuselage: { name: "Fuselage", group: "Major component", hl: ["fuselage", "fairing"], view: "iso", text: "The central body. Carries crew, passengers and cargo, and joins the wings and tail. Semimonocoque aluminum on the 172." },
@@ -37,6 +38,7 @@ const TOUR = [
 export function mount(host, opts = {}) {
   const { mode = "explore" } = opts;
   if (mode === "taxi") return taxiWind(host, opts);   // taxiing in wind: control positions on the same 3D airplane (AFH Ch 2)
+  if (mode === "walk") return walkaround(host, opts);   // walkaround stations with Spot the defect (AFH Ch 2)
   // Dimensions sit top-right on two lines, clear of the part title at bottom-left at every width.
   const SPEC = "Span 36 ft 1 in\nLength 27 ft 2 in".replace(/ /g, "\u00a0");   // each line stays whole on narrow phones
   const F = frame(host, { corners: { tl: "Cessna 172S", tr: SPEC } });
