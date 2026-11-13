@@ -148,6 +148,31 @@ export default {
     F("fw1-19", "fw1.sec", "sec", "Before pulling the mixture to stop the engine, you turn off:", ["Electrical equipment and the avionics", "The fuel selector", "The parking brake", "The control lock"], "Parking brake set, electrical equipment and avionics off, then mixture idle cutoff.", "C172S POH Sec 4"),
     F("fw1-20", "fw1.sec", "sec", "After the engine is shut down and switches are off, what goes on the controls?", ["The control lock", "The pitot cover", "Full nose-down trim", "Nothing"], "Install the control lock, and set the fuel selector to LEFT or RIGHT to prevent crossfeeding.", "C172S POH Sec 4"),
   ],
+  gl1: [
+    F("gl1x-27", "gl1.subs", "subs", "How do you work the 172S's brakes?", ["Press the tops of the rudder pedals (toe brakes)", "Pull a hand lever under the panel", "Push the yoke forward", "Pull the throttle back past idle"], "The 172S has hydraulic disc brakes on the main wheels, worked by the tops of the rudder pedals.", "PHAK Ch 3; C172S POH Sec 7"),
+    F("gl1x-28", "gl1.ground", "runup", "After landing, when should you do the after-landing checklist?", ["Once stopped beyond the runway holding position markings, unless the manufacturer says otherwise", "While still rolling on the runway", "On short final", "Only after shutdown"], "Clear the runway completely and stop before you start reconfiguring the airplane.", "AFH Ch 2"),
+    F("gl1x-29", "gl1.ground", "runup", "Why choose a run-up spot free of pebbles and debris?", ["The propeller can pick them up, and even small nicks become stress risers that can grow into cracks", "Debris makes the brakes overheat", "Pebbles affect the magneto check", "It keeps the windshield clean only"], "Prop nicks concentrate stress. A firm, clean surface protects the propeller.", "AFH Ch 2"),
+    F("gl1x-30", "gl1.ground", "runup", "Before raising the flaps after landing, you should:", ["Positively identify the flap switch", "Pull the mixture", "Turn off the master", "Retract the landing gear"], "In some airplanes the flap and gear switches are close together. Positively identify the flap switch before you move it.", "AFH Ch 2"),
+  ],
+  gl11: [
+    F("gl11-36", "gl11.course", "presolo", "Besides Parts 61 and 91 and the solo airport, the pre-solo knowledge test covers:", ["The flight characteristics and operating limitations of your make and model", "Instrument approach procedures", "Commercial pilot maneuvers", "Multiengine systems"], "The test covers the regulations, the solo airport's airspace and procedures, and your airplane's flight characteristics and limitations.", "14 CFR 61.87(b)"),
+  ],
+  gl13: [
+    F("gl13-41", "gl13.oat", "oat", "Before taxi, with the altimeter set to the current setting, it should read within:", ["75 ft of field elevation", "10 ft of field elevation", "200 ft of field elevation", "500 ft of field elevation"], "If the altimeter is more than 75 ft off field elevation with the correct setting, have it checked.", "PHAK Ch 8"),
+  ],
+  gl15: [
+    F("gl15-41", "gl15.land", "land", "On a night approach, when does the AFH suggest turning on the landing light?", ["About halfway down final", "On downwind", "Just before touchdown", "Only after landing"], "Turn the landing light on about halfway down final, then use its beam on the runway to judge the round out.", "AFH Ch 11"),
+  ],
+  gl16: [
+    F("gl16-42", "gl16.work", "work", "You notice you are task-saturated. The PHAK's fix is:", ["Stop, think, slow down and prioritize: aviate, navigate, communicate", "Work faster to catch up", "Focus on one task until it is done", "Turn off the radio and continue"], "Saturated decisions rest on incomplete information. Step back and put the essential tasks first.", "PHAK Ch 2"),
+  ],
+  gl17: [
+    F("gl17-52", "gl17.stress", "stress", "What cures acute fatigue?", ["Rest and about 8 hours of sound sleep", "Coffee", "A short walk around the airplane", "It needs a physician"], "Acute fatigue is short-term and is cured by rest and sound sleep. Chronic fatigue is the kind that needs a physician.", "PHAK Ch 17"),
+  ],
+  gl2: [
+    F("gl2-37", "gl2.inst", "gyro", "How often should you realign the heading indicator with the magnetic compass?", ["About every 15 minutes, in straight-and-level flight", "Once per flight, before takeoff only", "Every 2 hours", "Never; it doesn't drift"], "The heading indicator drifts from precession, so realign it about every 15 minutes in straight-and-level flight.", "PHAK Ch 8"),
+    F("gl2-38", "gl2.other", "airframe", "In the G1000 172S, which instruments back you up if a display fails?", ["Standby airspeed indicator, standby altimeter, vacuum standby attitude indicator and magnetic compass", "Only the magnetic compass", "The turn coordinator and VSI", "None; the second display is the only backup"], "The standby airspeed, altimeter, vacuum-driven attitude indicator and compass work without the displays.", "C172S NAV III POH Sec 7; PHAK Ch 8"),
+  ],
   mn1: [
     F("mn1-11", "mn1.reg", "reg", "In ATOMATOFLAMES, the T stands for:", ["Tachometer for each engine", "Transponder", "Turn coordinator", "Throttle"], "Airspeed indicator, Tachometer, Oil pressure gauge, and so on. A transponder is not on the day VFR list.", "14 CFR 91.205(b)"),
     F("mn1-12", "mn1.reg", "reg", "The two O's in ATOMATOFLAMES are:", ["Oil pressure gauge and oil temperature gauge (air-cooled engines)", "Outside air temperature and oxygen", "Oil quantity and overhead light", "Operating limitations and owner's manual"], "Oil pressure gauge, and an oil temperature gauge for each air-cooled engine.", "14 CFR 91.205(b)"),
@@ -191,6 +216,12 @@ export default {
     F("rg3-18", "rg3.alc", "alc", "The PHAK's IMSAFE checklist asks about alcohol in the last:", ["24 hours", "8 hours", "4 hours", "48 hours"], "The legal minimum is 8 hours bottle to throttle; IMSAFE looks back 24 hours because even one drink can impair skills.", "PHAK Ch 2"),
     F("rg3-19", "rg3.alt", "alt", "Away from congested areas, the minimum altitude (except for takeoff and landing) is:", ["500 ft above the surface", "1,000 ft above the highest obstacle", "200 ft above the surface", "1,500 ft AGL"], "Other than congested areas: 500 ft above the surface. Over open water or sparse areas, no closer than 500 ft to any person, vessel, vehicle or structure.", "14 CFR 91.119"),
     F("rg3-20", "rg3.eq", "eq", "Something on your airplane isn't working, and it isn't on the 91.205 lists. Before flying you need:", ["A legal way to fly without it: an approved MEL or the inoperative-equipment rules", "Nothing; only 91.205 items matter", "A new annual inspection", "Permission from ATC"], "An item off the 91.205 list may still be required. Use an approved MEL or the inoperative-equipment rules.", "14 CFR 91.213; ACS PA.I.B"),
+  ],
+  vs1: [
+    F("vs1-23", "vs1.mark", "dial", "What does VFE mean?", ["Maximum flap extended speed", "Best rate of climb speed", "Never-exceed speed", "Final approach speed"], "VFE is the maximum flap extended speed; VY is the best rate of climb. 14 CFR 1.2 defines the symbols.", "14 CFR 1.2"),
+    F("vs1-24", "vs1.mark", "dial", "The 172S POH stall chart gives about 40 KIAS with full flaps. In calibrated airspeed that is about:", ["48 KCAS", "40 KCAS", "33 KCAS", "60 KCAS"], "KIAS and KCAS differ most near the stall: 40 KIAS is about 48 KCAS. Fly the KIAS numbers.", "C172S POH Sec 5"),
+    F("vs1-25", "vs1.unmk", "approach", "If a manufacturer publishes no approach speed, the AFH says to use:", ["Not more than 1.3 VS0", "1.5 VS1", "VY", "VFE"], "Use the POH speed when there is one. Only when there's none, use not more than 1.3 VS0.", "AFH Ch 9"),
+    F("vs1-26", "vs1.unmk", "approach", "What is the 172S POH short-field approach speed with full flaps?", ["61 KIAS", "65 KIAS", "70 KIAS", "55 KIAS"], "Normal approaches are 60–70 KIAS with full flaps; the short-field approach is 61 KIAS.", "C172S POH Sec 4"),
   ],
   wx1: [
     F("wx1-13", "wx1.comp", "comp", "Runway 36, wind 030° at 20 kt. The crosswind component is about:", ["10 kt", "20 kt", "14 kt", "3 kt"], "The wind is 30° off the runway, and at 30° the crosswind is half the wind: 20 × 0.5 = 10 kt.", "PHAK Ch 16"),
