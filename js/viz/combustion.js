@@ -71,7 +71,7 @@ function cylModel() { const K = modelKit(THREE), root = K.root, cutMat = new THR
     const body = new THREE.CylinderGeometry(0.42, 0.42, 1.0, 6, 1, false, 0, Math.PI); body.rotateY(-Math.PI / 2); body.translate(pl.x, sg * (BR + 1.1), 0);
     const ins = new THREE.CylinderGeometry(0.22, 0.28, 1.2, 16, 1, false, 0, Math.PI); ins.rotateY(-Math.PI / 2); ins.translate(pl.x, sg * (BR + 2.2), 0);
     const thr = new THREE.CylinderGeometry(0.24, 0.24, 0.9, 12, 1, false, 0, Math.PI); thr.rotateY(-Math.PI / 2); thr.translate(pl.x, sg * (BR + 0.2), 0);
-    K.add("plug" + (sg > 0 ? 1 : 2), g, body, edges(body)); const im = new THREE.Mesh(ins, new THREE.MeshBasicMaterial({ color: 0xd9d6cc })); g.add(im); K.add("plug" + (sg > 0 ? 1 : 2), g, null, edges(ins, 40));
+    K.add("plug" + (sg > 0 ? 1 : 2), g, body, edges(body)); const im = new THREE.Mesh(ins, K.faceMat); g.add(im); K.add("plug" + (sg > 0 ? 1 : 2), g, null, edges(ins, 40));
     K.add("plug" + (sg > 0 ? 1 : 2), g, thr, [...edges(thr, 40), pl.x, sg * (BR - 0.25), 0, pl.x, sg * (BR - 0.42), 0, pl.x, sg * (BR - 0.42), 0, pl.x + 0.16, sg * (BR - 0.42), 0]); return g; });
   // piston: back-half skirt, crown, ring grooves, wrist pin; rod and crank
   const piston = new THREE.Group(); root.add(piston);
@@ -95,11 +95,11 @@ export function mount(host) {
   const F = frame(host, { cls: "capin sec3d cyl3d", corners: { tl: "Combustion", tr: "PHAK 7" } });
   const S = planeStage(F.stage, { model: cylModel, cg: [5, 0, 0], orbit: false, maxFps: 30, fov: 22, view: { tg: [5.5, 0, 0], az: 74, el: 16, d: 60, fov: 22 } });
   const M3 = S.P; S.renderer.localClippingEnabled = true;
-  // camera: slightly from the front and above the cut, framed to the whole cylinder, valve springs, plugs and crank
+  // camera: slightly from the front and above the cut; for detonation and preignition it glides square onto the cut so the chamber reads flat, framed to the whole cylinder, valve springs, plugs and crank
   const VZ = { az: 76, el: 14, fov: 22 }, FIT = [[-8.6, 0, 0], [-8.6, -1.6, 0], [0.35, BR + 2.85, 0], [0.35, -BR - 2.85, 0], [XC + 4.2, 0, -0.7], [XC, 4.2, -0.7], [XC, -4.2, -0.7], [BAR, BR + 1.3, 0], [BAR, -BR - 1.3, 0], [0, 0, -BR - 1.6]];
-  const band = () => { const sr = F.stage.getBoundingClientRect(); if (!sr.height) return; let b = 0; F.stage.querySelectorAll(".corner").forEach((c) => { if (c.textContent.trim()) b = Math.max(b, c.getBoundingClientRect().bottom - sr.top); }); S.setTopBand(b ? b + 4 : 0);
-    const Hh = Math.max(1, sr.height - (+F.stage.dataset.band || 0)); S.setView(fitView(THREE, FIT, VZ, sr.width / Hh, 0.84, 0.86), 1); lab.dirty = performance.now() + 400; S.kick(); };
-  const bro = new ResizeObserver(band); bro.observe(F.stage); F.on(() => bro.disconnect());
+  const band = (dur = 1) => { const sr = F.stage.getBoundingClientRect(); if (!sr.height) return; let b = 0; F.stage.querySelectorAll(".corner").forEach((c) => { if (c.textContent.trim()) b = Math.max(b, c.getBoundingClientRect().bottom - sr.top); }); S.setTopBand(b ? b + 4 : 0);
+    const Hh = Math.max(1, sr.height - (+F.stage.dataset.band || 0)); S.setView(fitView(THREE, FIT, VZ, sr.width / Hh, 0.84, 0.86), typeof dur === "number" ? dur : 1); lab.dirty = performance.now() + (typeof dur === "number" && dur > 1 ? dur + 200 : 400); S.kick(); };
+  const bro = new ResizeObserver(() => band()); bro.observe(F.stage); F.on(() => bro.disconnect());
   // part labels projected from the model into an SVG over the stage
   const lab = s("svg", { class: "full lab3d", role: "img" }, F.stage); let lg = s("g", {}, lab); lab.dirty = 0;
   function labels() { const W = F.stage.clientWidth, H = F.stage.clientHeight, ph = W < 520, k = fixed ? "normal" : kind; lab.setAttribute("viewBox", `0 0 ${W} ${H}`); lg.remove(); lg = s("g", {}, lab);
@@ -110,7 +110,7 @@ export function mount(host) {
   // strip under the stage: the cylinder-pressure trace
   const strip = h("div", { class: "vstrip" }); F.stage.after(strip); const sv = s("svg", { class: "full", role: "img" }, strip); let sg = s("g", {}, sv);
   const sro = new ResizeObserver(() => redraw()); sro.observe(strip); F.on(() => sro.disconnect());
-  const r0 = row(F.ctrl, "Burn"); const kc = chips(r0, [["normal", "Normal"], ["det", "Detonation"], ["pre", "Preignition"]], kind, (v) => { kind = v || "normal"; kc.set(kind); fixed = false; run(); }, { label: "Burn" });
+  const r0 = row(F.ctrl, "Burn"); const kc = chips(r0, [["normal", "Normal"], ["det", "Detonation"], ["pre", "Preignition"]], kind, (v) => { kind = v || "normal"; kc.set(kind); fixed = false; VZ.az = kind === "normal" ? 76 : 84; VZ.el = kind === "normal" ? 14 : 6; band(1400); run(); }, { label: "Burn" });
   const r1 = row(F.ctrl, "Respond"); const fg = h("div", { class: "chips", role: "group", "aria-label": "Respond" }); r1.append(fg);
   const fb = h("button", { class: "chip", type: "button" }, "–"), rb = h("button", { class: "chip", type: "button" }, "Run a cycle"); fg.append(fb, rb);
   fb.addEventListener("click", () => { if (kind !== "normal") { fixed = !fixed; run(); } }); rb.addEventListener("click", run);

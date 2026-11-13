@@ -37,9 +37,9 @@ function carbModel(THREE) { const K = modelKit(THREE), carb = new THREE.Group(),
   K.add("bowl", carb, bowl, bs);
   const fuelM = new THREE.Mesh(new THREE.BoxGeometry(B.x1 - B.x0 - 0.08, LEVEL - B.y1 - 0.04, B.z - 0.04), new THREE.MeshBasicMaterial({ color: 0x1b3a78, transparent: true, opacity: 0.85, depthWrite: false }));
   fuelM.position.set((B.x0 + B.x1) / 2, (LEVEL + B.y1) / 2, -B.z / 2); carb.add(fuelM);
-  // the float rides on the fuel: a light-gray hollow body, half submerged, with its hinge arm to the needle valve
+  // the float rides on the fuel: a hollow body (ink look), half submerged, with its hinge arm to the needle valve
   const fl = new THREE.BoxGeometry(0.8, 0.32, 0.6); fl.translate(B.x0 + 0.6, LEVEL + 0.05, -0.45);
-  const flo = new THREE.Mesh(fl, new THREE.MeshBasicMaterial({ color: 0x5b616c })); carb.add(flo);
+  const flo = new THREE.Mesh(fl, new THREE.MeshBasicMaterial({ color: 0x0d0d10 })); carb.add(flo);
   K.add("float", carb, null, [...Array.from(new THREE.EdgesGeometry(fl, 30).attributes.position.array), B.x0 + 1.0, LEVEL + 0.1, -0.02, B.x0 + 1.35, B.y0 - 0.12, -0.02]);
   const nz = new THREE.CylinderGeometry(0.07, 0.07, -0.1 - (B.y1 + 0.25), 10, 1, true); nz.translate(NZX, (-0.1 + B.y1 + 0.25) / 2, -0.12);
   K.add("nozzle", carb, nz, polySegs([[NZX, B.y1 + 0.25, -0.05], [NZX, -0.1, -0.05], [NZX - 0.12, 0.02, -0.05]]));
@@ -57,10 +57,10 @@ function carbModel(THREE) { const K = modelKit(THREE), carb = new THREE.Group(),
   const fsg = []; for (let k = -4; k <= 4; k++) { const y = (k / 4.6) * R0, zz = -Math.sqrt(Math.max(0, R0 * R0 - y * y)); fsg.push(-2.2, y, 0, -2.2, y, zz); } fsg.push(...polySegs(ring(-2.2, R0 - 0.02)));
   K.add("filter", inj, fg, fsg);
   const door = new THREE.Group(); door.position.set(-0.6, R0 + WT, -0.55); inj.add(door); const dr = new THREE.BoxGeometry(1.1, 0.06, 0.9); dr.translate(0.55, 0, 0);
-  const drm = new THREE.Mesh(dr, new THREE.MeshBasicMaterial({ color: 0x3a3f48 })); door.add(drm); K.add("door", door, null, Array.from(new THREE.EdgesGeometry(dr, 30).attributes.position.array));
+  const drm = new THREE.Mesh(dr, new THREE.MeshBasicMaterial({ color: 0x0d0d10 })); door.add(drm); K.add("door", door, null, Array.from(new THREE.EdgesGeometry(dr, 30).attributes.position.array));
   // fuel/air control unit: a block under the duct downstream of the filter, fuel lines out to the engine
   const fcu = new THREE.BoxGeometry(1.2, 0.8, 0.9); fcu.translate(2.0, -(R0 + WT) - 0.45, -0.45);
-  inj.add(new THREE.Mesh(fcu, new THREE.MeshBasicMaterial({ color: 0x2a2e35 }))); K.add("fcu", inj, null, [...Array.from(new THREE.EdgesGeometry(fcu, 30).attributes.position.array), 2.0, -(R0 + WT), -0.02, 2.0, -(R0 + WT) - 0.05, -0.02, 2.6, -(R0 + WT) - 0.45, -0.02, 3.3, -(R0 + WT) - 0.45, -0.02]);
+  inj.add(new THREE.Mesh(fcu, new THREE.MeshBasicMaterial({ color: 0x0d0d10 }))); K.add("fcu", inj, null, [...Array.from(new THREE.EdgesGeometry(fcu, 30).attributes.position.array), 2.0, -(R0 + WT), -0.02, 2.0, -(R0 + WT) - 0.05, -0.02, 2.6, -(R0 + WT) - 0.45, -0.02, 3.3, -(R0 + WT) - 0.45, -0.02]);
   return K.model({ carb, inj, valve, door, fuelM }); }
 export function mount(host) {
   let oat = 60, rh = 85, eng = "fp", pwr = "cruise", heat = false, filt = false, ice = 0, pen = 0, melt = 0;

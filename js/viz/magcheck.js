@@ -60,8 +60,9 @@ function engModel() { const K = modelKit(THREE), root = K.root;
   // magnetos on the accessory case: body, cap where the harness leaves
   const mags = {}; for (const [k, p] of Object.entries(MAG)) { const g = new THREE.Group(); g.position.set(...p); root.add(g); const b = new THREE.CylinderGeometry(1.45, 1.45, 3.2, 28); b.rotateZ(Math.PI / 2); mesh(b, black, g); const cap = new THREE.CylinderGeometry(1.25, 1.45, 0.9, 28); cap.rotateZ(Math.PI / 2); cap.translate(-2.0, 0, 0); mesh(cap, alu, g); mags[k] = g; }
   K.add("ref", root, null, []);
-  // light only the engine meshes; the stage stays black
-  const hemi = new THREE.HemisphereLight(0xf4f2ec, 0x15161a, 1.0), key = new THREE.DirectionalLight(0xffffff, 2.1), rim = new THREE.DirectionalLight(0xbfd0ff, 0.8); key.position.set(-10, 22, -14); rim.position.set(14, 6, 16); root.add(hemi, key, rim);
+  // Squawk School ink look: every engine part is a near-black face with thin ink edges (no lighting)
+  const ink = new THREE.LineBasicMaterial({ color: 0xf2f1ec, transparent: true, opacity: 0.42 }), ms = []; root.traverse((o) => { if (o.isMesh) ms.push(o); });
+  ms.forEach((o) => { o.material = K.faceMat; const e = new THREE.LineSegments(new THREE.EdgesGeometry(o.geometry, 24), ink); e.position.copy(o.position); e.rotation.copy(o.rotation); e.scale.copy(o.scale); o.parent.add(e); });
   return K.model({ plugs, mags }); }
 // Harness: each magneto's leads leave its cap as one bundle. The leads to the plugs on the magneto's own side run along a
 // low rail on that side; the leads to the other bank cross behind the accessory case (never over the crankcase) and run
@@ -76,19 +77,21 @@ export function mount(host) {
   F.root.dataset.live = "1";   // plugs flicker while the engine runs on screen; zero frames offscreen
   const S = planeStage(F.stage, { model: engModel, cg: [0, 0, 0], orbit: false, maxFps: 30, fov: 24, view: { tg: [-3, 1, 0], az: -148, el: 36, d: 70, fov: 24 } });
   const M3 = S.P;
+  // the camera glides to the part in question: cylinder 1 for a fouled plug, low behind the magnetos for a P-lead
+  const CAMS = { normal: [-158, 46], fouled: [-138, 58], nodrop: [-172, 22], dead: [-172, 30] };
   const VZ = { az: -158, el: 46, fov: 24 }, FIT = [[-20.5, 3.4, 0], [-20.5, 3.4, -1.5], [8, 0, 0], [-13, 7, 0], [-11.6, -1.2, 2.5], [-11.6, -1.2, -2.5]];
   for (const c of CYL) for (const dx of [-2.8, 2.8]) for (const y of [-3.4, 4.6]) FIT.push([c.x + dx, y, c.s * 13.1]);
-  const band = () => { const sr = F.stage.getBoundingClientRect(); if (!sr.height) return; let b = 0; F.stage.querySelectorAll(".corner").forEach((c) => { if (c.textContent.trim()) b = Math.max(b, c.getBoundingClientRect().bottom - sr.top); }); S.setTopBand(b ? b + 4 : 0);
-    const Hh = Math.max(1, sr.height - (+F.stage.dataset.band || 0)); S.setView(fitView(THREE, FIT, VZ, sr.width / Hh, 0.9, 0.84), 1); labDirty = performance.now() + 400; S.kick(); };
-  let labDirty = 0; const bro = new ResizeObserver(band); bro.observe(F.stage); F.on(() => bro.disconnect());
+  const band = (dur = 1) => { const sr = F.stage.getBoundingClientRect(); if (!sr.height) return; let b = 0; F.stage.querySelectorAll(".corner").forEach((c) => { if (c.textContent.trim()) b = Math.max(b, c.getBoundingClientRect().bottom - sr.top); }); S.setTopBand(b ? b + 4 : 0);
+    const Hh = Math.max(1, sr.height - (+F.stage.dataset.band || 0)); S.setView(fitView(THREE, FIT, VZ, sr.width / Hh, 0.9, 0.84), typeof dur === "number" ? dur : 1); labDirty = performance.now() + (typeof dur === "number" && dur > 1 ? dur + 200 : 400); S.kick(); };
+  let labDirty = 0; const bro = new ResizeObserver(() => band()); bro.observe(F.stage); F.on(() => bro.disconnect());
   // harness leads and P-leads as real 3D wires (depth-tested): gray insulation, glowing in the magneto's color while it fires
   const COLM = { r: 0x3b82f6, l: 0xf2f1ec }, wireG = (pts, r = 0.17) => new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pts.map((q) => new THREE.Vector3(...q)), false, "catmullrom", 0.2), 64, r, 8);
   const slots = { r: { up: 0, lo: 0 }, l: { up: 0, lo: 0 } };
-  const leads = M3.plugs.map((pl) => { const k = pl.mag, sl = slots[k][pl.up ? "up" : "lo"]++, mat = new THREE.MeshStandardMaterial({ color: 0x5c5f66, roughness: 0.6, emissive: 0x000000 });
+  const leads = M3.plugs.map((pl) => { const k = pl.mag, sl = slots[k][pl.up ? "up" : "lo"]++, mat = new THREE.MeshBasicMaterial({ color: 0x6b6e75 });
     const m = new THREE.Mesh(wireG(leadPts(k, pl, sl)), mat); M3.root.add(m); return { pl, mat }; });
   const pl2 = {}; for (const k of ["r", "l"]) { const a = [MAG[k][0] - 0.6, MAG[k][1] + 1.45, MAG[k][2]], c = KEYP[k]; const sm = k === "r" ? 1 : -1;
     const pts = [a, [a[0] - 1.2, a[1] + 0.9, a[2]], [a[0] - 3.6, c[1] + 0.6, c[2] + sm * 0.6], c];
-    const curve = new THREE.CatmullRomCurve3(pts.map((q) => new THREE.Vector3(...q))), mat = new THREE.MeshStandardMaterial({ color: 0x8a8d94, roughness: 0.55, emissive: 0x000000 });
+    const curve = new THREE.CatmullRomCurve3(pts.map((q) => new THREE.Vector3(...q))), mat = new THREE.MeshBasicMaterial({ color: 0x8a8d94 });
     const whole = new THREE.Mesh(new THREE.TubeGeometry(curve, 32, 0.13, 8), mat), cut = [0, 1].map((j) => { const pp = Array.from({ length: 9 }, (_, i) => curve.getPoint(j ? 0.62 + 0.38 * (i / 8) : 0.5 * (i / 8))); return new THREE.Mesh(new THREE.TubeGeometry(new THREE.CatmullRomCurve3(pp), 16, 0.13, 8), mat); });
     const ends = [0.5, 0.62].map((u) => { const e = new THREE.Mesh(new THREE.SphereGeometry(0.24, 12, 8), new THREE.MeshBasicMaterial({ color: 0xe0503e })); e.position.copy(curve.getPoint(u)); return e; });
     M3.root.add(whole, ...cut, ...ends); pl2[k] = { mat, whole, cut, ends, mid: curve.getPoint(0.56).toArray(), end: c }; }
@@ -103,7 +106,7 @@ export function mount(host) {
     at([MAG.r[0] - 1, MAG.r[1] - 1.6, MAG.r[2] + 1.6], ph ? "right mag" : "right magneto", { dy: 14, anchor: "start", dx: 2, fill: f.r && live ? ACC : GRAY, w: 600 });
     at([MAG.l[0] - 1, MAG.l[1] - 1.6, MAG.l[2] - 1.6], ph ? "left mag" : "left magneto", { dy: 14, anchor: "end", dx: -2, fill: f.l && live ? INK : GRAY, w: 600 });
     at([KEYP.l[0], KEYP.l[1], 0], ph ? "P-leads to key" : "P-leads to the key", { dy: 16, fill: GRAY });
-    for (const c of CYL) { const e = at([c.x, 4.2, c.s * 12.4], "cyl " + c.n + (Fa.rough && c.n === 1 ? " · fouled plug" : ""), { dy: -8, fill: Fa.rough && c.n === 1 ? COL.yellow : INK, w: 600 }); e.setAttribute("font-size", "12"); e.setAttribute("stroke", "#000"); e.setAttribute("stroke-width", "3"); e.setAttribute("paint-order", "stroke"); }
+    for (const c of CYL) { const e = at([c.x, 4.2, c.s * 12.4], "cyl " + c.n + (Fa.rough && c.n === 1 ? " fouled" : ""), { dy: -8, fill: Fa.rough && c.n === 1 ? COL.yellow : INK, w: 600 }); e.setAttribute("font-size", "12"); e.setAttribute("stroke", "#000"); e.setAttribute("stroke-width", "3"); e.setAttribute("paint-order", "stroke"); }
     if (crank > 0) at([8.4, 0.8, 0], "starter cranking", { dy: -22, fill: ACC, w: 600 });
     if (Fa.hot) at([KEYP.l[0], KEYP.l[1], 0], (Fa.hot === "L" ? "left" : "right") + " P-lead broken", { dy: 31, fill: COL.red }); }
   // which plugs fire: flicker in firing order 1-3-2-4 while running or cranking
@@ -111,7 +114,7 @@ export function mount(host) {
   function scene3d(now = performance.now()) { const f = shown(), Fa = FAULT[fault], live = (running && rpm > 150) || crank > 0, rate = crank > 0 ? 1.2 : 2.6;
     const cur = ORDER[Math.floor(((now / 1000) * rate * 4) % 4)];
     leads.forEach(({ pl, mat }, i) => { const on = live && f[pl.mag], fouled = Fa.rough && pl.c.n === 1 && pl.up, pulse = on && pl.c.n === cur && !reduced();
-      mat.emissive.set(on ? COLM[pl.mag] : 0x000000); mat.emissiveIntensity = on ? (pulse ? 1.4 : 0.55) : 0; mat.color.set(on ? 0x2a2c31 : 0x5c5f66); flashes[i].material.opacity = on && !fouled && (pulse || reduced()) ? (reduced() ? 0.6 : 0.9) : 0; });
+      mat.color.set(on ? COLM[pl.mag] : 0x6b6e75); if (on && !pulse) mat.color.multiplyScalar(0.62); flashes[i].material.opacity = on && !fouled && (pulse || reduced()) ? (reduced() ? 0.6 : 0.9) : 0; });
     const hot = (Fa.hot || "").toLowerCase();
     for (const k of ["r", "l"]) { const q = pl2[k], grounded = !f[k] && pos !== "START", br = k === hot; q.whole.visible = !br; q.cut.forEach((m) => (m.visible = br)); q.ends.forEach((m) => (m.visible = br));
       q.mat.color.set(grounded ? 0xb9bcc3 : 0x55575d); }
@@ -121,7 +124,7 @@ export function mount(host) {
   const strip = h("div", { class: "vstrip" }); F.stage.after(strip); const sv = s("svg", { class: "full", role: "img" }, strip); let sg = s("g", {}, sv);
   const sro = new ResizeObserver(() => redraw()); sro.observe(strip); F.on(() => sro.disconnect());
   const rk = row(F.ctrl, "Key"); const keyC = chips(rk, POS.map((p) => [p, p]), pos, (p) => setPos(p || pos), { label: "Key" });
-  const rf = row(F.ctrl, "Case"); chips(rf, Object.entries(FAULT).map(([k, v]) => [k, v.name]), fault, (k) => { fault = k || "normal"; log = {}; running = true; setPos("BOTH"); }, { label: "Case" });
+  const rf = row(F.ctrl, "Case"); chips(rf, Object.entries(FAULT).map(([k, v]) => [k, v.name]), fault, (k) => { fault = k || "normal"; log = {}; running = true; const cv = CAMS[fault] || CAMS.normal; VZ.az = cv[0]; VZ.el = cv[1]; band(1400); setPos("BOTH"); }, { label: "Case" });
   let tach = null;
   const A = anim(F, (dt) => { let m1 = false, m2 = false; if (crank > 0) { crank -= dt; m1 = true; if (crank <= 0) { running = true; pos = "BOTH"; keyC.set(pos); redraw(); } }
     [rpm, m2] = toward(rpm, target(), 3.2, dt, 0.5); if (running && rpm < 200 && target() === 0) { running = false; redraw(); } tach && tach.set(rpm); return m1 || m2; });
