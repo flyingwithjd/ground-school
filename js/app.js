@@ -14,6 +14,7 @@ const routes = [
   [/^#\/presolo$/, () => pages.presolo(main), "tools"],
   [/^#\/check\/(s[1-4])(?:\/(written|oral))?$/, (m) => pages.check(main, m[1], m[2]), "tools"],
   [/^#\/review$/, () => pages.review(main), "review"],
+  [/^#\/blindspots$/, () => pages.blindspots(main), "map"],
   [/^#\/practice\/([\w-]+)$/, (m) => pages.practice(main, m[1]), "review"],
   [/^#\/drill\/([\w.-]+)$/, (m) => pages.drill(main, m[1]), "map"],
   [/^#\/map$/, () => pages.map(main), "map"],

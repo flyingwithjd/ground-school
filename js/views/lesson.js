@@ -2,9 +2,10 @@ import { h, esc, pct } from "../core/util.js?v=0686b2b498";
 import { S, save, lessonState } from "../core/store.js?v=0686b2b498";
 import { LESSONS, lessonItems } from "../../data/index.js?v=0686b2b498";
 import { lessonStats, buildQueue } from "../core/progress.js?v=0686b2b498";
+import { get } from "../core/srs.js?v=0686b2b498";
 import { rich, autoTerms } from "../core/rich.js?v=0686b2b498";
 import { mountViz, destroyAll } from "../viz/index.js?v=0686b2b498";
-import { session } from "./quiz.js?v=0686b2b498";
+import { practiceSet, allLabel } from "./quiz.js?v=0686b2b498";
 const KIND = { ground: "Ground lesson", flight: "Flight lesson briefing", module: "Module unit" };
 export function lessonView(host, id, secIdx) {
   const L0 = LESSONS[id]; const p = h("div", { class: "page" }); host.append(p);
@@ -73,10 +74,15 @@ function build(p, L, id, secIdx) {
     ${P.note ? `<div class="note cfi">${rich(P.note)}</div>` : ""}<h3 class="mt2">Your debrief notes</h3><p class="dim" style="font-size:16px">Saved only on this device. Write what went well, what to fix, and what your instructor said.</p>`;
     const ta = h("textarea", { "aria-label": "Debrief notes" }); ta.value = S().notes[id] || ""; ta.oninput = () => { S().notes[id] = ta.value; save(); }; sec.append(ta); }
   function checkYourself(sec) { const ids = lessonItems(id, { oral: false, deep: !L.includes ? true : false });
-    const { queue, extra, dueCount, newCount } = buildQueue(ids, { max: 20 });
-    sec.innerHTML = `<span class="label">Check yourself</span><h2>Answer, then trust the schedule</h2><p class="dim mt" style="max-width:48rem">${ids.length} questions in this ${L.includes ? "lesson (the Airport units have their own sets)" : "lesson"}. This session: ${Math.min(queue.length, 20)} (${dueCount} due, ${Math.max(0, queue.length - dueCount)} new). Missed questions come back within minutes; the rest return on a spaced schedule.</p>`;
-    const go2 = h("button", { class: "btn pri arrow", type: "button" }, queue.length ? "Start" : "Practice ahead"); const box = h("div", { class: "mt" }); const bt = h("div", { class: "btns mt" }, go2); if ((L.oral || []).length) bt.append(h("a", { class: "btn", href: `#/oral/${id}` }, `Oral questions · ${L.oral.length}`)); sec.append(bt, box);
-    go2.onclick = () => { bt.remove(); sec.querySelector("p").remove(); sess = session(box, { queue: queue.length ? queue : extra.slice(0, 10), extra: queue.length ? extra : extra.slice(10), mode: queue.length ? "learn" : "ahead", title: L.code, label: `${L.code} · ${L.title}`, onExit: () => (location.hash = L.module ? "#/module/" + L.module : "#/course") }); }; }
+    const { queue, dueCount, blindCount } = buildQueue(ids, { max: 20, blindMax: 3 }); const answered = ids.filter((q) => get(q) && get(q).n).length; const nNew = Math.max(0, queue.length - dueCount - blindCount);
+    const parts = [dueCount && `${dueCount} due`, nNew && `${nNew} new`, blindCount && `${blindCount} blind spot${blindCount > 1 ? "s" : ""}`].filter(Boolean).join(", ");
+    sec.innerHTML = `<span class="label">Check yourself</span><h2>Answer, then trust the schedule</h2><p class="dim mt" style="max-width:48rem">${ids.length} questions${L.includes ? " (the units have their own sets)" : ""} · ${answered} answered · readiness ${pct(lessonStats(id).readiness)}.${queue.length ? ` This session: ${queue.length} (${parts}).` : " Nothing is due here right now."} A miss comes back 12 hours later as a blind spot.</p>`;
+    const go2 = h("button", { class: "btn pri arrow", type: "button" }, queue.length ? "Start" : "Keep going");
+    const allB = h("button", { class: "btn", type: "button" }, allLabel(id, ids.length));
+    const box = h("div", { class: "mt" }); const bt = h("div", { class: "btns mt" }, go2, allB); if ((L.oral || []).length) bt.append(h("a", { class: "btn", href: `#/oral/${id}` }, `Oral questions · ${L.oral.length}`)); sec.append(bt, box);
+    const begin = (all) => { bt.remove(); sec.querySelector("p").remove(); sec.parentNode && sec.parentNode.querySelectorAll(".secnav").forEach((n) => n.remove());
+      sess = practiceSet(box, { ids, key: id, all, title: L.code, label: `${L.code} · ${L.title}`, onExit: () => (location.hash = L.module ? "#/module/" + L.module : "#/course") }); };
+    go2.onclick = () => begin(false); allB.onclick = () => begin(true); }
   render();
   return { destroy() { sess && sess.destroy && sess.destroy(); } };
 }

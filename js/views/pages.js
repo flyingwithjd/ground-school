@@ -3,8 +3,8 @@ import { S, save, exportJSON, importJSON, reset } from "../core/store.js?v=0686b
 import { get } from "../core/srs.js?v=0686b2b498";
 import { STAGES, MODULES, STAGE_CHECK } from "../../data/course.js?v=0686b2b498";
 import { LESSONS, QUESTIONS, ORAL, TOPICS, ORDER, lessonItems } from "../../data/index.js?v=0686b2b498";
-import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone } from "../core/progress.js?v=0686b2b498";
-import { session } from "./quiz.js?v=0686b2b498";
+import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone, blindList } from "../core/progress.js?v=0686b2b498";
+import { session, practiceSet } from "./quiz.js?v=0686b2b498";
 import { G, rich } from "../core/rich.js?v=0686b2b498";
 const page = (host) => { const p = h("div", { class: "page" }); host.append(p); return p; };
 const meter = (x, big) => `<div class="meter${big ? " big" : ""}"><i style="width:${Math.round(x * 100)}%"></i></div>`;
@@ -29,17 +29,24 @@ export function home(host) {
   }
   p.innerHTML = `<section class="hero"><span class="label">${esc(CS.title)} · ${esc(CS.sub)}</span><h1>What to work on now</h1>
   <p>Reviews that are due come first, then the areas you are weakest in, then new material.</p></section>`;
-  const g = h("div", { class: "grid g3" }); p.append(g);
-  g.innerHTML = `<a class="cell" href="#/review"><span class="label">Due for review</span><div class="num">${due.length}<small>${due.length === 1 ? "item" : "items"}</small></div><p>${due.length ? "Answer these before they fade. Misses come back within minutes." : isFinite(nextDue()) ? `Nothing due. Next review ${fmtDue(nextDue())}.` : "Nothing scheduled yet. Start a lesson and answer its questions."}</p><span class="go btn ${due.length ? "pri" : ""} arrow">${due.length ? "Start review" : "Open review"}</span></a>
-  ${weak.length ? `<a class="cell" href="#/drill/${weak[0].t.id}"><span class="label">Weakest area</span><h3>${esc(weak[0].t.title)}</h3><p>${{ over: "You answered certain and were wrong here. Fix this first.", weak: "Recent accuracy is low or items keep slipping.", fading: "You knew this, but reviews are overdue.", building: "Still early. A few more spaced reviews will lock it in." }[weak[0].c]} ${LESSONS[weak[0].t.lesson].code}.</p>${meter(weak[0].st.readiness)}<span class="go btn arrow">Drill it</span></a>`
-  : `<a class="cell" href="#/map"><span class="label">Weakest area</span><h3>Not enough answers yet</h3><p>After you answer some questions, your weakest topics show up here automatically.</p><span class="go btn arrow">Blind-spot map</span></a>`}
-  ${L ? `<a class="cell" href="#/lesson/${L.id}"><span class="label">Next lesson · ${esc(L.code)}</span><h3>${esc(L.title)}</h3><p>${esc(L.short || "")}</p><span class="go btn ${due.length ? "" : "pri"} arrow">${S().lessons[L.id] ? "Continue" : "Begin"}</span></a>` : `<a class="cell" href="#/check/s4"><span class="label">Next</span><h3>End-of-course exam</h3><p>Every lesson is read. Take the mixed written and oral exam.</p><span class="go btn pri arrow">Start</span></a>`}`;
+  // Cards appear only when they have something in them. The first card's button is the primary one.
+  const open = blindList(); const ready = blindList({ ready: true }); const cells = [];
+  const openSet = new Set(open); const dueOther = due.filter((id) => !openSet.has(id));   // ready blind spots are counted on their own card
+  const nextBlind = () => Math.min(...open.map((id) => (get(id) ? get(id).due : Infinity)));
+  if (open.length) cells.push((pri) => `<a class="cell" href="#/blindspots" id="blind-card"><span class="label">Blind spots</span><div class="num">${open.length}<small>${open.length === 1 ? "question" : "questions"}</small></div><p>${ready.length ? `Questions you missed, back for another try. ${ready.length === open.length ? "All ready now." : `${ready.length} ready now.`}` : `Questions you missed. The next one is back ${fmtDue(nextBlind())}.`}</p><span class="go btn ${pri ? "pri" : ""} arrow">${ready.length ? "Review blind spots" : "Open blind spots"}</span></a>`);
+  if (dueOther.length) cells.push((pri) => `<a class="cell" href="#/review"><span class="label">Due for review</span><div class="num">${dueOther.length}<small>${dueOther.length === 1 ? "item" : "items"}</small></div><p>Answer these before they fade.</p><span class="go btn ${pri ? "pri" : ""} arrow">Start review</span></a>`);
+  if (weak.length) cells.push((pri) => `<a class="cell" href="#/drill/${weak[0].t.id}"><span class="label">Weakest area</span><h3>${esc(weak[0].t.title)}</h3><p>${{ over: "You answered certain and were wrong here. Fix this first.", weak: "Recent accuracy is low or items keep slipping.", fading: "You knew this, but reviews are overdue.", building: "Still early. A few more spaced reviews will lock it in." }[weak[0].c]} ${LESSONS[weak[0].t.lesson].code}.</p>${meter(weak[0].st.readiness)}<span class="go btn ${pri ? "pri" : ""} arrow">Drill it</span></a>`);
+  cells.push((pri) => L ? `<a class="cell" href="#/lesson/${L.id}"><span class="label">Next lesson · ${esc(L.code)}</span><h3>${esc(L.title)}</h3><p>${esc(L.short || "")}</p><span class="go btn ${pri ? "pri" : ""} arrow">${S().lessons[L.id] ? "Continue" : "Begin"}</span></a>` : `<a class="cell" href="#/check/s4"><span class="label">Next</span><h3>End-of-course exam</h3><p>Every lesson is read. Take the mixed written and oral exam.</p><span class="go btn ${pri ? "pri" : ""} arrow">Start</span></a>`);
+  // primary: ready blind spots, else due reviews, else the next lesson
+  const priAt = open.length && ready.length ? 0 : dueOther.length ? (open.length ? 1 : 0) : cells.length - 1;
+  const g = h("div", { class: "grid " + (cells.length === 3 ? "g3" : cells.length === 1 ? "" : "g2") }); p.append(g);
+  g.innerHTML = cells.map((c, k) => c(k === priAt)).join("");
   const r = h("section", { class: "section-gap" }); p.append(r);
   r.innerHTML = `<div class="list-head"><span class="label">${esc(CS.title)} readiness</span><span class="pct">${pct(st.readiness)}</span></div>${meter(st.readiness, true)}
   <div class="grid g3 mt"><div class="cell"><span class="label">Seen</span><div class="num">${st.seen}<small>of ${st.total}</small></div><p>Questions and oral items you have answered at least once.</p></div>
   <div class="cell"><span class="label">Mastered</span><div class="num">${st.mastered}</div><p>Recalled correctly across spaced reviews until the next review is three weeks or more away.</p></div>
-  <a class="cell" href="#/map"><span class="label">Certain but wrong</span><div class="num">${st.over}</div><p>Answers you marked certain that were wrong. These are the dangerous ones.</p><span class="go btn ghost arrow" style="padding:0">Blind spots</span></a></div>
-  <p class="dim mt" style="font-size:15px">Readiness estimates how much of this stage you would recall right now. It counts unseen items as zero and decays as reviews come due. <a href="#/coverage">Syllabus checklist</a></p>`;
+  <a class="cell" href="#/map"><span class="label">Certain but wrong</span><div class="num">${st.over}</div><p>Open blind spots you had marked Certain. These are the dangerous ones.</p><span class="go btn ghost arrow" style="padding:0">Blind spots</span></a></div>
+  <p class="dim mt" style="font-size:15px">Readiness counts each question by your latest answer: Certain and correct counts fully, Fairly sure counts half, and a guess, a miss or an unseen question counts zero. <a href="#/coverage">Syllabus checklist</a></p>`;
   p.insertAdjacentHTML("beforeend", foot());
 }
 function row(L) { const st = lessonStats(L.id); const done = lessonDone(L.id);
@@ -65,17 +72,22 @@ export function moduleView(host, id) { const m = MODULES.find((x) => x.id === id
 function runSession(host, opts) { const p = page(host); const s = session(p, { ...opts, onExit: opts.onExit || (() => history.length > 1 ? history.back() : (location.hash = "#/")) }); return s; }
 export function review(host) { const due = dueIds(); const pool = allCourseIds();
   const seen = pool.filter((id) => get(id) && get(id).n).sort((a, b) => (get(a).ivl - get(b).ivl));
-  return runSession(host, { queue: due.slice(0, 25), extra: seen, mode: "review", title: "Review", label: `Review · ${due.length} due`, intro: due.length ? "" : (seen.length ? `Nothing is due. Next review ${fmtDue(nextDue())}. You can practice ahead; correct early answers will not stretch your schedule.` : "Nothing is scheduled yet. Open a lesson and answer its questions to start your review schedule."), onExit: () => (location.hash = "#/") }); }
+  const b = new Set(blindList({ ready: true })); const queue = [...due.filter((id) => b.has(id)).slice(0, 10), ...due.filter((id) => !b.has(id))].slice(0, 25);
+  return runSession(host, { queue, more: (ex) => [...due, ...seen].filter((id) => !ex.has(id)).slice(0, 10), mode: "review", title: "Review", label: `Review · ${due.length} due`, intro: due.length ? "" : (seen.length ? `Next review ${fmtDue(nextDue())}. You can keep going ahead of schedule; early correct answers do not stretch your schedule.` : "Nothing is scheduled yet. Open a lesson and answer its questions to start your review schedule."), onExit: () => (location.hash = "#/") }); }
+// Every open blind spot whose 12-hour wait is over, Certain misses first.
+export function blindspots(host) { const open = blindList(); const ready = () => blindList({ ready: true });
+  const next = Math.min(...open.map((id) => (get(id) ? get(id).due : Infinity)));
+  return runSession(host, { queue: ready().slice(0, 25), more: (ex) => ready().filter((id) => !ex.has(id)).slice(0, 10), mode: "review", title: "Blind spots", label: `Blind spots · ${open.length}`,
+    intro: open.length ? `Your ${open.length} blind spot${open.length > 1 ? "s are" : " is"} waiting out the 12 hours. The next one is back ${fmtDue(next)}.` : "No blind spots right now. A question you miss lands here and comes back 12 hours later.", onExit: () => (location.hash = "#/") }); }
 export function practice(host, id) {
   let ids, title;
-  if (id.startsWith("mod-")) { const m = MODULES.find((x) => "mod-" + x.id === id); ids = m.units.flatMap((u) => lessonItems(u, { oral: false })); title = m.title; }
-  else { const L = LESSONS[id]; ids = lessonItems(id, { oral: false }); title = `${L.code} · ${L.title}`; }
-  const { queue, extra } = buildQueue(ids, { max: 20 });
-  return runSession(host, { queue, extra, mode: "learn", title, label: title, onExit: () => (location.hash = id.startsWith("mod-") ? "#/module/" + id.slice(4) : "#/lesson/" + id) }); }
+  if (id.startsWith("mod-")) { const m = MODULES.find((x) => "mod-" + x.id === id); if (!m) return; ids = m.units.flatMap((u) => lessonItems(u, { oral: false })); title = m.title; }
+  else { const L = LESSONS[id]; if (!L) return; ids = lessonItems(id, { oral: false, deep: !L.includes }); title = `${L.code} · ${L.title}`; }
+  const p = page(host); return practiceSet(p, { ids, key: id, title, label: title, onExit: () => (location.hash = id.startsWith("mod-") ? "#/module/" + id.slice(4) : "#/lesson/" + id) }); }
 export function drill(host, tid) { const t = TOPICS[tid]; const ids = topicList().find((x) => x.id === tid)?.ids || [];
   const sorted = ids.slice().sort((a, b) => { const A = get(a), B = get(b); return (A ? A.ivl : -1) - (B ? B.ivl : -1); });
   const due = sorted.filter((id) => !get(id) || !get(id).n || get(id).due <= Date.now() || get(id).reps === 0);
-  return runSession(host, { queue: (due.length ? due : sorted).slice(0, 15), extra: [], mode: due.length ? "learn" : "ahead", title: t ? t.title : "Drill", label: `Drill · ${t ? t.title : ""}`, onExit: () => (location.hash = "#/map") }); }
+  return runSession(host, { queue: (due.length ? due : sorted).slice(0, 15), more: (ex) => sorted.filter((id) => !ex.has(id) && !ORAL[id]).slice(0, 10), mode: due.length ? "learn" : "ahead", title: t ? t.title : "Drill", label: `Drill · ${t ? t.title : ""}`, onExit: () => (location.hash = "#/map") }); }
 export function map(host) {
   const p = page(host); const tl = topicList().filter((t) => LESSONS[t.lesson]); const rows = tl.map((t) => { const st = stats(t.ids); return { t, st, c: classify(t, st) }; });
   const by = (c) => rows.filter((r) => r.c === c);
@@ -83,6 +95,7 @@ export function map(host) {
   const block = (title, sub, list) => list.length ? `<section class="section-gap"><div class="list-head"><span class="label">${title}</span><span class="pct">${list.length}</span></div><p class="dim" style="font-size:15.5px;margin:12px 0 18px">${sub}</p><div class="heat">${list.map(tile).join("")}</div></section>` : "";
   const any = rows.some((r) => r.st.seen);
   p.innerHTML = `<section class="hero"><span class="label">Blind-spot map</span><h1>Where you are weak</h1><p>Every topic in the course, sorted by what needs you most. A topic is weak when recent answers are mostly wrong or items keep slipping. Certain-but-wrong means you tapped certain and missed it, which is the most dangerous kind of gap in an airplane.</p></section>
+  ${blindList().length ? `<div class="card" id="blind-open"><div class="list-head" style="margin:0"><span class="label">Open blind spots</span><span class="pct">${blindList().length}</span></div><p class="dim mt" style="font-size:16px">Questions you missed. Each comes back 12 hours after the miss and clears after a few correct answers on different days.</p><div class="btns mt"><a class="btn pri arrow" href="#/blindspots">Review blind spots</a></div></div>` : ""}
   ${any ? "" : `<div class="card"><h3>No answers yet.</h3><p class="dim mt">Answer a few questions in any lesson and this map fills in. Tap "How sure are you?" honestly; it is how the map finds overconfidence.</p></div>`}
   ${block("Certain but wrong", "You were sure and you were wrong. Drill these first.", by("over"))}
   ${block("Weak", "Low recent accuracy or repeated lapses.", by("weak"))}
@@ -120,7 +133,7 @@ export function glossary(host, focus) { const p = page(host); const keys = Objec
   if (focus) { const row = list.querySelector(`#g-${CSS.escape(slug(focus.toLowerCase()))}`); if (row) { row.classList.add("hit"); setTimeout(() => row.scrollIntoView({ block: "start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }), 60); } } }
 export function settings(host) { const p = page(host); const st = S();
   p.innerHTML = `<section class="hero"><span class="label">Progress and settings</span><h1>Your data, your device</h1><p>Nothing leaves this browser. No account, no server. Clearing site data erases progress, so export a backup now and then.</p></section>`;
-  const c1 = h("div", { class: "card" }); c1.innerHTML = `<span class="label">Confidence check</span><p class="dim mt" style="font-size:16px">After you pick an answer, tap how sure you are. Guessed-right answers return sooner; certain-but-wrong answers are flagged as blind spots.</p>`;
+  const c1 = h("div", { class: "card" }); c1.innerHTML = `<span class="label">Confidence check</span><p class="dim mt" style="font-size:16px">After you pick an answer, tap how sure you are. A correct guess comes back in 12 hours like a miss, and only Certain and correct answers count fully toward readiness. With this off, a correct answer counts as Fairly sure.</p>`;
   const ch = h("div", { class: "chips mt" }); [["on", "On"], ["off", "Off"]].forEach(([v, t]) => { const b = h("button", { class: "chip" + ((st.settings.confidence ? "on" : "off") === v ? " on" : ""), type: "button" }, t); b.onclick = () => { st.settings.confidence = v === "on"; save(); ch.querySelectorAll(".chip").forEach((x) => x.classList.toggle("on", x === b)); }; ch.append(b); }); c1.append(ch);
   const c2 = h("div", { class: "card" }); c2.innerHTML = `<span class="label">New questions per session</span><p class="dim mt" style="font-size:16px">How many never-seen questions a practice session adds after due reviews.</p>`;
   const ch2 = h("div", { class: "chips mt" }); [6, 12, 20].forEach((n) => { const b = h("button", { class: "chip" + (st.settings.newPerSession === n ? " on" : ""), type: "button" }, String(n)); b.onclick = () => { st.settings.newPerSession = n; save(); ch2.querySelectorAll(".chip").forEach((x) => x.classList.toggle("on", x === b)); }; ch2.append(b); }); c2.append(ch2);
@@ -130,7 +143,7 @@ export function settings(host) { const p = page(host); const st = S();
   file.onchange = async () => { const f = file.files[0]; if (!f) return; try { const t = await f.text(); if (!confirm("Replace the progress in this browser with the file's progress?")) return; importJSON(t); toast("Progress imported."); location.hash = "#/"; } catch (e) { toast(e.message || "Import failed."); } };
   const rs = h("button", { class: "btn ghost", type: "button" }, "Reset everything"); rs.onclick = () => { if (confirm("Erase all progress in this browser? Export first if you want a backup.")) { reset(); toast("Progress erased."); location.hash = "#/"; } };
   c3.append(h("div", { class: "btns mt" }, ex, im, rs, file));
-  p.append(c1, c2, c3); p.insertAdjacentHTML("beforeend", `<div class="card"><span class="label">How review scheduling works</span><div class="prose mt" style="font-size:16px"><p>Each question has its own schedule (a variant of the SM-2 spaced repetition algorithm). A miss resets it: the question returns in about 10 minutes and again later in the same session. A correct answer pushes it out to 1 day, then 3 days, then longer intervals that grow with how easily you recall it. A correct guess grows the interval less.</p><p>An item counts as mastered only when its next review is three weeks or more away, which takes several correct answers spread over days. Readiness estimates the chance you would recall each item right now; it decays between reviews.</p></div></div>`);
+  p.append(c1, c2, c3); p.insertAdjacentHTML("beforeend", `<div class="card"><span class="label">How review scheduling works</span><div class="prose mt" style="font-size:16px"><p>Each question has its own schedule (a variant of the SM-2 spaced repetition algorithm). A question is never repeated in the same session. A miss resets its schedule and brings it back 12 hours later as a blind spot; a correct guess also comes back in 12 hours. A correct answer pushes it out to 1 day, then 3 days, then longer intervals that grow with how easily you recall it.</p><p>Blind spots also come back inside later lessons' sessions, up to 3 at a time. One clears after correct answers on two different days, or three if you had marked it Certain.</p><p>Readiness counts each question by your latest answer: Certain and correct counts 100%, Fairly sure and correct 50%, a guess or a miss 0%. A lesson reaches 100% only when every question has been answered Certain and correct. An item counts as mastered only when its next review is three weeks or more away and its latest answer was Certain.</p></div></div>`);
   p.insertAdjacentHTML("beforeend", foot()); }
 export function about(host) { const p = page(host);
   p.innerHTML = `<section class="hero"><span class="label">About Squawk School</span><h1>Sources and licenses</h1><p>Squawk School is private pilot ground school you can study anywhere: every lesson, visual and check below is built from the FAA sources listed here.</p></section><div class="prose">

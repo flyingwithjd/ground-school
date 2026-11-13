@@ -1,6 +1,6 @@
 // Local-only persistence. One key, versioned. No network.
 const KEY = "ppg.v1";
-const blank = () => ({ v: 1, created: Date.now(), items: {}, lessons: {}, notes: {}, sims: [], settings: { confidence: true, newPerSession: 12 } });
+const blank = () => ({ v: 1, created: Date.now(), items: {}, lessons: {}, notes: {}, sims: [], blind: {}, settings: { confidence: true, newPerSession: 12 } });
 let state = load();
 function load() {
   try { const s = JSON.parse(localStorage.getItem(KEY)); if (s && s.v === 1) return { ...blank(), ...s, settings: { ...blank().settings, ...(s.settings || {}) } }; } catch (e) {}
@@ -16,7 +16,9 @@ export function exportJSON() { return JSON.stringify({ app: "private-pilot-groun
 export function importJSON(text) {
   const o = JSON.parse(text); const s = o && o.state ? o.state : o;
   if (!s || s.v !== 1 || typeof s.items !== "object") throw new Error("This file is not a progress export from this app.");
-  state = { ...blank(), ...s, settings: { ...blank().settings, ...(s.settings || {}) } }; save(true);
+  state = { ...blank(), ...s, settings: { ...blank().settings, ...(s.settings || {}) } }; migs.forEach((fn) => { try { fn(state); } catch (e) { console.warn("migration failed", e); } }); save(true);
 }
-export function reset() { state = blank(); save(true); }
+export function reset() { state = blank(); state.blindInit = 1; save(true); }
+// Additive migrations registered by other modules; each runs on the loaded state now and after every import.
+const migs = []; export function migrate(fn) { migs.push(fn); try { fn(state); } catch (e) { console.warn("migration failed", e); } }
 window.addEventListener("pagehide", () => save(true));

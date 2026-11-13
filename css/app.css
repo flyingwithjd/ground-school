@@ -218,6 +218,15 @@ svg text:not([font-family]) { font-family: var(--mono); }
 .verdict { margin-top: 30px; animation: rise 500ms var(--ease) both; }
 .verdict .big { font-size: clamp(26px, 3vw, 36px); }
 .verdict .prose { margin-top: 16px; }
+/* question flow: blind-spot badge, end-of-session summary */
+.qlab { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 12px; }
+.blind-tag { flex: none; }
+.verdict .cal { line-height: 1.7; }
+.miss .mq { font-weight: 600; margin: 0 0 10px; }
+.miss .ans { margin: 0 0 8px; font-size: 16.5px; }
+.miss .ans.no { color: var(--ink2); }
+.miss .ans.yes { color: var(--acc); }
+.miss .lab2, .miss .ans .lab2 { display: block; font-family: var(--mono); font-size: 10.5px; letter-spacing: .16em; text-transform: uppercase; color: var(--ink2); margin: 0 0 4px; }
 .order-list { display: flex; flex-direction: column; gap: 8px; }
 .order-item { display: grid; grid-template-columns: 40px 1fr auto; gap: 10px; align-items: center; padding: 14px 16px; border: 1px solid var(--line2); border-radius: 14px; font-size: 16.5px; background: var(--bg); }
 .order-item .n { font: 500 12px/1 var(--mono); color: var(--ink2); }
