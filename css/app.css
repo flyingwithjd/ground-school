@@ -635,3 +635,9 @@ html.locked #gate { display: flex; }
 .viz .ps-alt { font: 600 17px/1.2 var(--sans); font-variant-numeric: tabular-nums; color: var(--ink); }
 .viz .ps-now { color: var(--ink); min-height: 3em; }
 .viz .ps-how { font-size: 15px; }
+/* 3D section visuals (flaptypes, prop): stage + live readout band */
+.viz.sec3d .stage{aspect-ratio:16/10}
+@media (max-width:700px){.viz.sec3d .stage{aspect-ratio:4/3.6}}
+.viz .sec-read{padding:12px clamp(16px,2.6vw,26px) 0;border-top:1px solid var(--line);gap:6px 34px}
+.viz .sec-read span{font:500 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
+.viz .ctrl-row.off{opacity:.38}

@@ -14,14 +14,15 @@ export const VIEWS = {
   front: { tg: [-3, 5, 0], az: 0, el: 4, d: 52 }, rear: { tg: [-4, 5, 0], az: 180, el: 8, d: 52 }, tail: { tg: [-16.5, 5.6, 0], az: -150, el: 22, d: 24 }, tailR: { tg: [-16.8, 5.0, 1.2], az: 145, el: 24, d: 18 },
   nose: { tg: [5.5, 4, 0], az: -38, el: 16, d: 17 }, wingL: { tg: [-2, 6.4, -9], az: -130, el: 34, d: 30 }, wingR: { tg: [-2, 6.4, 9], az: 130, el: 34, d: 30 },
   gear: { tg: [0, 2.2, 0], az: -60, el: 6, d: 28 }, cabin: { tg: [-1, 5, 0], az: -70, el: 18, d: 26 }, strut: { tg: [-3, 4.6, 0], az: -18, el: -5, d: 42 } };
-export function planeStage(stage, { view = "iso", orbit = true, onPick = null, ortho = false, ground = false, maxFps = 64 } = {}) {
+// model: optional small model in the same { root, parts, meshes } format (section views, see section-models.js)
+export function planeStage(stage, { view = "iso", orbit = true, onPick = null, ortho = false, ground = false, maxFps = 64, model = null, cg = null, fov = 34 } = {}) {
   const canvas = document.createElement("canvas"); stage.prepend(canvas);
   const renderer = new THREE.WebGLRenderer({ canvas, antialias: !matchMedia("(max-width: 760px)").matches, alpha: false, powerPreference: "low-power" });
   const PHONE = matchMedia("(max-width: 760px)").matches; renderer.setPixelRatio(Math.min(1.5, window.devicePixelRatio || 1));   // retina / iPad: 1.5x (+ MSAA on larger screens) looks the same as 2x and fills ~45% fewer pixels renderer.setClearColor(BG, 1); renderer.debug.checkShaderErrors = false;   // skip the synchronous shader-log readback (a stall on first draw of each program)
   const scene = new THREE.Scene(); const res = new THREE.Vector2(1, 1);
-  const camera = new THREE.PerspectiveCamera(34, 16 / 9, 0.1, 800);
-  const P = buildPlane(THREE); const pivot = new THREE.Group(); scene.add(pivot);
-  const CG = new THREE.Vector3(-1.2, 4.6, 0); P.root.position.sub(CG); pivot.position.copy(CG); pivot.add(P.root);
+  const camera = new THREE.PerspectiveCamera(fov, 16 / 9, 0.1, 800);
+  const P = model ? model(THREE) : buildPlane(THREE); const pivot = new THREE.Group(); scene.add(pivot);
+  const CG = cg ? new THREE.Vector3(...cg) : new THREE.Vector3(-1.2, 4.6, 0); P.root.position.sub(CG); pivot.position.copy(CG); pivot.add(P.root);
   const inkMat = new THREE.LineBasicMaterial({ color: INK, transparent: true, opacity: 0.5 });
   const coreMat = new LineMaterial({ color: ACC, linewidth: 2.4, resolution: res }), glowMat = new LineMaterial({ color: ACC, linewidth: PHONE ? 6 : 9, transparent: true, opacity: PHONE ? 0.15 : 0.22, depthWrite: false, blending: THREE.AdditiveBlending, resolution: res });
   const INKLESS = new Set(["fuel", "propDim"]); const ACCENT = {}; const inkLines = {};
@@ -58,11 +59,11 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
   const tintMat = P.meshes[0] ? P.meshes[0].material.clone() : null; if (tintMat) tintMat.color.setHex(0x2b63d6);
   function tint(names) { names = [].concat(names || []); P.meshes.forEach((m) => { m.userData.mat0 ||= m.material; m.material = tintMat && names.includes(m.userData.part) ? tintMat : m.userData.mat0; }); kick(); }
   // camera state (spherical around a target), eased transitions
-  const cs = { ...VIEWS[view], tg: [...VIEWS[view].tg] }; let camTw = null;
+  const V0 = typeof view === "string" ? VIEWS[view] : view; const cs = { ...V0, tg: [...V0.tg] }; let camTw = null;
   function applyCam() { const az = cs.az * D, el = cs.el * D; camera.position.set(cs.tg[0] + cs.d * Math.cos(el) * Math.cos(az), cs.tg[1] + cs.d * Math.sin(el), cs.tg[2] + cs.d * Math.cos(el) * Math.sin(az)); camera.lookAt(...cs.tg); if (controls) controls.target.set(...cs.tg); }
   function setView(v, dur = 1600) { const to = typeof v === "string" ? VIEWS[v] : v; if (!to) return; if (controls) syncFromControls();
     const from = { ...cs, tg: [...cs.tg] }; let daz = to.az - from.az; while (daz > 180) daz -= 360; while (daz < -180) daz += 360;
-    const f0 = camera.fov, f1 = to.fov || 34;   // optional narrower lens for flat, profile-like side views
+    const f0 = camera.fov, f1 = to.fov || fov;   // optional narrower lens for flat, profile-like side views
     const t0 = performance.now(), dd = reduced() ? 1 : dur; camTw = (now) => { const k = s5((now - t0) / dd); cs.az = from.az + daz * k; cs.el = from.el + (to.el - from.el) * k; cs.d = Math.exp(Math.log(from.d) + (Math.log(to.d) - Math.log(from.d)) * k); cs.tg = from.tg.map((x, i) => x + (to.tg[i] - x) * k); if (f0 !== f1) { camera.fov = f0 + (f1 - f0) * k; camera.updateProjectionMatrix(); } applyCam(); if (k >= 1) camTw = null; }; kick(); }
   let controls = null;
   function syncFromControls() { const o = camera.position.clone().sub(controls.target); cs.d = o.length(); cs.el = Math.asin(clamp(o.y / cs.d, -1, 1)) / D; cs.az = Math.atan2(o.z, o.x) / D; cs.tg = controls.target.toArray(); }
