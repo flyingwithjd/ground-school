@@ -2,7 +2,7 @@
 // One correct answer is never "mastered": an item only reaches MASTERED after its interval grows past 21 days
 // and its latest answer was Certain and correct. A miss, or a correct guess, comes back 12 hours later (never in the
 // same session) and resets the interval. Every miss also opens a blind spot (S().blind) that resurfaces in later sessions.
-import { item, setItem, S, migrate } from "./store.js?v=681adac966";
+import { item, setItem, S, migrate } from "./store.js?v=3c9cdbaed9";
 export const DAY = 864e5, MIN = 6e4, HOUR = 36e5;
 export const CONF = { guess: { q: 3, label: "Guessed" }, unsure: { q: 4, label: "Fairly sure" }, sure: { q: 5, label: "Certain" } };
 // Readiness credit for a question, from its latest graded answer. A miss is always 0. Tune here only.

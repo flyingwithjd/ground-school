@@ -1,13 +1,13 @@
-import { h, esc, pct, fmtDue, toast, download, shuffle } from "../core/util.js?v=681adac966";
-import { S, save, exportJSON, importJSON, reset } from "../core/store.js?v=681adac966";
-import { get } from "../core/srs.js?v=681adac966";
-import { STAGES, MODULES, STAGE_CHECK, SUBJECTS } from "../../data/course.js?v=681adac966";
-import { LESSONS, QUESTIONS, TOPICS, ORDER, lessonItems } from "../../data/index.js?v=681adac966";
-import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone, blindList, onlyReached } from "../core/progress.js?v=681adac966";
-import { session, practiceSet } from "./quiz.js?v=681adac966";
-import { nextStep, pagesOf, pageIndex, pageIds, pageStats } from "../core/flow.js?v=681adac966";
-import { blindPages, blindLesson } from "./blindlesson.js?v=681adac966";
-import { G, rich } from "../core/rich.js?v=681adac966";
+import { h, esc, pct, fmtDue, toast, download, shuffle } from "../core/util.js?v=3c9cdbaed9";
+import { S, save, exportJSON, importJSON, reset } from "../core/store.js?v=3c9cdbaed9";
+import { get } from "../core/srs.js?v=3c9cdbaed9";
+import { STAGES, MODULES, STAGE_CHECK, SUBJECTS } from "../../data/course.js?v=3c9cdbaed9";
+import { LESSONS, QUESTIONS, TOPICS, ORDER, lessonItems } from "../../data/index.js?v=3c9cdbaed9";
+import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone, blindList, onlyReached } from "../core/progress.js?v=3c9cdbaed9";
+import { session, practiceSet } from "./quiz.js?v=3c9cdbaed9";
+import { nextStep, pagesOf, pageIndex, pageIds, pageStats } from "../core/flow.js?v=3c9cdbaed9";
+import { blindPages, blindLesson } from "./blindlesson.js?v=3c9cdbaed9";
+import { G, rich } from "../core/rich.js?v=3c9cdbaed9";
 const page = (host) => { const p = h("div", { class: "page" }); host.append(p); return p; };
 const meter = (x, big) => `<div class="meter${big ? " big" : ""}"><i style="width:${Math.round(x * 100)}%"></i></div>`;
 const stageLessons = (s) => [...s.ground, ...s.flight].flatMap((id) => [id, ...((LESSONS[id] && LESSONS[id].includes) || [])]);
@@ -151,7 +151,7 @@ export function tools(host) { const p = page(host); const sims = S().sims || [];
   <a class="cell" href="#/lesson/vs1"><span class="label">V-speeds · POH Sec 2</span><h3>What V<sub>FE</sub>, V<sub>NO</sub> and V<sub>Y</sub> mean</h3><p>Every V-speed on the 172S airspeed indicator and the ones that are not on it. Tap a speed to light up its arc or line.</p><span class="go btn arrow">Open</span></a>
   <a class="cell" href="#/glossary"><span class="label">Glossary</span><h3>${Object.keys(G).length} terms</h3><p>Every underlined term in a lesson opens its definition. Browse or search them all here.</p><span class="go btn arrow">Open</span></a>
   <a class="cell" href="#/settings"><span class="label">Progress and settings</span><h3>Your data stays here</h3><p>Progress is saved only in this browser. Export it to a file to move devices or keep a backup.</p><span class="go btn arrow">Open</span></a></div>${foot()}`; }
-export { sim, check } from "./checks.js?v=681adac966";
+export { sim, check } from "./checks.js?v=3c9cdbaed9";
 export function glossary(host, focus) { const p = page(host); const keys = Object.keys(G).sort(); const slug = (k) => k.replace(/\s+/g, "-");
   p.innerHTML = `<section class="hero"><span class="label">Glossary</span><h1>Terms, plainly</h1><p>Every underlined term in a lesson opens its definition. Airspeed symbols like V<sub>FE</sub> are explained with the dial in <a href="#/lesson/vs1">V-speeds</a>.</p></section>`;
   const inp = h("input", { type: "search", placeholder: "Search terms", "aria-label": "Search terms" }); p.append(h("div", { class: "field", style: "max-width:28rem" }, inp)); const list = h("div", { class: "mt" }); p.append(list);
@@ -176,4 +176,4 @@ export function about(host) { const p = page(host);
   <p>Citations name the chapter, section or regulation. Procedures are marked to confirm with your instructor and your aircraft's POH, because flight schools and airplanes differ.</p>
   <h4>Software and fonts</h4><ul><li>three.js r181, MIT License</li><li>GSAP 3.14, GreenSock Standard "No Charge" License (vendored, not loaded in this build)</li><li>Inter and IBM Plex Mono, SIL Open Font License 1.1</li></ul><p>License texts are in the LICENSES folder.</p>
   <h4>Not affiliated</h4><p>Squawk School is an independent study aid. Not affiliated with or endorsed by the FAA or Textron Aviation. Cessna and Skyhawk are trademarks of their owner.</p></div>`; }
-export { coverage, presolo } from "./checks.js?v=681adac966";
+export { coverage, presolo } from "./checks.js?v=3c9cdbaed9";

@@ -1,9 +1,9 @@
 // Three axes through the CG: rotate the airplane about each, with the axis drawn in the accent.
 // Cause, then effect: the control surface deflects first (exaggerated, tinted blue), then the airplane rotates.
 // Model signs: ail>0 = right aileron TE up / left down (roll right); elev<0 = elevator TE up (nose up); rud>0 = rudder TE right (nose right).
-import { frame, chips } from "./base.js?v=681adac966";
-import { planeStage } from "./planestage.js?v=681adac966";
-import { reduced } from "../core/util.js?v=681adac966";
+import { frame, chips } from "./base.js?v=3c9cdbaed9";
+import { planeStage } from "./planestage.js?v=3c9cdbaed9";
+import { reduced } from "../core/util.js?v=3c9cdbaed9";
 const DEF = 28;   // visual surface deflection, deg. Exaggerated for clarity; real travel is smaller (see the POH).
 const AX = {
   roll: { label: "Longitudinal axis · ailerons", dir: ["right", "left"], verb: "Rolling", held: "Banked", line: [[14, 0, 0], [-24, 0, 0]], att: "bank", amp: 30, hl: ["ailerons"], pose: (s) => ({ ail: s * DEF }),
