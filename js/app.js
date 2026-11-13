@@ -1,8 +1,8 @@
-import { whenUnlocked } from "./gate.js?v=3c9cdbaed9";
-import { initPopovers } from "./core/rich.js?v=3c9cdbaed9";
-import { destroyAll } from "./viz/index.js?v=3c9cdbaed9";
-import * as pages from "./views/pages.js?v=3c9cdbaed9";
-import { lessonView } from "./views/lesson.js?v=3c9cdbaed9";
+import { whenUnlocked } from "./gate.js?v=716452685f";
+import { initPopovers } from "./core/rich.js?v=716452685f";
+import { destroyAll } from "./viz/index.js?v=716452685f";
+import * as pages from "./views/pages.js?v=716452685f";
+import { lessonView } from "./views/lesson.js?v=716452685f";
 const main = document.getElementById("main");
 let cleanup = [];
 const routes = [

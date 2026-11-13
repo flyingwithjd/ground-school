@@ -1,6 +1,6 @@
 // Airspace cross-section (AIM 3-2): tap a class to see its typical floor, ceiling and what it asks of a VFR pilot.
-import { pxScene, T, TL, L, R, P, hit, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=3c9cdbaed9";
-import { chips } from "./base.js?v=3c9cdbaed9";
+import { pxScene, T, TL, L, R, P, hit, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=716452685f";
+import { chips } from "./base.js?v=716452685f";
 const INFO = {
   A: ["Class A", "18,000 ft MSL up to and including FL600", "IFR only. Not for VFR pilots.", "AIM 3-2-2"],
   B: ["Class B", "Surface to typically 10,000 ft MSL, in layers like an upside-down wedding cake, around the busiest airports", "ATC clearance to enter. Transponder with altitude reporting and ADS-B Out within the 30 NM Mode C veil. Student pilots need specific training and an endorsement, and some Class B primary airports are off-limits to student solo.", "AIM 3-2-3 · 14 CFR 61.95, 91.131"],

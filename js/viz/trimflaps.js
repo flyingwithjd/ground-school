@@ -3,7 +3,7 @@
 // same stage slides along the right side, square to the fuselage, to frame the right wing and flap (both modes default to a right rear 3/4 view from slightly above; orbit is still free)
 // while the flap, the 3D airflow lines over and under that wing and the 3D lift/drag arrows (scene objects, so they stay attached when orbiting) show the camber change. Title and chain sit in their own bands above and
 // below the stage, never over the model. PHAK Ch 6 · AFH Ch 9 · POH Sec 2, 7.
-import { h, clamp, reduced } from "../core/util.js?v=3c9cdbaed9";
+import { h, clamp, reduced } from "../core/util.js?v=716452685f";
 const D = Math.PI / 180, ACC = "#3B82F6", INK = "#F2F1EC";
 const TAB_MAX = 35, ELEV_MAX = 25, PITCH_MAX = 2.5;          // degrees, exaggerated for clarity
 const HX = -16.4, Y0 = 4.62, EL = 0.92, TL = 0.44, ZF = 1.75, SLE = -14.33;  // elevator hinge, chord to the tab hinge, tab chord, span station of the cues, stabilizer leading edge at that station (ft, model space)

@@ -2,10 +2,10 @@
 // buttons sit in a fixed bar under the stage, so nothing jumps. Sample: judge each cup Fly / Drain again / No-go.
 // Sources: AFH Ch 2 (grade colors, water beads, specks, all-water sample, jet fuel, nozzles, JET-A placard, oil cold vs warm);
 // C172S POH Sec 1, 2 (100LL or 100 grade fuel; oil 5 qt minimum, 8 qt capacity).
-import { pxScene, T, R, L, P, C, INK, ACC, GRAY, DIM, ACCF } from "./kit.js?v=3c9cdbaed9";
-import { chips } from "./base.js?v=3c9cdbaed9";
-import { rich } from "../core/rich.js?v=3c9cdbaed9";
-import { h } from "../core/util.js?v=3c9cdbaed9";
+import { pxScene, T, R, L, P, C, INK, ACC, GRAY, DIM, ACCF } from "./kit.js?v=716452685f";
+import { chips } from "./base.js?v=716452685f";
+import { rich } from "../core/rich.js?v=716452685f";
+import { h } from "../core/util.js?v=716452685f";
 const RED = "#E5484D";
 export const SAMPLES = [
   { c: "#4F8DF7", name: "Blue, gasoline smell", tag: "100LL", ans: "fly", why: "100LL is dyed blue and approved for the 172S. Clean, no water, no specks: good." },
