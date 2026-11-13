@@ -17,7 +17,7 @@ import { s, h, reduced } from "../core/util.js?v=c8fe6c3cee";
 const ICE = "#CFE6FF", WARM = "#E0894A", D = Math.PI / 180;
 export function risk(oat, rh) { if (oat < 70 && rh > 80) return 2; if (oat <= 100 && rh >= 50) return 1; return 0; }
 // ---------- 3D model (arbitrary units, about inches/2): flow along +x, the cut plane is z = 0 and the back half (z < 0) is kept ----------
-const X0 = -3.2, X1 = 3.4, R0 = 1.0, THR = 0.52, WV = 1.7, WT = 0.24, TVX = 2.35, BOWL = { x0: -1.5, x1: 1.0, y0: -1.3, y1: -3.2, z: 1.05 }, LEVEL = -2.35, NZX = 0.15;
+const FUEL_T = "#8fb3f0", X0 = -3.2, X1 = 3.4, R0 = 1.0, THR = 0.52, WV = 1.7, WT = 0.24, TVX = 2.35, BOWL = { x0: -1.5, x1: 1.0, y0: -1.3, y1: -3.2, z: 1.05 }, LEVEL = -2.35, NZX = 0.15;
 export const hw = (x) => { const u = x / WV; return Math.abs(u) >= 1 ? R0 : R0 - (R0 - THR) * 0.5 * (1 + Math.cos(Math.PI * u)); };
 function ring(x, r, n = 24) { return Array.from({ length: n + 1 }, (_, i) => { const a = Math.PI / 2 + (Math.PI * i) / n; return [x, r * Math.sin(a), r * Math.cos(a)]; }); }   // back half: z <= 0
 const polySegs = (pts) => { const sg = []; for (let i = 0; i + 1 < pts.length; i++) sg.push(...pts[i], ...pts[i + 1]); return sg; };
@@ -37,7 +37,10 @@ function carbModel(THREE) { const K = modelKit(THREE), carb = new THREE.Group(),
   K.add("bowl", carb, bowl, bs);
   const fuelM = new THREE.Mesh(new THREE.BoxGeometry(B.x1 - B.x0 - 0.08, LEVEL - B.y1 - 0.04, B.z - 0.04), new THREE.MeshBasicMaterial({ color: 0x1b3a78, transparent: true, opacity: 0.85, depthWrite: false }));
   fuelM.position.set((B.x0 + B.x1) / 2, (LEVEL + B.y1) / 2, -B.z / 2); carb.add(fuelM);
-  const fl = new THREE.BoxGeometry(0.9, 0.36, 0.7); fl.translate(B.x0 + 0.65, LEVEL, -0.5); K.add("float", carb, fl);
+  // the float rides on the fuel: a light-gray hollow body, half submerged, with its hinge arm to the needle valve
+  const fl = new THREE.BoxGeometry(0.8, 0.32, 0.6); fl.translate(B.x0 + 0.6, LEVEL + 0.05, -0.45);
+  const flo = new THREE.Mesh(fl, new THREE.MeshBasicMaterial({ color: 0x5b616c })); carb.add(flo);
+  K.add("float", carb, null, [...Array.from(new THREE.EdgesGeometry(fl, 30).attributes.position.array), B.x0 + 1.0, LEVEL + 0.1, -0.02, B.x0 + 1.35, B.y0 - 0.12, -0.02]);
   const nz = new THREE.CylinderGeometry(0.07, 0.07, -0.1 - (B.y1 + 0.25), 10, 1, true); nz.translate(NZX, (-0.1 + B.y1 + 0.25) / 2, -0.12);
   K.add("nozzle", carb, nz, polySegs([[NZX, B.y1 + 0.25, -0.05], [NZX, -0.1, -0.05], [NZX - 0.12, 0.02, -0.05]]));
   // butterfly throttle valve: half disc on a shaft along z; rotation.z = 0 is closed (across the bore), 90 deg is wide open
@@ -54,8 +57,10 @@ function carbModel(THREE) { const K = modelKit(THREE), carb = new THREE.Group(),
   const fsg = []; for (let k = -4; k <= 4; k++) { const y = (k / 4.6) * R0, zz = -Math.sqrt(Math.max(0, R0 * R0 - y * y)); fsg.push(-2.2, y, 0, -2.2, y, zz); } fsg.push(...polySegs(ring(-2.2, R0 - 0.02)));
   K.add("filter", inj, fg, fsg);
   const door = new THREE.Group(); door.position.set(-0.6, R0 + WT, -0.55); inj.add(door); const dr = new THREE.BoxGeometry(1.1, 0.06, 0.9); dr.translate(0.55, 0, 0);
-  K.add("door", door, dr);
-  const fcu = new THREE.BoxGeometry(0.9, 1.3, 0.9); fcu.translate(2.2, 0, -0.5); K.add("fcu", inj, fcu);
+  const drm = new THREE.Mesh(dr, new THREE.MeshBasicMaterial({ color: 0x3a3f48 })); door.add(drm); K.add("door", door, null, Array.from(new THREE.EdgesGeometry(dr, 30).attributes.position.array));
+  // fuel/air control unit: a block under the duct downstream of the filter, fuel lines out to the engine
+  const fcu = new THREE.BoxGeometry(1.2, 0.8, 0.9); fcu.translate(2.0, -(R0 + WT) - 0.45, -0.45);
+  inj.add(new THREE.Mesh(fcu, new THREE.MeshBasicMaterial({ color: 0x2a2e35 }))); K.add("fcu", inj, null, [...Array.from(new THREE.EdgesGeometry(fcu, 30).attributes.position.array), 2.0, -(R0 + WT), -0.02, 2.0, -(R0 + WT) - 0.05, -0.02, 2.6, -(R0 + WT) - 0.45, -0.02, 3.3, -(R0 + WT) - 0.45, -0.02]);
   return K.model({ carb, inj, valve, door, fuelM }); }
 export function mount(host) {
   let oat = 60, rh = 85, eng = "fp", pwr = "cruise", heat = false, filt = false, ice = 0, pen = 0, melt = 0;
@@ -66,8 +71,8 @@ export function mount(host) {
   // labels for the parts sit in an SVG over the stage, placed by projecting fixed model points (the camera never moves)
   const lab = s("svg", { class: "full lab3d", role: "img" }); F.stage.append(lab); let lg = s("g", {}, lab);
   const band = () => { const sr = F.stage.getBoundingClientRect(); if (!sr.height) return; let b = 0; F.stage.querySelectorAll(".corner").forEach((c) => { if (c.textContent.trim()) b = Math.max(b, c.getBoundingClientRect().bottom - sr.top); }); S.setTopBand(b ? b + 4 : 0);
-    const Hh = Math.max(1, sr.height - (+F.stage.dataset.band || 0)), TN = Math.tan(10 * D), dd = Math.max(5.6 / (2 * TN), (sr.width < 600 ? 9.8 : 8.4) / (2 * TN * (sr.width / Hh))); const fi = eng === "fi", d2 = fi ? Math.max(3.6 / (2 * TN), 8.0 / (2 * TN * (sr.width / Hh))) : dd;
-    S.setView(fi ? { tg: [0.1, 0.15, -0.2], az: 102, el: 24, d: d2, fov: 20 } : { tg: [0.1, -1.0, -0.2], az: 102, el: 24, d: dd, fov: 20 }, viewDur); labUntil = performance.now() + (viewDur > 1 ? viewDur + 300 : 400); viewDur = 1;
+    const Hh = Math.max(1, sr.height - (+F.stage.dataset.band || 0)), TN = Math.tan(10 * D), dd = Math.max(5.6 / (2 * TN), (sr.width < 600 ? 9.8 : 8.4) / (2 * TN * (sr.width / Hh))); const fi = eng === "fi", d2 = fi ? Math.max(4.9 / (2 * TN), 8.4 / (2 * TN * (sr.width / Hh))) : dd;
+    S.setView(fi ? { tg: [0.1, -0.15, -0.2], az: 102, el: 24, d: d2, fov: 20 } : { tg: [0.1, -1.0, -0.2], az: 102, el: 24, d: dd, fov: 20 }, viewDur); labUntil = performance.now() + (viewDur > 1 ? viewDur + 300 : 400); viewDur = 1;
     S.kick(); };
   let viewDur = 1, focusSet = null, labUntil = 0;
   const bro = new ResizeObserver(band); bro.observe(F.stage); F.on(() => bro.disconnect());
@@ -75,18 +80,22 @@ export function mount(host) {
     const at = (p, str, o = {}) => { const q = S.project(p); T(lg, Math.max(6, Math.min(W - 6, q.x + (o.dx || 0))), q.y + (o.dy || 0), str, { size: 11, anchor: o.anchor || "middle", fill: o.fill || GRAY }); };
     if (!fi) { at([0, R0 + WT, 0], ph ? "venturi: up to 70 °F colder" : "venturi: up to 70 °F colder", { dy: -12, fill: rk ? COL.cyan : GRAY });
       at([X0, 0, 0], heat ? "heated air" : `air ${oat} °F`, { dy: -10, anchor: "start", dx: -4, fill: heat ? WARM : INK });
-      at([(BOWL.x0 + BOWL.x1) / 2, BOWL.y1, 0], "float bowl · fuel nozzle", { dy: 16 });
-      at([TVX, -(R0 + WT), 0], "throttle valve", { dy: 22 }); }
-    else { at([-2.2, -(R0 + WT), 0], filt ? "filter iced" : "air filter", { dy: 16, fill: filt ? ICE : GRAY }); at([-0.1, R0 + WT, 0], filt ? "alternate air door open" : "alternate air door", { dy: -30, fill: filt ? ACC : GRAY });
-      at([2.2, -(R0 + WT), 0], "fuel/air control unit", { dy: 16, anchor: ph ? "end" : "middle", dx: ph ? 30 : 0 }); at([X0, 0, 0], "air", { dy: -10, anchor: "start", dx: -4, fill: INK }); } }
+      at([(BOWL.x0 + BOWL.x1) / 2, BOWL.y1, 0], "float bowl", { dy: 16 }); if (ph) at([NZX, LEVEL + 0.45, 0], "nozzle", { anchor: "start", dx: 5, dy: 4, fill: FUEL_T }); else at([NZX + 0.14, (BOWL.y0 + LEVEL) / 2 + 0.05, 0], "fuel nozzle", { anchor: "start", dx: 8, dy: 4, fill: FUEL_T });
+      at([TVX, -(R0 + WT), 0], "throttle valve", ph ? { dy: 16, anchor: "start", dx: -14 } : { dy: 18 }); }
+    else { at([-2.2, -(R0 + WT), 0], filt ? "filter iced" : "air filter", { dy: 16, fill: filt ? ICE : GRAY }); if (ph) at([0.75, R0 + WT + 0.3, 0], filt ? "alt air door open" : "alt air door", { anchor: "start", dx: 8, dy: 0, fill: filt ? ACC : GRAY }); else at([-0.75, R0 + WT + 0.3, 0], filt ? "alternate air door open" : "alternate air door", { anchor: "end", dx: -6, dy: 0, fill: filt ? ACC : GRAY });
+      at([2.0, -(R0 + WT) - 0.85, 0], "fuel/air control unit", { dy: 18 }); at([X0, 0, 0], "air", { dy: -10, anchor: "start", dx: -4, fill: INK }); } }
   // ---------- 3D cues: streamlines, frost layers, inlet and outlet arrows ----------
   const NP = 46, xsF = Array.from({ length: NP }, (_, i) => X0 - 0.9 + ((X1 + 1.2 - (X0 - 0.9)) * i) / (NP - 1));
   const sl = [-0.62, -0.28, 0.28, 0.62].map((f) => ({ f, base: S.cueLine(NP, { width: 1, opacity: 0.16 }), dash: S.cueLine(NP, { dash: [0.36, 0.3], width: 1.4, opacity: 0.6 }), cold: S.cueLine(18, { dash: [0.36, 0.3], width: 1.6, opacity: 0.9, color: 0x4fc3e0 }) }));
   const frost = Array.from({ length: 10 }, () => S.cueLine(26, { width: 2.2, opacity: 0, color: 0xcfe6ff })), frostV = [0, 1].map(() => S.cueLine(2, { width: 3, opacity: 0, color: 0xcfe6ff })), frostR = [0, 1].map(() => S.cueLine(25, { width: 1.6, opacity: 0, color: 0xcfe6ff }));
   const inA = S.cueArrow({ color: 0xf2f1ec, width: 2.6, head: 0.36 }), outA = S.cueArrow({ color: 0xf2f1ec, width: 2.2, head: 0.3 });
+  // fuel: up the nozzle from below the float-bowl level into the throat, where the low pressure draws it out as spray
+  const fuelL = S.cueLine(3, { width: 3, opacity: 0.95, color: 0x5b8fe8 }), spray = [0, 1, 2].map(() => S.cueLine(2, { dash: [0.12, 0.1], width: 1.6, opacity: 0.8, color: 0x8fb3f0 }));
+  fuelL.set([[NZX, LEVEL - 0.25, 0.04], [NZX, -0.12, 0.04], [0.02, 0.0, 0.04]]);
   const valveAng = () => (pwr === "cruise" ? 62 : 14);   // degrees open from closed: cruise well open, low power nearly closed
   function scene3d() { const fi = eng === "fi", rk = risk(oat, rh), cold = !fi && rk > 0, R = (x) => (fi ? R0 : hw(x));
-    M3.carb.visible = !fi; M3.inj.visible = fi; M3.valve.rotation.z = valveAng() * D; M3.door.rotation.z = filt ? 52 * D : 0;
+    M3.carb.visible = !fi; M3.inj.visible = fi; fuelL.opacity = fi ? 0 : 0.95;
+    spray.forEach((sp, j) => { const a = (j - 1) * 0.16; sp.set([[0.05, 0, 0.045], [0.05 + 0.85 * Math.cos(a), 0.85 * Math.sin(a), 0.045]]); sp.opacity = fi ? 0 : 0.8; }); M3.valve.rotation.z = valveAng() * D; M3.door.rotation.z = filt ? 52 * D : 0;
     sl.forEach((l) => { const pts = xsF.map((x) => [x, l.f * R(Math.max(X0, Math.min(X1, x))), 0.03]); l.base.set(pts); l.dash.set(pts); l.dash.opacity = 0.6;
       const cp = Array.from({ length: 18 }, (_, i) => { const x = -WV * 0.8 + (WV * 2.1 * i) / 17; return [x, l.f * R(x), 0.04]; }); l.cold.set(cp); l.cold.opacity = cold ? 0.9 : 0; });
     // frost: layered contours inside the throat (both walls in the cut plane), plus rings at the throat and on the valve
