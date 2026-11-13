@@ -1,6 +1,6 @@
 // Special use airspace (AIM 3-4): tap a type to see whether you can go in and who to ask.
-import { htmlScene } from "./kit.js?v=716452685f";
-import { h } from "../core/util.js?v=716452685f";
+import { htmlScene } from "./kit.js?v=7534528db0";
+import { h } from "../core/util.js?v=7534528db0";
 const TY = [
   ["P", "Prohibited", "No", "Flight is prohibited, for security or other reasons of national welfare. Regulatory.", "AIM 3-4-2"],
   ["R", "Restricted", "Only with authorization", "Often invisible hazards like artillery, aerial gunnery or guided missiles. Entering without authorization from the using or controlling agency may be extremely hazardous. Regulatory. Temporary restricted areas aren't charted.", "AIM 3-4-3"],

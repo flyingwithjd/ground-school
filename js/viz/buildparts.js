@@ -3,10 +3,10 @@
 // under the stage. Sources: PHAK Ch 3 (composites: fibers in a resin matrix, honeycomb sandwich, hidden low-energy impact
 // damage, heat above 150 °F, lightning mesh; wing spars, ribs, stringers; high/mid/low, mono/biplane, semi-cantilever);
 // AFH Ch 2 (tap test: a change in sound when gently tapping with a fingertip).
-import { pxScene, T, R, L, P, C, hit, INK, ACC, GRAY, DIM, ACCF } from "./kit.js?v=716452685f";
-import { chips } from "./base.js?v=716452685f";
-import { rich } from "../core/rich.js?v=716452685f";
-import { h } from "../core/util.js?v=716452685f";
+import { pxScene, T, R, L, P, C, hit, INK, ACC, GRAY, DIM, ACCF } from "./kit.js?v=7534528db0";
+import { chips } from "./base.js?v=7534528db0";
+import { rich } from "../core/rich.js?v=7534528db0";
+import { h } from "../core/util.js?v=7534528db0";
 const LAYERS = [
   { k: "paint", n: "Paint", hh: 0.08, d: "Often white: many epoxy resins weaken above about 150 °F, and a dark skin in the sun gets much hotter." },
   { k: "mesh", n: "Lightning mesh", hh: 0.07, d: "A fine aluminum or copper mesh bonded at the surface carries a lightning strike's current, because fiberglass doesn't conduct and carbon fiber conducts poorly." },

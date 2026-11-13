@@ -1,8 +1,8 @@
 // Angle of attack: drag the slider, watch the airflow follow (or leave) the wing and the lift curve respond.
 // The airfoil, flow field and lift curve are illustrative, not data for any specific wing.
-import { frame, slider, readout, svg, loop, ACC, FAINT, FAINT2 } from "./base.js?v=716452685f";
-import { s, clamp } from "../core/util.js?v=716452685f";
-import { T, arrow, setArrow } from "./shapes.js?v=716452685f";
+import { frame, slider, readout, svg, loop, ACC, FAINT, FAINT2 } from "./base.js?v=7534528db0";
+import { s, clamp } from "../core/util.js?v=7534528db0";
+import { T, arrow, setArrow } from "./shapes.js?v=7534528db0";
 const CRIT = 16, CH = 500, LE = -520, PIV = LE + CH * 0.25; // chord, leading edge x, quarter-chord pivot
 function airfoil() { // NACA 2412-like outline
   const m = 0.02, p = 0.4, t = 0.12, up = [], lo = [];

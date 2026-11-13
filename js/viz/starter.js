@@ -7,10 +7,10 @@
 // duty cycle 10 s cranking then 20 s cool down, repeat two more times, then 10 minutes cool down. AFH 2: a starter that stays
 // engaged shows a continuous, very high current draw on the ammeter (some airplanes have a starter-engaged light): shut down.
 // The cranking time before the engine catches and the amps are illustrative.
-import { chips, row } from "./base.js?v=716452685f";
-import { h, s } from "../core/util.js?v=716452685f";
-import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=716452685f";
-import { anim, COL } from "./dial.js?v=716452685f";
+import { chips, row } from "./base.js?v=7534528db0";
+import { h, s } from "../core/util.js?v=7534528db0";
+import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=7534528db0";
+import { anim, COL } from "./dial.js?v=7534528db0";
 const CASES = { normal: "Normal start", nostart: "Won't start", stuck: "Starter stays engaged" };
 export function mount(host) {
   let cs = "normal", master = false, hold = false, crank = 0, cool = 0, cycles = 0, running = false, spun = 0, t = 0, over = false;
