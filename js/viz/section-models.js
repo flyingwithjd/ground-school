@@ -31,3 +31,19 @@ export function sectionModel(THREE, pieces, { stations = 3, spanEvery = 4 } = {}
 // 2D transform helpers that mirror the three.js group transforms (rotation about z, CCW positive = trailing edge down for a
 // section whose leading edge points to +x)
 export const rotP = ([x, y], a, [cx, cy] = [0, 0]) => { const c = Math.cos(a), s = Math.sin(a), dx = x - cx, dy = y - cy; return [cx + dx * c - dy * s, cy + dx * s + dy * c]; };
+// Loft rings (arrays of [x, y, z], same count, closed) into one mesh; optional end caps (fan from the ring centroid).
+export function loftGeo(THREE, rings, { caps = true } = {}) {
+  const n = rings[0].length, pos = [], idx = []; rings.forEach((r) => r.forEach((p) => pos.push(...p)));
+  for (let k = 0; k < rings.length - 1; k++) for (let i = 0; i < n; i++) { const a = k * n + i, b = k * n + (i + 1) % n; idx.push(a, b, b + n, a, b + n, a + n); }
+  if (caps) [0, rings.length - 1].forEach((k) => { const c = [0, 1, 2].map((j) => rings[k].reduce((s, p) => s + p[j], 0) / n), ci = pos.length / 3; pos.push(...c); for (let i = 0; i < n; i++) idx.push(ci, k * n + i, k * n + (i + 1) % n); });
+  const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(pos, 3)); g.setIndex(idx); return g; }
+// Ink segments for lofted rings: every `every`-th ring outline plus lengthwise lines through the listed point indices.
+export function loftSegs(rings, every, along) { const s = [], push = (a, b) => s.push(...a, ...b);
+  rings.forEach((r, k) => { if (k % every === 0 || k === rings.length - 1) for (let i = 0; i < r.length; i++) push(r[i], r[(i + 1) % r.length]); });
+  along.forEach((i) => { for (let k = 0; k + 1 < rings.length; k++) push(rings[k][i], rings[k + 1][i]); }); return s; }
+// A tiny model builder: parts[name].subs = [{ obj, segs }], meshes tagged with their part (same format as c172-model.js).
+export function modelKit(THREE) { const faceMat = new THREE.MeshBasicMaterial({ color: 0x0d0d10, side: THREE.DoubleSide, polygonOffset: true, polygonOffsetFactor: 1, polygonOffsetUnits: 1 });
+  const root = new THREE.Group(), parts = {}, meshes = [];
+  const add = (name, parent, geo, segs) => { const o = new THREE.Group(); parent.add(o); if (geo) { const m = new THREE.Mesh(geo, faceMat); m.userData.part = name; m.userData.tag = name; o.add(m); meshes.push(m); }
+    (parts[name] ||= { name, subs: [] }).subs.push({ obj: o, segs: segs || [] }); return o; };
+  return { root, parts, meshes, add, faceMat, model: (extra = {}) => ({ root, parts, meshes, pose() {}, ...extra }) }; }

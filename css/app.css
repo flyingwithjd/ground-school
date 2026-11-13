@@ -641,3 +641,8 @@ html.locked #gate { display: flex; }
 .viz .sec-read{padding:12px clamp(16px,2.6vw,26px) 0;border-top:1px solid var(--line);gap:6px 34px}
 .viz .sec-read span{font:500 11px/1.4 var(--mono);letter-spacing:.06em;text-transform:uppercase;color:var(--ink3)}
 .viz .ctrl-row.off{opacity:.38}
+.viz .vstrip{position:relative;border-top:1px solid var(--line);background:#0A0A0B}
+.viz .vstrip svg{display:block;width:100%}
+.viz .vstrip svg text{pointer-events:none}
+.viz.prop3d .stage{aspect-ratio:16/9}
+@media (max-width:700px){.viz.prop3d .stage{aspect-ratio:1/1}}

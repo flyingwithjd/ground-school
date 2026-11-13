@@ -11,8 +11,9 @@ let bad = 0; const ok = (c, m) => { if (!c) { bad++; console.log("   FAIL " + m)
 const b = await chromium.launch({ executablePath: "/usr/bin/google-chrome", args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
 const overlaps = (pg, type) => pg.evaluate((type) => { const v = document.querySelector(`[data-viz="${type}"]`); if (!v) return ["visual not found"]; const out = [];
   const st = v.querySelector(".stage").getBoundingClientRect();
-  const tx = [...v.querySelectorAll(".stage svg text")].filter((e) => e.textContent.trim() && e.getAttribute("opacity") !== "0").map((e) => ({ t: e.textContent, r: e.getBoundingClientRect(), fs: parseFloat(e.getAttribute("font-size") || "12") }));
-  for (const a of tx) { if (a.r.right > st.right + 1 || a.r.left < st.left - 1 || a.r.top < st.top - 1 || a.r.bottom > st.bottom + 1) out.push(`"${a.t}" outside the stage`); if (a.fs < 11) out.push(`"${a.t}" font ${a.fs}px`); }
+  // SVG labels in the stage, and in a strip under a 3D stage (.vstrip), each checked against its own box
+  const tx = [...v.querySelectorAll(".stage svg text, .vstrip svg text")].filter((e) => e.textContent.trim() && e.getAttribute("opacity") !== "0").map((e) => ({ t: e.textContent, r: e.getBoundingClientRect(), fs: parseFloat(e.getAttribute("font-size") || "12"), box: e.closest(".stage, .vstrip").getBoundingClientRect() }));
+  for (const a of tx) { const st = a.box; if (a.r.right > st.right + 1 || a.r.left < st.left - 1 || a.r.top < st.top - 1 || a.r.bottom > st.bottom + 1) out.push(`"${a.t}" outside the stage`); if (a.fs < 11) out.push(`"${a.t}" font ${a.fs}px`); }
   const corners = [...v.querySelectorAll(".stage > .corner")].filter((e) => e.textContent.trim()).map((e) => ({ t: e.textContent, r: e.getBoundingClientRect() }));
   const all = tx.concat(corners);
   for (let i = 0; i < all.length; i++) for (let j = i + 1; j < all.length; j++) { const a = all[i].r, c = all[j].r; if (a.left < c.right - 1 && c.left < a.right - 1 && a.top < c.bottom - 1 && c.top < a.bottom - 1) out.push(`"${all[i].t}" overlaps "${all[j].t}"`); }
