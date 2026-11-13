@@ -26,9 +26,9 @@ for (const [w, hh] of [[390, 844], [744, 1133]]) {
       const offs = [], clip = [];
       cb.forEach((e) => { const q = e.getBoundingClientRect(), t = e.textContent.trim().slice(0, 24);
         if (q.top < hb - 1 || q.bottom > navTop + 1 || q.left < -1 || q.right > innerWidth + 1) offs.push(`${t} (${Math.round(q.top)}-${Math.round(q.bottom)})`);
-        const par = e.parentElement.getBoundingClientRect();
+        let par = e.parentElement.getBoundingClientRect(); if (!par.width) par = (e.closest(".ctrl-row") || e.closest(".ctrl")).getBoundingClientRect();   // chips may flow in the row (display: contents)
         if (e.scrollWidth > e.clientWidth + 1 || q.right > par.right + 1 || q.left < par.left - 1) clip.push(t); });
-      const rows = [...fig.querySelectorAll(".ctrl:not(.ctrl-live) .chips")].filter((c) => c.scrollWidth > c.clientWidth + 1).length;
+      const rows = [...fig.querySelectorAll(".ctrl:not(.ctrl-live) .chips, .ctrl:not(.ctrl-live) .ctrl-row")].filter((c) => c.scrollWidth > c.clientWidth + 1).length;
       const live = v.querySelector(".ctrl-live"), chipCtrl = v.querySelector(".ctrl:not(.ctrl-live)");
       const chipsNext = !chipCtrl || getComputedStyle(chipCtrl).display === "none" || (live ? live.nextElementSibling === chipCtrl : after === chipCtrl);
       return { hb, navTop, figTop: fr.top, stTop: st.top, stBot: st.bottom, sl: sl.map((q) => [q.top, q.bottom]), firstAfter: after ? after.className : "", n: sl.length, nc: cb.length, offs, clip, rows, chipsNext }; }, type);
@@ -39,7 +39,7 @@ for (const [w, hh] of [[390, 844], [744, 1133]]) {
       ok(!r.clip.length && !r.rows, `${tag}: no chip text cut off${r.clip.length ? " — " + r.clip.slice(0, 4).join(", ") : ""}${r.rows ? `, ${r.rows} sideways-scrolling row(s)` : ""}`); }
     ok(r.chipsNext, `${tag}: chip groups come right after the sliders (before any chart or readout)`);
     // a vertical swipe that starts on a chip row scrolls the page
-    const chip = await pg.evaluate((type) => { const c = document.querySelector(`[data-viz="${type}"] .ctrl:not(.ctrl-live) .chips`); if (!c) return null; c.scrollIntoView({ block: "center" }); const q = c.getBoundingClientRect(); return { x: q.left + 30, y: q.top + q.height / 2, sy: scrollY }; }, type);
+    const chip = await pg.evaluate((type) => { const c = document.querySelector(`[data-viz="${type}"] .ctrl:not(.ctrl-live) .chip`); if (!c) return null; c.scrollIntoView({ block: "center" }); const q = c.getBoundingClientRect(); return { x: q.left + Math.min(30, q.width / 2), y: q.top + q.height / 2, sy: scrollY }; }, type);
     if (chip) { await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: chip.x, y: chip.y }] }); for (let i = 1; i <= 8; i++) { await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: chip.x, y: chip.y - i * 20 }] }); await pg.waitForTimeout(16); }
       await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] }); await pg.waitForTimeout(500); const sy = await pg.evaluate(() => scrollY); ok(sy > chip.sy + 40, `${tag}: vertical swipe on a chip row scrolls the page (${Math.round(chip.sy)} -> ${Math.round(sy)})`); } }
   ok(!errs.length, `${w}: no page errors ${errs.slice(0, 2).join("; ")}`); await ctx.close(); }

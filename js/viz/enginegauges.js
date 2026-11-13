@@ -43,7 +43,7 @@ export function mount(host) {
   function draw(g, W, H, top) {
     const ph = S.phone; G = {}; const top2 = top + 8;
     if (panel === "round") {
-      const cols = ph ? 2 : 3, rows = Math.ceil(6 / cols), cw = W / cols, rh = (H - top2 - 46) / rows, r = Math.min(cw * 0.36, rh * 0.4, 84);
+      const cols = ph ? 2 : 3, rows = Math.ceil(6 / cols), cw = W / cols, rh = (H - top2 - 46) / rows, r = Math.min(cw * 0.36, rh * 0.43, 84);
       const defs = [["rpm", { min: 0, max: 3500, arcs: [[2100, ARC[alt], "green"]], reds: [2700], ticks: [0, 500, 1000, 1500, 2000, 2500, 3000, 3500], nums: [[1000, "10"], [2000, "20"], [3000, "30"]], title: "RPM ×100", fmt: (v) => String(Math.round(v / 10) * 10) }],
         ["ot", { min: 75, max: 250, arcs: [[100, 245, "green"]], reds: [245], ticks: [100, 150, 200, 250], nums: [[100, "100"], [200, "200"]], title: "OIL °F" }],
         ["op", { min: 0, max: 120, arcs: [[50, 90, "green"]], reds: [20, 115], ticks: [0, 20, 40, 60, 80, 100, 120], nums: [[20, "20"], [60, "60"], [100, "100"]], title: "OIL PSI" }],

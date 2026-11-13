@@ -31,7 +31,7 @@ export function mount(host) {
   function upd() { S.redraw(); A.kick(); }
   function draw(g, W, H, top) {
     const ph = S.phone, st = fuelState({ qL, qR, sel, flight, edp, aux, t }), w = st.warn ? st.warn[0] : null;
-    const tw = Math.min(110, W * 0.2), th = Math.min(190, (H - top) * 0.42), ty = top + 26, cx = W / 2;
+    const tw = Math.min(110, W * 0.2), ty = top + 26, th = Math.min(190, (H - top) * 0.42, H - ty - 66 - 22 - 40 - 88 - 40), cx = W / 2;
     const tank = (k, x, q) => { const on = st.feed.includes(k), fy = (v) => ty + th - (v / CAP) * th;
       T(g, x + tw / 2, ty - 10, k === "L" ? "Left tank" : "Right tank", { size: 11, anchor: "middle", fill: on ? INK : GRAY });
       R(g, x, ty, tw, th, { stroke: on ? INK : GRAY, sw: 1.4, rx: 6 });
