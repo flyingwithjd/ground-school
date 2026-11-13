@@ -33,7 +33,7 @@ export function mount(host) {
     const leg = (x, r) => { L(g, x, yAt(x) + L0 * 0.04, x, gy - r, { stroke: GRAY, w: 2 }); if (ty === "ski") R(g, x - r * 2.2, gy - 4, r * 4.4, 4, { fill: INK, rx: 2 }); else C(g, x, gy - r, r, { stroke: INK, sw: 2, fill: "#0A0A0B" }); };
     if (ty === "float") { R(g, nose + L0 * 0.05, gy - L0 * 0.06, L0 * 0.55, L0 * 0.05, { rx: 8, stroke: INK, sw: 1.6, fill: "#18181a" }); L(g, nose + L0 * 0.2, yAt(nose + L0 * 0.2) + L0 * 0.04, nose + L0 * 0.2, gy - L0 * 0.06, { stroke: GRAY, w: 2 }); L(g, nose + L0 * 0.45, yAt(nose + L0 * 0.45) + L0 * 0.04, nose + L0 * 0.45, gy - L0 * 0.06, { stroke: GRAY, w: 2 }); }
     else if (tail) { leg(mainX, wr); L(g, tailx - 10, yAt(tailx - 10) + 2, tailx - 8, gy - wr, { stroke: GRAY, w: 2 }); C(g, tailx - 8, gy - wr * 0.5, wr * 0.5, { stroke: INK, sw: 2 }); }
-    else { leg(mainX, wr); leg(nose + L0 * 0.08, wr * 0.8); if (ty === "retr") T(g, mainX + 14, gy - wr * 2 - 18, "folds up in cruise", { size: 11, fill: GRAY }); }
+    else { leg(mainX, wr); leg(nose + L0 * 0.08, wr * 0.8); if (ty === "retr") T(g, mainX + wr + 10, gy - wr + 4, "folds up in cruise", { size: 11, fill: GRAY }); }
     if (ty === "retr") { [mainX, nose + L0 * 0.08].forEach((x) => C(g, x, yAt(x) + L0 * 0.02, wr * 0.8, { stroke: ACC, sw: 1.2, dash: "3 3" })); }
     // CG marker and the main-wheel line
     const cy = yAt(cgX) - L0 * 0.02; C(g, cgX, cy, 7, { stroke: COL.yellow, sw: 2 }); L(g, cgX - 7, cy, cgX + 7, cy, { stroke: COL.yellow, w: 1.5 }); L(g, cgX, cy - 7, cgX, cy + 7, { stroke: COL.yellow, w: 1.5 });
