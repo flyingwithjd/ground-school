@@ -1,6 +1,6 @@
 // The night blind spot (AFH 11, PHAK 17): the fovea has no rods, so a dim light you stare at can vanish. Look about 10° off center.
-import { chips } from "./base.js?v=0080002776";
-import { pxScene, T, L, C, R, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=0080002776";
+import { chips } from "./base.js?v=dc3bb5b371";
+import { pxScene, T, L, C, R, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=dc3bb5b371";
 export function mount(host) {
   let look = "at";
   const S = pxScene(host, { corners: { tl: "Night blind spot", tr: "AFH 11 · PHAK 17" } }, draw);

@@ -1,5 +1,5 @@
-import { GLOSSARY } from "../../data/glossary.js?v=0080002776";
-import { esc } from "./util.js?v=0080002776";
+import { GLOSSARY } from "../../data/glossary.js?v=dc3bb5b371";
+import { esc } from "./util.js?v=dc3bb5b371";
 const norm = (k) => k.toLowerCase().replace(/[’']/g, "'").trim();
 export const G = Object.fromEntries(Object.entries(GLOSSARY).map(([k, v]) => [norm(k), { term: k, ...v }]));
 // Other spellings that point at one entry (VSO is often written VS0; ACS is the short name).
@@ -15,6 +15,8 @@ export function rich(html) { return String(html || "").replace(/\[\[([^\]|]+)(?:
 // Plain "VR" and "VMC" are skipped (VR routes, visual meteorological conditions); the V<sub>R</sub> form is unambiguous.
 const PLAIN = { VSO: "vs0", VS0: "vs0", VS1: "vs1", VFE: "vfe", VNO: "vno", VNE: "vne", VA: "va", VX: "vx", VY: "vy", VG: "vg", VREF: "vref", VYSE: "vyse", VLE: "vle", VLO: "vlo", KIAS: "kias", KCAS: "kcas", KTAS: "ktas", POH: "poh", AFM: "afm", ACS: "airman certification standards", MSL: "msl", AGL: "agl",
   HSI: "horizontal situation indicator", LAA: "local airport advisory", HS: "hot spot", AROW: "arrow", ADC: "air data computer" };
+// V<sub>XX</sub>: the subscript letters name the speed
+const SUB = { SO: "vs0", S0: "vs0", "S1": "vs1", S: "vs", FE: "vfe", NO: "vno", NE: "vne", A: "va", X: "vx", Y: "vy", R: "vr", G: "vg", REF: "vref", YSE: "vyse", MC: "vmc (speed)", LE: "vle", LO: "vlo" };
 // Every other abbreviation that has its own glossary entry (key = the letters) is tapped the same way.
 // Ambiguous letters (VR, VMC, TC, NAV, IR, DC, ID, switch and TAF codes) stay out; tests/acronyms.mjs keeps this list honest.
 export const ABBR = ["FAA", "CFR", "FAR", "AIM", "PHAK", "AFH", "AC", "VFR", "IFR", "MVFR", "LIFR", "IMC", "ATC", "CFI", "PIC", "NTSB", "ICAO", "NOAA", "UTC", "CONUS", "SM", "NM", "RPM", "GPH", "OAT", "CHT", "EGT", "ISA", "IAS", "CAS", "TAS", "GS", "WCA", "ETA", "ETE", "CG", "AOA", "ASI", "VSI", "IVSI", "PFD", "MFD", "EFB", "ADM", "SRM", "CRM", "CFIT", "TUC", "DCS", "CO", "AME", "PAVE", "CARE", "TEAM", "DECIDE", "ABCDE", "ANDS", "AV1ATE", "ARROW", "SAFETY", "ELT", "AD", "SAIB", "MEL", "TCDS", "TSO", "NOTAM", "TFR", "SFRA", "MOA", "MTR", "CFA", "NSA", "GPS", "RNAV", "RAIM", "VOR", "VORTAC", "NDB", "DME", "ILS", "CDI", "OBS", "ADS-B", "UAT", "TIS-B", "FIS-B", "IDENT", "ATIS", "ASOS", "AWOS", "FSS", "MULTICOM", "GFA", "CVA", "MEF", "TAC", "WAC", "MAYDAY", "PAN-PAN", "TH", "MH", "CH", "MC", "CC", "E6B", "VOT", "SOP", "PSI",
