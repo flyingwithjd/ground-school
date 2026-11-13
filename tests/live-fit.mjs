@@ -5,6 +5,8 @@
 import { createRequire } from "module"; const { chromium } = createRequire("/workspace/pgs-build/")("playwright-core");
 const BASE = process.env.BASE || "http://localhost:8765/index.html";
 const ALL = { catlim: "vg", ignition: "magcheck", fuellim: "fuellim", induct: "carbice", elec: "elecsys", oilcool: "enginegauges", mixture: "mixture", combust: "combustion", prop: "prop", secctl: "flaptypes", icing: "icing", oxygen: "hypoxia", koel: "koel", press: "pressurization", heat: "cabinheat", ap: "autopilot", airframe: "gear", starting: "starter" };
+// GL1 papers visuals are addressed as lesson/section
+Object.assign(ALL, { "gl1/design": "certs", "gl1/papers": "airworthy", "gl1/cert": "pilotpath" });
 const want = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(ALL);
 let bad = 0; const ok = (c, m) => { if (!c) bad++; console.log((c ? "   ok   " : "   FAIL ") + m); };
 const b = await chromium.launch({ executablePath: "/usr/bin/google-chrome", args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
@@ -13,7 +15,7 @@ for (const [w, hh] of [[390, 844], [744, 1133]]) {
   await pg.addInitScript(() => { try { localStorage.setItem("sqs.access", "1"); } catch (e) {} });
   const errs = []; pg.on("pageerror", (e) => errs.push(e.message)); const cdp = await ctx.newCDPSession(pg);
   for (const sec of want) { const type = ALL[sec], tag = `${type} @ ${w}x${hh}`;
-    await pg.goto("about:blank"); await pg.goto(BASE + "#/lesson/gl2/" + sec); await pg.waitForTimeout(1300);
+    await pg.goto("about:blank"); await pg.goto(BASE + "#/lesson/" + (sec.includes("/") ? sec : "gl2/" + sec)); await pg.waitForTimeout(1300);
     const r = await pg.evaluate((type) => { const v = document.querySelector(`[data-viz="${type}"]`); if (!v) return null; const fig = v.querySelector("figure.viz") || v;
       const top = document.querySelector(".top"), nav = document.querySelector(".nav"); const hb = top ? top.getBoundingClientRect().height : 0;
       window.scrollTo(0, fig.getBoundingClientRect().top + scrollY - hb);
@@ -30,7 +32,7 @@ for (const [w, hh] of [[390, 844], [744, 1133]]) {
         if (e.scrollWidth > e.clientWidth + 1 || q.right > par.right + 1 || q.left < par.left - 1) clip.push(t); });
       const rows = [...fig.querySelectorAll(".ctrl:not(.ctrl-live) .chips, .ctrl:not(.ctrl-live) .ctrl-row")].filter((c) => c.scrollWidth > c.clientWidth + 1).length;
       const live = v.querySelector(".ctrl-live"), chipCtrl = v.querySelector(".ctrl:not(.ctrl-live)");
-      const chipsNext = !chipCtrl || getComputedStyle(chipCtrl).display === "none" || (live ? live.nextElementSibling === chipCtrl : after === chipCtrl);
+      const chipsNext = !chipCtrl || getComputedStyle(chipCtrl).display === "none" || chipCtrl.nextElementSibling === v.querySelector(".stage") /* chips on top */ || (live ? live.nextElementSibling === chipCtrl : after === chipCtrl);
       return { hb, navTop, figTop: fr.top, stTop: st.top, stBot: st.bottom, sl: sl.map((q) => [q.top, q.bottom]), firstAfter: after ? after.className : "", n: sl.length, nc: cb.length, offs, clip, rows, chipsNext }; }, type);
     if (!r) { ok(false, `${tag}: visual not found`); continue; }
     ok(Math.abs(r.figTop - r.hb) < 2 && r.stTop >= r.hb - 1 && r.stBot <= r.navTop + 1, `${tag}: stage on screen (${Math.round(r.stTop)}-${Math.round(r.stBot)} within ${Math.round(r.hb)}-${Math.round(r.navTop)})`);
