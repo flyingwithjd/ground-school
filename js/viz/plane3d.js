@@ -1,8 +1,8 @@
 // 3D part explorer and feature tour for the C172S wireframe.
-import { frame, chips } from "./base.js?v=2481aa7edd";
-import { planeStage } from "./planestage.js?v=2481aa7edd";
-import { h, reduced } from "../core/util.js?v=2481aa7edd";
-import { mount as taxiWind } from "./taxiwind.js?v=2481aa7edd";
+import { frame, chips } from "./base.js?v=58985d3f52";
+import { planeStage } from "./planestage.js?v=58985d3f52";
+import { h, reduced } from "../core/util.js?v=58985d3f52";
+import { mount as taxiWind } from "./taxiwind.js?v=58985d3f52";
 // Pose sign conventions (model): ail>0 rolls right, elev<0 = trailing edge up (nose up), rud>0 = right rudder, steer>0 = nose wheel left.
 const PARTS = {
   fuselage: { name: "Fuselage", group: "Major component", hl: ["fuselage", "fairing"], view: "iso", text: "The central body. Carries crew, passengers and cargo, and joins the wings and tail. Semimonocoque aluminum on the 172." },
