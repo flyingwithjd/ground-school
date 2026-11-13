@@ -431,6 +431,7 @@ export const GLOSSARY = {
   "Aviator's breathing oxygen": { def: "Oxygen that meets SAE AS8010 for purity and dryness, used in aircraft oxygen systems.", src: "PHAK Ch 7" },
   "Kinds of operation": { def: "The types of flight an airplane is approved for, such as day VFR, night VFR, IFR and flight into known icing, listed in Section 2 of its POH.", src: "POH Sec 2" },
   "KOEL": { def: "Kinds of Operations Equipment List: the part of an airplane's equipment list that shows which equipment must work for each kind of operation.", src: "POH Sec 2 · 14 CFR 91.213" },
-  "Equipment list": { def: "The list of equipment installed in a particular airplane, with weights and arms; it marks which items are required.", src: "POH Sec 6 · 14 CFR 91.213" }
+  "Equipment list": { def: "The list of equipment installed in a particular airplane, with weights and arms; it marks which items are required.", src: "POH Sec 6 · 14 CFR 91.213" },
+  "SAE AS8010": { def: "The SAE (Society of Automotive Engineers) standard for aviator's breathing oxygen, which sets its purity and dryness.", src: "PHAK Ch 7" }
 };
 export default GLOSSARY;

@@ -9,9 +9,9 @@
 // falls) and lowers it when airspeed falls (or load rises); manifold pressure shows power; at the pitch stops it acts
 // like a fixed-pitch propeller. C172S POH 2: static full-throttle RPM 2,300-2,400, red line 2,700.
 // RPM and manifold pressure values, blade pitch and pitch stops are illustrative, not published numbers.
-import { chips, slider, row } from "./base.js?v=da5a58a7ab";
-import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=da5a58a7ab";
-import { dial, anim, toward, COL } from "./dial.js?v=da5a58a7ab";
+import { chips, slider, row } from "./base.js?v=e4c491e0c8";
+import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=e4c491e0c8";
+import { dial, anim, toward, COL } from "./dial.js?v=e4c491e0c8";
 const RAD = 0.96, ST = [0.3, 0.6, 0.9], KT = 0.5144, D = Math.PI / 180, PITCH = 1.71, LOW = 10, HIGH = 38;
 export const fixedRpm = (thr, v) => 600 + thr * (1750 + 2.2 * v) + v * 0.8; // thr 0-1, v knots
 export const phi = (v, rpm, r) => Math.atan2(v * KT, (Math.max(rpm, 1) / 60) * 2 * Math.PI * r) / D;

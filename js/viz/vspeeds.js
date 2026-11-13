@@ -1,8 +1,8 @@
 // V-speeds on the C172S airspeed indicator. Tap a speed (or the dial) and only that arc or line lights up;
 // speeds that are not painted on the dial get an accent tick. Every number is from the C172S POH (NAV III, 172SPHBUS),
 // which matches the 1998 C172S Information Manual. Arc colors are the real instrument colors, muted (the color is the message).
-import { frame, ACC, FAINT, FAINT2, svg, drawOn, tween } from "./base.js?v=da5a58a7ab";
-import { s, h, esc, reduced } from "../core/util.js?v=da5a58a7ab";
+import { frame, ACC, FAINT, FAINT2, svg, drawOn, tween } from "./base.js?v=e4c491e0c8";
+import { s, h, esc, reduced } from "../core/util.js?v=e4c491e0c8";
 const MIN = 30, MAX = 180, A0 = -150, A1 = 150;
 const ang = (v) => A0 + ((Math.max(MIN, Math.min(MAX, v)) - MIN) / (MAX - MIN)) * (A1 - A0);
 const COL = { white: "#F2F1EC", green: "#3FA66B", yellow: "#D9B23A", red: "#D9493E" };

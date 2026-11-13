@@ -6,10 +6,10 @@
 // as ice is seen; thermal anti-ice should be on before entering icing; a weeping wing pumps antifreeze through small holes
 // to prevent ice and can also deice; the systems are not meant for long-term flight in icing. AC 91-74B: water that runs
 // back past a heated area can refreeze behind it (runback ice). Ice growth rates and the lift/drag bars are illustrative.
-import { chips, row } from "./base.js?v=da5a58a7ab";
-import { h } from "../core/util.js?v=da5a58a7ab";
-import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=da5a58a7ab";
-import { anim, COL } from "./dial.js?v=da5a58a7ab";
+import { chips, row } from "./base.js?v=e4c491e0c8";
+import { h } from "../core/util.js?v=e4c491e0c8";
+import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=e4c491e0c8";
+import { anim, COL } from "./dial.js?v=e4c491e0c8";
 const ICE = "#CFE6FF";
 const SAY = {
   none: ["No protection", "Most trainers aren't certified for icing. If you meet it, exit at once: turn back or change altitude."],
@@ -35,7 +35,7 @@ export function mount(host) {
     S.redraw(); return more; });
   function upd() { ib.textContent = icing ? "Exit icing" : "Enter icing"; ib.classList.toggle("on", icing); cb.disabled = prot !== "boots"; S.redraw(); A.kick(); }
   function draw(g, W, H, top) {
-    const wide = W >= 600, sc = Math.min(wide ? W * 0.62 : W * 0.86, 520), lx = wide ? 40 : 18, cy = top + (H - top) * (wide ? 0.5 : 0.36), th = sc * 0.2;
+    const wide = W >= 600, sc = Math.min(wide ? W * 0.62 : W * 0.8, 520), lx = wide ? 40 : 18, cy = top + (H - top) * (wide ? 0.5 : 0.36), th = sc * 0.2;
     // leading edge: a half-round nose blending into upper and lower skins
     if (ice > 0.01) { const t = ice * th * 0.45, x = lx + th * 0.6 - th / 2 - t; P(g, `M${lx + th * 0.6 + th * 0.4},${cy - th / 2 - 2} Q${x - t * 0.6},${cy - th / 2 - t * 1.2} ${x},${cy} Q${x - t * 0.6},${cy + th / 2 + t * 1.2} ${lx + th * 0.6 + th * 0.4},${cy + th / 2 + 2} Z`, { fill: ICE, stroke: ICE, w: 1, op: 0.92 });
       if (ice > 0.5) [-1, 1].forEach((sd) => P(g, `M${x + 4},${cy + sd * th * 0.2} l${-t * 0.5},${sd * t * 0.25}`, { stroke: ICE, w: 4 })); }
@@ -51,7 +51,7 @@ export function mount(host) {
     // labels
     const lab = { none: "", pitot: "", boots: "rubber boot", heated: "heated zone", weep: "antifreeze holes" }[prot];
     if (lab) T(g, lx + th * 0.9, cy + th / 2 + 26, lab, { size: 11, anchor: "middle", fill: prot === "heated" ? COL.red : prot === "weep" ? COL.cyan : ACC });
-    if (ice > 0.05) T(g, lx + th * 0.1, cy + th / 2 + 46 + ice * 8, "ice", { size: 11, fill: ICE });
+    if (ice > 0.05 && wide) T(g, lx + th * 0.1, cy + th / 2 + 46 + ice * 8, "ice", { size: 11, fill: ICE });
     if (run > 0.1) T(g, lx + th * 2.3, cy - th / 2 - 22, "runback ice", { size: 11, anchor: "middle", fill: ICE });
     // pitot tube and bars
     const px0 = wide ? W * 0.72 : 24, py0 = wide ? cy - 70 : cy + th / 2 + 60, bw = wide ? W * 0.24 : W - 48;

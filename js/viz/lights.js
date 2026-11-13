@@ -1,8 +1,8 @@
 // Airport lighting (AIM 2-1; PHAK Ch 14). Beacon, runway and taxiway lights, PAPI (fly the slider), 2-bar VASI, and
 // pilot-controlled lighting (key the mic). Light colors are real because the color is the message.
-import { frame, chips, slider, svg, loop, readout, FAINT, FAINT2, INK, ACC } from "./base.js?v=da5a58a7ab";
-import { s, h, reduced } from "../core/util.js?v=da5a58a7ab";
-import { T } from "./shapes.js?v=da5a58a7ab";
+import { frame, chips, slider, svg, loop, readout, FAINT, FAINT2, INK, ACC } from "./base.js?v=e4c491e0c8";
+import { s, h, reduced } from "../core/util.js?v=e4c491e0c8";
+import { T } from "./shapes.js?v=e4c491e0c8";
 const C = { w: "#FFF7E0", g: "#39D98A", r: "#FF4D4D", y: "#FFC93C", b: "#4D8DFF" };
 const dot = (p, x, y, c, r = 7, op = 1) => s("circle", { cx: x, cy: y, r, fill: C[c] || c, opacity: op }, p);
 export function mount(host, opts = {}) {

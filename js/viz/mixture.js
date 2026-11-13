@@ -7,9 +7,9 @@
 // lean by EGT or, with a fixed-pitch prop and no EGT, by RPM (lean until RPM peaks, then enrich slightly).
 // C172S POH 4 (Leaning Using EGT table): recommended lean 50 °F rich of peak EGT; best economy peak EGT. Standard-atmosphere density ratios.
 // Curve shapes, RPM values and the per-cylinder spread are illustrative, not published numbers.
-import { chips, slider, row } from "./base.js?v=da5a58a7ab";
-import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=da5a58a7ab";
-import { dial, eisCell, COL } from "./dial.js?v=da5a58a7ab";
+import { chips, slider, row } from "./base.js?v=e4c491e0c8";
+import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=e4c491e0c8";
+import { dial, eisCell, COL } from "./dial.js?v=e4c491e0c8";
 const SIG = { 0: 1, 5000: 0.862, 10000: 0.738 }, QP = 0.68, OFF = [0.03, -0.03, 0.05, 0.01];
 // d: fraction rich (+) or lean (-) of peak EGT for mixture m (0-100) at altitude a
 export const dOf = (m, a) => (m / 100 / SIG[a]) / QP - 1;

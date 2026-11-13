@@ -1,6 +1,6 @@
 // Four-stroke cycle: drag the crank through 720° and watch valves, spark and piston.
-import { frame, slider, chips, svg, loop, ACC, FAINT, FAINT2 } from "./base.js?v=da5a58a7ab";
-import { s, reduced } from "../core/util.js?v=da5a58a7ab";
+import { frame, slider, chips, svg, loop, ACC, FAINT, FAINT2 } from "./base.js?v=e4c491e0c8";
+import { s, reduced } from "../core/util.js?v=e4c491e0c8";
 const STROKES = [
   { k: "Intake", t: "Piston moves down with the intake valve open, drawing the fuel-air mixture into the cylinder." },
   { k: "Compression", t: "Both valves closed. The piston moves up and squeezes the mixture." },
