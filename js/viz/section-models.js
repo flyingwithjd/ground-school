@@ -47,3 +47,13 @@ export function modelKit(THREE) { const faceMat = new THREE.MeshBasicMaterial({ 
   const add = (name, parent, geo, segs) => { const o = new THREE.Group(); parent.add(o); if (geo) { const m = new THREE.Mesh(geo, faceMat); m.userData.part = name; m.userData.tag = name; o.add(m); meshes.push(m); }
     (parts[name] ||= { name, subs: [] }).subs.push({ obj: o, segs: segs || [] }); return o; };
   return { root, parts, meshes, add, faceMat, model: (extra = {}) => ({ root, parts, meshes, pose() {}, ...extra }) }; }
+// Fit a camera view to a set of model points: returns { tg, az, el, d, fov } that centers the points and fills the
+// given aspect (width / height) with a small margin. Uses a throwaway camera, so it can run before the stage renders.
+export function fitView(THREE, pts, { az, el, fov }, aspect, mx = 0.92, my = 0.9, tg0 = null) {
+  const D = Math.PI / 180, cam = new THREE.PerspectiveCamera(fov, aspect, 0.1, 1000), v3 = new THREE.Vector3();
+  const tg = tg0 ? new THREE.Vector3(...tg0) : pts.reduce((s, p) => s.add(v3.set(...p)), new THREE.Vector3()).divideScalar(pts.length); let d = 40;
+  for (let it = 0; it < 7; it++) { cam.position.set(tg.x + d * Math.cos(el * D) * Math.cos(az * D), tg.y + d * Math.sin(el * D), tg.z + d * Math.cos(el * D) * Math.sin(az * D)); cam.lookAt(tg); cam.updateMatrixWorld();
+    let x0 = 9, x1 = -9, y0 = 9, y1 = -9; pts.forEach((q) => { v3.set(...q).project(cam); x0 = Math.min(x0, v3.x); x1 = Math.max(x1, v3.x); y0 = Math.min(y0, v3.y); y1 = Math.max(y1, v3.y); });
+    const half = d * Math.tan((fov / 2) * D), right = new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld, 0), up = new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld, 1);
+    tg.addScaledVector(right, ((x0 + x1) / 2) * half * aspect).addScaledVector(up, ((y0 + y1) / 2) * half); d *= Math.max((x1 - x0) / 2 / mx, (y1 - y0) / 2 / my); }
+  return { tg: tg.toArray(), az, el, d, fov }; }
