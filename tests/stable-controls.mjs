@@ -2,6 +2,7 @@
 // In every interactive visual, clicks each button (chips, sub-chips, toggles) and asserts that every control group stays in its
 // own area: a group (chip row, slider, button set) may shift a little (a row wrapping, a caption growing), but it must not jump
 // sideways, move more than about a row, or end up beside a group it used to sit below. Groups may appear or disappear.
+// Inline glossary terms (.gl) in captions and explanations are text that reflows, not controls, so they are not grouped or clicked.
 // Each visual type + options is checked once (on the first route that shows it). Exit code 1 on any problem.
 import { createRequire } from "module"; const require = createRequire("/workspace/pgs-build/");
 const { chromium } = require("playwright-core"); import { execSync } from "child_process";
@@ -13,7 +14,7 @@ const ctx = await b.newContext({ viewport: { width: w, height: hh }, hasTouch: w
 const errs = []; pg.on("pageerror", (e) => errs.push(e.message));
 // snapshot: every visible control group in visual #vi (chip group, slider, or the parent of a lone button), page coordinates
 const snap = (vi) => pg.evaluate((vi) => { const v = document.querySelectorAll("[data-viz]")[vi]; if (!v) return null; const G = new Map();
-  v.querySelectorAll("button, input, select").forEach((e) => { if (!e.offsetParent || e.closest("svg")) return; const r = e.getBoundingClientRect(); if (!r.width) return;
+  v.querySelectorAll("button, input, select").forEach((e) => { if (!e.offsetParent || e.closest("svg") || e.matches(".gl")) return; /* .gl = inline glossary term in prose, not a control */ const r = e.getBoundingClientRect(); if (!r.width) return;
     const g = e.closest('[role=group], .chips, .slider') || e.parentElement; const u = G.get(g) || [1e9, 1e9, -1e9, -1e9];
     G.set(g, [Math.min(u[0], r.left + scrollX), Math.min(u[1], r.top + scrollY), Math.max(u[2], r.right + scrollX), Math.max(u[3], r.bottom + scrollY)]); });
   const out = {}, n = {}; for (const [g, r] of G) { let k = g.getAttribute("aria-label") || ((g.className || g.tagName) + ":" + ((g.querySelector("button, input, select") || {}).textContent || "").trim().slice(0, 24)); n[k] = (n[k] || 0) + 1; out[k + "#" + n[k]] = r; } return out; }, vi);
@@ -23,11 +24,11 @@ for (const r of routes) {
   await pg.goto("about:blank"); await pg.goto((process.env.BASE || "http://localhost:8765/index.html") + r); await pg.waitForTimeout(1000);
   const list = await pg.evaluate(() => [...document.querySelectorAll("[data-viz]")].map((v, i) => ({ i, type: v.dataset.viz, sig: v.dataset.viz + "|" + [...v.querySelectorAll("button")].map((b) => b.textContent.trim()).join(",").slice(0, 300) })));
   for (const V of list) { if (seen.has(V.sig)) continue; seen.add(V.sig); nviz++;
-    const labels = await pg.evaluate((vi) => [...document.querySelectorAll("[data-viz]")[vi].querySelectorAll("button")].filter((b) => b.offsetParent && !b.closest("svg")).map((b, j) => j), V.i);
+    const labels = await pg.evaluate((vi) => [...document.querySelectorAll("[data-viz]")[vi].querySelectorAll("button")].filter((b) => b.offsetParent && !b.closest("svg") && !b.matches(".gl")).map((b, j) => j), V.i);
     const probs = [];
     for (const j of labels.slice(0, 40)) {
       const before = await snap(V.i); if (!before) break;
-      const name = await pg.evaluate(([vi, j]) => { const bs = [...document.querySelectorAll("[data-viz]")[vi].querySelectorAll("button")].filter((b) => b.offsetParent && !b.closest("svg")); const b = bs[j]; if (!b || b.disabled) return null; b.click(); return (b.getAttribute("aria-label") || b.textContent).trim().replace(/\s+/g, " ").slice(0, 30); }, [V.i, j]);
+      const name = await pg.evaluate(([vi, j]) => { const bs = [...document.querySelectorAll("[data-viz]")[vi].querySelectorAll("button")].filter((b) => b.offsetParent && !b.closest("svg") && !b.matches(".gl")); const b = bs[j]; if (!b || b.disabled) return null; b.click(); return (b.getAttribute("aria-label") || b.textContent).trim().replace(/\s+/g, " ").slice(0, 30); }, [V.i, j]);
       if (name == null) continue; nclick++; await pg.waitForTimeout(260);
       if (!(await pg.evaluate(() => location.hash)).startsWith(r.split("?")[0].slice(0, 12))) { await pg.goBack(); await pg.waitForTimeout(800); continue; }
       const after = await snap(V.i); if (!after) break;
