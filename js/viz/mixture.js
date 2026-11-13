@@ -43,35 +43,50 @@ export function mount(host) {
   function draw(g, W, H, top) {
     const wide = W >= 600, d = dOf(m, alt), z = zone(d, alt, m), pw = power(d); if (d + OFF[1] < 0) peaked = true; if (m >= 95) peaked = false;
     const base = 2450 - alt * 0.015, rpm = pw ? base - (1 - pw) * 900 : 0, egtV = (x) => 0.85 + dEgt(x) / 600;
-    // chart
-    const cx0 = wide ? 52 : 44, cx1 = wide ? W * 0.6 : W - 18, cy0 = top + 22, cy1 = wide ? H - 40 : top + (H - top) * 0.52;
-    const X = (mm) => cx0 + ((100 - mm) / 100) * (cx1 - cx0), YE = (e) => cy0 + 12 + (-e / 320) * (cy1 - cy0 - 24), YR = (r) => cy1 - 8 - ((r - (base - 700)) / 760) * (cy1 - cy0 - 30);
-    R(g, cx0, cy0, cx1 - cx0, cy1 - cy0, { stroke: DIM, sw: 1 });
-    let pe = "", pr = ""; for (let mm = 100; mm >= 0; mm -= 1) { const dd = dOf(mm, alt); if (dd < QUIT) break; const e = Math.max(-320, dEgt(dd)); pe += (pe ? "L" : "M") + X(mm).toFixed(1) + "," + YE(e).toFixed(1);
+    // chart: EGT (yellow) and RPM (blue) against the mixture setting, full rich at left, idle cutoff at right
+    const cx0 = wide ? 50 : 44, cx1 = wide ? W * 0.6 : W - 18, cy0 = top + 26, cy1 = wide ? H - 34 : top + (H - top) * 0.5;
+    const mlo = Math.max(0, mFor(QUIT, alt) - 12), X = (mm) => cx0 + ((100 - Math.max(mm, mlo)) / (100 - mlo)) * (cx1 - cx0), YE = (e) => cy0 + 14 + (-e / 320) * (cy1 - cy0 - 28), YR = (r) => cy1 - 10 - ((r - (base - 700)) / 760) * (cy1 - cy0 - 34);
+    R(g, cx0, cy0, cx1 - cx0, cy1 - cy0, { fill: "#0d0d10", stroke: "rgba(242,241,236,.14)", sw: 1, rx: 6 });
+    for (let k = 1; k < 4; k++) L(g, cx0 + 1, cy0 + ((cy1 - cy0) * k) / 4, cx1 - 1, cy0 + ((cy1 - cy0) * k) / 4, { stroke: "rgba(242,241,236,.06)", w: 1 });
+    const mq = mFor(QUIT, alt); R(g, X(mq), cy0 + 1, cx1 - X(mq) - 1, cy1 - cy0 - 2, { fill: "rgba(242,241,236,.045)" });
+    if (cx1 - X(mq) > 34) T(g, (X(mq) + cx1) / 2, cy1 - 12, "quits", { size: 11, anchor: "middle", fill: z === "quit" ? COL.red : DIM });
+    let pe = "", pr = "", xl = cx0; for (let mm = 100; mm >= 0; mm -= 1) { const dd = dOf(mm, alt); if (dd < QUIT) break; xl = X(mm); const e = Math.max(-320, dEgt(dd)); pe += (pe ? "L" : "M") + X(mm).toFixed(1) + "," + YE(e).toFixed(1);
       pr += (pr ? "L" : "M") + X(mm).toFixed(1) + "," + YR(base - (1 - power(dd)) * 900).toFixed(1); }
-    P(g, pe, { stroke: COL.yellow, w: 2 }); P(g, pr, { stroke: ACC, w: 2 });
-    const mq = mFor(QUIT, alt); R(g, X(mq), cy0, cx1 - X(mq), cy1 - cy0, { fill: "rgba(217,73,62,.12)" });
+    P(g, pe + `L${xl.toFixed(1)},${cy1 - 1}L${cx0},${cy1 - 1}Z`, { fill: "rgba(217,178,58,.07)", stroke: "none" });
+    P(g, pe, { stroke: COL.yellow, w: 2.2 }); P(g, pr, { stroke: ACC, w: 2.2 });
     const mp = mFor(0, alt), mr = mFor(0.2, alt);
-    L(g, X(mp), cy0, X(mp), cy1, { stroke: DIM, w: 1, dash: "3 4" }); L(g, X(mr), cy0, X(mr), cy1, { stroke: DIM, w: 1, dash: "3 4" });
-    T(g, X(mp) + 4, cy0 - 6, "peak EGT", { size: 11, fill: z === "peak" ? INK : GRAY }); T(g, X(mr) - 4, cy0 - 6, "50 °F rich", { size: 11, anchor: "end", fill: z === "rec" ? INK : GRAY });
-    T(g, cx0, cy1 + 15, "rich", { size: 11, fill: DIM }); T(g, cx1, cy1 + 15, "lean", { size: 11, anchor: "end", fill: DIM });
-    const d0 = dOf(100, alt); T(g, cx0 + 6, YE(dEgt(d0)) - 8, "EGT", { size: 11, fill: COL.yellow }); T(g, cx0 + 6, YR(base - (1 - power(d0)) * 900) + 16, "RPM", { size: 11, fill: ACC });
-    if (pw) { C(g, X(m), YE(Math.max(-320, dEgt(d))), 5.5, { fill: COL.yellow, stroke: INK, sw: 1.4 }); C(g, X(m), YR(rpm), 5.5, { fill: ACC, stroke: INK, sw: 1.4 }); }
-    else L(g, X(m), cy0, X(m), cy1, { stroke: COL.red, w: 2 });
+    L(g, X(mp), cy0, X(mp), cy1, { stroke: z === "peak" ? INK : DIM, w: 1, dash: "3 4" }); L(g, X(mr), cy0, X(mr), cy1, { stroke: z === "rec" ? INK : DIM, w: 1, dash: "3 4" });
+    T(g, X(mp) + 4, cy0 - 8, "peak EGT", { size: 11, fill: z === "peak" ? INK : GRAY }); T(g, X(mr) - 4, cy0 - 8, "50 °F rich", { size: 11, anchor: "end", fill: z === "rec" ? INK : GRAY });
+    T(g, cx0, cy1 + 16, "◂ rich", { size: 11, fill: DIM }); T(g, cx1, cy1 + 16, "lean ▸", { size: 11, anchor: "end", fill: DIM });
+    const d0 = dOf(100, alt); T(g, cx0 + 8, YE(dEgt(d0)) - 9, "EGT", { size: 11, fill: COL.yellow, weight: 600 }); T(g, cx0 + 8, YR(base - (1 - power(d0)) * 900) + 17, "RPM", { size: 11, fill: ACC, weight: 600 });
+    // where you are now: a cursor line and two glowing points
+    L(g, X(m), cy0 + 2, X(m), cy1 - 2, { stroke: pw ? "rgba(242,241,236,.35)" : COL.red, w: pw ? 1.2 : 2 });
+    if (pw) { C(g, X(m), YE(Math.max(-320, dEgt(d))), 10, { fill: "rgba(217,178,58,.22)" }); C(g, X(m), YE(Math.max(-320, dEgt(d))), 5.5, { fill: COL.yellow, stroke: INK, sw: 1.4 });
+      C(g, X(m), YR(rpm), 10, { fill: "rgba(59,130,246,.25)" }); C(g, X(m), YR(rpm), 5.5, { fill: ACC, stroke: INK, sw: 1.4 }); }
     // instruments
     const ix0 = wide ? W * 0.6 + 24 : 16, ix1 = W - 16, iy0 = wide ? top + 4 : cy1 + 34, iy1 = H - 14, iw = ix1 - ix0, ih = iy1 - iy0;
+    // the red mixture knob: pushed in = full rich, pulled out = lean (idle cutoff all the way out)
+    const knob = (kx, ky, len) => { const out = (100 - m) / 100 * len; R(g, kx, ky - 9, len + 14, 18, { fill: "#0d0d10", stroke: "rgba(242,241,236,.14)", sw: 1, rx: 4 });
+      R(g, kx + 4, ky - 2.5, out + 6, 5, { fill: "#8c8c90" }); C(g, kx + out + 14, ky, 11, { fill: COL.red, stroke: "#f2a39c", sw: 1 }); for (let j = -1; j <= 1; j++) L(g, kx + out + 9, ky + j * 4.5, kx + out + 19, ky + j * 4.5, { stroke: "rgba(0,0,0,.35)", w: 1.2 });
+      T(g, kx, ky + 26, "MIXTURE", { size: 11, fill: GRAY }); T(g, kx + len + 14, ky + 26, m >= 100 ? "in: full rich" : m <= 0 ? "out: cutoff" : "pulled " + (100 - m) + "%", { size: 11, anchor: "end", fill: INK }); };
     if (panel === "round") {
-      const r = Math.min(wide ? ih * 0.22 : iw * 0.2, wide ? iw * 0.42 : ih * 0.42, 70), ax = wide ? ix0 + iw / 2 : ix0 + iw * 0.27, ay = wide ? iy0 + r + 8 : iy0 + ih / 2, bx = wide ? ax : ix0 + iw * 0.73, by = wide ? iy1 - r - 8 : ay;
+      const kH = wide ? 58 : 0, r = Math.min(wide ? (ih - kH) * 0.22 : iw * 0.2, wide ? iw * 0.4 : ih * 0.42, 70), ax = wide ? ix0 + iw / 2 : ix0 + iw * 0.27, ay = wide ? iy0 + r + 8 : iy0 + ih / 2, bx = wide ? ax : ix0 + iw * 0.73, by = wide ? iy0 + (ih - kH) - r - 4 : ay;
       dial(g, ax, ay, r, { min: 0, max: 3500, arcs: [[2100, 2500 + alt / 50, "green"]], reds: [2700], ticks: [0, 500, 1000, 1500, 2000, 2500, 3000, 3500], nums: [[1000, "10"], [2000, "20"], [3000, "30"]], title: "RPM ×100", focus: true, value: rpm, fmt: (v) => String(Math.round(v / 10) * 10) });
       const eg = dial(g, bx, by, r, { min: 0, max: 1, ticks: [0.25, 0.5, 0.75], title: "EGT", focus: true, value: pw ? egtV(d) : 0.15 });
       const a = eg.ang(0.85) * Math.PI / 180; L(g, bx + Math.sin(a) * (r - 18), by - Math.cos(a) * (r - 18), bx + Math.sin(a) * (r - 2), by - Math.cos(a) * (r - 2), { stroke: COL.yellow, w: 3 });
+      if (wide) knob(ix0 + 6, iy1 - 30, iw - 30);
     } else {
-      eisCell(g, ix0, iy0 + 12, Math.min(iw, 320), { label: "RPM", min: 0, max: 3000, bands: [[2100, 2500 + alt / 50, "green"], [2700, 3000, "red"]], value: rpm, fmt: (v) => String(Math.round(v / 10) * 10), focus: true });
-      const ds = OFF.map((o) => d + o), first = 1, past = (peaked = peaked || ds[first] < 0) && m < 95, bw = Math.min(30, iw / 9), gap = (Math.min(iw, 320) - 16 - 4 * bw) / 3, bx0 = ix0 + 8, bTop = iy0 + 64, bBot = iy1 - 34;
-      T(g, ix0, iy0 + 52, "EGT", { size: 11, fill: GRAY });
+      // a G1000 engine strip: dark screen in a bezel, RPM cell, then a bar per cylinder with the first to peak in cyan
+      const sw2 = Math.min(iw, 320), sx = ix0, sy = iy0, sh = (wide ? ih - 62 : ih);
+      R(g, sx - 6, sy - 2, sw2 + 12, sh + 4, { fill: "#1b1b1f", stroke: "rgba(242,241,236,.18)", sw: 1, rx: 10 }); R(g, sx, sy + 4, sw2, sh - 8, { fill: "#050506", rx: 4 });
+      const ix = sx + 12, iwx = sw2 - 24; T(g, sx + sw2 / 2, sy + 22, "ENGINE", { size: 11, anchor: "middle", fill: COL.cyan, weight: 600 });
+      eisCell(g, ix, sy + 46, iwx, { label: "RPM", min: 0, max: 3000, bands: [[2100, 2500 + alt / 50, "green"], [2700, 3000, "red"]], value: rpm, fmt: (v) => String(Math.round(v / 10) * 10), focus: true });
+      const ds = OFF.map((o) => d + o), first = 1, past = (peaked = peaked || ds[first] < 0) && m < 95, bw = Math.min(20, iwx / 9), gap = (iwx - 24 - 4 * bw) / 3, bx0 = ix + 12, bTop = sy + 96, bBot = sy + sh - 34;
+      T(g, ix, sy + 86, "EGT °F", { size: 11, fill: GRAY });
       ds.forEach((dd, i) => { const v = pw ? Math.max(0.1, Math.min(1, egtV(dd))) : 0.1, x = bx0 + i * (bw + gap), hh = (bBot - bTop) * v, hot = i === first;
         R(g, x, bTop, bw, bBot - bTop, { stroke: DIM, sw: 1 }); R(g, x + 2, bBot - hh, bw - 4, hh, { fill: hot && past ? COL.cyan : "rgba(242,241,236,.6)" }); T(g, x + bw / 2, bBot + 16, String(i + 1), { size: 11, anchor: "middle", fill: hot && past ? COL.cyan : GRAY }); });
-      T(g, ix1, iy0 + 52, pw && past ? `ΔPEAK ${Math.round(dEgt(ds[first]))} °F` : pw ? "peak not reached" : "", { size: 12, anchor: "end", fill: past ? COL.cyan : GRAY, weight: 600 });
+      T(g, ix + iwx, sy + 86, pw && past ? `ΔPEAK ${Math.round(dEgt(ds[first]))} °F` : pw ? "peak not reached" : "", { size: 12, anchor: "end", fill: past ? COL.cyan : GRAY, weight: 600 });
+      if (wide) knob(ix0 + 6, iy1 - 30, iw - 30);
     }
     S.F.caption(SAY[z][0], SAY[z][1]);
   }
