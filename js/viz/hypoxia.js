@@ -57,9 +57,9 @@ export function mount(host, opts = {}) {
     if (SY) { const o2 = sys === "none" ? spo2(a) : over ? null : 96, bx2 = cx, by2 = Math.max(ty + 6, bot - 70), low = o2 != null && o2 < 90;
       R(g, bx2, by2, 170, 64, { rx: 10, fill: "#0A0A0B", stroke: low || o2 == null ? "#D9493E" : GRAY, sw: 1.4 });
       T(g, bx2 + 12, by2 + 20, "PULSE OXIMETER", { size: 11, fill: GRAY });
-      T(g, bx2 + 12, by2 + 50, o2 == null ? (sys === "none" ? "inadequate" : "over limit") : `SpO2 ${o2}%`, { size: o2 == null ? 13 : 20, fill: low || o2 == null ? "#D9493E" : INK, weight: 700 });
-      const cap = sys === "none" ? (o2 == null ? ["No oxygen", "Breathing air is totally inadequate here. Descend or use oxygen now."] : low ? ["Below 90%", "Mental function starts to suffer. Use oxygen or descend."] : ["Breathing air", "Drag the altitude and watch your blood oxygen fall."])
-        : over ? ["Past this system's limit", "Use a system rated for this altitude, or descend."] : ["On oxygen", "Enough supplemental oxygen keeps saturation near sea-level values."];
+      T(g, bx2 + 12, by2 + 50, o2 == null ? (sys === "none" ? "inadequate" : "over limit") : `SpO2 ${o2}%`, { mono: false, size: o2 == null ? 13 : 20, fill: low || o2 == null ? "#D9493E" : INK, weight: 700 });
+      const cap = sys === "none" ? (o2 == null ? ["No oxygen", "Breathing air is totally inadequate at this altitude. Use supplemental oxygen or descend now."] : low ? ["Below 90%", "Mental function starts to suffer below about 90%. Use supplemental oxygen or descend now."] : ["Breathing air", "Drag the altitude and watch your blood oxygen fall. The readout uses the FAA's typical values."])
+        : over ? ["Past this system's limit", "This system isn't rated for this altitude. Switch to one that is, or descend to where it works."] : ["On oxygen", "Enough supplemental oxygen keeps blood saturation near sea-level values: 96% in the FAA table."];
       S.F.caption(cap[0], cap[1]); }
     S.F.explain(`Oxygen is still about 21% of the air at ${a.toLocaleString()} ft, but its partial pressure drops as you climb, so each breath delivers less. Symptoms vary and the first ones can feel pleasant. Treatment: descend and/or use oxygen. <span class="src">AIM 8-1-2 · PHAK 17</span>`);
   }

@@ -12,17 +12,17 @@ import { pxScene, T, R, hit, INK, GRAY, DIM, ACC } from "./kit.js?v=da5a58a7ab";
 import { COL } from "./dial.js?v=da5a58a7ab";
 const LINES = [
   ["cat", "NORMAL CATEGORY: NO ACROBATIC", "MANEUVERS, INCLUDING SPINS, APPROVED", "Category limits come from Section 2 of your airplane's POH; the placard repeats the key ones."],
-  ["kinds", "KINDS OF OPERATION:", "DAY · NIGHT · VFR · IFR", "What the airplane was certified for as equipped. Each one also needs the required equipment installed and working."],
-  ["ice", "FLIGHT INTO KNOWN ICING", "PROHIBITED", "Most trainers aren't certified for icing. If you meet it, exit at once."],
+  ["kinds", "KINDS OF OPERATION:", "DAY · NIGHT · VFR · IFR", "What the airplane is approved for. Each kind also needs its required equipment installed and working."],
+  ["ice", "FLIGHT INTO KNOWN ICING", "PROHIBITED", "Most trainers aren't certified for icing. If you meet it anyway, exit the icing conditions at once."],
 ];
 const FLIGHT = { day: "Day VFR", night: "Night VFR", ifr: "IFR", ice: "Known icing" };
 const ITEM = { none: "Nothing", land: "Landing light", pos: "Position lights", ai: "Attitude indicator" };
 export function verdict(f, it) {
-  if (f === "ice") return ["Prohibited", "The POH prohibits flight into known icing, whatever is installed."];
-  if (it === "pos" && f !== "day") return ["No-go", "Position lights are required at night (91.205(c)). Fly by day or get them fixed."];
-  if (it === "ai" && f === "ifr") return ["No-go", "IFR requires an attitude indicator (91.205(d)). Fly VFR or get it fixed."];
+  if (f === "ice") return ["Prohibited", "The POH prohibits flight into known icing, whatever ice protection or equipment is installed."];
+  if (it === "pos" && f !== "day") return ["No-go", "Position lights are required at night (91.205(c)). Fly by day instead, or get them fixed first."];
+  if (it === "ai" && f === "ifr") return ["No-go", "IFR requires a gyroscopic attitude indicator (91.205(d)). Fly VFR instead, or get it fixed first."];
   if (it !== "none") return ["Go, if placarded", "If nothing lists it as required: deactivate or remove it and placard it Inoperative (91.213(d))."];
-  return ["Go", "Approved in the POH, and the equipment this flight requires is installed and working."];
+  return ["Go", "Approved in the POH, and all the equipment this flight requires is installed and working. Go."];
 }
 export function mount(host) {
   let fl = "day", it = "none", focus = null;
@@ -30,7 +30,7 @@ export function mount(host) {
   const r0 = row(S.F.ctrl, "Flight"); chips(r0, Object.entries(FLIGHT), fl, (k) => { fl = k || "day"; S.redraw(); }, { label: "Flight" });
   const r1 = row(S.F.ctrl, "Inoperative"); chips(r1, Object.entries(ITEM), it, (k) => { it = k || "none"; S.redraw(); }, { label: "Inoperative" });
   function draw(g, W, H, top) {
-    const wide = W >= 600, px = wide ? 28 : 14, pw = Math.min(wide ? W * 0.5 : W - 28, 330), lh = 18, py = top + 10;
+    const wide = W >= 600, px = wide ? 28 : 14, pw = Math.min(wide ? W * 0.5 : W - 28, 330), lh = 18, ph0 = 3 * (lh * 2 + 22) + 30, py = wide ? top + Math.max(10, (H - top - ph0) / 2 - 10) : top + 10;
     R(g, px, py, pw, 3 * (lh * 2 + 22) + 30, { fill: "#141416", stroke: GRAY, sw: 1.4, rx: 4 });
     T(g, px + pw / 2, py + 20, "OPERATING LIMITATIONS (EXAMPLE)", { size: 11, anchor: "middle", fill: GRAY });
     LINES.forEach(([k, a, b], i) => { const y = py + 30 + i * (lh * 2 + 22), on = focus === k || (k === "ice" && fl === "ice") || (k === "kinds" && fl !== "ice" && focus == null);
