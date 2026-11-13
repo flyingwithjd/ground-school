@@ -24,11 +24,12 @@ export function mount(host) {
   chips(F.ctrl, [["comp", "Composite skin"], ["wing", "Wing parts"], ["lay", "Wing layout"]], mode, (v) => { mode = v; ui(); }, { label: "Close-up" });
   function ui() { bar.innerHTML = "";
     if (mode === "comp") { const r = h("div", { class: "fc-row" });
-      [["good", "Tap a sound spot"], ["bad", "Tap the bubbled spot"]].forEach(([k, t]) => { const b = h("button", { type: "button", class: "btn ghost fc-ans" + (tap === k ? " on" : "") }, t); b.onclick = () => { tap = k; layer = null; ui(); }; r.append(b); });
+      [["good", "Tap a sound spot"], ["bad", "Tap the bubbled spot"]].forEach(([k, t]) => { const b = h("button", { type: "button", class: "btn ghost fc-ans" + (tap === k ? " on" : "") }, t); b.dataset.k = k; b.onclick = () => { tap = k; layer = null; refresh(); }; r.append(b); });
       bar.append(r, h("p", { class: "aw-hint" }, "Or tap a layer to name it.")); }
-    else if (mode === "wing") chips(bar, Object.entries(WING).map(([k, v]) => [k, v[0]]), wp, (v) => { wp = v; ui(); }, { label: "Wing part" });
-    else chips(bar, Object.entries(LAY).map(([k, v]) => [k, v[0].split(",")[0]]), lay, (v) => { lay = v; ui(); }, { label: "Layout" });
-    text(); sc.redraw(); }
+    else if (mode === "wing") chips(bar, Object.entries(WING).map(([k, v]) => [k, v[0]]), wp, (v) => { wp = v; refresh(); }, { label: "Wing part" });
+    else chips(bar, Object.entries(LAY).map(([k, v]) => [k, v[0].split(",")[0]]), lay, (v) => { lay = v; refresh(); }, { label: "Layout" });
+    refresh(); }
+  function refresh() { bar.querySelectorAll(".fc-ans").forEach((b) => b.classList.toggle("on", b.dataset.k === tap)); text(); sc.redraw(); }
   function text() {
     if (mode === "comp") { const L0 = LAYERS.find((x) => x.k === layer);
       if (L0) { F.caption("Composite layer", L0.n); F.explain(rich(L0.d) + ' <span class="src">PHAK 3</span>'); }
@@ -38,14 +39,14 @@ export function mount(host) {
     else if (mode === "wing") { F.caption("Wing structure", WING[wp][0]); F.explain(rich(WING[wp][1] + ' <span class="src">PHAK 3</span>')); }
     else { F.caption("Wing layout", LAY[lay][0]); F.explain(rich(LAY[lay][1] + ' <span class="src">PHAK 3</span>')); } }
   function draw(g, W, H, top) { const avail = H - top - 10, x0 = 18, x1 = W - 18;
-    if (mode === "comp") { let y = top + 6; const hh = avail * 0.78, spot = tap === "bad" ? W * 0.62 : W * 0.38;
+    if (mode === "comp") { let y = top + 6; const hh = avail * 0.8, spot = tap === "bad" ? (x1 - 130) * 0.62 : (x1 - 130) * 0.3;
       LAYERS.forEach((Lr) => { const lh = Lr.hh * hh, on = layer === Lr.k, st = on ? ACC : INK, fill = on ? ACCF : "#141416";
         const r = R(g, x0, y, x1 - x0, lh, { fill, stroke: st, sw: on ? 2 : 1 });
-        if (Lr.k === "mesh") for (let x = x0 + 4; x < x1; x += 9) L(g, x, y + 1, x + 6, y + lh - 1, { stroke: on ? ACC : GRAY, w: 1 });
+        if (Lr.k === "mesh") for (let x = x0 + 4; x < x1 - 130; x += 9) L(g, x, y + 1, x + 6, y + lh - 1, { stroke: on ? ACC : GRAY, w: 1 });
         if (Lr.k === "outer" || Lr.k === "inner") for (let i = 1; i < 3; i++) L(g, x0, y + (lh * i) / 3, x1, y + (lh * i) / 3, { stroke: DIM, w: 1 });
-        if (Lr.k === "core") for (let x = x0 + 10; x < x1 - 10; x += 22) P(g, `M${x} ${y + 2} L${x + 6} ${y + lh / 2} L${x} ${y + lh - 2} M${x + 6} ${y + lh / 2} L${x + 16} ${y + lh / 2}`, { stroke: on ? ACC : GRAY, w: 1 });
+        if (Lr.k === "core") for (let x = x0 + 10; x < x1 - 140; x += 22) P(g, `M${x} ${y + 2} L${x + 6} ${y + lh / 2} L${x} ${y + lh - 2} M${x + 6} ${y + lh / 2} L${x + 16} ${y + lh / 2}`, { stroke: on ? ACC : GRAY, w: 1 });
         T(g, x1 - 6, y + lh / 2 + 4, Lr.n, { anchor: "end", size: 11, fill: on ? INK : GRAY });
-        hit(g, r, Lr.n, () => { layer = Lr.k; tap = null; ui(); });
+        hit(g, r, Lr.n, () => { layer = Lr.k; tap = null; refresh(); });
         Lr.y = y; Lr.h = lh; y += lh; });
       if (tap) { const sy = top + 6, o = LAYERS[2];
         if (tap === "bad") { P(g, `M${spot - 40} ${o.y + o.h * 0.5} Q${spot} ${o.y + o.h * 0.5 - 14} ${spot + 40} ${o.y + o.h * 0.5}`, { stroke: "#E5484D", w: 2, fill: "rgba(229,72,77,.18)" }); T(g, spot, o.y + o.h + 16, "gap between plies", { anchor: "middle", size: 11, fill: "#F2B8BA" }); }

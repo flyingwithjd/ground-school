@@ -106,10 +106,10 @@ function cdi(crs) { const el = base(`Course deviation indicator, course ${crs}, 
 
 // Situations: control instruments change first, performance instruments follow (example readings).
 const SIT = {
-  level: { cap: "Level cruise", ctl: { pitch: 0, rpm: 2300 }, perf: { kt: 100, ft: 4500, fpm: 0 }, t: "Level cruise: set the attitude and power, then the performance instruments settle and confirm it." },
-  nose: { cap: "Raise the nose", ctl: { pitch: 5, rpm: 2300 }, perf: { kt: 85, ft: 4560, fpm: 500 }, t: "Nose up, same power: the attitude indicator shows it at once; then airspeed bleeds off, the VSI shows a climb and the altimeter starts to wind up." },
-  power: { cap: "Add power, hold altitude", ctl: { pitch: -1, rpm: 2500 }, perf: { kt: 110, ft: 4500, fpm: 0 }, t: "More power on the tachometer, with the nose eased down a touch to stay level: the airspeed rises; altitude and VSI stay put." },
-  less: { cap: "Less power, descend", ctl: { pitch: -3, rpm: 1900 }, perf: { kt: 100, ft: 4440, fpm: -500 }, t: "Power back and nose down a little to keep 100 knots: the VSI shows a descent and the altimeter unwinds, airspeed holds." },
+  level: { chip: "Level", cap: "Level cruise", ctl: { pitch: 0, rpm: 2300 }, perf: { kt: 100, ft: 4500, fpm: 0 }, t: "Level cruise: set the attitude and power, then the performance instruments settle and confirm it." },
+  nose: { chip: "Nose up", cap: "Raise the nose", ctl: { pitch: 5, rpm: 2300 }, perf: { kt: 85, ft: 4560, fpm: 500 }, t: "Nose up, same power: the attitude indicator shows it at once; then airspeed bleeds off, the VSI shows a climb and the altimeter starts to wind up." },
+  power: { chip: "Add power", cap: "Add power, hold altitude", ctl: { pitch: -1, rpm: 2500 }, perf: { kt: 110, ft: 4500, fpm: 0 }, t: "More power on the tachometer, with the nose eased down a touch to stay level: the airspeed rises; altitude and VSI stay put." },
+  less: { chip: "Less power", cap: "Less power, descend", ctl: { pitch: -3, rpm: 1900 }, perf: { kt: 100, ft: 4440, fpm: -500 }, t: "Power back and nose down a little to keep 100 knots: the VSI shows a descent and the altimeter unwinds, airspeed holds." },
 };
 const CELLS = [
   ["asi", "Airspeed", "perf", (v) => asi(v.kt), (v) => `${v.kt} KIAS`], ["ai", "Attitude", "ctl", (v) => ai(v.pitch), (v) => v.pitch ? `${Math.abs(v.pitch)}° ${v.pitch > 0 ? "up" : "down"}` : "Level"],
@@ -127,12 +127,12 @@ export function mount(host, opts = {}) {
   const light = () => { for (const [k, , g] of CELLS) { cells[k].classList.toggle("on", grp === g); cells[k].classList.toggle("off", !!grp && grp !== g); }
     if (grp) F.explain(`<p><b>${GNAME[grp][0]}:</b> ${rich(GNAME[grp][1])}.</p>` + notes); else F.explain(`<p>${SIT[sit].t}</p>` + notes); };
   chips(F.ctrl, [["perf", "Performance"], ["ctl", "Control"], ["nav", "Navigation"]], null, (g) => { grp = g; light(); }, { label: "Instrument group", toggle: true });
-  chips(F.ctrl, Object.entries(SIT).map(([k, o]) => [k, o.cap]), "level", (k) => { if (!k) return; sit = k; clearTimeout(tmr); const S = SIT[k];
+  chips(F.ctrl, Object.entries(SIT).map(([k, o]) => [k, o.chip]), "level", (k) => { if (!k) return; sit = k; clearTimeout(tmr); const S = SIT[k];
     Object.assign(v, S.ctl); paint(["ai", "tach"]); F.caption("First: control instruments", S.cap);
     tmr = setTimeout(() => { Object.assign(v, S.perf); paint(["asi", "alt", "vsi"]); F.caption("Then: performance instruments follow", S.cap); }, reduced() ? 0 : 1100); grp = null; light(); }, { label: "Situation" });
-  F.ctrl.append(h("p", { class: "ip-hint" }, "Pick a group to light it, or a situation to watch the gauges respond."));
+  F.root.insertBefore(F.root.querySelector(".caption"), F.stage);   // the step caption sits right above the gauges, always in view
   const notes = [].concat(opts.note || []).map((n) => `<p class="ip-note">${n}</p>`).join("");
-  paint(); F.caption("Six-pack plus power and navigation", "Level cruise"); light();
+  paint(); F.caption("Light a group, or pick a situation", "Level cruise"); light();
   F.on(() => clearTimeout(tmr));
   return { destroy: () => F.destroy() };
 }

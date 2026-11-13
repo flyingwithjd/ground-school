@@ -6,7 +6,7 @@ import { createRequire } from "module"; const { chromium } = createRequire("/wor
 const BASE = process.env.BASE || "http://localhost:8765/index.html";
 const ALL = { catlim: "vg", ignition: "magcheck", fuellim: "fuellim", induct: "carbice", elec: "elecsys", oilcool: "enginegauges", mixture: "mixture", combust: "combustion", prop: "prop", secctl: "flaptypes", icing: "icing", oxygen: "hypoxia", koel: "koel", press: "pressurization", heat: "cabinheat", ap: "autopilot", airframe: "gear", starting: "starter" };
 // GL1 papers visuals are addressed as lesson/section
-Object.assign(ALL, { "gl1/design": "certs", "gl1/papers": "airworthy", "gl1/cert": "pilotpath", "gl1/walk": "plane3d", "gl1/walk:fuelcheck": "fuelcheck" });
+Object.assign(ALL, { "gl1/design": "certs", "gl1/papers": "airworthy", "gl1/cert": "pilotpath", "gl1/walk": "plane3d", "gl1/walk:fuelcheck": "fuelcheck", "gl1/build:buildparts": "buildparts", "gl1/parts:gear": "gear", "gl1/aero:forces": "forces", "gl1/insts:instpanel": "instpanel" });
 const want = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(ALL);
 let bad = 0; const ok = (c, m) => { if (!c) bad++; console.log((c ? "   ok   " : "   FAIL ") + m); };
 const b = await chromium.launch({ executablePath: "/usr/bin/google-chrome", args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
@@ -32,7 +32,7 @@ for (const [w, hh] of [[390, 844], [744, 1133]]) {
         if (e.scrollWidth > e.clientWidth + 1 || q.right > par.right + 1 || q.left < par.left - 1) clip.push(t); });
       const rows = [...fig.querySelectorAll(".ctrl:not(.ctrl-live) .chips, .ctrl:not(.ctrl-live) .ctrl-row")].filter((c) => c.scrollWidth > c.clientWidth + 1).length;
       const live = v.querySelector(".ctrl-live"), chipCtrl = v.querySelector(".ctrl:not(.ctrl-live)");
-      const chipsNext = !chipCtrl || getComputedStyle(chipCtrl).display === "none" || chipCtrl.nextElementSibling === v.querySelector(".stage") /* chips on top */ || (live ? live.nextElementSibling === chipCtrl : after === chipCtrl);
+      const chipsNext = !chipCtrl || getComputedStyle(chipCtrl).display === "none" || chipCtrl.nextElementSibling === v.querySelector(".stage") /* chips on top */ || (chipCtrl.nextElementSibling && chipCtrl.nextElementSibling.classList.contains("caption") && chipCtrl.nextElementSibling.nextElementSibling === v.querySelector(".stage")) /* chips, step caption, stage */ || (live ? live.nextElementSibling === chipCtrl : after === chipCtrl);
       return { hb, navTop, figTop: fr.top, stTop: st.top, stBot: st.bottom, sl: sl.map((q) => [q.top, q.bottom]), firstAfter: after ? after.className : "", n: sl.length, nc: cb.length, offs, clip, rows, chipsNext }; }, type);
     if (!r) { ok(false, `${tag}: visual not found`); continue; }
     ok(Math.abs(r.figTop - r.hb) < 2 && r.stTop >= r.hb - 1 && r.stBot <= r.navTop + 1, `${tag}: stage on screen (${Math.round(r.stTop)}-${Math.round(r.stBot)} within ${Math.round(r.hb)}-${Math.round(r.navTop)})`);

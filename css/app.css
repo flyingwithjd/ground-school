@@ -810,3 +810,8 @@ html.locked #gate { display: flex; }
 .viz.instp.ipx .stage { padding: 40px 8px 10px; }
 .ip-hint { margin: 2px 0 0; font: 500 12px/1.4 var(--mono); color: var(--ink2); }
 @media (prefers-reduced-motion: reduce) { .viz.instp.ipx .ip-cell.chg { animation: none; } }
+.viz.instp.ipx .ctrl .chip { padding: 6px 12px; font-size: 14px; min-height: 36px; }
+.viz.instp.ipx .ctrl { gap: 6px; }
+@media (max-width: 600px) { .viz.instp.ipx .ip-face svg { max-width: 100px; } .viz.instp.ipx .ip-grid { gap: 6px 6px; } .viz.instp.ipx .stage { padding-top: 36px; } }
+@media (max-width: 700px) { .viz.px.buildparts .stage { aspect-ratio: 3 / 2.9; } }
+.viz.instp.ipx > .caption { padding: 10px 18px 0; }
