@@ -5,7 +5,8 @@ export default {
 <p>You decide whether the airplane is in condition for safe flight, and you discontinue the flight when it isn't. A signed annual doesn't make that decision for you. <span class="src">14 CFR 91.7</span></p>`,
       kdr: { k: "Pilot-in-command responsibilities.", d: "Determine the airplane is airworthy.", r: "Accepting an unairworthy airplane.", codes: ["PA.I.B.K1e", "PA.I.B.S2", "PA.II.A.K2"] } },
     { id: "docs", label: "Documents · ARROW", title: "Paper in the airplane",
-      body: `<p>ARROW lists what must be on board. Tap each letter for the rule behind it. <span class="src">14 CFR 91.203, 91.9; PHAK Ch 9</span></p>`,
+      body: `<p>ARROW lists what must be on board. Tap each letter for the rule behind it. <span class="src">14 CFR 91.203, 91.9; PHAK Ch 9</span></p>
+<p>ARROW stands for: the [[Airworthiness certificate]], displayed at the cabin or cockpit entrance where passengers or crew can read it; the [[Registration certificate]]; the radio station license, needed only for flights outside the United States; the operating limitations, which are the approved flight manual or POH plus the markings and [[Placard|placards]]; and [[Weight and balance]] data. The maintenance logbooks are not on the list. <span class="src">14 CFR 91.203, 91.9; PHAK Ch 9</span></p>`,
       viz: { type: "mnemo", opts: { set: "arrow" } },
       kdr: { k: "Location and expiration of required certificates.", d: "Locate the airworthiness and registration documents.", r: "Missing documents.", codes: ["PA.I.B.K1a", "PA.I.B.S1", "PA.I.B.K4"] } },
     { id: "insp", label: "Inspections · AV1ATE", title: "What the logbooks must show",
