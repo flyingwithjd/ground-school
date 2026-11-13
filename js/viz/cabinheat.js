@@ -32,7 +32,7 @@ export function mount(host) {
     // exhaust pipe through the shroud, with an optional crack
     const mx = x0 + gap + 4, mw = gap - (wide ? 30 : 14); L(g, mx + 6, y + bh + 14, mx + mw - 6, y + bh + 14, { stroke: GRAY, w: 6 }); T(g, mx + mw / 2, y + bh + 36, "exhaust", { size: 11, anchor: "middle", fill: GRAY });
     if (crack) { P(g, `M${mx + mw / 2 - 6},${y + bh + 10} l4,4 l-3,3 l5,4`, { stroke: COL.red, w: 2 }); }
-    if (bad) for (let i = 0; i < 3; i++) { const x = x0 + (i + 2) * gap - 13; C(g, x, y + bh / 2 - 12, 3, { fill: COL.red }); C(g, x - 7, y + bh / 2 - 18, 2.5, { fill: COL.red }); }
+    if (bad) { for (let i = 0; i < 2; i++) { const x = x0 + (i + 2) * gap - 13; C(g, x, y + bh / 2 - 12, 3, { fill: COL.red }); C(g, x - 7, y + bh / 2 - 18, 2.5, { fill: COL.red }); } for (let i = 0; i < 3; i++) C(g, x0 + 3 * gap + 18 + i * 10, y + bh - 10 - (i % 2) * 5, 2.5, { fill: COL.red }); }
     // fresh air and defrost
     const cx = x0 + 3 * gap + 4, cw = gap - (wide ? 30 : 14);
     L(g, cx + cw / 2, y - 36, cx + cw / 2, y - 4, { stroke: air ? ACC : DIM, w: air ? 3 : 1.2, arrow: air }); T(g, cx + cw / 2, y - 42, air ? "fresh air" : "cabin air closed", { size: 11, anchor: "middle", fill: air ? ACC : GRAY });
