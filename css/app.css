@@ -414,7 +414,7 @@ svg text:not([font-family]) { font-family: var(--mono); }
 .viz.px .stage { aspect-ratio: 16 / 9; }
 .viz.px.tall .stage { aspect-ratio: 4 / 3; }
 .viz.px.xtall .stage { aspect-ratio: 4 / 3; }
-@media (max-width: 700px) { .viz.px .stage { aspect-ratio: 4 / 3.6; } .viz.px.tall .stage { aspect-ratio: 3 / 3.6; } .viz.px.xtall .stage { aspect-ratio: 3 / 4.4; } }
+@media (max-width: 700px) { .viz.px .stage { aspect-ratio: 4 / 3.6; } .viz.px.tall .stage { aspect-ratio: 3 / 3.6; } .viz.px.xtall .stage { aspect-ratio: 3 / 4.4; } .viz.px.xtall.slfirst.vg .stage { aspect-ratio: 3 / 3.55; } .viz.px.xtall.slfirst.fuellim .stage, .viz.px.xtall.slfirst.elecsys .stage, .viz.px.xtall.slfirst.enggauges .stage { aspect-ratio: 3 / 3.4; } }
 .viz.px svg text { pointer-events: none; }
 .viz.px svg [role="button"]:focus-visible { outline: none; stroke: var(--acc); }
 .viz.hv .stage { aspect-ratio: auto; min-height: 0; display: block; touch-action: auto; user-select: text; -webkit-user-select: text; }
@@ -667,9 +667,15 @@ html.locked #gate { display: flex; }
 .viz.slfirst.capin > .caption{border-top:1px solid var(--line);padding-bottom:6px}
 .viz.slfirst.capin > .caption .big{font-size:clamp(18px,2.6vw,28px)}
 @media (max-width:700px){
-  .viz.slfirst .ctrl-row{flex-wrap:nowrap;gap:10px}
-  .viz.slfirst .ctrl-row > .ctrl-lab{flex:0 0 64px;min-width:0;flex-basis:64px;white-space:normal;line-height:1.2}
-  .viz.slfirst .ctrl-row > .chips{flex:1 1 0;min-width:0;flex-wrap:nowrap;overflow-x:auto;overscroll-behavior-x:contain;touch-action:pan-x pan-y;scrollbar-width:none;-webkit-overflow-scrolling:touch;padding-bottom:2px}
-  .viz.slfirst .ctrl-row > .chips::-webkit-scrollbar{display:none}
-  .viz.slfirst .ctrl-row > .chips > .chip{flex:0 0 auto;white-space:nowrap}
+  .viz.slfirst > .ctrl:not(.ctrl-live){padding-top:8px;padding-bottom:10px;gap:7px}
+  .viz.slfirst .ctrl-row{flex-wrap:nowrap;gap:8px;align-items:flex-start}
+  .viz.slfirst .ctrl-row > .ctrl-lab{flex:0 0 56px;min-width:0;flex-basis:56px;white-space:normal;line-height:1.2;font-size:9.5px;letter-spacing:.1em;padding-top:8px}
+  .viz.slfirst .ctrl-row > .chips{flex:1 1 0;min-width:0;flex-wrap:wrap;gap:5px}
+  .viz.slfirst .ctrl-row > .chips > .chip{flex:0 1 auto;max-width:100%;min-height:32px;padding:5px 10px;font-size:12.5px;line-height:1.15;white-space:normal;text-align:left}
+  .viz.slfirst > .ctrl-live{padding-top:6px;padding-bottom:6px;gap:2px}
+  .viz.slfirst > .ctrl-live .slider{grid-template-columns:78px minmax(0,1fr) 70px;gap:8px}
+  .viz.slfirst > .ctrl-live .slider label{font-size:9.5px;letter-spacing:.1em}
+  .viz.slfirst > .ctrl-live .slider output{font-size:13.5px;min-width:0}
+  .viz.slfirst.enggauges .ctrl-row > .chips:has(> .chip:nth-child(4)){display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr))}
+  .viz.slfirst.enggauges .ctrl-row > .chips > .chip{justify-content:flex-start}
 }
