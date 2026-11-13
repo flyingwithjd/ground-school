@@ -16,7 +16,7 @@
 import { frame, chips, slider, row } from "./base.js?v=58985d3f52";
 import { planeStage } from "./planestage.js?v=58985d3f52";
 import { sectionModel, airfoil, rotP } from "./section-models.js?v=58985d3f52";
-import { h, s, clamp, reduced } from "../core/util.js?v=58985d3f52";
+import { h, clamp, reduced } from "../core/util.js?v=58985d3f52";
 const D = Math.PI / 180;
 export const WING = {
   plain: { name: "Plain flap", dl: 0.5, dd: 0.6, crit: 16, say: ["Plain flap", "The simplest flap: more camber, more lift and a lot more drag. The nose tends to pitch down."] },
@@ -68,7 +68,7 @@ function poseOf(dev, k) { const p = {};
   else if (dev === "split") p.plate = [0, 0, 50 * D * k];
   else if (dev === "spoiler") p.spoiler = [0, 0, -50 * D * k];
   else if (dev === "slat") p.slat = [0.075 * CH * k, -0.045 * CH * k, 0.12 * k];
-  else if (dev === "slot") p.slat = [0.07 * CH, -0.045 * CH, 0.11];   // fixed gap: the slot is always open
+  else if (dev === "slot") p.slat = [0.085 * CH, -0.055 * CH, 0.12];   // fixed gap: the slot is always open
   else if (dev === "trim") { p.tab = [0, 0, 22 * D * k]; p.elev = [0, 0, -10 * D * k]; }
   else if (dev === "balance") { p.elev = [0, 0, -18 * D * k]; p.tab = [0, 0, 16 * D * k]; }
   else if (dev === "servo") { p.tab = [0, 0, 20 * D * k]; p.elev = [0, 0, -14 * D * k]; }
@@ -97,7 +97,7 @@ export function mount(host) {
   const fit = (dur = 1) => { const r = F.stage.getBoundingClientRect(), Hh = Math.max(1, r.height - (+F.stage.dataset.band || 0)), Ww = Math.max(1, r.width), TN = Math.tan(9 * D), ph = Ww < 560;
     const wft = ph ? 8.2 : 10.8, hft = ph ? 5.2 : 5.4, d = Math.max(wft / (2 * TN * (Ww / Hh)), hft / (2 * TN)); const tl = !!tail, d2 = tl ? d * 0.78 : d;   // tail tabs: closer and lower, framed on the elevator and tab so their deflections read
     const lv = !tl && (dev === "slot" || dev === "slat");   // slot and slat: nearly side-on, so the gap and the flow through it read
-    S.setView(lv ? { tg: [ph ? -0.4 : -0.6, ph ? -0.9 : -0.5, -0.6], az: -82, el: 6, d: d * (ph ? 1.08 : 0.95), fov: 18 } : tl ? { tg: [ph ? -1.0 : -1.3, 0.1, -0.8], az: -70, el: 9, d: d2, fov: 18 } : { tg: [ph ? -0.5 : -0.9, 0.45, -0.4], az: -66, el: 15, d, fov: 18 }, dur); };
+    S.setView(lv ? { tg: [ph ? -0.3 : -0.4, ph ? 0.6 : 0.2, -0.6], az: -89, el: 3, d: d * (ph ? 1.04 : 0.9), fov: 18 } : tl ? { tg: [ph ? -1.0 : -1.3, 0.1, -0.8], az: -70, el: 9, d: d2, fov: 18 } : { tg: [ph ? -0.5 : -0.9, 0.45, -0.4], az: -66, el: 15, d, fov: 18 }, dur); };
   const bro = new ResizeObserver(band); bro.observe(F.stage); F.on(() => bro.disconnect());
   // live readout band under the stage: three values, fixed slots so nothing moves
   const rb = h("div", { class: "readout sec-read" }); const cells = [0, 1, 2].map(() => { const b = h("b", {}, "–"), sp = h("span", {}); rb.append(h("div", {}, b, sp)); return [b, sp]; }); F.stage.after(rb);
@@ -110,9 +110,14 @@ export function mount(host) {
   const ups = [0.2, 0.7, 1.45].map((d, i) => mk(d, ZF, [0.75, 0.6, 0.42][i])), los = [-0.24, -0.9].map((d, i) => mk(d, ZF, [0.6, 0.42][i]));
   const back = [0.55].map((d) => mk(d, ZB, 0.22));
   const jetB = S.cueLine(30, { width: 4, opacity: 0.2, color: 0x3b82f6 }), jetD = S.cueLine(30, { dash: [0.4, 0.26], width: 2, opacity: 1, color: 0x3b82f6 });
-  let jetW = 0; const jet = { set(p) { jetB.set(p); jetD.set(p); }, set opacity(o) { jetB.opacity = o * 0.25; jetD.opacity = o; }, bold(on) { if (on === jetW) return; jetW = on; jetB.obj.material.linewidth = on ? 8 : 4; jetD.obj.material.linewidth = on ? 3.4 : 2; } };
+  // slot: a wide glow, a solid core so the path reads as one line, and long bright streaks racing along it (driven in the flow loop)
+  const jetS = S.cueLine(30, { dash: [0.6, 0.5], width: 3.6, opacity: 0, color: 0xdbeafe });
+  let jetW = 0, jetO = 0; const jet = { set(p) { jetB.set(p); jetD.set(p); jetS.set(p); }, set opacity(o) { jetO = o; jetB.opacity = o * (jetW ? 0.6 : 0.25); jetD.opacity = o; jetS.opacity = jetW ? o : 0; },
+    bold(on) { if (on === jetW) return; jetW = on; jetB.obj.material.linewidth = on ? 8 : 4; jetD.obj.material.linewidth = on ? 3.6 : 2; jetD.obj.material.dashed = !on; jetD.obj.material.needsUpdate = true; this.opacity = jetO; } };
   // the slot itself: its two walls (the back of the leading-edge piece and the nose of the wing) traced in the accent
-  const gapA = S.cueLine(4, { width: 3.4, opacity: 0, color: 0x3b82f6 }), gapB = S.cueLine(3, { width: 3.4, opacity: 0, color: 0x3b82f6 });
+  const gapA = S.cueLine(4, { width: 3, opacity: 0, color: 0x60a5fa }), gapB = S.cueLine(3, { width: 3, opacity: 0, color: 0x60a5fa });
+  const outS = S.cueLine(byName.slat.pts.length + 1, { width: 2.2, opacity: 0, color: 0xf2f1ec }), outW = S.cueLine(byName.wingLE.pts.length + 1, { width: 1.6, opacity: 0, color: 0xf2f1ec });   // slot: crisp outlines so the slat and the wing read as two pieces with a channel between
+  const gapF = Array.from({ length: 9 }, () => S.cueLine(2, { width: 2.4, opacity: 0, color: 0x3b82f6 }));   // the channel between the walls, filled with accent rungs
   const eddies = Array.from({ length: 5 }, () => S.cueLine(22, { width: 1.2, opacity: 0.3 }));
   const liftA = S.cueArrow({ color: 0x3b82f6, width: 3.4, head: 0.5 }), dragA = S.cueArrow({ color: 0xf2f1ec, width: 2.8, head: 0.42 });
   const tabA = S.cueArrow({ color: 0xf2f1ec, width: 3.2, head: 0.36 }), tailA = S.cueArrow({ color: 0x3b82f6, width: 3.8, head: 0.5 });
@@ -136,42 +141,23 @@ export function mount(host) {
   // the slot close-up: a 2D cut of the leading edge in the corner of the stage, the gap walls in the accent, the air from
   // under the wing curving up through the slot (blue) and the airflow over the top (white), all from the same section and
   // streamline geometry as the 3D view, so it pitches with the angle of attack and shows separation the same way
-  const cu = s("svg", { class: "ft-close", role: "img", "aria-label": "Close-up of the slot" }, F.stage); let cuG = null;
-  s("defs", {}, cu).innerHTML = `<marker id="ftcb" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#3B82F6"/></marker><marker id="ftcw" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="5" markerHeight="5" orient="auto"><path d="M0,0 L10,5 L0,10 z" fill="#F2F1EC"/></marker><clipPath id="ftclip"><rect x="1" y="1" width="1" height="1" rx="10"/></clipPath>`;
-  function closeUp(jetPts, lines) { if (cuG) { cuG.remove(); cuG = null; } cu.style.display = jetPts ? "" : "none"; if (!jetPts) return;
-    const r = F.stage.getBoundingClientRect(), W = Math.min(r.width * (r.width < 560 ? 0.5 : 0.34), 260), H = Math.round(W * 0.66); cu.setAttribute("width", W); cu.setAttribute("height", H); cu.setAttribute("viewBox", `0 0 ${W} ${H}`);
-    const cr = cu.querySelector("#ftclip rect"); cr.setAttribute("width", W - 2); cr.setAttribute("height", H - 2);
-    const g0 = xf("slat", M([0.085, 0.03])), m0 = xf("wingLE", M([0.07, 0.004])), gc = [(g0[0] + m0[0]) / 2, (g0[1] + m0[1]) / 2], sc = W / 1.9, cx = W * 0.36, cy = H * 0.52;
-    const P2 = (q) => [cx - (q[0] - gc[0]) * sc, cy - (q[1] - gc[1]) * sc], d = (pts) => "M" + pts.map((q) => P2(q).map((v) => v.toFixed(1)).join(",")).join("L");
-    cuG = s("g", {}, cu); s("rect", { x: 0.5, y: 0.5, width: W - 1, height: H - 1, rx: 10, fill: "#0A0A0B", stroke: "rgba(242,241,236,.28)", "stroke-width": 1 }, cuG);
-    const g = s("g", { "clip-path": "url(#ftclip)" }, cuG);
-    lines.forEach((ln, i) => s("path", { d: d(ln), fill: "none", stroke: "#F2F1EC", "stroke-width": 1.3, opacity: [0.75, 0.45, 0.55][i], "stroke-dasharray": "5 4", "marker-end": "url(#ftcw)" }, g));
-    for (const n of ["wingLE", "slat"]) s("path", { d: d(byName[n].pts.map((q) => xf(n, q))) + "Z", fill: "#141417", stroke: "#F2F1EC", "stroke-width": 1.3, "stroke-linejoin": "round" }, g);
-    const wall = (name, uv) => uv.map((q) => xf(name, M(q)));
-    s("path", { d: d([...wall("slat", WALL_S), ...wall("wingLE", WALL_W)]) + "Z", fill: "rgba(59,130,246,.22)", stroke: "none" }, g);   // the gap itself
-    s("path", { d: d(wall("slat", WALL_S)), fill: "none", stroke: "#3B82F6", "stroke-width": 2.6, "stroke-linecap": "round" }, g);
-    s("path", { d: d(wall("wingLE", WALL_W)), fill: "none", stroke: "#3B82F6", "stroke-width": 2.6, "stroke-linecap": "round" }, g);
-    let jp2 = resample(jetPts, 60); for (let pass = 0; pass < 3; pass++) jp2 = jp2.map((q, i) => (i === 0 || i === jp2.length - 1 ? q : [(jp2[i - 1][0] + 2 * q[0] + jp2[i + 1][0]) / 4, (jp2[i - 1][1] + 2 * q[1] + jp2[i + 1][1]) / 4]));
-    s("path", { d: d(jp2), fill: "none", stroke: "#3B82F6", "stroke-width": 3, "stroke-linecap": "round", "marker-end": "url(#ftcb)" }, g);
-    const lab = (x, y, str, fill, anchor = "start") => { const e = s("text", { x, y, "text-anchor": anchor, "font-family": "IBM Plex Mono, ui-monospace, monospace", "font-size": 11, "font-weight": 600, fill }, cuG); e.textContent = str; e.setAttribute("stroke", "#0A0A0B"); e.setAttribute("stroke-width", "3"); e.setAttribute("paint-order", "stroke"); };
-    lab(8, 15, "SLOT, CLOSE UP", "rgba(242,241,236,.55)"); lab(W - 8, H - 9, "air from below", "#3B82F6", "end"); lab(W * 0.36 + 14, H * 0.52 + 16, "slot", "#3B82F6"); }
-  F.on(() => closeUp(null));
   function cues(now = performance.now()) {
     const cur = tail || dev, vis = SHOW[cur];
     segsW = []; for (const n of vis) { const w = byName[n].pts.map((q) => xf(n, q)); for (let i = 0; i < w.length; i++) segsW.push([w[i], w[(i + 1) % w.length]]); }
     let xLE = -Infinity, xTE = Infinity, pLE = null, pTE = null; for (const [a] of segsW) { if (a[0] > xLE) { xLE = a[0]; pLE = a; } if (a[0] < xTE) { xTE = a[0]; pTE = a; } }
     const Ls = st.liftV || 0.5, dw = tail ? 0 : 0.3 * Ls;
     const sepP = !tail && st.sepU < 0.99 ? xf(vis[0], M([Math.min(1, st.sepU), yAt(FU, Math.min(1, st.sepU))])) : null;
+    const eLE = env(xLE - 0.03), yLE = up0 => (up0 && eLE ? Math.max(pLE[1], eLE[1]) : pLE[1]), lp = !tail && (dev === "slot" || dev === "slat");   // the nose height the lines bend over: the top of the nose, so a drooped slat does not leave a step
     const line = (d) => { const pts = []; const up = d > 0, h0 = d + (up ? 0.15 : -0.1);
       for (let i = 0; i < NP; i++) { const x = XA - ((XA - XB) * i) / (NP - 1); let y;
         const e = env(x);
-        if (x > xLE) y = h0 + (pLE[1] + d * 0.9 - h0) * Math.exp(-(x - xLE) / 2.2);
+        if (x > xLE) y = h0 + (yLE(up) + d * 0.9 - h0) * Math.exp(-(x - xLE) / 2.2);
         else if (e && x > xTE) y = (up ? e[1] : e[0]) + d;
         else y = pTE[1] + d + (h0 - dw - pTE[1] - d) * (1 - Math.exp(-(xTE - x) / 3.2));
         if (sepP && up && x < sepP[0]) { const wd = st.str * Math.exp(-d / 1.5), det = sepP[1] + d * (1 + 0.5 * st.str) + 0.3 * st.str * (1 - Math.exp(-(sepP[0] - x) / 1.4)), fade = Math.exp(-Math.max(0, xTE - 1.5 - x) / 5);
           y = Math.max(y, y + (det - y) * wd * fade); }
         pts.push([x, y]); }
-      return smooth(pts, 4); };
+      return smooth(pts, lp && up ? 7 : 4); };
     const upLine = line(ups[0].d), loLine = line(los[0].d), up2 = line(ups[1].d); ups.forEach((l) => l.el.set(line(l.d).map(([x, y]) => [x, y, l.z]))); los.forEach((l) => l.el.set(line(l.d).map(([x, y]) => [x, y, l.z])));
     back.forEach((l) => l.el.set(line(l.d).map(([x, y]) => [x, y, l.z])));
     // wake regions for eddies: behind the separation point, and behind a lowered split flap
@@ -188,7 +174,11 @@ export function mount(host) {
     if (lePiece) { const z = ZF - 0.06, wall = (name, uv) => uv.map((q) => [...xf(name, M(q)), z]);
       gapA.set(wall("slat", WALL_S));
       gapB.set(wall("wingLE", WALL_W));
-      gapA.opacity = gapB.opacity = 1; } else gapA.opacity = gapB.opacity = 0;
+      const wa = resample(wall("slat", WALL_S).map((q) => q.slice(0, 2)), gapF.length + 2).slice(1, -1), wb = resample(wall("wingLE", WALL_W).map((q) => q.slice(0, 2)).reverse(), gapF.length + 2).slice(1, -1);
+      const ol = (n) => { const w = byName[n].pts.map((q) => [...xf(n, q), z + 0.01]); return [...w, w[0]]; };
+      if (dev === "slot") { outS.set(ol("slat")); outW.set(ol("wingLE")); outS.opacity = 0.95; outW.opacity = 0.7; } else outS.opacity = outW.opacity = 0;
+      gapF.forEach((g, i) => { g.set([[...wa[i], z - 0.01], [...wb[i], z - 0.01]]); g.opacity = 0.45; });
+      gapA.opacity = gapB.opacity = 1; } else { gapA.opacity = gapB.opacity = 0; outS.opacity = outW.opacity = 0; gapF.forEach((g) => (g.opacity = 0)); }
     jet.bold(lePiece && dev === "slot");
     if (lePiece) {   // through the gap: in at the mouth between the two lower edges, out between the two upper edges, then along the top
       const mid = (a, b) => [(a[0] + b[0]) / 2, (a[1] + b[1]) / 2], inn = mid(xf("slat", M([0.045, yAt(FL, 0.045)])), xf("wingLE", M([0.055, yAt(FL, 0.055)]))), out = mid(xf("slat", M([0.105, yAt(FU, 0.105)])), xf("wingLE", M([0.12, yAt(FU, 0.12)])));
@@ -199,10 +189,9 @@ export function mount(host) {
     if (jp) { const sp = []; for (let i = 0; i + 1 < jp.length; i++) for (let t = 0; t < 1; t += 0.1) { const a = jp[Math.max(0, i - 1)], b = jp[i], c = jp[i + 1], d2 = jp[Math.min(jp.length - 1, i + 2)], t2 = t * t, t3 = t2 * t;   // Catmull-Rom
         sp.push([0, 1].map((j) => 0.5 * (2 * b[j] + (-a[j] + c[j]) * t + (2 * a[j] - 5 * b[j] + 4 * c[j] - d2[j]) * t2 + (-a[j] + 3 * b[j] - 3 * c[j] + d2[j]) * t3))); }
       sp.push(jp.at(-1)); let rs = resample(sp, 30); for (let pass = 0; pass < 4; pass++) rs = rs.map((q, i) => (i === 0 || i === rs.length - 1 ? q : [(rs[i - 1][0] + 2 * q[0] + rs[i + 1][0]) / 4, (rs[i - 1][1] + 2 * q[1] + rs[i + 1][1]) / 4]));   // calm the bends
-      jet.set(resample(rs, 30).map(([x, y]) => [x, y, ZF - 0.05])); jet.opacity = 0.95; if (lePiece && dev === "slot") closeUp(rs, [upLine, up2, loLine]); } else jet.opacity = 0;
-    if (!(lePiece && dev === "slot")) closeUp(null);
+      jet.set(resample(rs, 30).map(([x, y]) => [x, y, ZF - 0.05])); jet.opacity = 0.95; } else jet.opacity = 0;
     // forces
-    if (!tail) { const sp2 = dev === "spoiler" && k > 0.05, q = rotP([QC[0] - (sp2 ? CH * 0.57 : 0), QC[1] + CH * 0.09], A, QC), L1 = 0.6 + 1.5 * st.liftV, y0 = q[1] + (sp2 ? 0.95 : 0.75), zl = ZF;   // with a spoiler up, the (small) lift arrow stands behind the panel, never on it
+    if (!tail) { const sp2 = dev === "spoiler" && k > 0.05, lv = dev === "slot" || dev === "slat", q = rotP([QC[0] - (sp2 ? CH * 0.57 : lv ? CH * 0.22 : 0), QC[1] + CH * (lv ? 0.075 : 0.09)], A, QC), L1 = lv ? 0.45 + 0.8 * st.liftV : 0.6 + 1.5 * st.liftV, y0 = q[1] + (sp2 ? 0.95 : lv ? 0.3 : 0.75), zl = ZF;   // with a spoiler up, the (small) lift arrow stands behind the panel, never on it
       liftA.set([q[0], y0, zl], [q[0], y0 + L1, zl]); liftA.opacity = 1;
       const L2 = 0.3 + 1.5 * st.dragV; dragA.set([xTE - 0.35, pTE[1], ZF], [xTE - 0.35 - L2, pTE[1], ZF]); dragA.opacity = 1; tabA.opacity = 0; tailA.opacity = 0; }
     else { liftA.opacity = 0; dragA.opacity = 0; const tn = cur === "anti" ? "atab" : "tab", sn = cur === "anti" ? "stabtor" : "elev";
@@ -252,7 +241,7 @@ export function mount(host) {
     const da = aoaT - aoa; if (Math.abs(da) < 0.05) aoa = aoaT; else { aoa += da * Math.min(1, dt * 5); busy = true; }
     apply(); if (!busy) { running = false; last = 0; S.animate(null); } };
   function go() { if (reduced()) { k = tgt; aoa = aoaT; apply(); return; } if (!running) { running = true; last = 0; S.animate(tick); } }
-  S.setFlow(true, (now) => { if (wake.length) eddyDraw(now); });
+  S.setFlow(true, (now) => { if (wake.length) eddyDraw(now); if (jetW && !reduced()) jetS.obj.material.dashOffset = -((now / 420) % 1000) * 1.15; });
   F.explain(`<p>Pick a device, then drag the deflection. On the wing, raise the angle of attack until it stalls. Then try a slot or slat. The 172S has single-slot flaps and an elevator trim tab; your airplane's POH shows what yours has.</p><p class="src">PHAK Ch 6. Airflow, angles and forces are illustrations, not to scale.</p>`);
   band(); fit(1); pick("plain", null);
   return { destroy() { S.destroy(); F.destroy(); } };
