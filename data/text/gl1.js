@@ -42,7 +42,7 @@ export default {
       body: `<p>An airplane moves in three dimensions, and every movement is a rotation about one or more of three axes. All three pass through the <strong>[[center of gravity]]</strong> (CG). <span class="src">PHAK 3</span></p>
       <ul><li><strong>[[Longitudinal axis]]</strong>, nose to tail. Movement about it is <strong>[[roll|Roll]]</strong>, controlled by the [[ailerons|Ailerons]].</li>
       <li><strong>[[Lateral axis]]</strong>, wingtip to wingtip. Movement about it is <strong>[[pitch|Pitch]]</strong>, controlled by the [[elevator|Elevator]].</li>
-      <li><strong>[[Vertical axis]]</strong>, top to bottom. Movement about it is <strong>yaw</strong>, controlled by the [[rudder|Rudder]].</li></ul>
+      <li><strong>[[Vertical axis]]</strong>, top to bottom. Movement about it is <strong>[[yaw]]</strong>, controlled by the [[rudder|Rudder]].</li></ul>
       <p>A useful way to remember it: the control surface that moves about an axis is the one farthest from it. The [[ailerons|Ailerons]] at the wingtips [[roll|Roll]] about the axis running down the middle of the [[fuselage|Fuselage]].</p>`,
       viz: { type: "axes" },
       kdr: { k: "Name each axis, the motion about it and the control that produces it.", d: "Describe which way the airplane moves for each control input.", r: "Confusing roll and yaw leads to uncoordinated flight, the setup for a stall-spin.", codes: "PA.I.G.K1a" } },
