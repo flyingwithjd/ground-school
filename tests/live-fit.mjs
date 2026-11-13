@@ -6,7 +6,7 @@ import { createRequire } from "module"; const { chromium } = createRequire("/wor
 const BASE = process.env.BASE || "http://localhost:8765/index.html";
 const ALL = { catlim: "vg", ignition: "magcheck", fuellim: "fuellim", induct: "carbice", elec: "elecsys", oilcool: "enginegauges", mixture: "mixture", combust: "combustion", prop: "prop", secctl: "flaptypes", icing: "icing", oxygen: "hypoxia", koel: "koel", press: "pressurization", heat: "cabinheat", ap: "autopilot", airframe: "gear", starting: "starter" };
 // GL1 papers visuals are addressed as lesson/section
-Object.assign(ALL, { "gl1/design": "certs", "gl1/papers": "airworthy", "gl1/cert": "pilotpath", "gl1/walk": "plane3d", "gl1/walk:fuelcheck": "fuelcheck", "gl1/build:buildparts": "buildparts", "gl1/parts:gear": "gear", "gl1/aero:forces": "forces", "gl1/insts:instpanel": "instpanel" });
+Object.assign(ALL, { "gl1/design": "certs", "gl1/papers": "airworthy", "gl1/cert": "pilotpath", "gl1/walk": "plane3d", "gl1/walk:fuelcheck": "fuelcheck", "gl1/build:buildparts": "buildparts", "gl1/parts:gear": "gear", "gl1/aero:forces": "forces", "gl1/insts:instpanel": "instpanel", "gl1/parts:tailtypes": "tailtypes", "gl1/subs": "plane3d", "gl1/c172:combustion": "combustion", "gl1/ground:mnemo": "mnemo" });
 const want = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(ALL);
 let bad = 0; const ok = (c, m) => { if (!c) bad++; console.log((c ? "   ok   " : "   FAIL ") + m); };
 const b = await chromium.launch({ executablePath: "/usr/bin/google-chrome", args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });

@@ -815,3 +815,11 @@ html.locked #gate { display: flex; }
 @media (max-width: 600px) { .viz.instp.ipx .ip-face svg { max-width: 100px; } .viz.instp.ipx .ip-grid { gap: 6px 6px; } .viz.instp.ipx .stage { padding-top: 36px; } }
 @media (max-width: 700px) { .viz.px.buildparts .stage { aspect-ratio: 3 / 2.9; } }
 .viz.instp.ipx > .caption { padding: 10px 18px 0; }
+/* gear3d: CG tags ride the 3D cues */
+.gear3d .g3-tag { position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; font: 600 11px/1 var(--mono, ui-monospace, monospace); letter-spacing: .08em; color: #FFD23F; padding: 3px 6px; border: 1px solid rgba(255,210,63,.6); border-radius: 6px; background: rgba(10,10,11,.75); }
+.gear3d .g3-tag.ax { color: var(--ink, #F2F1EC); border-color: rgba(242,241,236,.35); }
+.gear3d .g3-row { display: flex; gap: 8px; margin-top: 8px; }
+.gear3d .g3-go { min-width: 150px; }
+.viz.gear3d .stage { aspect-ratio: 1 / 1; }
+.forces3d .f3-tag { position: absolute; left: 0; top: 0; z-index: 2; pointer-events: none; font: 600 11px/1 var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; color: rgba(242,241,236,.8); }
+.forces3d .f3-tag.on { color: var(--acc, #3B82F6); }

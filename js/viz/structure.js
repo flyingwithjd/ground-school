@@ -39,7 +39,10 @@ const PARTS = {
     ["lon", "Longerons", "Heavy lengthwise members, usually four. Together with the skin they carry most of the bending loads."],
     ["str", "Stringers", "Lighter, more numerous lengthwise members. They stiffen the skin, help it keep its shape and carry some of the load."],
     ["form", "Formers", "Ring frames spaced along the fuselage. They give the shape and tie the stringers and longerons together."],
-    ["bulk", "Bulkhead", "A former that is also a wall across the fuselage, like the firewall between the engine and the cabin."]],
+    ["bulk", "Bulkhead", "A former that is also a wall across the fuselage, like the firewall between the engine and the cabin."],
+    ["spar", "Wing spars", "The main spanwise beams of the wing, front and rear. They carry most of the wing's bending loads into the fuselage."],
+    ["rib", "Wing ribs", "Chordwise pieces that give the wing its airfoil shape and tie the spars and skin together."],
+    ["wstr", "Wing stringers", "Light spanwise members that stiffen the wing skin between the ribs."]],
 };
 const ALL_DESC = "Blue carries the load. Tap a label or a part to see it on its own.";
 const DENT_LABEL = ["DENT", "shell can buckle", true, "dent", "t"];
@@ -187,6 +190,18 @@ export function mount(host) {
     range(CUT.x1, CUT.x0, 30).forEach((x) => e.push(surf(x, tB, 0.01))); range(tB, tA, 16).forEach((t) => e.push(surf(CUT.x0, t, 0.01))); polyLine(e, m);
     addPart("skin", [], (st) => { m.color.setHex(st === "off" ? INK : ACC); m.opacity = st === "off" ? 0.45 : 0.95; });
     anchors.skin = surf(-0.6, Math.PI * 0.56, 0); anchors.form = surf(FR[8], Math.PI + 0.6, -0.07); anchors.str = surf(-11.0, TH(9.5, NS), -0.1); anchors.lon = surf(-4.0, LONG[3] + 2 * Math.PI, -0.12);
+    // wing structure inside the ghosted wing stubs (same planform as c172-model.js wst()): two spars, ribs, and the wing's own stringers. PHAK 3
+    const DIH = Math.tan(1.73 * D), NA = (u) => 0.2969 * Math.sqrt(u) - 0.126 * u - 0.3516 * u * u + 0.2843 * u ** 3 - 0.1015 * u ** 4, NN = (u) => NA(u) / NA(0.3);
+    const wst = (a) => { const o = clamp((a - 7.5) / (18.04 - 7.5), 0, 1); return { le: 1.6 + (1.15 - 1.6) * o, te: -3.75 + (-2.4 + 3.75) * o, t: 0.7 + (0.45 - 0.7) * clamp((a - 1.9) / (18.04 - 1.9), 0, 1), y: 6.62 + Math.max(0, a - 1.9) * DIH }; };
+    const wp = (a, sd, u, up) => { const w = wst(a), c = w.le - w.te; return V(w.le - u * c, w.y + (up ? 0.6 : -0.4) * w.t * NN(Math.max(u, 1e-3)) * (up ? 1 : 1), sd * a); };
+    const WA = range(0.3, WCUT - 0.15, 14);
+    for (const sd of [1, -1]) {
+      [0.22, 0.68].forEach((u) => { const top = WA.map((a) => wp(a, sd, u, true)), bot = WA.map((a) => wp(a, sd, u, false)); tube("spar", "blue", top, 0.05); tube("spar", "blue", bot, 0.05);
+        [0, 4, 8, 12, 14].forEach((i) => rod("spar", "blue", top[i], bot[i], 0.03)); });
+      range(1.0, WCUT - 0.3, 6).forEach((a) => { const us = range(0, 0.95, 14); tube("rib", "thin", [...us.map((u) => wp(a, sd, u, true)), ...us.slice(1, -1).reverse().map((u) => wp(a, sd, u, false))], 0.025, true); });
+      [0.08, 0.4, 0.55, 0.85].forEach((u) => tube("wstr", "thin", WA.map((a) => wp(a, sd, u, true)), 0.016));
+    }
+    anchors.spar = wp(6.0, -1, 0.22, true); anchors.rib = wp(WCUT - 0.3, -1, 0.5, true);
   }
 
   // ---------- labels: a row along the top and a row along the bottom of the stage, each label sitting over (or under) its part ----------

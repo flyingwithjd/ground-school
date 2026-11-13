@@ -2,13 +2,13 @@
 import { frame, chips, svg, drawOn } from "./base.js?v=7534528db0";
 import { s } from "../core/util.js?v=7534528db0";
 import { sidePlane, T, arrow, setArrow, accentize } from "./shapes.js?v=7534528db0";
-const INFO = {
+export const INFO = {
   lift: ["Lift", "Acts perpendicular to the relative wind, through the center of lift. Produced mostly by the wing."],
   weight: ["Weight", "Always acts straight down toward the center of the earth, through the CG, whatever the attitude."],
   thrust: ["Thrust", "The forward force from the propeller. It acts roughly along the propeller shaft."],
   drag: ["Drag", "The rearward, retarding force. It acts parallel to the relative wind, opposite the flight path."],
 };
-const STATES = {
+export const STATES = {
   steady: { L: 1, W: 1, T: 1, D: 1, cap: ["Steady flight", "Forces in balance"], t: "Opposing forces cancel: the airplane holds its speed and flight path. Lift and weight are much larger than thrust and drag. The arrows show direction and balance, not scale." },
   power: { L: 1, W: 1, T: 1.5, D: 1, cap: ["Add power", "Thrust exceeds drag"], t: "With more thrust than drag the airplane accelerates (or, if you hold airspeed with pitch, it climbs). Drag rises with speed until a new balance is reached." },
   idle: { L: 1, W: 1, T: 0.35, D: 1, cap: ["Reduce power", "Drag exceeds thrust"], t: "The airplane slows. To hold airspeed you lower the nose and let a component of weight help pull you forward: a descent." },
