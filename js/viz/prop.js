@@ -63,9 +63,11 @@ export function mount(host) {
       const half = d * Math.tan((VZ.fov / 2) * D), right = new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld, 0), up = new THREE.Vector3().setFromMatrixColumn(cam.matrixWorld, 1);
       tg.addScaledVector(right, ((x0 + x1) / 2) * half * aspect).addScaledVector(up, ((y0 + y1) / 2) * half); d *= k; }
     return { tg: tg.toArray(), az: VZ.az, el: VZ.el, d, fov: VZ.fov }; }
-  const band = () => { const sr = F.stage.getBoundingClientRect(); if (!sr.height) return; let b = 0; F.stage.querySelectorAll(".corner").forEach((c) => { if (c.textContent.trim()) b = Math.max(b, c.getBoundingClientRect().bottom - sr.top); }); S.setTopBand(b ? b + 4 : 0);
-    const Hh = Math.max(1, sr.height - (+F.stage.dataset.band || 0)); S.setView(fit(sr.width / Hh), 1); };
-  const bro = new ResizeObserver(band); bro.observe(F.stage); F.on(() => bro.disconnect());
+  const band = (dur = 1) => { const sr = F.stage.getBoundingClientRect(); if (!sr.height) return; let b = 0; F.stage.querySelectorAll(".corner").forEach((c) => { if (c.textContent.trim()) b = Math.max(b, c.getBoundingClientRect().bottom - sr.top); }); S.setTopBand(b ? b + 4 : 0);
+    const Hh = Math.max(1, sr.height - (+F.stage.dataset.band || 0)); S.setView(fit(sr.width / Hh), typeof dur === "number" ? dur : 1); };
+  // camera glides to the angle that shows the current choice best: down the blade from the tip for twist, front three-quarter for pitch change
+  const glide = (az, el) => { VZ.az = az; VZ.el = el; band(1400); };
+  const bro = new ResizeObserver(() => band()); bro.observe(F.stage); F.on(() => bro.disconnect());
   // station numbers ride on the blade: projected each frame next to the lit band
   const lab = s("svg", { class: "full lab3d", role: "img" }, F.stage); let lg = s("g", {}, lab);
   const wp = new THREE.Vector3();
@@ -80,8 +82,8 @@ export function mount(host) {
   const redraw = () => { const W = strip.clientWidth || 600; gEl.remove(); gEl = s("g", {}, svgEl); const H = draw(gEl, W); svgEl.setAttribute("viewBox", `0 0 ${W} ${H}`); svgEl.setAttribute("height", H); strip.style.height = H + "px"; apply3d(); };
   const sro = new ResizeObserver(() => redraw()); sro.observe(strip); F.on(() => sro.disconnect());
   const S0 = { F, redraw };
-  const r0 = row(F.ctrl, "Prop"); chips(r0, [["fixed", "Fixed pitch"], ["cs", "Constant speed"]], mode, (k) => { mode = k || "fixed"; r4.classList.toggle("off", mode !== "cs"); rs.input.disabled = mode !== "cs"; b75 = targetB(); rpmCS = set; upd(); }, { label: "Prop" });
-  const r1 = row(F.ctrl, "Blade"); chips(r1, [["tw", "Twisted"], ["flat", "No twist"]], "tw", (k) => { twist = k !== "flat"; upd(); }, { label: "Blade" });
+  const r0 = row(F.ctrl, "Prop"); chips(r0, [["fixed", "Fixed pitch"], ["cs", "Constant speed"]], mode, (k) => { mode = k || "fixed"; glide(mode === "cs" ? -28 : -54, mode === "cs" ? 18 : 14); r4.classList.toggle("off", mode !== "cs"); rs.input.disabled = mode !== "cs"; b75 = targetB(); rpmCS = set; upd(); }, { label: "Prop" });
+  const r1 = row(F.ctrl, "Blade"); chips(r1, [["tw", "Twisted"], ["flat", "No twist"]], "tw", (k) => { twist = k !== "flat"; glide(twist ? -54 : -40, twist ? 14 : 26); upd(); }, { label: "Blade" });
   const r2 = row(F.ctrl, "Fly"); const sv = slider(r2, { label: "Airspeed", min: 0, max: 150, value: v, fmt: (x) => x + " KIAS", oninput: (x) => { v = x; pre.set(null); upd(); } });
   const st = slider(r2, { label: "Throttle", min: 0, max: 100, value: thr * 100, fmt: (x) => (x >= 100 ? "Full" : x <= 0 ? "Idle" : x + "%"), oninput: (x) => { thr = x / 100; pre.set(null); upd(); } });
   const r3 = row(F.ctrl, "Try"); const pre = chips(r3, [["static", "Full-throttle static"], ["climb", "Climb"], ["cruise", "Cruise"], ["dive", "Dive"]], "static", (k) => {
