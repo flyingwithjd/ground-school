@@ -1,79 +1,151 @@
-// Ignition and the magneto check. Turn the key (OFF-R-L-BOTH-START), watch which spark plugs fire and what the runup
-// tach does at 1,800 RPM, then try the faults. Facts: C172S POH Sec 7 (two magnetos, two plugs per cylinder: right
+// Ignition and the magneto check, on a 3D flat-four engine seen from behind and above (planeStage): two magnetos on the
+// accessory case, a harness lead from each to one plug in every cylinder, and the P-leads that run to the key. Turn the
+// key (OFF-R-L-BOTH-START) in the strip below, watch which leads and plugs fire and what the runup tach does at 1,800 RPM,
+// then try the faults. Facts: C172S POH Sec 7 (two magnetos, two plugs per cylinder: right
 // magneto fires lower right + upper left plugs, left magneto fires lower left + upper right; rotary switch OFF, R, L,
 // BOTH, START; START is spring-loaded back to BOTH) and Sec 4 (check at 1,800 RPM: R, BOTH, L, BOTH; drop no more than
 // 150 RPM on either, no more than 50 RPM difference; no drop may mean faulty grounding or advanced timing).
 // PHAK 7: no drop is not normal; if the engine quits on one magneto or the drop exceeds limits, don't fly; a broken
 // magneto ground wire can let the engine fire with the switch OFF, and only idle cutoff stops it.
 // The RPM drops shown for each case are examples, not published values.
-import { chips, row } from "./base.js?v=c8fe6c3cee";
-import { pxScene, T, L, C, R, hit, INK, GRAY, DIM, ACC } from "./kit.js?v=c8fe6c3cee";
+import { frame, chips, row } from "./base.js?v=c8fe6c3cee";
+import { planeStage } from "./planestage.js?v=c8fe6c3cee";
+import { modelKit, fitView } from "./section-models.js?v=c8fe6c3cee";
+import { h, s, reduced } from "../core/util.js?v=c8fe6c3cee";
+import * as THREE from "three";
+import { T, L, C, R, hit, INK, GRAY, DIM, ACC } from "./kit.js?v=c8fe6c3cee";
 import { dial, anim, toward, COL } from "./dial.js?v=c8fe6c3cee";
 const POS = ["OFF", "R", "L", "BOTH", "START"], ANG = { OFF: -84, R: -42, L: 0, BOTH: 42, START: 84 };
 const FAULT = {
   normal: { name: "Normal", dR: 75, dL: 100 },
   fouled: { name: "Fouled plug", dR: 75, dL: 225, rough: "L" },
-  nodrop: { name: "No drop", dR: 0, dL: 100, hot: "R" },
+  nodrop: { name: "Broken P-lead", dR: 0, dL: 100, hot: "L" },   // the left P-lead is broken: the left magneto can never be grounded, so the R check shows no drop
   dead: { name: "Dead magneto", dR: 75, dL: null },
 };
 export function verdict(f) { const F = FAULT[f]; if (F.dL == null || F.dR == null) return "dont"; if (F.dR === 0 || F.dL === 0) return "dont";
   return Math.max(F.dR, F.dL) <= 150 && Math.abs(F.dR - F.dL) <= 50 ? "ok" : "dont"; }
+// ---------- 3D engine (inches; x forward, y up, z right). Cylinders 1 and 3 on the right, 2 and 4 on the left (staggered). ----------
+const CYL = [{ n: 1, x: 3.4, s: 1 }, { n: 2, x: 1.4, s: -1 }, { n: 3, x: -2.6, s: 1 }, { n: 4, x: -4.6, s: -1 }];
+// harness, C172S POH 7: the right magneto fires the lower right and upper left plugs, the left magneto the lower left and upper right
+const plugMag = (c, up) => (c.s > 0 ? (up ? "l" : "r") : up ? "r" : "l");
+const plugPos = (c, up) => [c.x, up ? 2.55 : -2.55, c.s * 11.2];
+const MAG = { r: [-11.6, 2.6, 2.5], l: [-11.6, 2.6, -2.5] }, KEYP = { r: [-19, 3.4, 1.0], l: [-19, 3.4, -1.0] };
+const D = Math.PI / 180;
+function engModel() { const K = modelKit(THREE), root = K.root;
+  const metal = new THREE.MeshStandardMaterial({ color: 0x80858e, metalness: 0.45, roughness: 0.42 }), dark = new THREE.MeshStandardMaterial({ color: 0x3e4149, metalness: 0.35, roughness: 0.55 }), black = new THREE.MeshStandardMaterial({ color: 0x23252a, metalness: 0.2, roughness: 0.6 }), white = new THREE.MeshStandardMaterial({ color: 0xe8e4da, roughness: 0.35 });
+  const mesh = (g, m, parent = root) => { const o = new THREE.Mesh(g, m); parent.add(o); return o; };
+  // crankcase, accessory case, prop flange
+  { const g = new THREE.BoxGeometry(14, 6.4, 7.2); mesh(g, dark); const a = new THREE.BoxGeometry(2.6, 6.8, 9.5); a.translate(-8.2, 0.6, 0); mesh(a, dark); const f = new THREE.CylinderGeometry(2.2, 2.2, 0.8, 32); f.rotateZ(Math.PI / 2); f.translate(7.6, 0.6, 0); mesh(f, metal);
+    const sp = new THREE.CylinderGeometry(3.4, 3.4, 4, 4, 1); sp.rotateY(Math.PI / 4); sp.scale(1.6, 0.55, 1); sp.translate(-0.6, -4.2, 0); mesh(sp, black); }
+  // cylinders: finned barrels and heads, two plugs each
+  const plugs = [];
+  for (const c of CYL) { const prof = []; for (let i = 0; i <= 14; i++) { const z = 3.6 + i * 0.46; prof.push(new THREE.Vector2(i % 2 ? 2.9 : 2.25, z), new THREE.Vector2(i % 2 ? 2.9 : 2.25, z + 0.46)); }
+    const bg = new THREE.LatheGeometry(prof, 32); bg.rotateX(c.s * Math.PI / 2); bg.translate(c.x, 0, 0); mesh(bg, metal);
+    const hg = new THREE.CylinderGeometry(3.1, 2.9, 3.4, 32); hg.rotateX(Math.PI / 2); hg.translate(c.x, 0.2, c.s * 11.3); mesh(hg, metal);
+    for (let k = 0; k < 4; k++) { const fg = new THREE.BoxGeometry(5.4, 0.18, 3.2); fg.translate(c.x, -1.2 + k * 0.8, c.s * 11.3); mesh(fg, metal); }
+    const rc = new THREE.BoxGeometry(4.4, 1.1, 2.6); rc.translate(c.x, 3.0, c.s * 11.6); mesh(rc, black);   // rocker cover
+    for (const up of [true, false]) { const p = plugPos(c, up), g = new THREE.Group(); g.position.set(...p); root.add(g); const ins = new THREE.CylinderGeometry(0.32, 0.38, 1.3, 16); ins.translate(0, up ? 0.65 : -0.65, 0); g.rotation.x = c.s * (up ? -0.5 : 0.5); mesh(ins, white, g);
+      const boot = new THREE.CylinderGeometry(0.46, 0.46, 0.9, 16); boot.translate(0, up ? 1.6 : -1.6, 0); mesh(boot, black, g);
+      plugs.push({ c, up, g, mag: plugMag(c, up), end: new THREE.Vector3(0, up ? 2.1 : -2.1, 0) }); } }
+  // magnetos on the accessory case: body, cap where the harness leaves, and the P-lead terminal
+  const mags = {}; for (const [k, p] of Object.entries(MAG)) { const g = new THREE.Group(); g.position.set(...p); root.add(g); const b = new THREE.CylinderGeometry(1.45, 1.45, 3.2, 28); b.rotateZ(Math.PI / 2); mesh(b, black, g); const cap = new THREE.CylinderGeometry(1.25, 1.45, 0.9, 28); cap.rotateZ(Math.PI / 2); cap.translate(-2.0, 0, 0); mesh(cap, metal, g); mags[k] = g; }
+  K.add("ref", root, null, []);
+  // light only the engine meshes; the stage stays black
+  const hemi = new THREE.HemisphereLight(0xf4f2ec, 0x15161a, 1.0), key = new THREE.DirectionalLight(0xffffff, 2.0), rim = new THREE.DirectionalLight(0xbfd0ff, 0.8); key.position.set(-10, 22, -14); rim.position.set(14, 6, 16); root.add(hemi, key, rim);
+  return K.model({ plugs, mags }); }
+// a lead: from the magneto cap up over the engine and down to the plug boot (upper plugs) or round the cylinder (lower plugs)
+function leadPts(from, to, up) { const P = [], a = new THREE.Vector3(...from), d = new THREE.Vector3(...to), b = new THREE.Vector3(a.x + 3, up ? 6.6 : 4.6, a.z * 0.5 + d.z * 0.25), c = new THREE.Vector3(d.x - 1.5, up ? 6.2 : -4.6, d.z * 0.82);
+  if (!up) { b.set(a.x + 3, 4.6, a.z * 0.6); c.set(d.x - 2.5, 3.6, d.z * 1.08); }
+  const curve = up ? new THREE.CubicBezierCurve3(a, b, c, d) : new THREE.CatmullRomCurve3([a, b, c, new THREE.Vector3(d.x - 1.2, -0.5, d.z * 1.12), d]);
+  for (let i = 0; i <= 28; i++) P.push(curve.getPoint(i / 28).toArray()); return P; }
 export function mount(host) {
   let pos = "BOTH", fault = "normal", rpm = 1800, running = true, crank = 0, log = {};
-  const S = pxScene(host, { cls: "xtall mag", corners: { tl: "Ignition · runup at 1,800 RPM", tr: "POH 4, 7 · PHAK 7" } }, draw);
-  const rk = row(S.F.ctrl, "Key"); const keyC = chips(rk, POS.map((p) => [p, p]), pos, (p) => setPos(p || pos), { label: "Key" });
-  const rf = row(S.F.ctrl, "Case"); chips(rf, Object.entries(FAULT).map(([k, v]) => [k, v.name]), fault, (k) => { fault = k || "normal"; log = {}; running = true; setPos("BOTH"); }, { label: "Case" });
+  const F = frame(host, { cls: "capin sec3d mag3d", corners: { tl: "Ignition · runup at 1,800 RPM", tr: "POH 4, 7 · PHAK 7" } });
+  F.root.dataset.live = "1";   // plugs flicker while the engine runs on screen; zero frames offscreen
+  const S = planeStage(F.stage, { model: engModel, cg: [0, 0, 0], orbit: false, maxFps: 30, fov: 24, view: { tg: [-3, 1, 0], az: -148, el: 36, d: 70, fov: 24 } });
+  const M3 = S.P;
+  const VZ = { az: -158, el: 46, fov: 24 }, FIT = [[-20.5, 3.4, 0], [-20.5, 3.4, -1.5], [8, 0, 0], [-13, 7, 0], [-11.6, -1.2, 2.5], [-11.6, -1.2, -2.5]];
+  for (const c of CYL) for (const dx of [-2.8, 2.8]) for (const y of [-3.4, 4.6]) FIT.push([c.x + dx, y, c.s * 13.1]);
+  const band = () => { const sr = F.stage.getBoundingClientRect(); if (!sr.height) return; let b = 0; F.stage.querySelectorAll(".corner").forEach((c) => { if (c.textContent.trim()) b = Math.max(b, c.getBoundingClientRect().bottom - sr.top); }); S.setTopBand(b ? b + 4 : 0);
+    const Hh = Math.max(1, sr.height - (+F.stage.dataset.band || 0)); S.setView(fitView(THREE, FIT, VZ, sr.width / Hh, 0.9, 0.84), 1); labDirty = performance.now() + 400; S.kick(); };
+  let labDirty = 0; const bro = new ResizeObserver(band); bro.observe(F.stage); F.on(() => bro.disconnect());
+  // harness leads (one per plug) and P-leads: cue lines; each set lights in its magneto's color while that magneto fires
+  const COLM = { r: 0x3b82f6, l: 0xf2f1ec };
+  const leads = M3.plugs.map((pl) => { const to = pl.g.localToWorld(pl.end.clone()).toArray(), from = [MAG[pl.mag][0] - 2.4, MAG[pl.mag][1], MAG[pl.mag][2]], pts = leadPts(from, to, pl.up);
+    const base = S.cueLine(pts.length, { width: 1.6, opacity: 0.22, color: 0x9a9ca3 }), live = S.cueLine(pts.length, { width: 2.4, opacity: 0, color: COLM[pl.mag], dash: [0.9, 0.7] }); base.set(pts); live.set(pts); return { pl, base, live }; });
+  const pl2 = {}; for (const k of ["r", "l"]) { const a = [MAG[k][0] - 1.2, MAG[k][1] + 1.4, MAG[k][2]], b = [KEYP[k][0] + 3, KEYP[k][1] + 1.2, KEYP[k][2]], c = KEYP[k];
+    const pts = Array.from({ length: 16 }, (_, i) => { const u = i / 15; return [a[0] + (c[0] - a[0]) * u, a[1] + (b[1] - a[1]) * Math.sin(u * Math.PI / 2), a[2] + (c[2] - a[2]) * u]; });
+    pl2[k] = { pts, ln: S.cueLine(16, { width: 2, opacity: 0.6, color: 0x9a9ca3 }), brk: S.cueLine(2, { width: 3, opacity: 0, color: 0xe0503e }) }; pl2[k].ln.set(pts); }
+  // spark flashes at the plug tips
+  const sMat = (c) => new THREE.MeshBasicMaterial({ color: c, transparent: true, opacity: 0, depthTest: false, blending: THREE.AdditiveBlending });
+  const flashes = M3.plugs.map((pl) => { const m = new THREE.Mesh(new THREE.SphereGeometry(0.42, 16, 12), sMat(pl.mag === "r" ? 0x7fb0ff : 0xffffff)); m.position.copy(pl.g.localToWorld(new THREE.Vector3(0, pl.up ? -0.3 : 0.3, 0))); m.renderOrder = 8; S.scene.add(m); return m; });
+  // labels over the stage
+  const lab = s("svg", { class: "full lab3d", role: "img" }, F.stage); let lg = s("g", {}, lab);
+  function labels() { const W = F.stage.clientWidth, H = F.stage.clientHeight, ph = W < 520, Fa = FAULT[fault]; lab.setAttribute("viewBox", `0 0 ${W} ${H}`); lg.remove(); lg = s("g", {}, lab); const f = firing();
+    const at = (p, str, o = {}) => { const q = S.project(p, false); return T(lg, Math.max(6, Math.min(W - 6, q.x + (o.dx || 0))), q.y + (o.dy || 0), str, { size: 11, anchor: o.anchor || "middle", fill: o.fill || GRAY, weight: o.w }); };
+    const live = running || crank > 0;
+    at([MAG.r[0] - 1, MAG.r[1] - 1.6, MAG.r[2] + 1.6], ph ? "right mag" : "right magneto", { dy: 14, anchor: "start", dx: 2, fill: f.r && live ? ACC : GRAY, w: 600 });
+    at([MAG.l[0] - 1, MAG.l[1] - 1.6, MAG.l[2] - 1.6], ph ? "left mag" : "left magneto", { dy: 14, anchor: "end", dx: -2, fill: f.l && live ? INK : GRAY, w: 600 });
+    at([KEYP.l[0], KEYP.l[1], 0], ph ? "P-leads to key" : "P-leads to the key", { dy: 16, fill: GRAY });
+    for (const c of CYL) at([c.x, -4.4, c.s * 13.4], "cyl " + c.n, { dy: 12, fill: DIM });
+    if (Fa.rough) { const pl = M3.plugs.find((q) => q.c.n === 1 && q.up); at(pl.g.localToWorld(new THREE.Vector3(0, 2.2, 0)).toArray(), "fouled plug", { dy: -8, fill: COL.yellow }); }
+    if (Fa.hot) at([KEYP.l[0], KEYP.l[1], 0], (Fa.hot === "L" ? "left" : "right") + " P-lead broken", { dy: 31, fill: COL.red }); }
+  // which plugs fire: flicker in firing order 1-3-2-4 while running or cranking
+  let ph0 = 0; const ORDER = [1, 3, 2, 4];
+  function scene3d(now = performance.now()) { const f = firing(), Fa = FAULT[fault], live = (running && rpm > 150) || crank > 0, rate = crank > 0 ? 1.2 : 2.6;
+    const cur = ORDER[Math.floor(((now / 1000) * rate * 4) % 4)];
+    leads.forEach(({ pl, live: lv }, i) => { const on = live && f[pl.mag], fouled = Fa.rough && pl.c.n === 1 && pl.up; lv.opacity = on ? 0.95 : 0; flashes[i].material.opacity = on && !fouled && pl.c.n === cur && !reduced() ? 0.9 : on && reduced() && !fouled ? 0.6 : 0; });
+    const hot = (Fa.hot || "").toLowerCase();
+    for (const k of ["r", "l"]) { const grounded = !f[k], q = pl2[k]; q.ln.opacity = grounded ? 0.9 : 0.35; q.ln.obj.material.color.set(grounded ? 0x9a9ca3 : 0x55575d);
+      if (k === hot) { const a = q.pts[7], b = q.pts[9]; q.brk.set([a, b]); q.brk.opacity = 1; q.ln.set(q.pts.map((p, i) => (i >= 7 && i <= 9 ? q.pts[i < 8 ? 7 : 9] : p))); } else { q.brk.opacity = 0; q.ln.set(q.pts); } }
+    if (now < labDirty || !lgDone) { labels(); lgDone = now >= labDirty; } }
+  let lgDone = false; S.setFlow(true, (now) => scene3d(now));
+  // strip: the key switch (tappable), the tach and the check log
+  const strip = h("div", { class: "vstrip" }); F.stage.after(strip); const sv = s("svg", { class: "full", role: "img" }, strip); let sg = s("g", {}, sv);
+  const sro = new ResizeObserver(() => redraw()); sro.observe(strip); F.on(() => sro.disconnect());
+  const rk = row(F.ctrl, "Key"); const keyC = chips(rk, POS.map((p) => [p, p]), pos, (p) => setPos(p || pos), { label: "Key" });
+  const rf = row(F.ctrl, "Case"); chips(rf, Object.entries(FAULT).map(([k, v]) => [k, v.name]), fault, (k) => { fault = k || "normal"; log = {}; running = true; setPos("BOTH"); }, { label: "Case" });
   let tach = null;
-  const A = anim(S.F, (dt) => { let m1 = false, m2 = false; if (crank > 0) { crank -= dt; m1 = true; if (crank <= 0) { running = true; pos = "BOTH"; keyC.set(pos); S.redraw(); } }
-    [rpm, m2] = toward(rpm, target(), 3.2, dt, 0.5); if (running && rpm < 200 && target() === 0) { running = false; S.redraw(); } tach && tach.set(rpm); return m1 || m2; });
-  function firing(p = pos) { const F = FAULT[fault]; const r = p === "R" || p === "BOTH" || (p === "OFF" && F.hot === "R"), l = (p === "L" || p === "BOTH") && F.dL != null; return { r, l }; }
-  function target() { if (crank > 0) return 300; if (!running) return 0; const F = FAULT[fault], f = firing();
-    if (!f.r && !f.l) return 0; if (f.r && f.l) return 1800; if (f.r) return 1800 - F.dR; return 1800 - F.dL; }
+  const A = anim(F, (dt) => { let m1 = false, m2 = false; if (crank > 0) { crank -= dt; m1 = true; if (crank <= 0) { running = true; pos = "BOTH"; keyC.set(pos); redraw(); } }
+    [rpm, m2] = toward(rpm, target(), 3.2, dt, 0.5); if (running && rpm < 200 && target() === 0) { running = false; redraw(); } tach && tach.set(rpm); return m1 || m2; });
+  // a magneto fires unless the key grounds it through its P-lead; a broken P-lead means it can't be grounded
+  function firing(p = pos) { const Fa = FAULT[fault], hot = (Fa.hot || "").toLowerCase(); const r = p === "R" || p === "BOTH" || p === "START" || hot === "r", l = (p === "L" || p === "BOTH" || p === "START" || hot === "l") && Fa.dL != null; return { r, l }; }
+  function target() { if (crank > 0) return 300; if (!running) return 0; const Fa = FAULT[fault], f = firing();
+    if (!f.r && !f.l) return 0; if (f.r && f.l) return 1800; if (f.r) return 1800 - Fa.dR; return 1800 - Fa.dL; }
   function setPos(p) { pos = p; keyC.set(p); if (p === "START") { crank = 1.6; } else if (running) { const t = target(); if (p === "R" || p === "L") log[p] = t ? 1800 - t : "quit"; }
-    S.redraw(); A.kick(); }
-  function draw(g, W, H, top) {
-    const ph = S.phone, F = FAULT[fault], f = firing(); const wide = W >= 600;
-    // key (left), tach (right), engine between them on wide screens; key + tach on top and engine below on phones
-    const kr = wide ? Math.min(66, (H - top) * 0.18) : Math.min(54, W * 0.14), kx = wide ? 26 + kr + 22 : 14 + kr + 26, ky = wide ? top + (H - top) * 0.42 : top + kr + 24;
-    C(g, kx, ky, kr, { fill: "#0A0A0B", stroke: GRAY, sw: 1.4 });
+    lgDone = false; redraw(); A.kick(); S.kick(); }
+  function redraw() { const W = strip.clientWidth || 600; sg.remove(); sg = s("g", {}, sv); const Hh = draw(sg, W); sv.setAttribute("viewBox", `0 0 ${W} ${Hh}`); sv.setAttribute("height", Hh); strip.style.height = Hh + "px"; lgDone = false; S.kick(); }
+  function draw(g, W) {
+    const Fa = FAULT[fault], wide = W >= 600, kr = wide ? 46 : 40; let Hh = 176;
+    // key switch
+    const kx = 16 + kr + 34, ky = 26 + kr + 18;
+    C(g, kx, ky, kr, { fill: "#0d0d10", stroke: GRAY, sw: 1.4 });
     POS.forEach((p) => { const a = (ANG[p] * Math.PI) / 180, x = kx + Math.sin(a) * (kr + 16), y = ky - Math.cos(a) * (kr + 16);
       T(g, x, y + 4, p, { size: 11, anchor: Math.abs(ANG[p]) > 60 ? (ANG[p] < 0 ? "end" : "start") : "middle", fill: p === pos ? ACC : GRAY, weight: p === pos ? 700 : 500 });
       const hz = C(g, x, y, 16, { fill: "transparent" }); hit(g, hz, "Key " + p, () => setPos(p)); });
-    const a = (ANG[pos] * Math.PI) / 180; L(g, kx - Math.sin(a) * kr * 0.55, ky + Math.cos(a) * kr * 0.55, kx + Math.sin(a) * kr * 0.75, ky - Math.cos(a) * kr * 0.75, { stroke: INK, w: 9 });
-    C(g, kx, ky, 6, { fill: ACC });
-    if (pos === "START") T(g, kx, ky + kr + 20, "spring-loaded", { size: 11, anchor: "middle", fill: GRAY });
-    const tr = wide ? Math.min(80, (H - top) * 0.22) : Math.min(64, W * 0.17), tx = W - tr - (wide ? 26 : 16), ty = wide ? ky : top + tr + 14;
-    tach = dial(g, tx, ty, tr, { min: 0, max: 3000, arcs: [[2100, 2500, "green"]], reds: [2700], ticks: [500, 1000, 1500, 2000, 2500], nums: tr >= 72 ? [[0, "0"], [1000, "10"], [2000, "20"], [3000, "30"]] : [[1000, "10"], [2000, "20"]], title: "RPM ×100", focus: true, fmt: (v) => String(Math.round(v / 5) * 5) });
-    tach.set(rpm);
-    // engine: 4 opposed cylinders, heads outboard, two plugs in each head (upper + lower)
-    const ey = wide ? top + 30 : Math.max(ky + kr + 52, ty + tr + 40), ex0 = wide ? kx + kr + 70 : 30, ex1 = wide ? tx - tr - 60 : W - 30, eh = Math.max(150, (H - ey) - 70);
-    const cw = Math.min(150, (ex1 - ex0) / 2 - 26), mid = (ex0 + ex1) / 2;
-    R(g, mid - 18, ey + 10, 36, eh - 20, { stroke: DIM, rx: 8 }); T(g, mid, ey + eh + 6, "crankcase", { size: 11, anchor: "middle", fill: DIM });
-    const ch = (eh - 20) / 2 - 10;
-    for (const side of ["L", "R"]) for (const k of [0, 1]) {
-      const x = side === "L" ? mid - 22 - cw : mid + 22, y = ey + 10 + k * (ch + 20);
-      R(g, x, y, cw, ch, { stroke: GRAY, rx: 6 }); for (let i = 1; i < 6; i++) L(g, x + (cw * i) / 6, y + 6, x + (cw * i) / 6, y + ch - 6, { stroke: "rgba(242,241,236,.12)", w: 1 });
-      // right magneto -> lower right + upper left; left magneto -> lower left + upper right
-      const upMag = side === "L" ? "r" : "l", loMag = side === "L" ? "l" : "r", px = side === "L" ? x - 1 : x + cw + 1;
-      [[y + ch * 0.28, upMag], [y + ch * 0.72, loMag]].forEach(([py, m]) => { const fouled = F.rough && F.rough.toLowerCase() === m && k === 0 && side === "R";
-        const on = running && crank <= 0 && f[m] && !fouled; C(g, px, py, on ? 7 : 5.5, { fill: on ? (m === "r" ? ACC : INK) : "#0A0A0B", stroke: on ? "none" : fouled ? COL.yellow : DIM, sw: 1.4 }); });
-    }
-    T(g, mid - 22 - cw / 2, ey + 2, "left bank", { size: 11, anchor: "middle", fill: DIM }); T(g, mid + 22 + cw / 2, ey + 2, "right bank", { size: 11, anchor: "middle", fill: DIM });
-    // legend
-    const ly = ey + eh + 30, lx = mid - 22 - cw; C(g, lx + 6, ly - 4, 6, { fill: ACC }); T(g, lx + 18, ly, "right magneto plugs", { size: 11, fill: f.r && running ? INK : DIM });
-    C(g, lx + 6, ly + 16, 6, { fill: INK }); T(g, lx + 18, ly + 20, "left magneto plugs", { size: 11, fill: f.l && running ? INK : DIM });
-    if (F.rough && pos === F.rough && running) T(g, mid + 22 + cw, ly, "rough", { size: 12, anchor: "end", fill: COL.yellow, weight: 700 });
+    const a = (ANG[pos] * Math.PI) / 180; L(g, kx - Math.sin(a) * kr * 0.55, ky + Math.cos(a) * kr * 0.55, kx + Math.sin(a) * kr * 0.75, ky - Math.cos(a) * kr * 0.75, { stroke: INK, w: 8 });
+    C(g, kx, ky, 5, { fill: ACC }); T(g, kx, ky + kr + 22, pos === "START" ? "spring-loaded" : "ignition switch", { size: 11, anchor: "middle", fill: GRAY });
+    // tach
+    const tr = wide ? 62 : 58, tx = wide ? kx + kr + 60 + tr : W - 16 - tr, ty = ky;
+    tach = dial(g, tx, ty, tr, { min: 0, max: 3000, arcs: [[2100, 2500, "green"]], reds: [2700], ticks: [500, 1000, 1500, 2000, 2500], nums: [[1000, "10"], [2000, "20"]], title: "RPM ×100", focus: true, fmt: (v) => String(Math.round(v / 5) * 5) }); tach.set(rpm);
+    // check log
+    const lx = wide ? tx + tr + 28 : 16, ly = wide ? 30 : ky + kr + 52, lw = (wide ? W - 16 : W - 16) - lx;
+    const rows = [["Right mag drop", log.R === undefined ? "–" : log.R === "quit" ? "quits" : log.R + " RPM", log.R === "quit" || log.R === 0 || log.R > 150], ["Left mag drop", log.L === undefined ? "–" : log.L === "quit" ? "quits" : log.L + " RPM", log.L === "quit" || log.L === 0 || log.L > 150], ["Limits (172S)", "150 max · 50 apart", false]];
+    T(g, lx, ly, "Mag check", { size: 11, fill: INK, weight: 600 });
+    rows.forEach(([k, v, bad], i) => { const y = ly + 26 + i * 26; T(g, lx, y, k, { size: 11, fill: GRAY }); T(g, lx + lw, y, v, { size: 12, anchor: "end", fill: bad ? COL.red : INK, weight: 600 }); L(g, lx, y + 9, lx + lw, y + 9, { stroke: "rgba(242,241,236,.07)", w: 1 }); });
+    const done = log.R !== undefined && log.L !== undefined, vd = verdict(fault); if (!wide) Hh = ly + 26 * 4 + 16;
+    T(g, lx, ly + 26 * 4 + 2, done ? (vd === "ok" ? "Within limits: OK to fly" : "Out of limits: don't fly") : "R, BOTH, L, BOTH", { size: 12, fill: done ? (vd === "ok" ? COL.green : COL.red) : GRAY, weight: 600 });
     // caption
     const drop = (k) => (log[k] === undefined ? "–" : log[k] === "quit" ? "quits" : log[k] + " RPM");
     let cap;
-    if (!running) cap = ["Engine stopped", F.hot && pos === "OFF" ? "" : "Key to START to crank it again."];
+    if (!running) cap = ["Engine stopped",  "Key to START to crank it again."];
     else if (crank > 0) cap = ["Cranking", "Starter engaged. Release and the key springs back to BOTH."];
-    else if (pos === "OFF" && F.hot) cap = ["Still running with the key OFF", "The right magneto's ground wire is broken, so OFF can't ground it. Only idle cutoff stops this engine. Treat every prop as live."];
+    else if (pos === "OFF" && Fa.hot) cap = ["Still running with the key OFF", "The left magneto's P-lead is broken, so OFF can't ground it. Only idle cutoff stops this engine. Treat every prop as live."];
     else if (pos === "BOTH") cap = ["Both magnetos", log.R !== undefined && log.L !== undefined ? `Right drop ${drop("R")}, left drop ${drop("L")}. ${verdict(fault) === "ok" ? "Within limits: OK to fly." : "Out of limits: don't fly."}` : "Turn the key to R, back to BOTH, then L, back to BOTH."];
-    else if (pos === "R" || pos === "L") { const d = log[pos]; cap = [pos === "R" ? "Right magneto only" : "Left magneto only", d === "quit" ? "The engine quits on this magneto. Don't fly." : d === 0 ? "No drop. That's not normal: suspect a broken ground wire or timing. Don't fly." : `Drop ${d} RPM (example). Limit 150 RPM, and 50 RPM difference between sides.`]; }
-    else cap = ["Key OFF", "Both magnetos grounded. The engine stops."];
-    S.F.caption(cap[0], cap[1]);
-  }
-  S.F.explain(`<p>Each magneto fires one of the two plugs in every cylinder, so either one alone keeps the engine running, with a small RPM drop. The check: R, back to BOTH to clear the plugs, L, back to BOTH. Your airplane's POH gives the limits; in the 172S, 150 RPM max drop and 50 RPM max difference. Magnetos don't need the battery or the master switch.</p>`);
-  return { destroy: () => { A.stop(); S.F.destroy(); } };
+    else if (pos === "R" || pos === "L") { const d = log[pos]; cap = [pos === "R" ? "Right magneto only" : "Left magneto only", d === "quit" ? "The engine quits on this magneto. Don't fly." : d === 0 ? "No drop. That's not normal: suspect a broken P-lead (ground wire) or timing. Don't fly." : `Drop ${d} RPM (example). Limit 150 RPM, and 50 RPM difference between sides.`]; }
+    else cap = ["Key OFF", "Both P-leads grounded, so neither magneto fires. The engine stops."];
+    F.caption(cap[0], cap[1]); return Hh; }
+  F.explain(`<p>Each magneto fires one of the two plugs in every cylinder, so either one alone keeps the engine running, with a small RPM drop. The key works by grounding: a magneto's P-lead runs to the switch, and grounding it stops that magneto from firing. The check: R, back to BOTH to clear the plugs, L, back to BOTH. Your airplane's POH gives the limits; in the 172S, 150 RPM max drop and 50 RPM max difference. Magnetos don't need the battery or the master switch.</p>`);
+  band(); redraw();
+  return { destroy: () => { A.stop(); S.destroy(); F.destroy(); } };
 }
