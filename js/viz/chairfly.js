@@ -1,8 +1,8 @@
 // Chair-fly trainer: tap the checklist items in order from memory. Items are from the C172S POH Section 3/4.
 // Baseline is the round-gauge C172S POH (r: ignition switch, avionics master, no standby battery); the Panel switch shows the
 // 172S NAV III (G1000) POH version (steps). Confirm with your CFI and your aircraft's POH.
-import { frame, chips } from "./base.js?v=7204d1cc12";
-import { h, esc, shuffle } from "../core/util.js?v=7204d1cc12";
+import { frame, chips } from "./base.js?v=ff9d939563";
+import { h, esc, shuffle } from "../core/util.js?v=ff9d939563";
 export const DRILLS = {
   roll: { name: "Engine failure, takeoff roll", src: "C172S POH 3", steps: ["Throttle: IDLE", "Brakes: APPLY", "Wing flaps: RETRACT", "Mixture: IDLE CUTOFF", "Magnetos: OFF", "STBY BATT: OFF", "Master (ALT and BAT): OFF"], r: ["Throttle: IDLE", "Brakes: APPLY", "Wing flaps: RETRACT", "Mixture: IDLE CUTOFF", "Ignition switch: OFF", "Master switch: OFF"] },
   after: { name: "Engine failure after takeoff", src: "C172S POH 3", steps: ["Airspeed: 70 KIAS flaps up, 65 KIAS flaps 10° to full", "Mixture: IDLE CUTOFF", "Fuel shutoff valve: OFF", "Magnetos: OFF", "Wing flaps: AS REQUIRED (full recommended)", "STBY BATT: OFF", "Master (ALT and BAT): OFF", "Cabin door: UNLATCH", "Land: STRAIGHT AHEAD"], r: ["Airspeed: 70 KIAS flaps up, 65 KIAS flaps down", "Mixture: IDLE CUTOFF", "Fuel shutoff valve: OFF", "Ignition switch: OFF", "Wing flaps: AS REQUIRED", "Master switch: OFF", "Cabin door: UNLATCH", "Land: STRAIGHT AHEAD"] },

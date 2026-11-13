@@ -1,8 +1,8 @@
 // Magnetic compass errors from dip (PHAK 8): northerly turning error and acceleration error (ANDS).
 // Two dials: the heading indicator shows where the airplane really points; the compass shows what the magnet says.
 // The turning-error size is schematic, scaled with the "15° plus half your latitude" rule of thumb (largest on north/south headings, zero on east/west).
-import { chips, slider } from "./base.js?v=7204d1cc12";
-import { pxScene, T, L, C, ACC, INK, GRAY, DIM, wrap } from "./kit.js?v=7204d1cc12";
+import { chips, slider } from "./base.js?v=ff9d939563";
+import { pxScene, T, L, C, ACC, INK, GRAY, DIM, wrap } from "./kit.js?v=ff9d939563";
 const NAMES = { 0: "N", 90: "E", 180: "S", 270: "W" };
 export function mount(host) {
   let mode = "turn", from = "n", spd = "acc", hdgEW = 90, prog = 20, lat = 44;
