@@ -11,6 +11,7 @@ await pg.addInitScript(() => { try { localStorage.setItem("sqs.access", "1"); } 
 const shot = async (n) => { if (!SHOTS) return; await pg.waitForTimeout(900); await pg.screenshot({ path: `${SHOTS}/${n}.png` }); };
 const V = async () => pg.evaluate(() => document.querySelector('meta[name="build"]').content);
 const D = async (fn, arg) => pg.evaluate(async ([v, src, arg]) => { const d = await import(`/data/index.js?v=${v}`); const pi = (await import(`/data/pageindex.js?v=${v}`)).default; return new Function("d", "pi", "arg", src)(d, pi, arg); }, [await V(), fn, arg]);
+const P = async (lid) => pg.evaluate(async ([v, lid]) => { const F = await import(`/js/core/flow.js?v=${v}`); const st = F.plan(lid, F.pagesOf(lid), false); return { checks: st.filter((s) => s.kind === "cp").map((s) => s.size), wrap: st.find((s) => s.kind === "wrap").size }; }, [await V(), lid]);
 const st = async () => (await pg.waitForTimeout(300), pg.evaluate(() => JSON.parse(localStorage.getItem("ppg.v1") || "{}")));
 const cur = async () => pg.evaluate(async (v) => { const d = await import(`/data/index.js?v=${v}`); const el = document.querySelector(".qtext"); if (!el) return null; const txt = el.innerText.trim();
   const strip = (s) => { const e = document.createElement("div"); e.innerHTML = String(s).replace(/\[\[([^\]|]+)(?:\|[^\]]+)?\]\]/g, "$1"); return e.innerText.trim(); };
@@ -37,7 +38,7 @@ ok(await pg.locator(".skip-now", { hasText: "Skip for now" }).count() === 1, "th
 await pg.locator(".cp-btns .btn.pri").click(); await pg.waitForSelector(".qtext");
 let asked = await runSession((i) => ({ wrong: i === 0, conf: 2 }));
 const want = new Set(pages.slice(0, 3).map((s) => `${L}/${s}`));
-ok(asked.length >= 4 && asked.length <= 5, `quick check asks 4-5 (${asked.length})`); ok(asked.every((c) => want.has(c.page)), `all from pages 1-3: ${[...new Set(asked.map((c) => c.page))]}`);
+const P3 = await P(L); ok(asked.length === P3.checks[0] && asked.length >= 3 && asked.length <= 6, `quick check asks its share of the pass (${asked.length} of plan ${P3.checks.join("+")}|${P3.wrap})`); ok(asked.every((c) => want.has(c.page)), `all from pages 1-3: ${[...new Set(asked.map((c) => c.page))]}`);
 ok(asked.every((c) => c.conf === 3), "every answer had the confidence step");
 let s = await st(); const miss = asked[0].id;
 ok(s.blind && s.blind[miss] && !s.blind[miss].done && s.blind[miss].conf === "sure", "a wrong answer marked Certain is a blind spot at once, mid-lesson");
@@ -64,7 +65,7 @@ ok(await pg.locator("h2", { hasText: "Wrap-up" }).count() === 1, "the last step 
 await pg.locator(".cp-btns .btn.pri").click(); await pg.waitForSelector(".qtext");
 const first = await cur(); ok(first.id === miss, `the wrap-up starts with the missed question (${first.id} vs ${miss})`);
 const reached = new Set((await st()).lessons[L].read.map((x) => `${L}/${x}`));
-asked = await runSession({ conf: 1 }); ok(asked.length >= 5 && asked.length <= 6, `wrap-up asks 5-6 (${asked.length})`); ok(asked.every((c) => reached.has(c.page)), "wrap-up asks only pages opened");
+asked = await runSession({ conf: 1 }); ok(asked.length === P3.wrap, `wrap-up asks the rest of the pass (${asked.length} of ${P3.wrap})`); ok(asked.every((c) => reached.has(c.page)), "wrap-up asks only pages opened");
 await shot("learnB-wrapup"); s = await st();
 ok(s.lessons[L].fin && (await pg.locator(".card.finished", { hasText: "Lesson finished" }).count()) === 1 && /readiness/.test(await pg.locator(".card.finished").innerText()), "lesson marked finished with readiness shown");
 await pg.locator(".card.finished").scrollIntoViewIfNeeded(); await shot("learnB-finished");
@@ -108,6 +109,22 @@ await pg.locator("#cf-stage .chip", { hasText: /^All$/ }).click(); await pg.wait
 await pg.locator("#cf-stage .chip", { hasText: /^Not started$/ }).click(); await pg.waitForTimeout(250); ids = await listIds(); ok(ids.length > 10 && !ids.includes("gl3"), "Not started hides GL3");
 await pg.locator("#cf-stage .chip", { hasText: /^Weak$/ }).click(); await pg.waitForTimeout(250); ids = await listIds(); ok(ids.includes("gl3") || !(await st()).blind, `Weak lists GL3 (${ids})`);
 await pg.locator("#cf-stage .chip", { hasText: /^All$/ }).click();
+// ---------- per-pass size: about 20 in one pass, short units 15+, GL2 up to 25 ----------
+const tot = (p) => p.checks.reduce((a, b) => a + b, 0) + p.wrap;
+ok(tot(P3) >= 18 && tot(P3) <= 21, `GL3 asks about 20 in one pass (${P3.checks.join("+")}|${P3.wrap})`);
+const P2 = await P("gl2"); ok(tot(P2) >= 20 && tot(P2) <= 25, `GL2 is capped near 25 (${P2.checks.join("+")}|${P2.wrap})`);
+for (const u of ["ap1", "ap4", "wx1", "mn1"]) { const pu = await P(u); ok(tot(pu) >= 15 && tot(pu) <= 20, `${u} asks 15-20 in one pass (${pu.checks.join("+") || "-"}|${pu.wrap})`); }
+// a short unit end to end: quick check after page 2, then the wrap-up takes the rest, still only from opened pages
+const PA = await P("ap1"); await pg.goto(BASE + "#/lesson/ap1/0"); await pg.reload(); await pg.waitForTimeout(900);
+for (let i = 0; i < 2; i++) await next(); ok(/ap1\/check1$/.test(pg.url()), "AP1 quick check after page 2: " + pg.url());
+await pg.locator(".cp-btns .btn.pri").click(); await pg.waitForSelector(".qtext"); asked = await runSession({ conf: 2 });
+ok(asked.length === PA.checks[0], `AP1 quick check asks ${asked.length} of ${PA.checks[0]}`);
+await pg.locator(".next-btns button", { hasText: /^Continue · / }).click(); await pg.waitForTimeout(400); await next(); await pg.waitForTimeout(300);
+ok(/ap1\/wrap$/.test(pg.url()), "AP1 wrap-up after page 3: " + pg.url());
+await pg.locator(".cp-btns .btn.pri").click(); await pg.waitForSelector(".qtext"); const askedW = await runSession({ conf: 2 });
+const reachedA = new Set((await st()).lessons.ap1.read.map((x) => `ap1/${x}`));
+ok(askedW.length === PA.wrap && askedW.every((c) => reachedA.has(c.page)), `AP1 wrap-up asks ${askedW.length} of ${PA.wrap}, opened pages only`);
+ok(asked.length + askedW.length >= 15, `AP1 one pass = ${asked.length + askedW.length} questions`);
 // ---------- old links ----------
 await pg.goto(BASE + "#/lesson/gl3/3"); await pg.waitForTimeout(900); ok(/gl3\/3$/.test(pg.url()) && (await pg.locator(".sec .label").first().innerText()).length > 0 && !(await pg.locator(".cp-intro").count()), "old link #/lesson/gl3/3 still opens page 4");
 await pg.goto(BASE + `#/lesson/gl3/${pages.length}`); await pg.waitForTimeout(900); ok(await pg.locator("h2", { hasText: "Wrap-up" }).count() === 1, "old Check yourself link (one past the pages) opens the wrap-up");

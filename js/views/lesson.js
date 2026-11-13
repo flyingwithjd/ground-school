@@ -1,19 +1,19 @@
-import { h, esc, pct } from "../core/util.js?v=771fe5f0ea";
-import { S, save, lessonState } from "../core/store.js?v=771fe5f0ea";
-import { LESSONS, lessonItems } from "../../data/index.js?v=771fe5f0ea";
-import { lessonStats, onlyReached, nextLesson } from "../core/progress.js?v=771fe5f0ea";
-import { plan, pick, wrapPool, pageIds, pageStats, pageBlind, cpState, cpMark, finish } from "../core/flow.js?v=771fe5f0ea";
-import { get } from "../core/srs.js?v=771fe5f0ea";
-import { rich, autoTerms } from "../core/rich.js?v=771fe5f0ea";
-import { mountViz, destroyAll } from "../viz/index.js?v=771fe5f0ea";
-import { practiceSet, allLabel, session } from "./quiz.js?v=771fe5f0ea";
-import { mergeSections } from "./merge-sections.js?v=771fe5f0ea";
+import { h, esc, pct } from "../core/util.js?v=ab272ba69e";
+import { S, save, lessonState } from "../core/store.js?v=ab272ba69e";
+import { LESSONS, lessonItems } from "../../data/index.js?v=ab272ba69e";
+import { lessonStats, onlyReached, nextLesson } from "../core/progress.js?v=ab272ba69e";
+import { plan, pick, wrapPool, pageIds, pageStats, pageBlind, cpState, cpMark, finish } from "../core/flow.js?v=ab272ba69e";
+import { get } from "../core/srs.js?v=ab272ba69e";
+import { rich, autoTerms } from "../core/rich.js?v=ab272ba69e";
+import { mountViz, destroyAll } from "../viz/index.js?v=ab272ba69e";
+import { practiceSet, allLabel, session } from "./quiz.js?v=ab272ba69e";
+import { mergeSections } from "./merge-sections.js?v=ab272ba69e";
 export { mergeSections };
 const KIND = { ground: "Ground lesson", flight: "Flight lesson briefing", module: "Module unit" };
 // Lesson text is code-split: question banks load up front (the review engine needs them); prose loads when the lesson opens.
 // Supplement sections (data/text/x/<id>.js) slot in after the section named by `at` ("^" = first), else at the end.
 export function loadLesson(id) { const L0 = LESSONS[id]; if (!L0) return Promise.reject(new Error("Lesson not found."));
-  return Promise.all([import(`../../data/text/${id}.js?v=771fe5f0ea`), L0.textx ? import(`../../data/text/x/${id}.js?v=771fe5f0ea`) : null])
+  return Promise.all([import(`../../data/text/${id}.js?v=ab272ba69e`), L0.textx ? import(`../../data/text/x/${id}.js?v=ab272ba69e`) : null])
     .then(([m, x]) => ({ ...L0, ...m.default, sections: mergeSections(m.default.sections || [], x ? x.default.sections || [] : []) })); }
 // One page of lesson prose with its visuals, Know/Do/Risk card and ACS codes (also used by the Review blind spots lesson).
 export function renderPage(sec, S0, terms = autoTerms) {
@@ -99,7 +99,7 @@ function build(p, L, id, secIdx) {
   // Hide the pager while questions are on screen; the session's own buttons lead on.
   const startSession = (sec) => { sec.querySelectorAll(".cp-intro").forEach((n) => n.remove()); body.querySelectorAll(".secnav").forEach((n) => n.remove()); const box = h("div", { class: "mt" }); sec.append(box); return box; };
   const skipBtn = (onclick) => h("button", { class: "btn ghost skip-now", type: "button", onclick }, "Skip for now");
-  // A quick check after every 2-3 pages: 4-5 questions from only those pages, never a gate.
+  // A quick check after every 2-3 pages: 2-6 questions (flow.js budget) from only those pages, never a gate.
   function checkpoint(sec, s) { const pool = s.pages.flatMap((sid) => pageIds(id, sid)); const ids = pick(pool, s.size); const unread = s.pages.filter((sid) => !ls.read.includes(sid));
     const titles = s.pages.map((sid) => sections.find((x) => x.id === sid)).map((x) => x.title || x.label);
     const st = cpState(id, s.key); const range = s.from === s.to ? `page ${s.from + 1}` : `pages ${s.from + 1}–${s.to + 1}`;
@@ -124,8 +124,8 @@ function build(p, L, id, secIdx) {
     const b = h("div", { class: "btns mt2 next-btns" }); if (N) b.append(h("a", { class: "btn pri arrow", href: `#/lesson/${N.id}` }, `Next · ${N.code} ${N.title}`));
     const bk = h("button", { class: "btn" + (N ? " ghost" : " pri"), type: "button" }, "Back to course"); bk.onclick = backTo; b.append(bk); el.append(b); return el; }
   const meter = (x) => `<div class="meter big mt"><i style="width:${Math.round(x * 100)}%"></i></div>`;
-  // The wrap-up: 5-6 questions across the whole lesson, weighted toward misses and low confidence. Only pages opened are asked.
-  function wrapUp(sec) { const all = wrapPool(id, sections, !L.includes); const reached = onlyReached(all); const n = reached.length >= 12 ? 6 : 5; const ids = pick(all, n, { wrap: true });
+  // The wrap-up: the rest of the pass budget (5-15 questions) across the whole lesson, weighted toward misses and low confidence. Only pages opened are asked.
+  function wrapUp(sec) { const all = wrapPool(id, sections, !L.includes); const reached = onlyReached(all); const n = (steps.find((x) => x.kind === "wrap") || {}).size || 6; const ids = pick(all, n, { wrap: true });
     sec.innerHTML = `<span class="label">Wrap-up · ${esc(L.code)}</span><h2>Wrap-up</h2>`;
     const intro = h("div", { class: "cp-intro" }); sec.append(intro);
     const scope = reached.length < all.length ? `${reached.length} of ${all.length} questions so far: only pages you've opened are asked` : `${all.length} questions in this lesson`;

@@ -1,11 +1,12 @@
-// The learning flow inside a lesson: pages in groups of 2-3, a quick check of 4-5 questions after each group (drawn only
-// from the pages just read), and a 5-6 question wrap-up across the lesson at the end. Checks are never a gate: "Skip for
-// now" moves on, and a lesson counts as finished once its pages are read or its wrap-up is done or skipped.
+// The learning flow inside a lesson: pages in groups of 2-3, a quick check after each group (drawn only from the pages just
+// read), and a wrap-up across the lesson at the end. One pass asks about 20 questions (short units about 15-20, very long
+// lessons up to 25): see budget() below. Checks are never a gate: "Skip for now" moves on, and a lesson counts as finished
+// once its pages are read or its wrap-up is done or skipped.
 // Progress lives in lessons[id] inside ppg.v1 (additive): cp[key] = { done, ok, n } or { skip }, fin = time finished.
-import { get, isDue, isBlind } from "./srs.js?v=771fe5f0ea";
-import { QUESTIONS, secKey, lessonItems } from "../../data/index.js?v=771fe5f0ea";
-import { reachedSet, isReached, stats } from "./progress.js?v=771fe5f0ea";
-import { S, save } from "./store.js?v=771fe5f0ea";
+import { get, isDue, isBlind } from "./srs.js?v=ab272ba69e";
+import { QUESTIONS, secKey, lessonItems } from "../../data/index.js?v=ab272ba69e";
+import { reachedSet, isReached, stats } from "./progress.js?v=ab272ba69e";
+import { S, save } from "./store.js?v=ab272ba69e";
 const HOUR = 36e5;
 // Question ids by page key "lesson/sec", in bank order.
 let BY = null; export function byPage() { if (BY) return BY; BY = {}; for (const q of Object.values(QUESTIONS)) { const k = secKey(q); if (k) (BY[k] ||= []).push(q.id); } return BY; }
@@ -15,13 +16,22 @@ export const pageBlind = (lid, sid) => pageIds(lid, sid).filter((id) => isBlind(
 // Split n pages into groups of 2-3 (3 pages: a check after the first 2; 1-2 pages: no quick check, only the wrap-up).
 export function groups(n) { if (n === 3) return [[0, 1], [2]]; if (n < 3) return [Array.from({ length: n }, (_, i) => i)]; const k = Math.ceil(n / 3), base = Math.floor(n / k), extra = n % k; const out = []; let at = 0;
   for (let g = 0; g < k; g++) { const sz = base + (g < extra ? 1 : 0); out.push(Array.from({ length: sz }, (_, i) => at + i)); at += sz; } return out; }
+// One pass through a lesson asks about PASS questions (PASS_LONG when a lesson has 6+ quick checks, like GL2). Quick checks
+// get 3-6 each (2-3 when there are many), the wrap-up the rest (5-15), and nothing asks more than its pool holds.
+export const PASS = 20, PASS_LONG = 25;
+export function budget(checkPools, wrapPool) { const n = checkPools.length, B = Math.min(n >= 6 ? PASS_LONG : PASS, Math.max(wrapPool, 5)); let sizes = [];
+  if (n) { const forChecks = B - 5, base = Math.floor(forChecks / n), extra = forChecks % n;
+    sizes = checkPools.map((p, i) => Math.min(p, Math.min(6, Math.max(base >= 3 ? base : base + (i < extra ? 1 : 0), 2)))); }
+  const used = sizes.reduce((a, b) => a + b, 0); return { checks: sizes, wrap: Math.min(wrapPool, Math.max(5, Math.min(15, B - used))) }; }
 // Steps of a lesson: { kind: "sec" | "cp" | "prep" | "wrap", key, label }. Section keys stay their index so old links keep working.
 export function plan(lid, sections, hasPrep) { const steps = []; let n = 0; const g = groups(sections.length);
   g.forEach((grp, gi) => { grp.forEach((si) => steps.push({ kind: "sec", si, key: String(si), label: sections[si].label }));
     if (gi < g.length - 1) { const pages = grp.map((si) => sections[si].id); const pool = pages.flatMap((sid) => pageIds(lid, sid));
-      if (pool.length) { n++; steps.push({ kind: "cp", key: "check" + n, n, pages, from: grp[0], to: grp[grp.length - 1], size: Math.min(grp.length <= 2 ? 4 : 5, pool.length), label: `Quick check ${n}` }); } } });
+      if (pool.length) { n++; steps.push({ kind: "cp", key: "check" + n, n, pages, from: grp[0], to: grp[grp.length - 1], pool: pool.length, label: `Quick check ${n}` }); } } });
   if (hasPrep) steps.push({ kind: "prep", key: "brief", label: "Briefing card" });
-  steps.push({ kind: "wrap", key: "wrap", label: "Wrap-up" }); return steps; }
+  const L = LESSONS[lid]; const cps = steps.filter((s) => s.kind === "cp"); const b = budget(cps.map((s) => s.pool), wrapPool(lid, sections, !!L && !L.includes).length);
+  cps.forEach((s, i) => (s.size = b.checks[i]));
+  steps.push({ kind: "wrap", key: "wrap", label: "Wrap-up", size: b.wrap }); return steps; }
 // Every question a lesson's wrap-up can draw from: questions tagged with its pages plus its own bank (stage reviews point at earlier pages).
 export function wrapPool(lid, sections, deep = false) { return [...new Set([...sections.flatMap((s) => pageIds(lid, s.id)), ...lessonItems(lid, { deep })])]; }
 const last = (id) => { const it = get(id); const h = it && it.h; return h && h.length ? h[h.length - 1] : null; };
@@ -44,9 +54,9 @@ export function cpMark(lid, key, v) { const ls = (S().lessons[lid] ||= { visited
 export function finish(lid) { const ls = (S().lessons[lid] ||= { visited: 0, sec: 0, read: [] }); if (!ls.fin) { ls.fin = Date.now(); save(); } }
 // The one next step for the Now page: a quick check whose pages are read but which was neither done nor skipped, else the
 // lesson in progress (most recently opened, not finished), else the next lesson in course order.
-import PI from "../../data/pageindex.js?v=771fe5f0ea";
-import { LESSONS, ORDER } from "../../data/index.js?v=771fe5f0ea";
-import { lessonDone, nextLesson } from "./progress.js?v=771fe5f0ea";
+import PI from "../../data/pageindex.js?v=ab272ba69e";
+import { LESSONS, ORDER } from "../../data/index.js?v=ab272ba69e";
+import { lessonDone, nextLesson } from "./progress.js?v=ab272ba69e";
 export const pagesOf = (lid) => (PI.lessons[lid] || []).map(([id, label, title]) => ({ id, label, title }));
 export const pageIndex = () => PI;
 export function nextStep() { const ls = S().lessons || {};

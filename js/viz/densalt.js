@@ -1,8 +1,8 @@
 // Density altitude from field elevation, altimeter setting and temperature using the standard atmosphere
 // (pressure altitude ≈ elevation + (29.92 − setting) × 1,000 ft, PHAK 4/11). No rule-of-thumb shortcuts.
-import { frame, slider, readout, svg, ACC, FAINT, FAINT2 } from "./base.js?v=771fe5f0ea";
-import { s } from "../core/util.js?v=771fe5f0ea";
-import { T } from "./shapes.js?v=771fe5f0ea";
+import { frame, slider, readout, svg, ACC, FAINT, FAINT2 } from "./base.js?v=ab272ba69e";
+import { s } from "../core/util.js?v=ab272ba69e";
+import { T } from "./shapes.js?v=ab272ba69e";
 const K = 6.8755856e-6;
 export function compute(elev, alt, tc) { const pa = elev + (29.92 - alt) * 1000, isa = 15 - 1.98 * (pa / 1000);
   const delta = Math.pow(1 - K * pa, 5.2558797), theta = (tc + 273.15) / 288.15, sigma = delta / theta, da = (1 - Math.pow(sigma, 0.2349690)) / K; return { pa, isa, da, sigma }; }
