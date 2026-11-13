@@ -92,19 +92,20 @@ export function mount(host) {
       if (i) L(g, pad + sw * i, top + 4, pad + sw * i, top + sH + 40, { stroke: "rgba(242,241,236,.07)", w: 1 });
       L(g, cx - sw * 0.46, cy, cx + sw * 0.46, cy, { stroke: DIM, w: 1, dash: "3 5" });
       // angle-of-attack wedge between the relative wind and the chord line, at the leading edge
-      const wl = Math.min(sw * 0.4, c * 0.9), ar = wl * 0.7, a0 = Math.PI + ph * D, a1 = Math.PI + be * D, p0 = [le[0] + Math.cos(a0) * ar, le[1] + Math.sin(a0) * ar], p1 = [le[0] + Math.cos(a1) * ar, le[1] + Math.sin(a1) * ar];
+      const wl = Math.min(sw * 0.4, c * 0.9), ar = Math.min(wl * 0.7, (le[1] - top + 4) * 0.9), a0 = Math.PI + ph * D, a1 = Math.PI + be * D, p0 = [le[0] + Math.cos(a0) * ar, le[1] + Math.sin(a0) * ar], p1 = [le[0] + Math.cos(a1) * ar, le[1] + Math.sin(a1) * ar];
       if (Math.abs(aoa) > 0.5) { const sweep = aoa > 0 ? 1 : 0; P(g, `M${le[0].toFixed(1)},${le[1].toFixed(1)} L${p0[0].toFixed(1)},${p0[1].toFixed(1)} A${ar.toFixed(1)},${ar.toFixed(1)} 0 0 ${sweep} ${p1[0].toFixed(1)},${p1[1].toFixed(1)} Z`, { fill: bad ? "rgba(217,73,62,.22)" : "rgba(59,130,246,.24)", stroke: "none" });
         P(g, `M${p0[0].toFixed(1)},${p0[1].toFixed(1)} A${ar.toFixed(1)},${ar.toFixed(1)} 0 0 ${sweep} ${p1[0].toFixed(1)},${p1[1].toFixed(1)}`, { stroke: col, w: 2.6 }); }
-      L(g, le[0], le[1], le[0] - cb * wl, le[1] - sb * wl, { stroke: "rgba(242,241,236,.5)", w: 1.1, dash: "4 3" });
+      const roof = (k, sn) => Math.min(k, (le[1] - top + 8) / Math.max(0.05, sn));   // keep the lines inside the strip at steep angles
+      L(g, le[0], le[1], le[0] - cb * roof(wl, sb), le[1] - sb * roof(wl, sb), { stroke: "rgba(242,241,236,.5)", w: 1.1, dash: "4 3" });
       const pts = FO.map(([x, y]) => [le[0] + cb * x * c + sb * y * c, le[1] + sb * x * c - cb * y * c]);
       P(g, "M" + pts.map((q) => q[0].toFixed(1) + "," + q[1].toFixed(1)).join("L") + "Z", { fill: "#141417", stroke: bad ? COL.red : INK, w: 1.8 });
-      const wc = Math.cos(ph * D), ws = Math.sin(ph * D); L(g, le[0] - wc * wl * 1.15, le[1] - ws * wl * 1.15, le[0] - wc * 4, le[1] - ws * 4, { stroke: GRAY, w: 1.6, arrow: "pkahg" });
-      const ly = top + sH + 8;
+      const wc = Math.cos(ph * D), ws = Math.sin(ph * D); L(g, le[0] - wc * roof(wl * 1.15, ws), le[1] - ws * roof(wl * 1.15, ws), le[0] - wc * 4, le[1] - ws * 4, { stroke: GRAY, w: 1.6, arrow: "pkahg" });
+      const ly = top + sH + 14;
       T(g, cx, ly, ["1 · near hub", "2 · mid-blade", "3 · near tip"][i], { size: 11, anchor: "middle", fill: GRAY });
       T(g, cx, ly + 19, `AoA ${Math.round(aoa)}°`, { size: wide ? 15 : 13, anchor: "middle", fill: col, weight: 600 });
       T(g, cx, ly + 36, `blade ${Math.round(be)}°`, { size: 11, anchor: "middle", fill: GRAY }); });
     // instruments in their own strip: tachometer, then (constant speed) the governor and manifold pressure
-    const iy0 = top + sH + 58, gr = wide ? 62 : 56, gy = iy0 + gr + 6, Hh = gy + gr + 14;
+    const iy0 = top + sH + 64, gr = wide ? 62 : 56, gy = iy0 + gr + 6, Hh = gy + gr + 14;
     L(g, pad, iy0 - 4, W - pad, iy0 - 4, { stroke: "rgba(242,241,236,.08)", w: 1 });
     const gx = pad + Math.max(sw / 2, gr + 2), bx = pad + sw * 2.5, fx = pad + sw * 1.5;
     dial(g, gx, gy, gr, { min: 0, max: 3500, arcs: [[2100, 2500, "green"]], reds: [2700], ticks: [0, 500, 1000, 1500, 2000, 2500, 3000, 3500], nums: [[1000, "10"], [2000, "20"], [3000, "30"]], title: "RPM ×100", focus: true, value: rpm, fmt: (x) => String(Math.round(x / 10) * 10) });
