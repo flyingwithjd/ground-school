@@ -1,7 +1,7 @@
 // Mnemonic unpacker: tap a letter to open the item, the reason it matters and its source.
 // Recall mode hides the items so you can say each one before you tap. HTML only; every set is cited.
-import { frame, chips } from "./base.js?v=ea4e112490";
-import { h, esc } from "../core/util.js?v=ea4e112490";
+import { frame, chips } from "./base.js?v=771fe5f0ea";
+import { h, esc } from "../core/util.js?v=771fe5f0ea";
 export const SETS = {
   atomato: { name: "ATOMATOFLAMES", what: "Day VFR equipment", src: "14 CFR 91.205(b)", items: [
     ["A", "Airspeed indicator", "Stall and limit speeds are all indicated airspeeds."], ["T", "Tachometer for each engine", "Power settings and engine limits."],

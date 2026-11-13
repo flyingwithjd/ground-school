@@ -1,11 +1,11 @@
 // The practice engine UI: multiple choice and ordered sequences, each followed by a one-tap confidence rating; learn/review/exam modes.
-import { h, esc, shuffle, fmtDue, toast } from "../core/util.js?v=ea4e112490";
-import { review, get, CONF, isBlind, MISS_DELAY } from "../core/srs.js?v=ea4e112490";
-import { nextDue, buildQueue, nextChunk, onlyReached } from "../core/progress.js?v=ea4e112490";
-import { S, save } from "../core/store.js?v=ea4e112490";
-import { item } from "../../data/index.js?v=ea4e112490";
-import { TOPICS, LESSONS } from "../../data/index.js?v=ea4e112490";
-import { rich, autoTerms } from "../core/rich.js?v=ea4e112490";
+import { h, esc, shuffle, fmtDue, toast } from "../core/util.js?v=771fe5f0ea";
+import { review, get, CONF, isBlind, MISS_DELAY } from "../core/srs.js?v=771fe5f0ea";
+import { nextDue, buildQueue, nextChunk, onlyReached } from "../core/progress.js?v=771fe5f0ea";
+import { S, save } from "../core/store.js?v=771fe5f0ea";
+import { item } from "../../data/index.js?v=771fe5f0ea";
+import { TOPICS, LESSONS } from "../../data/index.js?v=771fe5f0ea";
+import { rich, autoTerms } from "../core/rich.js?v=771fe5f0ea";
 const KEYS = "ABCDEFG";
 // Each question is asked at most once per sitting (`seen` is shared by chained "Keep going" sessions). A miss is never
 // re-asked in the same session: it is scheduled 12 hours out and opens a blind spot that comes back in later sessions.

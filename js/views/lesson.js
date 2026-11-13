@@ -1,19 +1,19 @@
-import { h, esc, pct } from "../core/util.js?v=ea4e112490";
-import { S, save, lessonState } from "../core/store.js?v=ea4e112490";
-import { LESSONS, lessonItems } from "../../data/index.js?v=ea4e112490";
-import { lessonStats, onlyReached, nextLesson } from "../core/progress.js?v=ea4e112490";
-import { plan, pick, wrapPool, pageIds, pageStats, pageBlind, cpState, cpMark, finish } from "../core/flow.js?v=ea4e112490";
-import { get } from "../core/srs.js?v=ea4e112490";
-import { rich, autoTerms } from "../core/rich.js?v=ea4e112490";
-import { mountViz, destroyAll } from "../viz/index.js?v=ea4e112490";
-import { practiceSet, allLabel, session } from "./quiz.js?v=ea4e112490";
-import { mergeSections } from "./merge-sections.js?v=ea4e112490";
+import { h, esc, pct } from "../core/util.js?v=771fe5f0ea";
+import { S, save, lessonState } from "../core/store.js?v=771fe5f0ea";
+import { LESSONS, lessonItems } from "../../data/index.js?v=771fe5f0ea";
+import { lessonStats, onlyReached, nextLesson } from "../core/progress.js?v=771fe5f0ea";
+import { plan, pick, wrapPool, pageIds, pageStats, pageBlind, cpState, cpMark, finish } from "../core/flow.js?v=771fe5f0ea";
+import { get } from "../core/srs.js?v=771fe5f0ea";
+import { rich, autoTerms } from "../core/rich.js?v=771fe5f0ea";
+import { mountViz, destroyAll } from "../viz/index.js?v=771fe5f0ea";
+import { practiceSet, allLabel, session } from "./quiz.js?v=771fe5f0ea";
+import { mergeSections } from "./merge-sections.js?v=771fe5f0ea";
 export { mergeSections };
 const KIND = { ground: "Ground lesson", flight: "Flight lesson briefing", module: "Module unit" };
 // Lesson text is code-split: question banks load up front (the review engine needs them); prose loads when the lesson opens.
 // Supplement sections (data/text/x/<id>.js) slot in after the section named by `at` ("^" = first), else at the end.
 export function loadLesson(id) { const L0 = LESSONS[id]; if (!L0) return Promise.reject(new Error("Lesson not found."));
-  return Promise.all([import(`../../data/text/${id}.js?v=ea4e112490`), L0.textx ? import(`../../data/text/x/${id}.js?v=ea4e112490`) : null])
+  return Promise.all([import(`../../data/text/${id}.js?v=771fe5f0ea`), L0.textx ? import(`../../data/text/x/${id}.js?v=771fe5f0ea`) : null])
     .then(([m, x]) => ({ ...L0, ...m.default, sections: mergeSections(m.default.sections || [], x ? x.default.sections || [] : []) })); }
 // One page of lesson prose with its visuals, Know/Do/Risk card and ACS codes (also used by the Review blind spots lesson).
 export function renderPage(sec, S0, terms = autoTerms) {

@@ -2,10 +2,10 @@
 // from the pages just read), and a 5-6 question wrap-up across the lesson at the end. Checks are never a gate: "Skip for
 // now" moves on, and a lesson counts as finished once its pages are read or its wrap-up is done or skipped.
 // Progress lives in lessons[id] inside ppg.v1 (additive): cp[key] = { done, ok, n } or { skip }, fin = time finished.
-import { get, isDue, isBlind } from "./srs.js?v=ea4e112490";
-import { QUESTIONS, secKey, lessonItems } from "../../data/index.js?v=ea4e112490";
-import { reachedSet, isReached, stats } from "./progress.js?v=ea4e112490";
-import { S, save } from "./store.js?v=ea4e112490";
+import { get, isDue, isBlind } from "./srs.js?v=771fe5f0ea";
+import { QUESTIONS, secKey, lessonItems } from "../../data/index.js?v=771fe5f0ea";
+import { reachedSet, isReached, stats } from "./progress.js?v=771fe5f0ea";
+import { S, save } from "./store.js?v=771fe5f0ea";
 const HOUR = 36e5;
 // Question ids by page key "lesson/sec", in bank order.
 let BY = null; export function byPage() { if (BY) return BY; BY = {}; for (const q of Object.values(QUESTIONS)) { const k = secKey(q); if (k) (BY[k] ||= []).push(q.id); } return BY; }
@@ -44,9 +44,9 @@ export function cpMark(lid, key, v) { const ls = (S().lessons[lid] ||= { visited
 export function finish(lid) { const ls = (S().lessons[lid] ||= { visited: 0, sec: 0, read: [] }); if (!ls.fin) { ls.fin = Date.now(); save(); } }
 // The one next step for the Now page: a quick check whose pages are read but which was neither done nor skipped, else the
 // lesson in progress (most recently opened, not finished), else the next lesson in course order.
-import PI from "../../data/pageindex.js?v=ea4e112490";
-import { LESSONS, ORDER } from "../../data/index.js?v=ea4e112490";
-import { lessonDone, nextLesson } from "./progress.js?v=ea4e112490";
+import PI from "../../data/pageindex.js?v=771fe5f0ea";
+import { LESSONS, ORDER } from "../../data/index.js?v=771fe5f0ea";
+import { lessonDone, nextLesson } from "./progress.js?v=771fe5f0ea";
 export const pagesOf = (lid) => (PI.lessons[lid] || []).map(([id, label, title]) => ({ id, label, title }));
 export const pageIndex = () => PI;
 export function nextStep() { const ls = S().lessons || {};
