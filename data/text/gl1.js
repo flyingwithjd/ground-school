@@ -56,6 +56,7 @@ export default {
       <p>To exercise private pilot privileges in the usual training airplane, you generally need an appropriate medical certificate, or [[BasicMed]] if you meet its eligibility and operating conditions. <span class="src">14 CFR 61.23, 61.113(i)</span></p>
       <h4>The standard you are held to</h4>
       <p>The practical test is graded against the <strong>[[Airman Certification Standards]]</strong> (ACS), currently FAA-S-ACS-6C for private pilot airplane. Every task lists what you must <strong>know</strong> (knowledge), how you <strong>manage the risk</strong> (risk management), and what you must <strong>do</strong> (skills). This course tags each section with the matching ACS elements.</p>`,
+      viz: { type: "pilotpath", after: "p:nth-of-type(2)" },
       kdr: { k: "Eligibility for student and private certificates, and what the ACS is.", d: "Get your student pilot certificate early, through IACRA with your instructor.", r: "Currency is not proficiency. Meeting minimums does not make you ready.", codes: "PA.I.A.K1, PA.I.A.R1" } },
   ],
 };
