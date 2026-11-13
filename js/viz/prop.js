@@ -121,21 +121,22 @@ export function mount(host) {
     T(g, x0, top + 8, ["Near the hub", "Mid-blade", "Near the tip"][stn], { size: 13, weight: 600 });
     T(g, x0, top + 25, `blade angle ${Math.round(be)}°`, { size: 11.5, fill: GRAY });
     T(g, x0 + pw, top + 8, `angle of attack ${Math.round(aoa)}°`, { size: 13, weight: 600, anchor: "end", fill: col });
-    if (bad) T(g, x0 + pw, top + 25, aoa < 0 ? "negative: no useful thrust" : "very high: the blade may stall", { size: 11.5, anchor: "end", fill: COL.red });
+    if (bad) T(g, x0 + pw, top + 25, aoa < 0 ? "negative: no useful thrust" : "very high: may stall", { size: 11.5, anchor: "end", fill: COL.red });
     L(g, x0, le[1], x0 + pw, le[1], { stroke: DIM, w: 1, dash: "3 5" }); T(g, x0, le[1] + 32, "plane of rotation", { size: 11, fill: DIM });
     // the velocity triangle: blade speed (left), airspeed (up), and the relative wind that results, pointing at the blade
-    const qx = le[0] - u * k, qy = le[1] - va * k, hyp = Math.hypot(u, va) * k, ah = va * k;
+    const qx = le[0] - u * k, qy = le[1] - va * k, hyp = Math.hypot(u, va) * k, ah = va * k; let rw = null;
     if (ah > 5) {
       L(g, le[0], le[1], qx + 3, le[1], { stroke: GRAY, w: 1.8, arrow: "pkahg" }); T(g, le[0] - 8, le[1] + 17, "blade speed", { size: 11, anchor: "end", fill: GRAY });
       L(g, qx, le[1], qx, qy + 3, { stroke: GRAY, w: 1.8, arrow: "pkahg" });
-      if (ah >= 56) rot(T(g, qx - 6, (le[1] + qy) / 2, "airspeed", { size: 11, anchor: "middle", fill: GRAY }), qx - 6, (le[1] + qy) / 2, -90);
+      const amy = ah >= 56 ? (le[1] + qy) / 2 : le[1] - 28;   // a short arrow: the label stands on the base line
+      if (ah >= 56 || qx - x0 < 62) rot(T(g, qx - 6, amy, "airspeed", { size: 11, anchor: "middle", fill: GRAY }), qx - 6, amy, -90);
       else if (qx - x0 >= 62) T(g, qx - 6, (le[1] + qy) / 2 + 8, "airspeed", { size: 11, anchor: "end", fill: GRAY });
-      else T(g, qx - 4, qy - 8, "airspeed", { size: 11, fill: GRAY });
       const ex = le[0] - (le[0] - qx) * 5 / hyp, ey = le[1] - (le[1] - qy) * 5 / hyp; L(g, qx, qy, ex, ey, { stroke: INK, w: 2.4, arrow: "pkahw" });
-      const mx = (qx + le[0]) / 2, my = (qy + le[1]) / 2, nx = (le[1] - qy) / hyp, ny = -(le[0] - qx) / hyp;
+      const mx = qx + 0.4 * (le[0] - qx), my = qy + 0.4 * (le[1] - qy), nx = (le[1] - qy) / hyp, ny = -(le[0] - qx) / hyp;
       const sd = aoa < 0 ? -1 : 1, lx = mx - sd * nx * (sd > 0 ? 7 : 5), ly = my - sd * ny * (sd > 0 ? 7 : 5) + (sd > 0 ? 9 : 0);   // on the side away from the angle-of-attack wedge
-      if (hyp >= 120 && ah >= 22) rot(T(g, lx, ly, "relative wind", { size: 11.5, anchor: "middle", fill: INK }), lx, ly, ph);
-      else T(g, qx - 6, qy - (ah >= 56 || qx - x0 < 62 ? 8 : 0) + 4, "relative wind", { size: 11.5, anchor: ah >= 56 || qx - x0 >= 62 ? "end" : "start", fill: INK });
+      if (hyp >= 120 && ah >= 40) rot(T(g, lx, ly, "relative wind", { size: 11.5, anchor: "middle", fill: INK }), lx, ly, ph);
+      else if (ah < 40) { const ry = Math.min(qy - 16, le[1] - 62); T(g, qx - 4, ry, "relative wind", { size: 11.5, fill: INK }); rw = [qx - 4, ry - 12, qx + 92, ry + 3]; }   // thin triangle: over the tail
+      else T(g, qx - 6, qy + 4, "relative wind", { size: 11.5, anchor: "end", fill: INK });
     } else { L(g, qx, le[1], le[0] - 5, le[1], { stroke: INK, w: 2.4, arrow: "pkahw" }); T(g, le[0] - 8, le[1] + 17, "relative wind", { size: 11.5, anchor: "end", fill: INK }); }
     // the blade section, its chord line run forward, and the angle of attack between chord and relative wind
     const roof = Math.min(1, (le[1] - top - 36) / Math.max(1, c * 1.05 * sb)), ext = c * 1.05 * roof, ar = Math.max(44, Math.min(c * 0.95, ext * 0.92, 130));
@@ -144,13 +145,15 @@ export function mount(host) {
     const pts = FO.map(([x, y]) => [le[0] + cb * x * c + sb * y * c, le[1] + sb * x * c - cb * y * c]);
     P(g, "M" + pts.map((q) => f2(q[0]) + "," + f2(q[1])).join("L") + "Z", { fill: "#141417", stroke: bad ? COL.red : INK, w: 1.8 });
     L(g, le[0], le[1], le[0] + cb * c, le[1] + sb * c, { stroke: "rgba(242,241,236,.35)", w: 1, dash: "3 3" });
-    T(g, Math.min(le[0] + cb * c + 6, x0 + pw - 34), le[1] + sb * c + 14, "chord", { size: 11, fill: GRAY });
+    T(g, Math.min(le[0] + cb * c + 6, x0 + pw - 46), le[1] + sb * c + 14, "chord", { size: 11, fill: GRAY });
     const a0 = Math.PI + ph * D, a1 = Math.PI + be * D;
     if (Math.abs(aoa) > 0.4) { const p0 = [le[0] + Math.cos(a0) * ar, le[1] + Math.sin(a0) * ar], p1 = [le[0] + Math.cos(a1) * ar, le[1] + Math.sin(a1) * ar], sw = aoa > 0 ? 1 : 0;
       P(g, `M${f2(le[0])},${f2(le[1])} L${f2(p0[0])},${f2(p0[1])} A${f2(ar)},${f2(ar)} 0 0 ${sw} ${f2(p1[0])},${f2(p1[1])} Z`, { fill: bad ? "rgba(217,73,62,.3)" : "rgba(59,130,246,.34)", stroke: "none" });
       P(g, `M${f2(p0[0])},${f2(p0[1])} A${f2(ar)},${f2(ar)} 0 0 ${sw} ${f2(p1[0])},${f2(p1[1])}`, { stroke: col, w: 3.4 }); }
-    const la = Math.PI + (be + (aoa < 0 ? -6 : 6)) * D, lt = T(g, le[0] + Math.cos(la) * (ar + 2), le[1] + Math.sin(la) * (ar + 2), `${Math.round(aoa)}°`, { size: 13, anchor: "end", fill: col, weight: 700 });
-    lt.setAttribute("stroke", "#0A0A0B"); lt.setAttribute("stroke-width", "4"); lt.setAttribute("paint-order", "stroke");
+    // the number by the arc (the header carries it too); left out if it would sit on the relative-wind label
+    const la = Math.PI + (be + (aoa < 0 ? -6 : 6)) * D, nx0 = le[0] + Math.cos(la) * (ar + 2), ny0 = le[1] + Math.sin(la) * (ar + 2), nw = 9 * String(Math.round(aoa)).length + 10;
+    if (!rw || nx0 < rw[0] - 2 || nx0 - nw > rw[2] + 2 || ny0 < rw[1] - 2 || ny0 - 13 > rw[3] + 2) { const lt = T(g, nx0, ny0, `${Math.round(aoa)}°`, { size: 13, anchor: "end", fill: col, weight: 700 });
+      lt.setAttribute("stroke", "#0A0A0B"); lt.setAttribute("stroke-width", "4"); lt.setAttribute("paint-order", "stroke"); }
     // one line on what the station shows
     const by = Math.max(le[1] + 56, le[1] + sb * c + 38), spread = Math.max(...stall) - Math.min(...stall);
     const l1 = !twist ? "No twist: the same blade angle at every station." : ["Slowest part of the blade: steepest blade angle.", "Middle speed: middle blade angle.", "Fastest part of the blade: flattest blade angle."][stn];
