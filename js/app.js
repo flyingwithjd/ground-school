@@ -35,10 +35,12 @@ function route() {
   const hash = location.hash || "#/"; main.innerHTML = "";
   for (const [re, fn, nav] of routes) { const m = hash.match(re); if (m) { const r = fn(m); if (r && r.destroy) cleanup.push(r.destroy); else if (typeof r === "function") cleanup.push(r);
       document.querySelectorAll("[data-nav]").forEach((a) => { const on = a.dataset.nav === nav; a.classList.toggle("on", on); on ? a.setAttribute("aria-current", "page") : a.removeAttribute("aria-current"); });
-      if (!/^#\/lesson\/[\w-]+\/\d+$/.test(hash) || !route.sameLesson(hash)) window.scrollTo(0, 0); route.last = hash; setTitle(nav === "home", nav); return; } }
+      if (!/^#\/lesson\/[\w-]+\/\d+$/.test(hash) || !route.sameLesson(hash)) { window.scrollTo({ top: 0, left: 0, behavior: "instant" }); requestAnimationFrame(() => window.scrollTo({ top: 0, left: 0, behavior: "instant" })); } route.last = hash; setTitle(nav === "home", nav); return; } }
   main.innerHTML = `<div class="page"><h2>Page not found.</h2><p class="dim mt"><a href="#/">Back to what to work on now</a></p></div>`; setTitle();
 }
 route.sameLesson = (h) => (route.last || "").split("/").slice(0, 3).join("/") === h.split("/").slice(0, 3).join("/");
+// the app handles scroll itself: without this, Back/Forward restores the old (often bottom) position after the new page renders
+try { history.scrollRestoration = "manual"; } catch (e) {}
 initPopovers();
 whenUnlocked(() => { addEventListener("hashchange", route); route(); }); // nothing renders until the entry gate is passed
 // Stale-cache guard: GitHub Pages lets a browser keep index.html for up to 10 minutes (longer for a home-screen app), so

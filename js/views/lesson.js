@@ -42,7 +42,10 @@ function build(p, L, id, secIdx) {
   const body = h("div"); p.append(body);
   steps.forEach((label, i) => { const b = h("button", { type: "button", "aria-label": label, title: label }); b.onclick = () => go(i); stepBar.append(b); });
   function mark() { [...stepBar.children].forEach((b, i) => { b.classList.toggle("on", i === cur); b.classList.toggle("done", i < sections.length && ls.read.includes(sections[i].id)); b.setAttribute("aria-current", i === cur ? "step" : "false"); }); }
-  function go(i, scroll = true) { cur = i; ls.sec = i; save(); history.replaceState(null, "", `#/lesson/${id}/${i}`); render(); if (scroll) stepBar.scrollIntoView({ behavior: "smooth", block: "start" }); }
+  function go(i, scroll = true) { cur = i; ls.sec = i; save(); history.replaceState(null, "", `#/lesson/${id}/${i}`); render(); if (scroll) toTop(); }
+  // a new section always opens at the very top: an instant jump (a smooth scroll from the bottom of a long section can be
+  // cut short on iOS when the new visuals resize the page, leaving it near the bottom), repeated once the visuals have laid out
+  function toTop() { const up = () => window.scrollTo({ top: 0, left: 0, behavior: "instant" }); up(); requestAnimationFrame(() => { up(); setTimeout(up, 120); }); }
   let sess = null;
   function render() { mark(); top.classList.toggle("compact", cur > 0); body.innerHTML = ""; sess && sess.destroy && sess.destroy(); sess = null; destroyAll();
     const sec = h("section", { class: "sec" }); body.append(sec);
