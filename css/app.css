@@ -203,6 +203,7 @@ svg text:not([font-family]) { font-family: var(--mono); }
 /* ---------- quiz ---------- */
 .quiz { max-width: none; }
 .qhead { display: flex; justify-content: space-between; align-items: center; gap: 16px; margin-bottom: 26px; }
+.qhead > .label:first-child { min-width: 0; } .qhead > .label:last-child { flex: none; white-space: nowrap; }
 .qtext { font: 600 clamp(23px, 2.8vw, 32px)/1.28 var(--sans); letter-spacing: -.015em; margin: 0 0 30px; }
 .choices { display: flex; flex-direction: column; gap: 10px; }
 .choice { display: grid; grid-template-columns: 34px 1fr; align-items: start; gap: 12px; text-align: left; width: 100%; padding: 18px 20px; min-height: 64px; border-radius: 16px; border: 1px solid var(--line2); background: transparent; font-size: 17.5px; line-height: 1.45; transition: border-color .3s, background .3s, opacity .4s; }

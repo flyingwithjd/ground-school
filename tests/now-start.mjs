@@ -1,5 +1,5 @@
 // Now page first visit: with no answers, one clear Begin above the fold (not under the bottom nav) and no empty progress cards.
-// After one answered question, the progress layout (due / weakest / next lesson, readiness) shows.
+// After one answered question, the progress layout (next lesson, readiness; due / blind spots / weakest only when non-empty) shows.
 // Usage: node tests/now-start.mjs [SHOTDIR]   (sizes 1440x900, 1024x768, 820x1180, 390x844)
 import { createRequire } from "module";
 const { chromium } = createRequire("/workspace/pgs-build/")("playwright-core");
@@ -27,7 +27,9 @@ for (const [W, H] of sizes) {
     await pg.locator(".choice:not([disabled])").first().click(); const conf = pg.locator(".conf .chip"); if (await conf.count()) await conf.first().click(); else await pg.locator("button", { hasText: "Check" }).click();
     await pg.waitForTimeout(500); await pg.goto(BASE + "#/"); await pg.reload(); await pg.waitForTimeout(1200);
     ok(await pg.evaluate(() => Object.values(JSON.parse(localStorage.getItem("ppg.v1")).items).some((i) => i.n > 0)), "answer not stored");
-    const c2 = await cards(pg); ok(c2.some((t) => /Due for review/.test(t)) && c2.some((t) => /Weakest area/.test(t)) && c2.some((t) => /readiness/i.test(t)), "progress cards missing after an answer: " + c2.join(", "));
+    const c2 = await cards(pg); ok(c2.some((t) => /Next lesson/.test(t)) && c2.some((t) => /readiness/i.test(t)), "progress cards missing after an answer: " + c2.join(", "));
+    // empty cards stay hidden: right after one answer nothing is due yet, so there is no Due for review card
+    ok(!c2.some((t) => /Due for review/.test(t)), "empty Due for review card shown: " + c2.join(", "));
     ok(!(await pg.locator("#begin").count()), "first-visit hero still shown after an answer");
     if (shotDir) await pg.screenshot({ path: `${shotDir}/now_progress_${W}x${H}.png` });
   }

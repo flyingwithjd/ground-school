@@ -118,9 +118,10 @@ export function practiceSet(host, { ids, key, title, label, onExit, all = false,
   ids = ids.filter((id) => item(id) && item(id).kind !== "oral");
   const allPath = { get label() { return allLabel(key, ids.length); }, start: () => runAll() };
   if (all) return runAll();
-  const { queue } = buildQueue(ids, { max: 20, blindMax });
-  return session(host, { queue, mode: "learn", title, label, onExit, seen: new Set(), more: (ex) => nextChunk(ids, ex, 10), all: allPath });
+  const seen = new Set(); let { queue } = buildQueue(ids, { max: 20, blindMax });
+  if (!queue.length) queue = nextChunk(ids, seen, 10);   // nothing due or new: go straight to the next 10 (practice ahead)
+  return session(host, { queue, seen, mode: "learn", title, label, onExit, more: (ex) => nextChunk(ids, ex, 10), all: allPath });
   function runAll() { const qa = (S().qa ||= {}); if (!(qa[key] < ids.length)) qa[key] = 0; const seen = new Set(); const from = qa[key];
-    return session(host, { queue: ids.slice(from, from + 10), mode: "learn", title, label: `${label} · all ${ids.length}`, onExit, seen, count: { base: from, total: ids.length },
+    return session(host, { queue: ids.slice(from, from + 10), mode: "learn", title, label, onExit, seen, count: { base: from, total: ids.length },
       onAnswer: (id) => { qa[key] = Math.max(qa[key] || 0, ids.indexOf(id) + 1); save(); }, more: () => ids.slice(qa[key], qa[key] + 10), all: null, finishedAll: () => qa[key] >= ids.length }); }
 }

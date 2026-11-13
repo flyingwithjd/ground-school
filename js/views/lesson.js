@@ -81,7 +81,7 @@ function build(p, L, id, secIdx) {
     const allB = h("button", { class: "btn", type: "button" }, allLabel(id, ids.length));
     const box = h("div", { class: "mt" }); const bt = h("div", { class: "btns mt" }, go2, allB); if ((L.oral || []).length) bt.append(h("a", { class: "btn", href: `#/oral/${id}` }, `Oral questions · ${L.oral.length}`)); sec.append(bt, box);
     const begin = (all) => { bt.remove(); sec.querySelector("p").remove(); sec.parentNode && sec.parentNode.querySelectorAll(".secnav").forEach((n) => n.remove());
-      sess = practiceSet(box, { ids, key: id, all, title: L.code, label: `${L.code} · ${L.title}`, onExit: () => (location.hash = L.module ? "#/module/" + L.module : "#/course") }); };
+      sess = practiceSet(box, { ids, key: id, all, title: L.code, label: L.code, onExit: () => (location.hash = L.module ? "#/module/" + L.module : "#/course") }); };
     go2.onclick = () => begin(false); allB.onclick = () => begin(true); }
   render();
   return { destroy() { sess && sess.destroy && sess.destroy(); } };
