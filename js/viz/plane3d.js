@@ -65,6 +65,19 @@ export function mount(host, opts = {}) {
     groups.push(chips(F.ctrl, [["fuselage", "Fuselage"], ["wing", "Wings"], ["empennage", "Empennage"], ["gear", "Landing gear"], ["powerplant", "Powerplant"]], null, (k) => (k ? select(k) : reset()), { label: "Major components", toggle: true }));
     groups.push(chips(F.ctrl, [["ailerons", "Ailerons"], ["flaps", "Flaps"], ["struts", "Lift struts"], ["fuel", "Fuel tanks"], ["hstab", "Horizontal stabilizer"], ["elevator", "Elevator"], ["trimtab", "Trim tab"], ["fin", "Vertical stabilizer"], ["rudder", "Rudder"], ["engine", "Engine"], ["cowling", "Cowling"], ["propeller", "Propeller"]], null, (k) => (k ? select(k) : reset()), { label: "Parts", toggle: true }));
     F.caption(INTRO[0], INTRO[1]); F.explain(INTRO[2]);
+  } else if (mode === "systems") {
+    // PHAK 3 subcomponents: only the parts of the chosen system go blue; the rest stays ink.
+    const SYS = {
+      air: ["Airframe", "The basic structure", ["fuselage", "fairing", "wing", "fin", "hstab", "struts"], "iso", {}, "Fuselage, wings, struts and tail: built to carry the air loads plus the weight of fuel, crew and payload."],
+      elec: ["Electrical system", "Engine-driven alternator", ["engine"], "nose", {}, "The engine turns the alternator; with the battery it powers lights, radios and instruments through the panel. Battery and wiring aren't drawn on this model. 172S: 28 volts.", true],
+      ctl: ["Flight controls", "Ailerons, elevator, rudder, flaps, trim", ["ailerons", "elevator", "rudder", "flaps", "trimtab"], "iso", { ail: 18, elev: -16, rud: 16, flap: 20, trim: 8 }, "The surfaces that change the airplane's attitude, worked from the yoke, pedals, flap switch and trim wheel. Shown deflected for clarity."],
+      brk: ["Brakes", "Discs on the main wheels", ["gear"], "gear", {}, "Hydraulic disc brakes on the two main wheels, worked by the tops of the rudder pedals. Look at discs, pads and the brake line on the walkaround."],
+    };
+    const SY0 = ["Four subcomponents", "Pick a system"];
+    const sysPick = (k) => { if (!k) { cowl(true); S.highlight([]); S.setView("iso"); animatePose({}); F.caption(...SY0); F.explain("Each chip lights only that system's parts. Drag to orbit."); return; }
+      const [name, big, hl, view, pose, text, hideCowl] = SYS[k]; cowl(!hideCowl); S.highlight(hl); S.setView(view); animatePose(pose); F.caption(name, big); F.explain(text + ' <span class="src">PHAK 3 · C172S POH 7</span>'); };
+    chips(F.ctrl, Object.entries(SYS).map(([k, v]) => [k, v[0]]), null, sysPick, { label: "System", toggle: true });
+    sysPick(null);
   } else {
     const prev = h("button", { class: "btn ghost", type: "button" }, "←"), next = h("button", { class: "btn pri arrow", type: "button" }, "Next");
     const dots = chips(F.ctrl, TOUR.map((t, i) => [String(i), t.big]), "0", (v) => show(+v), { label: "Tour stops" }); F.ctrl.append(h("div", { class: "btns" }, prev, next));

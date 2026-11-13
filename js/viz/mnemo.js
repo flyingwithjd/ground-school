@@ -3,6 +3,15 @@
 import { frame, chips } from "./base.js?v=7534528db0";
 import { h, esc } from "../core/util.js?v=7534528db0";
 export const SETS = {
+  handprop: { name: "Hand propping", what: "Steps and safeguards, in order", src: "AFH 2", items: [
+    ["1", "Assume the ignition is on", "A faulty magneto switch can read OFF and still let the engine fire."],
+    ["2", "Two trained people", "One pulls the prop and gives the calls; one who knows the controls sits in the seat and holds the brakes."],
+    ["3", "Firm footing, brakes set", "Gravel, wet grass, oil, ice or snow can make you slip into the blades. Move the airplane if the ground is poor."],
+    ["4", "Agree on the calls", "\u201cFuel on, switch off, throttle closed, brakes set,\u201d then \u201cBrakes and contact.\u201d CONTACT and SWITCH OFF can't be mixed up in wind or noise."],
+    ["5", "Blade just above horizontal", "Stand a little less than an arm's length away, facing the blade, so you never lean in off balance."],
+    ["6", "Push down with the palms, step back", "Fingers wrapped around the blade can pull you in if the engine kicks back."],
+    ["7", "Failed start: switch OFF first", "Don't move the prop for another try until the magnetos are confirmed off."],
+    ["8", "Chocks from behind only", "A spinning prop is nearly invisible. Throttle to idle, and reach chocks only from behind the prop."]] },
   atomato: { name: "ATOMATOFLAMES", what: "Day VFR equipment", src: "14 CFR 91.205(b)", items: [
     ["A", "Airspeed indicator", "Stall and limit speeds are all indicated airspeeds."], ["T", "Tachometer for each engine", "Power settings and engine limits."],
     ["O", "Oil pressure gauge (pressure systems)", "First warning of an engine about to fail."], ["M", "Manifold pressure gauge (altitude engines)", "Not on a C172S: its engine isn't an altitude engine."],
