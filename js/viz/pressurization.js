@@ -6,10 +6,10 @@
 // differential is reached, further climb raises cabin altitude; explosive decompression < 0.5 s, faster than the lungs can
 // decompress; rapid decompression: the lungs decompress faster than the cabin; the primary danger is hypoxia.
 // TUC: PHAK Fig 17-1 (via hypoxia.js). Decompression durations here are illustrative.
-import { slider, chips, row } from "./base.js?v=ab272ba69e";
-import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=ab272ba69e";
-import { anim, COL } from "./dial.js?v=ab272ba69e";
-import { TUC } from "./hypoxia.js?v=ab272ba69e";
+import { slider, chips, row } from "./base.js?v=681adac966";
+import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=681adac966";
+import { anim, COL } from "./dial.js?v=681adac966";
+import { TUC } from "./hypoxia.js?v=681adac966";
 const PS = [[0, 14.7], [2000, 13.7], [4000, 12.7], [6000, 11.8], [8000, 10.9], [10000, 10.1], [12000, 9.4], [14000, 8.6], [16000, 8.0], [18000, 7.3], [20000, 6.8], [22000, 6.2], [24000, 5.7], [26000, 5.2], [28000, 4.8], [30000, 4.4]];
 export function psi(a) { for (let i = 1; i < PS.length; i++) if (a <= PS[i][0]) { const [a0, p0] = PS[i - 1], [a1, p1] = PS[i]; return p0 + ((a - a0) / (a1 - a0)) * (p1 - p0); } return 4.4; }
 export function altOf(p) { for (let i = 1; i < PS.length; i++) if (p >= PS[i][1]) { const [a0, p0] = PS[i - 1], [a1, p1] = PS[i]; return a0 + ((p0 - p) / (p0 - p1)) * (a1 - a0); } return 30000; }

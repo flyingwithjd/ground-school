@@ -1,8 +1,8 @@
 // Runway markings by runway type (AIM 2-3-3, TBL 2-3-1; AC 150/5340-1M). Pick a runway type, then tap a marking.
 // Plan view, approach from the left. Lengths along the runway are roughly to scale; width is exaggerated for legibility.
-import { frame, chips, row, svg, isolate, ACC, FAINT, FAINT2, INK } from "./base.js?v=ab272ba69e";
-import { s } from "../core/util.js?v=ab272ba69e";
-import { T } from "./shapes.js?v=ab272ba69e";
+import { frame, chips, row, svg, isolate, ACC, FAINT, FAINT2, INK } from "./base.js?v=681adac966";
+import { s } from "../core/util.js?v=681adac966";
+import { T } from "./shapes.js?v=681adac966";
 const K = 0.36, X0 = 360, CY = 360, HW = 120; // px per ft, threshold x, centerline y, half-width px
 const fx = (ft) => X0 + ft * K;
 const W = "rgba(242,241,236,.55)", Y = "rgba(242,241,236,.3)";

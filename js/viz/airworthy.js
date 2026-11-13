@@ -1,9 +1,9 @@
 // "Airworthy today?" (GL1 "papers"): set when each inspection was last done and the checker counts calendar months to
 // today, line by line, with the rule behind each. Docs row: the AROW papers on board. The PIC still makes the call (91.7).
 // Sources: 14 CFR 91.207(c),(d), 91.409(a),(b), 91.413, 91.9, 91.203; AFH Ch 2.
-import { htmlScene } from "./kit.js?v=ab272ba69e";
-import { chips } from "./base.js?v=ab272ba69e";
-import { h } from "../core/util.js?v=ab272ba69e";
+import { htmlScene } from "./kit.js?v=681adac966";
+import { chips } from "./base.js?v=681adac966";
+import { h } from "../core/util.js?v=681adac966";
 const MO = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const last = (y, m) => new Date(y, m + 1, 0).getDate();
 export function mount(host) {
