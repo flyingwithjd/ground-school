@@ -1,10 +1,10 @@
-// GL2 systems visuals (V-g, ignition, fuel limits, carb ice, electrical, engine gauges) at iPad 744x1133 (touch), phone 390x844
+// GL2 systems visuals (V-g, ignition, fuel limits, carb ice, electrical, engine gauges, mixture, combustion, propeller, flap and tab types) at iPad 744x1133 (touch), phone 390x844
 // and desktop 1440x900. For each visual: tap every control and check that no two SVG labels overlap, every label stays inside
 // the stage, and labels are at least 11 px; the page never throws; once settled the visual draws zero frames (idle);
 // and at iPad size a touch swipe that starts on the visual scrolls the page. Usage: node tests/gl2-visuals.mjs [sectionId ...]
 import { createRequire } from "module"; const { chromium } = createRequire("/workspace/pgs-build/")("playwright-core");
 const BASE = process.env.BASE || "http://localhost:8765/index.html";
-const ALL = { catlim: "vg", ignition: "magcheck", fuellim: "fuellim", induct: "carbice", elec: "elecsys", oilcool: "enginegauges" };
+const ALL = { catlim: "vg", ignition: "magcheck", fuellim: "fuellim", induct: "carbice", elec: "elecsys", oilcool: "enginegauges", mixture: "mixture", combust: "combustion", prop: "prop", secctl: "flaptypes" };
 const want = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(ALL);
 const SIZES = [[744, 1133, true], [390, 844, true], [1440, 900, false]];
 let bad = 0; const ok = (c, m) => { if (!c) { bad++; console.log("   FAIL " + m); } };

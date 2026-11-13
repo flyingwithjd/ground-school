@@ -6,9 +6,9 @@
 // with ice, power drops then rises as it melts; without ice it drops and stays; full heat, not partial; especially dangerous
 // at reduced power in a descent. C172S POH 7: a fuel-injected engine's spring-loaded alternate air door opens if the filter
 // is blocked, costing about 10% power at full throttle. RPM and MP values shown are examples, not published numbers.
-import { chips, slider, row } from "./base.js?v=3bad3dc1c8";
-import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=3bad3dc1c8";
-import { dial, anim, toward, COL } from "./dial.js?v=3bad3dc1c8";
+import { chips, slider, row } from "./base.js?v=da5a58a7ab";
+import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=da5a58a7ab";
+import { dial, anim, toward, COL } from "./dial.js?v=da5a58a7ab";
 const ICE = "#CFE6FF";
 export function risk(oat, rh) { if (oat < 70 && rh > 80) return 2; if (oat <= 100 && rh >= 50) return 1; return 0; }
 export function mount(host) {

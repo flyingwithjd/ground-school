@@ -398,5 +398,21 @@ export const GLOSSARY = {
   "Bus bar": { def: "The connection point that distributes electrical power from the battery and alternator to the airplane's circuits.", src: "PHAK Ch 7" },
   "Overvoltage": { def: "Bus voltage too high, usually from a faulty voltage regulator. In the 172S a sensor shuts the alternator down at about 31.5 volts.", src: "C172S POH Sec 7" },
   "Spark plug fouling": { def: "Carbon or lead deposits on a spark plug that keep it from firing, felt as roughness and an obvious power loss when you switch to one magneto.", src: "C172S POH Sec 3" },
+  "Mixture": { def: "The ratio of fuel to air going into the cylinders. The mixture control lets the pilot adjust it, mainly to lean it as air density drops with altitude.", src: "PHAK Ch 7" },
+  "Leaning": { def: "Reducing fuel flow with the mixture control to match thinner air. Lean by EGT, or with a fixed-pitch propeller by RPM, following the POH.", src: "PHAK Ch 7 · FAASTeam" },
+  "Blade angle": { def: "The angle between a propeller blade's chord line and its plane of rotation. It is largest near the hub and smallest at the tip.", src: "PHAK Ch 7" },
+  "Plain flap": { def: "The simplest flap: the rear of the wing hinges down. It adds lift and a lot of drag, and moves the center of pressure aft, so the nose tends to pitch down.", src: "PHAK Ch 6" },
+  "Split flap": { def: "A flap hinged from the lower surface only, while the upper surface stays put. Slightly more lift than a plain flap, and more drag.", src: "PHAK Ch 6" },
+  "Slotted flap": { def: "A flap that opens a gap between itself and the wing, so high-energy air from below flows over the flap and delays separation. More lift than a plain or split flap.", src: "PHAK Ch 6" },
+  "Fowler flap": { def: "A slotted flap that slides aft on tracks before hinging down, adding both camber and wing area. The largest increase in lift for the least change in drag.", src: "PHAK Ch 6" },
+  "Slot": { def: "A fixed gap near the wing's leading edge that routes air from below to the upper surface, delaying the stall to a higher angle of attack.", src: "PHAK Ch 6" },
+  "Slat": { def: "A movable leading-edge section that slides forward to open a slot, delaying the stall to a higher angle of attack.", src: "PHAK Ch 6" },
+  "Spoilers": { def: "Panels on top of the wing that rise to disrupt the airflow, reducing lift and adding drag. Used to descend without gaining speed, for roll control on some airplanes and gliders, and after touchdown to help braking.", src: "PHAK Ch 6" },
+  "Balance tab": { def: "A tab linked so that it moves opposite its control surface; the air on it helps move the surface and lightens the control force.", src: "PHAK Ch 6" },
+  "Servo tab": { def: "A tab moved by the cockpit control; the air on the tab then moves the control surface the opposite way.", src: "PHAK Ch 6" },
+  "Antiservo tab": { def: "A tab on a stabilator that moves in the same direction as the trailing edge, making the stabilator less sensitive and adding feel. It also works as a trim tab.", src: "PHAK Ch 6" },
+  "Stabilator": { def: "A one-piece horizontal tail that pivots as a whole, replacing a stabilizer and elevator. It is very sensitive, so it usually has an antiservo tab.", src: "PHAK Ch 6" },
+  "Ground-adjustable tab": { def: "A small metal tab on a control surface, often the rudder, bent on the ground to correct a steady out-of-trim condition in flight.", src: "PHAK Ch 6" },
+  "Adjustable stabilizer": { def: "A horizontal stabilizer whose angle is changed for trim, usually by a jackscrew, instead of using a trim tab.", src: "PHAK Ch 6" }
 };
 export default GLOSSARY;

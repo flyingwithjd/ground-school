@@ -24,10 +24,10 @@ export const COVERAGE = {
     ["Engine and propeller", "propeller|prop\\b|cowling|nicks|exhaust leak|air filter|bird nests", ["walk"]],
     ["Ground operations", "taxi|before-takeoff check|quartering (head|tail)wind|engine start|run-?up", ["ground", "wind", "runup"]] ] },
   gl2: { refs: "PHAK 5, 6, 7, 8 · POH 1, 2, 3, 4, 7 · ACS PA.I.F, PA.I.G", units: ["gl2", "vs1"], items: [
-    ["Flight control systems", "flight control"], ["Primary flight controls", "aileron|elevator|rudder"], ["Secondary flight controls", "flaps?|trim"],
-    ["Autopilot", "autopilot"], ["Powerplant", "reciprocating|four-stroke|cylinder"], ["Propeller", "propeller"],
+    ["Flight control systems", "flight control"], ["Primary flight controls", "aileron|elevator|rudder"], ["Secondary flight controls", "flaps?|trim|slats?|spoilers?|servo tab|stabilator"],
+    ["Autopilot", "autopilot"], ["Powerplant", "reciprocating|four-stroke|cylinder"], ["Propeller", "propeller|governor|blade angle"],
     ["Induction systems", "induction|carburetor|fuel injection"], ["Ignition systems", "magneto|ignition"], ["Oil systems", "\\boil\\b"],
-    ["Engine cooling systems", "cooling|cylinder head|cowl flap"], ["Starting systems", "starter|hand-?prop"], ["Combustion", "detonation|preignition|combustion"],
+    ["Engine cooling systems", "cooling|cylinder head|cowl flap"], ["Starting systems", "starter|hand-?prop"], ["Combustion", "detonation|preignition|combustion|mixture|leaning"],
     ["Turbine engines (introduction)", "turbine|turboprop|turbojet|turbofan"], ["Airframe systems", "airframe|landing gear|tricycle|tailwheel"],
     ["Fuel systems", "fuel (system|selector|tank|pump)|gravity-feed|fuel-pump"], ["Refueling procedures", "refuel|ground(ing)? wire|bond"],
     ["Heating systems", "cabin heat|heater|carbon monoxide"], ["Electrical systems", "alternator|battery|ammeter|electrical"], ["Hydraulic systems", "hydraulic"],

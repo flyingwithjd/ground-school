@@ -6,20 +6,20 @@
 // CHT green 200-500 F and red arcs (tach 2,700-3,000, oil temp 245-250, oil pressure 0-20 and 115-120). The round-dial 172S
 // has no CHT gauge (POH 7). Low oil pressure procedure: POH 3. Temperature causes and fixes: PHAK 7.
 // Needle values for each situation are examples, not published numbers.
-import { chips, row } from "./base.js?v=3bad3dc1c8";
-import { h } from "../core/util.js?v=3bad3dc1c8";
-import { pxScene, T, R, C, hit, INK, GRAY, DIM, ACC } from "./kit.js?v=3bad3dc1c8";
-import { dial, eisCell, anim, toward, COL } from "./dial.js?v=3bad3dc1c8";
+import { chips, row } from "./base.js?v=da5a58a7ab";
+import { h } from "../core/util.js?v=da5a58a7ab";
+import { pxScene, T, R, C, hit, INK, GRAY, DIM, ACC } from "./kit.js?v=da5a58a7ab";
+import { dial, eisCell, anim, toward, COL } from "./dial.js?v=da5a58a7ab";
 const SC = {
   cruise: { name: "Cruise", v: { rpm: 2400, ff: 8.5, op: 70, ot: 190, cht: 360, egt: 0.6, vac: 5 }, say: ["Normal cruise", "Every needle in the green."] },
   climb: { name: "Long slow climb", v: { rpm: 2500, ff: 11.5, op: 66, ot: 238, cht: 470, egt: 0.45, vac: 5 }, fix: { name: "Lower the nose, enrich", v: { rpm: 2450, ff: 12, op: 70, ot: 205, cht: 390, egt: 0.4, vac: 5 } },
-    say: ["High power, low airspeed", "Less cooling air at high power. CHT climbs right away; oil temperature follows later."], fixed: ["Cooling", "More airspeed and a richer mixture bring the temperatures down. Reducing power helps too."] },
+    say: ["High power, low airspeed", "Less cooling air at high power. CHT climbs right away; oil temperature follows later."], sayR: ["High power, low airspeed", "Less cooling air at high power. Oil temperature climbs slowly toward the red line."], fixed: ["Cooling", "More airspeed and a richer mixture bring the temperatures down. Reducing power helps too."] },
   lowoil: { name: "Oil loss", v: { rpm: 2350, ff: 8.5, op: 12, ot: 244, cht: 410, egt: 0.6, vac: 5 }, fix: { name: "Reduce power, pick a field", v: { rpm: 1700, ff: 5, op: 10, ot: 240, cht: 330, egt: 0.5, vac: 4.6 } },
     say: ["Oil pressure low, temperature rising", "Losing oil pressure with rising oil temperature: engine failure may be near."], fixed: ["Plan the landing now", "Use only the power you need to reach the field you picked."] },
   sender: { name: "Low pressure, temp normal", v: { rpm: 2400, ff: 8.5, op: 15, ot: 190, cht: 360, egt: 0.6, vac: 5 }, say: ["OIL PRESS on, temperature normal", "Probably the pressure sender or relief valve. Land at the nearest airport and have it inspected."] },
   cooler: { name: "Blocked oil cooler", v: { rpm: 2400, ff: 8.5, op: 60, ot: 246, cht: 380, egt: 0.6, vac: 5 }, fix: { name: "Reduce power, add airspeed", v: { rpm: 2200, ff: 7, op: 62, ot: 232, cht: 340, egt: 0.6, vac: 5 } },
     say: ["High oil temperature", "Low oil, a plugged line, a blocked oil cooler or a bad gauge."], fixed: ["Easing the load", "Less power and more airspeed lower engine temperature. Have the cause found before the next flight."] },
-  shock: { name: "Fast idle descent", v: { rpm: 1600, ff: 3, op: 55, ot: 170, cht: 230, egt: 0.3, vac: 4.6 }, say: ["Shock cooling risk", "A high-speed descent at low power cools the cylinders abruptly. CHT drops fast; oil temperature lags."] },
+  shock: { name: "Fast idle descent", v: { rpm: 1600, ff: 3, op: 55, ot: 170, cht: 230, egt: 0.3, vac: 4.6 }, say: ["Shock cooling risk", "A high-speed descent at low power cools the cylinders abruptly. CHT drops fast; oil temperature lags."], sayR: ["Shock cooling risk", "A high-speed descent at low power cools the cylinders abruptly. The round dials have no CHT gauge to show it."] },
   static: { name: "Full-throttle static", v: { rpm: 2350, ff: 14, op: 72, ot: 185, cht: 340, egt: 0.4, vac: 5.2 }, say: ["Static RPM check", "On the ground at full throttle, the 172S should show 2,300 to 2,400 RPM."] },
 };
 const RATE = { rpm: 2.2, ff: 2, op: 2, ot: 0.18, cht: 0.9, egt: 1.6, vac: 2 };
@@ -66,7 +66,7 @@ export function mount(host) {
       cells.forEach(([k, o], i) => { const y = top2 + 14 + i * dy; G[k] = eisCell(g, x, y, w, { ...o, focus: focus === k, value: val[k] });
         const z = R(g, x - 6, y - 14, w + 12, dy - 6, { fill: "transparent" }); hit(g, z, INFO[k], () => { focus = focus === k ? null : k; S.redraw(); }); });
     }
-    const say = fixed && SC[sc].fixed ? SC[sc].fixed : SC[sc].say;
+    const say = fixed && SC[sc].fixed ? SC[sc].fixed : (panel === "round" && SC[sc].sayR) || SC[sc].say;
     S.F.caption(focus ? "Markings" : say[0], focus ? INFO[focus] : say[1]);
   }
   S.F.explain(`<p>Tap any gauge for its markings. The round-dial 172S has an EGT gauge but no CHT gauge; the G1000 shows CHT and EGT. The tach's green arc gets longer with altitude. Your airplane's POH has the limits for your engine.</p>`);
