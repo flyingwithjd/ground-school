@@ -1,8 +1,8 @@
-import { whenUnlocked } from "./gate.js?v=d8e00a0994";
-import { initPopovers } from "./core/rich.js?v=d8e00a0994";
-import { destroyAll } from "./viz/index.js?v=d8e00a0994";
-import * as pages from "./views/pages.js?v=d8e00a0994";
-import { lessonView } from "./views/lesson.js?v=d8e00a0994";
+import { whenUnlocked } from "./gate.js?v=7204d1cc12";
+import { initPopovers } from "./core/rich.js?v=7204d1cc12";
+import { destroyAll } from "./viz/index.js?v=7204d1cc12";
+import * as pages from "./views/pages.js?v=7204d1cc12";
+import { lessonView } from "./views/lesson.js?v=7204d1cc12";
 const main = document.getElementById("main");
 let cleanup = [];
 const routes = [
@@ -48,7 +48,7 @@ whenUnlocked(() => { addEventListener("hashchange", route); route(); }); // noth
   if (/[?&]b=/.test(location.search)) history.replaceState(null, "", location.pathname + location.hash);
   const cur = (document.querySelector('meta[name="build"]') || {}).content; if (!cur || !window.fetch) return;
   const check = () => fetch(location.pathname + "?nc=" + Date.now(), { cache: "no-store" }).then((r) => (r.ok ? r.text() : "")).then((t) => {
-    const m = t.match(/<meta name="build" content="([0-9a-f]+)">/); if (!m || m[1] === cur) return;
+    const m = t.match(//); if (!m || m[1] === cur) return;
     const k = "sqs.build." + m[1]; try { if (sessionStorage.getItem(k)) return; sessionStorage.setItem(k, "1"); } catch (e) {}
     location.replace(location.pathname + "?b=" + m[1] + location.hash); }).catch(() => {});
   setTimeout(check, 1500); document.addEventListener("visibilitychange", () => { if (!document.hidden) check(); });
