@@ -27,7 +27,7 @@ const state = () => pg.evaluate(() => JSON.parse(localStorage.getItem("ppg.v1") 
 // ---- 1. a GL2 session: miss the first 3 (Certain), answer the rest right
 await pg.goto(BASE + "#/practice/gl2"); await pg.waitForSelector(".qtext"); await pg.waitForTimeout(400);
 const asked = []; const counters = []; let k = 0; const t0 = Date.now();
-while (await pg.locator(".qtext").count()) { const c = await answer(k < 3); if (!c) break; asked.push(c.id); counters.push(c.counter); if (k === 0 && shot) await pg.screenshot({ path: shot + "/qf_01_miss_verdict.png" });
+while (await pg.locator(".qtext").count()) { const c = await answer(k < 3); if (!c) break; asked.push(c.id); counters.push(c.counter); if (k === 0 && shot) { await pg.waitForTimeout(800); } if (k === 0 && shot) await pg.screenshot({ path: shot + "/qf_01_miss_verdict.png" });
   k++; if (!(await nextQ())) break; if (k > 40) break; }
 ok(asked.length === 12, `first session asks 12 questions (asked ${asked.length})`);
 ok(new Set(asked).size === asked.length, "no question is asked twice in a session");
@@ -60,7 +60,7 @@ const N = +(await allBtn.textContent()).match(/\d+/)[0]; await allBtn.click(); a
 let c2 = await cur(); ok(c2.counter === `Answered 0 / ${N}`, "All path counter: " + c2.counter);
 for (let i = 0; i < 4; i++) { await answer(false); await nextQ(); }
 c2 = await cur(); ok(c2.counter === `Answered 4 / ${N}`, "All path advances: " + c2.counter);
-if (shot) await pg.screenshot({ path: shot + "/qf_03_all_path.png" });
+if (shot) { await pg.waitForTimeout(500); await pg.screenshot({ path: shot + "/qf_03_all_path.png" }); }
 await pg.goto(BASE + "#/lesson/gl2"); await pg.waitForTimeout(900);
 for (let i = 0; i < 40 && !(await pg.locator("h2", { hasText: "Answer, then trust" }).count()); i++) { await pg.locator(".secnav .pg.next").click(); await pg.waitForTimeout(150); }
 const resume = pg.locator("button", { hasText: /^All questions · 4 \/ \d+$/ }); ok(await resume.count() === 1, "All path remembers its place (All questions · 4 / N)");
@@ -74,11 +74,11 @@ await pg.goto(BASE + "#/"); await pg.waitForTimeout(1000);
 const card = await pg.evaluate(() => { const c = document.getElementById("blind-card"); return c ? { txt: c.innerText, num: c.querySelector(".num").textContent, pri: !!c.querySelector(".btn.pri") } : null; });
 ok(card && /Blind spots/i.test(card.txt) && /^3/.test(card.num) && card.pri, "Now page shows the Blind spots card first: " + (card && card.txt.replace(/\s+/g, " ")));
 ok(!(await pg.evaluate(() => /within minutes/.test(document.body.innerText))), "no 'within minutes' text on the Now page");
-if (shot) await pg.screenshot({ path: shot + "/qf_04_now_blind_card.png" });
+if (shot) { await pg.waitForTimeout(500); await pg.screenshot({ path: shot + "/qf_04_now_blind_card.png" }); }
 await pg.goto(BASE + "#/practice/gl3"); await pg.waitForSelector(".qtext"); await pg.waitForTimeout(300);
 const seen3 = []; let badgeShot = false;
 while (await pg.locator(".qtext").count()) { const c = await cur(); if (!c) break; seen3.push(c);
-  if (c.badge && !badgeShot && shot) { await pg.screenshot({ path: shot + "/qf_05_blind_badge.png" }); badgeShot = true; }
+  if (c.badge && !badgeShot && shot) { await pg.waitForTimeout(500); await pg.screenshot({ path: shot + "/qf_05_blind_badge.png" }); badgeShot = true; }
   await answer(false); if (!(await nextQ())) break; if (seen3.length > 30) break; }
 const back = seen3.filter((c) => missed.includes(c.id));
 ok(back.length === 3 && back.every((c) => c.badge), `the 3 GL2 blind spots come back in GL3 with the badge (${back.length})`);
