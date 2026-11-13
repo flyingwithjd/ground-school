@@ -1,6 +1,6 @@
 // VOR and CDI (PHAK 16, AIM 1-1-3): tap where the airplane is and turn the OBS. The needle and TO/FROM depend on position, not heading.
-import { slider } from "./base.js?v=c8fe6c3cee";
-import { pxScene, T, L, C, R, P, planeTop, ACC, INK, GRAY, DIM, ACCF, wrap } from "./kit.js?v=c8fe6c3cee";
+import { slider } from "./base.js?v=d8e00a0994";
+import { pxScene, T, L, C, R, P, planeTop, ACC, INK, GRAY, DIM, ACCF, wrap } from "./kit.js?v=d8e00a0994";
 const rad = (d) => (d * Math.PI) / 180, deg = (r) => (r * 180) / Math.PI;
 export function mount(host) {
   let obs = 360, pos = { r: 30, d: 0.7 }; // airplane on the 030 radial, 70% of the plot radius

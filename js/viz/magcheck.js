@@ -8,13 +8,13 @@
 // PHAK 7: no drop is not normal; if the engine quits on one magneto or the drop exceeds limits, don't fly; a broken
 // magneto ground wire can let the engine fire with the switch OFF, and only idle cutoff stops it.
 // The RPM drops shown for each case are examples, not published values.
-import { frame, chips, row } from "./base.js?v=c8fe6c3cee";
-import { planeStage } from "./planestage.js?v=c8fe6c3cee";
-import { modelKit, fitView } from "./section-models.js?v=c8fe6c3cee";
-import { h, s, reduced } from "../core/util.js?v=c8fe6c3cee";
+import { frame, chips, row } from "./base.js?v=d8e00a0994";
+import { planeStage } from "./planestage.js?v=d8e00a0994";
+import { modelKit, fitView } from "./section-models.js?v=d8e00a0994";
+import { h, s, reduced } from "../core/util.js?v=d8e00a0994";
 import * as THREE from "three";
-import { T, L, C, R, hit, INK, GRAY, DIM, ACC } from "./kit.js?v=c8fe6c3cee";
-import { dial, anim, toward, COL } from "./dial.js?v=c8fe6c3cee";
+import { T, L, C, R, hit, INK, GRAY, DIM, ACC } from "./kit.js?v=d8e00a0994";
+import { dial, anim, toward, COL } from "./dial.js?v=d8e00a0994";
 const POS = ["OFF", "R", "L", "BOTH", "START"], ANG = { OFF: -84, R: -42, L: 0, BOTH: 42, START: 84 };
 const FAULT = {
   normal: { name: "Normal", dR: 75, dL: 100 },

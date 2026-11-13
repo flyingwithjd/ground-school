@@ -1,6 +1,6 @@
 // Three definitions of night (14 CFR 1.1, 61.57(b), 91.209): drag the clock through an example evening.
-import { slider } from "./base.js?v=c8fe6c3cee";
-import { pxScene, T, L, R, ACC, INK, GRAY, DIM, ACCF, ACCM, fmtTime } from "./kit.js?v=c8fe6c3cee";
+import { slider } from "./base.js?v=d8e00a0994";
+import { pxScene, T, L, R, ACC, INK, GRAY, DIM, ACCF, ACCM, fmtTime } from "./kit.js?v=d8e00a0994";
 export function mount(host) {
   // Example evening only. Real sunset and civil twilight times vary by date and place: look them up.
   let ss = 19 * 60 + 30, tw = 30, t = 20 * 60 + 15;
