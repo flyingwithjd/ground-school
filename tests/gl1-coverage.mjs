@@ -6,7 +6,7 @@ import text from '../data/text/gl1.js';import extra from '../data/text/x/gl1.js'
 import {term} from '../js/core/rich.js';
 import {COVERAGE} from '../data/coverage-src.js';
 const l=LESSONS.gl1,secs=[...text.sections,...extra.sections];
-assert.equal(l.questions.length,92);assert.ok(!l.oral||!l.oral.length);
+assert.equal(l.questions.length,99);assert.ok(!l.oral||!l.oral.length);
 for(const [prefix,n] of [['gl1-',30],['gl1x-',16],['gl1c-',17]])for(let i=1;i<=n;i++)assert.equal(QUESTIONS[prefix+String(i).padStart(2,'0')].lesson,'gl1');
 
 for(const s of secs)for(const m of ((s.body||'')+(s.body2||'')).matchAll(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g))assert.ok(term(m[2]||m[1]),`${s.id}: ${m[0]}`);
@@ -15,4 +15,4 @@ assert.equal(COVERAGE.gl1.items.length,19); // grouped headings; first contains 
 for(const id of ['gl1c-13','gl1c-14','gl1c-15'])assert.equal(QUESTIONS[id].t,'gl1.ground');
 assert.ok(secs.find(s=>s.id==='wind').viz.opts.mode==='taxi');
 assert.ok(fs.readFileSync(new URL('../js/core/store.js',import.meta.url),'utf8').includes('const KEY = "ppg.v1"'));
-console.log('GL1 PASS: 21 targets / 19 grouped headings, 92 questions (orals retired, step C and GL1 chunk 1-2 fills), original IDs preserved, all glossary references resolve, taxi question stays GL1, progress key untouched');
+console.log('GL1 PASS: 21 targets / 19 grouped headings, 99 questions (orals retired, step C and GL1 chunk 1-3 fills), original IDs preserved, all glossary references resolve, taxi question stays GL1, progress key untouched');

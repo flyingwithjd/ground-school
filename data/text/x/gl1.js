@@ -31,6 +31,7 @@ export default {
 <p>How much lift the wing makes depends on its <strong>[[angle of attack]]</strong>: the angle between the wing's [[chord line]] and the [[relative wind|Relative wind]]. That's different from [[pitch|Pitch]] attitude, which is the nose's angle to the horizon. <span class="src">PHAK Glossary</span></p>
 <p>The CG matters too. Its position determines the airplane's [[stability|Stable]], and as it moves aft the airplane becomes less stable. Loading, fuel and equipment all move it. <span class="src">PHAK 3</span></p>
 <div class="why"><span class="label">Why it matters</span><p>Every control in this lesson works by changing one of these forces. You'll go deeper in GL3 (aerodynamics) and GL5 ([[weight and balance|Weight and balance]]).</p></div>`,
+      viz: { type: "forces", after: "ul" },
       kdr: { k: "Name the four forces, which way each acts, and what angle of attack is.", d: "Point to where each force acts on the airplane during the walkaround.", r: "Confusing angle of attack with pitch attitude: the wing stalls at its critical angle of attack, whatever the nose is doing.", codes: ["PA.I.G.K1a"] } },
     { id: "insts", at: "axes", label: "Instrument groups · PHAK 3", title: "Performance, control, navigation",
       body: `<p>Whether the panel is analog gauges or a glass display, the PHAK groups the flight instruments into three categories. <span class="src">PHAK 3</span></p>

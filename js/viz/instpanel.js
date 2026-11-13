@@ -1,9 +1,10 @@
-// Static drawings of the flight instruments, grouped the way PHAK Ch 3 groups them (performance, control, navigation).
-// Faces are simplified from the PHAK Ch 8 figures and a round-gauge C172S panel. Nothing is interactive or highlighted.
-// Example readings: level cruise, 100 KIAS, 4,500 ft, 0 fpm, heading 120, wings level, 2,300 RPM.
+// The flight instruments in six-pack order plus tachometer and CDI, grouped the way PHAK Ch 3 groups them. Group chips light
+// one group; situation chips change attitude or power: the control instruments (attitude, tachometer) move first and the
+// performance instruments follow a moment later (PHAK 3 / AFH attitude flying). Readings are examples, not POH numbers.
+// Faces are simplified from the PHAK Ch 8 figures and a round-gauge C172S panel.
 // Airspeed markings reuse the V-speeds dial (C172S POH Fig 2-2); tachometer markings are C172S POH Fig 2-3 (sea-level green arc).
-import { frame, FAINT, FAINT2 } from "./base.js?v=716452685f";
-import { s, h } from "../core/util.js?v=716452685f";
+import { frame, chips, FAINT, FAINT2 } from "./base.js?v=716452685f";
+import { s, h, reduced } from "../core/util.js?v=716452685f";
 import { rich } from "../core/rich.js?v=716452685f";
 const INK = "#F2F1EC", DIM = "rgba(242,241,236,.6)", FACE = "#111113";
 const COL = { white: "#F2F1EC", green: "#3FA66B", yellow: "#D9B23A", red: "#D9493E", sky: "#2E4D6B", ground: "#634631" };
@@ -72,9 +73,9 @@ function tc() { const el = base("Turn coordinator, wings level, ball centered");
   txt(el, 0, 82, "2 MIN", { size: 8, mono: true, w: 500 }); return el; }
 
 // Attitude indicator: muted sky and ground, pitch lines every 5°, bank marks 10, 20, 30, 60, 90 on the case
-function ai() { const el = base("Attitude indicator, wings level, level pitch"); const id = "aic" + Math.random().toString(36).slice(2, 7);
+function ai(pitch = 0) { const el = base(`Attitude indicator, wings level, pitch ${pitch > 0 ? pitch + " degrees up" : pitch < 0 ? -pitch + " degrees down" : "level"}`); const id = "aic" + Math.random().toString(36).slice(2, 7);
   s("clipPath", { id }, s("defs", {}, el)).append(s("circle", { r: 84 }));
-  const m = s("g", { "clip-path": `url(#${id})` }, el); s("rect", { x: -90, y: -90, width: 180, height: 90, fill: COL.sky }, m); s("rect", { x: -90, y: 0, width: 180, height: 90, fill: COL.ground }, m);
+  const m0 = s("g", { "clip-path": `url(#${id})` }, el), m = s("g", { transform: `translate(0 ${pitch * 3})` }, m0); s("rect", { x: -90, y: -140, width: 180, height: 140, fill: COL.sky }, m); s("rect", { x: -90, y: 0, width: 180, height: 140, fill: COL.ground }, m);
   s("line", { x1: -90, y1: 0, x2: 90, y2: 0, stroke: INK, "stroke-width": 1.6 }, m);
   for (const p of [5, 10, 15, 20]) for (const sgn of [-1, 1]) { const w = p % 10 ? 10 : 20; s("line", { x1: -w, y1: -sgn * p * 3, x2: w, y2: -sgn * p * 3, stroke: "rgba(242,241,236,.75)", "stroke-width": 1.3 }, m); }
   s("path", { d: "M0,-82 L-6,-70 L6,-70 Z", fill: INK }, m); // bank pointer on the moving card
@@ -103,18 +104,35 @@ function cdi(crs) { const el = base(`Course deviation indicator, course ${crs}, 
   s("path", { d: "M26,-22 L19,-12 L33,-12 Z", fill: INK }, el); txt(el, 26, -32, "TO", { size: 8, mono: true, w: 500 });
   return el; }
 
-const GROUPS = [
-  { name: "Performance", what: "What the airplane is doing", items: [
-    ["Airspeed indicator", "100 KIAS", () => asi(100)], ["Altimeter", "4,500 ft · 29.92", () => alt(4500, "29.92")], ["Vertical speed", "0 fpm", () => vsi(0)],
-    ["Heading indicator", "120°", () => hi(120)], ["Turn coordinator", "Wings level · ball centered", tc]] },
-  { name: "Control", what: "Attitude and power", items: [["Attitude indicator", "Wings level · level pitch", ai], ["Tachometer (power)", "2,300 RPM", () => tach(2300)]] },
-  { name: "Navigation", what: "Where you are relative to a [[fix]]", items: [["Course deviation indicator", "VOR · course 120 · centered · TO", () => cdi(120)]] },
+// Situations: control instruments change first, performance instruments follow (example readings).
+const SIT = {
+  level: { cap: "Level cruise", ctl: { pitch: 0, rpm: 2300 }, perf: { kt: 100, ft: 4500, fpm: 0 }, t: "Level cruise: set the attitude and power, then the performance instruments settle and confirm it." },
+  nose: { cap: "Raise the nose", ctl: { pitch: 5, rpm: 2300 }, perf: { kt: 85, ft: 4560, fpm: 500 }, t: "Nose up, same power: the attitude indicator shows it at once; then airspeed bleeds off, the VSI shows a climb and the altimeter starts to wind up." },
+  power: { cap: "Add power, hold altitude", ctl: { pitch: -1, rpm: 2500 }, perf: { kt: 110, ft: 4500, fpm: 0 }, t: "More power on the tachometer, with the nose eased down a touch to stay level: the airspeed rises; altitude and VSI stay put." },
+  less: { cap: "Less power, descend", ctl: { pitch: -3, rpm: 1900 }, perf: { kt: 100, ft: 4440, fpm: -500 }, t: "Power back and nose down a little to keep 100 knots: the VSI shows a descent and the altimeter unwinds, airspeed holds." },
+};
+const CELLS = [
+  ["asi", "Airspeed", "perf", (v) => asi(v.kt), (v) => `${v.kt} KIAS`], ["ai", "Attitude", "ctl", (v) => ai(v.pitch), (v) => v.pitch ? `${Math.abs(v.pitch)}° ${v.pitch > 0 ? "up" : "down"}` : "Level"],
+  ["alt", "Altimeter", "perf", (v) => alt(v.ft, "29.92"), (v) => `${v.ft.toLocaleString("en-US")} ft`], ["tc", "Turn coord.", "perf", () => tc(), () => "Wings level"],
+  ["hi", "Heading", "perf", () => hi(120), () => "120°"], ["vsi", "Vert. speed", "perf", (v) => vsi(v.fpm), (v) => `${v.fpm > 0 ? "+" : ""}${v.fpm} fpm`],
+  ["tach", "Tachometer", "ctl", (v) => tach(v.rpm), (v) => `${v.rpm.toLocaleString("en-US")} RPM`], ["cdi", "VOR / CDI", "nav", () => cdi(120), () => "Course 120"],
 ];
+const GNAME = { perf: ["Performance", "What the airplane is doing"], ctl: ["Control", "Attitude and power: set these"], nav: ["Navigation", "Where you are relative to a [[fix]]"] };
 export function mount(host, opts = {}) {
-  const F = frame(host, { cls: "instp", corners: { tl: "Round gauges", tr: "PHAK 3, 8" } }); F.ctrl.remove();
-  for (const G of GROUPS) { const sec = h("div", { class: "ip-group" }); sec.append(h("div", { class: "ip-head" }, h("span", { class: "label" }, G.name), Object.assign(h("span", { class: "ip-what" }), { innerHTML: rich(G.what) })));
-    const grid = h("div", { class: "ip-grid" }); for (const [name, read, fn] of G.items) { const c = h("div", { class: "ip-cell" }); c.append(fn(), h("div", { class: "ip-name" }, name), h("div", { class: "ip-read" }, read)); grid.append(c); }
-    sec.append(grid); F.stage.append(sec); }
-  for (const n of [].concat(opts.note || [])) F.stage.append(h("p", { class: "ip-note" }, n));
-  F.explain(""); return { destroy: () => F.destroy() };
+  const F = frame(host, { cls: "instp ipx capin", corners: { tl: "Round gauges", tr: "Example readings" } }); F.root.insertBefore(F.ctrl, F.stage);   // chips on top: nothing below can move them
+  let grp = null, sit = "level", v = { ...SIT.level.ctl, ...SIT.level.perf }, tmr = 0;
+  const grid = h("div", { class: "ip-grid" }); F.stage.append(grid); const cells = {};
+  for (const [k, name, g] of CELLS) { const c = h("div", { class: "ip-cell", "data-g": g }); c.append(h("div", { class: "ip-face" }), h("div", { class: "ip-name" }, name), h("div", { class: "ip-read" }, "")); grid.append(c); cells[k] = c; }
+  const paint = (keys) => { for (const [k, , , fn, rd] of CELLS) if (!keys || keys.includes(k)) { const c = cells[k]; c.querySelector(".ip-face").replaceChildren(fn(v)); c.querySelector(".ip-read").textContent = rd(v); if (keys) { c.classList.remove("chg"); void c.offsetWidth; c.classList.add("chg"); } } };
+  const light = () => { for (const [k, , g] of CELLS) { cells[k].classList.toggle("on", grp === g); cells[k].classList.toggle("off", !!grp && grp !== g); }
+    if (grp) F.explain(`<p><b>${GNAME[grp][0]}:</b> ${rich(GNAME[grp][1])}.</p>` + notes); else F.explain(`<p>${SIT[sit].t}</p>` + notes); };
+  chips(F.ctrl, [["perf", "Performance"], ["ctl", "Control"], ["nav", "Navigation"]], null, (g) => { grp = g; light(); }, { label: "Instrument group", toggle: true });
+  chips(F.ctrl, Object.entries(SIT).map(([k, o]) => [k, o.cap]), "level", (k) => { if (!k) return; sit = k; clearTimeout(tmr); const S = SIT[k];
+    Object.assign(v, S.ctl); paint(["ai", "tach"]); F.caption("First: control instruments", S.cap);
+    tmr = setTimeout(() => { Object.assign(v, S.perf); paint(["asi", "alt", "vsi"]); F.caption("Then: performance instruments follow", S.cap); }, reduced() ? 0 : 1100); grp = null; light(); }, { label: "Situation" });
+  F.ctrl.append(h("p", { class: "ip-hint" }, "Pick a group to light it, or a situation to watch the gauges respond."));
+  const notes = [].concat(opts.note || []).map((n) => `<p class="ip-note">${n}</p>`).join("");
+  paint(); F.caption("Six-pack plus power and navigation", "Level cruise"); light();
+  F.on(() => clearTimeout(tmr));
+  return { destroy: () => F.destroy() };
 }
