@@ -9,10 +9,10 @@
 // airplane master also remove autopilot power. Default modes on engage (roll and pitch hold) follow the GFC 700; the
 // sped-up time, turn rate and climb rate shown here are illustrative.
 // The servos lit here are the generic idea (roll servo -> ailerons, pitch servo -> elevator, trim servo -> trim tab).
-import { frame, chips, row } from "./base.js?v=964a60d052";
-import { h } from "../core/util.js?v=964a60d052";
-import { planeStage } from "./planestage.js?v=964a60d052";
-import { tags3d } from "./tags3d.js?v=964a60d052";
+import { frame, chips, row } from "./base.js?v=098eade7ef";
+import { h } from "../core/util.js?v=098eade7ef";
+import { planeStage } from "./planestage.js?v=098eade7ef";
+import { tags3d } from "./tags3d.js?v=098eade7ef";
 const tw = (v, t, s) => (Math.abs(t - v) <= s ? t : v + Math.sign(t - v) * s);
 const STEPS = [["grasp", "1 · Grasp wheel"], ["disc", "2 · Hold A/P DISC"], ["trim", "3 · Trim by hand"], ["cb", "4 · Pull AP breaker"], ["rel", "5 · Release DISC"]];
 const SAY = {

@@ -1,4 +1,4 @@
-import { buildPitot } from "./pitot3d.js?v=964a60d052";
+import { buildPitot } from "./pitot3d.js?v=098eade7ef";
 // Cessna 172S, minimal technical model (v4: separated control surfaces, trim tab, IO-360 engine, fuel tank outlines, nose steering).
 // Cessna 172S, minimal technical model. Units: feet. x forward (spinner tip x=+8.0), y up (ground y=0), z right.
 // Sourced: span 36 ft 1 in, length 27 ft 2 in, height 8 ft 11 in, horizontal tail span 11 ft 4 in, wheelbase 65 in,
