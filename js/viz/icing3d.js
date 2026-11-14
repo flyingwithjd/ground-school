@@ -10,11 +10,11 @@
 // don't "bridge"); thermal anti-ice should be on before entering icing; a weeping wing pumps antifreeze through small
 // holes to prevent ice and can also deice; none is meant for long flight in icing. AC 91-74B: water that runs back past a
 // heated area can refreeze behind it (runback ice). Ice growth rates and the lift/drag meters are illustrative.
-import { frame, chips, row } from "./base.js?v=093801d129";
-import { h } from "../core/util.js?v=093801d129";
-import { planeStage } from "./planestage.js?v=093801d129";
-import { tags3d } from "./tags3d.js?v=093801d129";
-import { buildPitot } from "./pitot3d.js?v=093801d129";
+import { frame, chips, row } from "./base.js?v=e5f54f3664";
+import { h } from "../core/util.js?v=e5f54f3664";
+import { planeStage } from "./planestage.js?v=e5f54f3664";
+import { tags3d } from "./tags3d.js?v=e5f54f3664";
+import { buildPitot } from "./pitot3d.js?v=e5f54f3664";
 const ACC = 0x3b82f6, ICE = 0xd6ecff, HEAT = 0xef4444, FLUID = 0x22d3ee, DIH = Math.tan(1.73 * Math.PI / 180);
 const SAY = {
   none: ["No protection", "Most trainers aren't certified for icing. If you meet it, exit at once: turn back or change altitude."],

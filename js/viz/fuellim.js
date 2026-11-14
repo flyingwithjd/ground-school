@@ -2,9 +2,9 @@
 // take off and land on BOTH; LEFT or RIGHT for level flight only; with one tank dry, slips or skids 30 s max;
 // at 1/4 tank or less, no prolonged uncoordinated flight on LEFT or RIGHT; fuel below the gauge's red 0 can't be used.
 // POH Sec 3/4: an engine-driven pump failure drops fuel flow to zero and the engine quits even with fuel; aux pump ON restores it.
-import { chips, slider, row } from "./base.js?v=093801d129";
-import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC, ACCF } from "./kit.js?v=093801d129";
-import { anim, COL } from "./dial.js?v=093801d129";
+import { chips, slider, row } from "./base.js?v=e5f54f3664";
+import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC, ACCF } from "./kit.js?v=e5f54f3664";
+import { anim, COL } from "./dial.js?v=e5f54f3664";
 const CAP = 28, UNUSE = 1.5, Q = (CAP - UNUSE) / 4;
 // pure: what the pilot sees for a configuration
 export function fuelState({ qL, qR, sel, flight, edp, aux, t = 0 }) {

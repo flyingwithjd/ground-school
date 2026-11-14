@@ -2,7 +2,7 @@
 const live = new Set();
 export async function mountViz(host, spec) {
   const ph = document.createElement("div"); ph.dataset.viz = spec.type; host.append(ph);
-  try { const mod = await import(`./${spec.type}.js?v=093801d129`); if (!ph.isConnected) return; const v = await mod.mount(ph, spec.opts || {}); live.add(v); return v; }
+  try { const mod = await import(`./${spec.type}.js?v=e5f54f3664`); if (!ph.isConnected) return; const v = await mod.mount(ph, spec.opts || {}); live.add(v); return v; }
   catch (e) { console.error("viz failed", spec.type, e); ph.innerHTML = `<p class="dim" style="font-size:15px">This visualization could not start in this browser (${String(e.message || e).slice(0, 80)}).</p>`; }
 }
 export function destroyAll() { live.forEach((v) => { try { v && v.destroy && v.destroy(); } catch (e) {} }); live.clear(); }

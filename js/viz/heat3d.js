@@ -6,10 +6,10 @@
 // crack in the exhaust inside the shroud lets fumes into the cabin; CO LVL HIGH at 50 ppm or more; checklist: CABIN HT OFF,
 // CABIN AIR ON, vents OPEN, windows OPEN (163 KIAS max), land as soon as practical if it stays on. The ppm values are
 // illustrative; only the 50 ppm alarm point is from the POH. Duct routing and part positions are approximate.
-import { frame, chips, row } from "./base.js?v=093801d129";
-import { h } from "../core/util.js?v=093801d129";
-import { planeStage } from "./planestage.js?v=093801d129";
-import { tags3d } from "./tags3d.js?v=093801d129";
+import { frame, chips, row } from "./base.js?v=e5f54f3664";
+import { h } from "../core/util.js?v=e5f54f3664";
+import { planeStage } from "./planestage.js?v=e5f54f3664";
+import { tags3d } from "./tags3d.js?v=e5f54f3664";
 const ACC = 0x3b82f6, HOT = 0xf59e0b, RED = 0xef4444, OFF = 0x4b5160, ALARM = 50;
 export function mount(host) {
   const F = frame(host, { cls: "heat3d capin", corners: { tl: "Cabin heat and CO", tr: "PHAK 7 · POH 3, 7" } });

@@ -7,16 +7,16 @@
 // G1000 172S POH Sec 3/7: normal bus about 28.0 V; HIGH VOLTS above 32.0; LOW VOLTS below 24.5; LOW VOLTS checklist with
 // M BUS 27.5 V minimum and M BATT charging; below 20 V on M BUS the standby battery powers the essential bus for at least 30 min.
 // Amps and the battery-time bar are illustrative, not published values.
-import { chips, row, frame } from "./base.js?v=093801d129";
-import { planeStage } from "./planestage.js?v=093801d129";
-import { tags3d } from "./tags3d.js?v=093801d129";
-import { glowSprite, lightPulse } from "./lightglow.js?v=093801d129";
-import { buildPitot } from "./pitot3d.js?v=093801d129";
-import { rich } from "../core/rich.js?v=093801d129";
-import { s as svgEl } from "../core/util.js?v=093801d129";
-import { h } from "../core/util.js?v=093801d129";
-import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC, ACCF } from "./kit.js?v=093801d129";
-import { dial, eisCell, anim, COL } from "./dial.js?v=093801d129";
+import { chips, row, frame } from "./base.js?v=e5f54f3664";
+import { planeStage } from "./planestage.js?v=e5f54f3664";
+import { tags3d } from "./tags3d.js?v=e5f54f3664";
+import { glowSprite, lightPulse, landingBeam } from "./lightglow.js?v=e5f54f3664";
+import { buildPitot } from "./pitot3d.js?v=e5f54f3664";
+import { rich } from "../core/rich.js?v=e5f54f3664";
+import { s as svgEl } from "../core/util.js?v=e5f54f3664";
+import { h } from "../core/util.js?v=e5f54f3664";
+import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC, ACCF } from "./kit.js?v=e5f54f3664";
+import { dial, eisCell, anim, COL } from "./dial.js?v=e5f54f3664";
 const CASES = { normal: "Normal", nuis: "Overvoltage trip", altfail: "Alternator failed", lowrpm: "Low-RPM taxi", sensor: "Too much charge" };
 const LIST = {
   round: { volts: ["Avionics master OFF", "ALT FLD breaker CHECK IN", "Master switch OFF (both sides)", "Master switch ON", "VOLTS CHECK OFF", "Avionics master ON"],
@@ -136,22 +136,23 @@ function buildX(S) {
   wire("pitot", [[1.55, 6.7, -3.5], [1.4, 6.5, -7.2], pitot.plate], 1.6);
   const NAVCOL = { navL: 0xff2a2a, navR: 0x22c55e, navT: 0xf2f1ec };
   const glows = {
-    land: glowSprite(S, { color: 0xfff4d4, size: 2.4, tight: true }),
+    land: glowSprite(S, { color: 0xfff4d4, size: 3.2 }),
     navL: glowSprite(S, { color: 0xff2a2a, size: 1.7, tight: true }),
     navR: glowSprite(S, { color: 0x22c55e, size: 1.7, tight: true }),
     navT: glowSprite(S, { color: 0xf2f1ec, size: 1.5, tight: true }),
-    beacon: glowSprite(S, { color: 0xff2a2a, size: 2.2, tight: true }),
-    strobesL: glowSprite(S, { color: 0xffffff, size: 2.0, tight: true }),
-    strobesR: glowSprite(S, { color: 0xffffff, size: 2.0, tight: true })
+    beacon: glowSprite(S, { color: 0xff2a2a, size: 3.8 }),
+    strobesL: glowSprite(S, { color: 0xffffff, size: 3.6 }),
+    strobesR: glowSprite(S, { color: 0xffffff, size: 3.6 })
   };
+  const beam = landingBeam(S);
   const TG = tags3d(S.renderer.domElement.parentElement), tight = (text, cls, dx, dy) => TG.add(text, { cls: "tight " + cls, dx, dy, tight: true });
   const T = {
-    bat: [TG.add("Battery", { dx: -30, dy: 44 }), BAT], alt: [TG.add("Alternator", { dx: 30, dy: 44 }), ALT], bus: [TG.add("Bus + breakers", { dx: -40, dy: -44 }), BUS],
-    land: [TG.add("Landing light", { dx: -72, dy: 20 }), LDG],
+    bat: [TG.add("Battery", { dx: -30, dy: 44 }), BAT], alt: [TG.add("Alternator", { dx: 30, dy: 44 }), ALT], bus: [TG.add("Bus + breakers", { dx: -56, dy: 22 }), BUS],
+    land: [TG.add("Landing light", { cls: "tight", dx: 44, dy: -16, tight: true }), LDG],
     navL: [tight("Nav · red", "nav-l", 14, 10), TIPL], navR: [tight("Nav · green", "nav-r", -16, -16), TIPR], navT: [tight("Nav · white", "nav-w", 12, 12), TAIL],
     beacon: [tight("Beacon", "", 10, -16), BCN],
     strobeL: [tight("Strobe", "strobe", 14, 22), STL], strobeR: [tight("Strobe", "strobe", -16, 16), STR],
-    pitot: [TG.add("Pitot heat", { dx: 36, dy: 52 }), PIT], mag: [TG.add("Magnetos (own circuit)", { dx: -10, dy: 52 }), MAG] };
+    pitot: [TG.add("Pitot heat", { dx: 36, dy: 52 }), PIT], mag: [TG.add("Magnetos (own circuit)", { dx: -36, dy: 58 }), MAG] };
   let hint = null;
   const paint = (k, on, lit, hex) => { (parts[k] || []).forEach((p) => { p.edge.color.setHex(on ? (hex || lit || ACCH) : OFFH); p.fill.color.setHex(on ? (hex || (lit ? 0x0c2c6e : 0x1a1d24)) : 0x1a1d24); p.fill.opacity = on && hex ? 0.95 : 0.85; }); (wires[k] || []).forEach((l) => { l.obj.material.color.setHex(on ? ACCH : OFFH); l.opacity = on ? 0.95 : 0.55; }); };
   paint("mag", true, ACCH, 0xffffff);
@@ -164,7 +165,7 @@ function buildX(S) {
       T.alt[0].el.classList.toggle("bad", !!o.altBad); S.kick(); },
     hint(k) { hint = k; },
     pulse(t, on = st) {
-      glows.land.set(LDG, on.land ? 0.85 : 0);
+      glows.land.set(LDG, on.land ? 1 : 0); beam.set(LDG, on.land ? 1 : 0);
       glows.navL.set(TIPL, on.nav ? 0.95 : 0); glows.navR.set(TIPR, on.nav ? 0.95 : 0); glows.navT.set(TAIL, on.nav ? 0.8 : 0);
       glows.beacon.set(BCN, on.beacon ? lightPulse(t, "beacon") : 0);
       const fl = on.strobes ? lightPulse(t, "strobe") : 0; glows.strobesL.set(STL, fl); glows.strobesR.set(STR, fl);

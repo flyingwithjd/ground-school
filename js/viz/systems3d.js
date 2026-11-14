@@ -11,12 +11,12 @@
 //    tops of the pedals.
 // Coordinates are the model's (x forward, y up, z right; firewall x 3.62 = FS 0, mains x -1.22, track 4.1 ft each side).
 // Exact routing of wires and lines is schematic; locations of the parts follow the POH.
-import { chips } from "./base.js?v=093801d129";
-import { tags3d } from "./tags3d.js?v=093801d129";
-import { glowSprite, lightPulse } from "./lightglow.js?v=093801d129";
-import { buildPitot } from "./pitot3d.js?v=093801d129";
-import { rich } from "../core/rich.js?v=093801d129";
-import { h } from "../core/util.js?v=093801d129";
+import { chips } from "./base.js?v=e5f54f3664";
+import { tags3d } from "./tags3d.js?v=e5f54f3664";
+import { glowSprite, lightPulse, landingBeam } from "./lightglow.js?v=e5f54f3664";
+import { buildPitot } from "./pitot3d.js?v=e5f54f3664";
+import { rich } from "../core/rich.js?v=e5f54f3664";
+import { h } from "../core/util.js?v=e5f54f3664";
 const ACC = 0x3b82f6, XM = -1.22, WZ = -4.1;
 export function systems(S, F, { cowl, animatePose }) {
   const THREE = S.THREE, G = S.cueGroup, groups = { elec: new THREE.Group(), brk: new THREE.Group(), pedals: new THREE.Group() };
@@ -39,12 +39,14 @@ export function systems(S, F, { cowl, animatePose }) {
   const PIT = pitot.tip;
   wire([[1.55, 6.7, -3.5], [1.4, 6.5, -7.2], pitot.plate], E, 1.6);
   const glows = {
-    land: glowSprite(S, { color: 0xfff4d4, size: 2.4, tight: true }),
+    land: glowSprite(S, { color: 0xfff4d4, size: 3.2 }),
     navL: glowSprite(S, { color: 0xff2a2a, size: 1.7, tight: true }), navR: glowSprite(S, { color: 0x22c55e, size: 1.7, tight: true }), navT: glowSprite(S, { color: 0xf2f1ec, size: 1.5, tight: true }),
-    beacon: glowSprite(S, { color: 0xff2a2a, size: 2.2, tight: true }),
-    strobesL: glowSprite(S, { color: 0xffffff, size: 2.0, tight: true }), strobesR: glowSprite(S, { color: 0xffffff, size: 2.0, tight: true })
+    beacon: glowSprite(S, { color: 0xff2a2a, size: 3.8 }),
+    strobesL: glowSprite(S, { color: 0xffffff, size: 3.6 }), strobesR: glowSprite(S, { color: 0xffffff, size: 3.6 })
   };
+  const beam = landingBeam(S);
   Object.values(glows).forEach((g) => { G.remove(g.obj); groups.elec.add(g.obj); });
+  G.remove(beam.obj); groups.elec.add(beam.obj);
   // ---- brakes: left main wheel close-up ----
   const B = groups.brk, DZ = WZ + 0.36, DC = [XM, 0.73, DZ];
   solid(new THREE.CylinderGeometry(0.42, 0.42, 0.05, 28), DC, B, [Math.PI / 2, 0, 0]);
@@ -55,15 +57,15 @@ export function systems(S, F, { cowl, animatePose }) {
   wire([[3.05, 3.45, -0.62], [3.2, 3.35, -0.85]], P, 2); wire([[3.05, 3.45, -0.62], [3.2, 3.35, -0.4]], P, 2);
   // ---- labels ----
   const TG = tags3d(F.stage); const T = (txt, at, dx, dy, grp, cls = "", tight = false) => ({ t: TG.add(txt, { dx, dy, cls: (tight ? "tight " : "") + cls, tight }), at, grp });
-  const LBL = [T("Battery", BAT, -26, 46, "elec"), T("Alternator", ALT, 24, -46, "elec"), T("Starter", STR, 30, 34, "elec"), T("Master + breakers", BUS, -40, -58, "elec"),
-    T("Landing/taxi lts", LDG, -72, 20, "elec"), T("Nav · red", TIPL, 14, 10, "elec", "nav-l", true), T("Nav · green", TIPR, -16, -16, "elec", "nav-r", true), T("Nav · white", TAIL, 12, 12, "elec", "nav-w", true),
+  const LBL = [T("Battery", BAT, -26, 46, "elec"), T("Alternator", ALT, 24, -46, "elec"), T("Starter", STR, 30, 34, "elec"), T("Master + breakers", BUS, -56, 22, "elec"),
+    T("Landing/taxi lts", LDG, 44, -16, "elec", "", true), T("Nav · red", TIPL, 14, 10, "elec", "nav-l", true), T("Nav · green", TIPR, -16, -16, "elec", "nav-r", true), T("Nav · white", TAIL, 12, 12, "elec", "nav-w", true),
     T("Beacon", BCN, 10, -16, "elec", "", true), T("Strobe", STBL, 14, 22, "elec", "strobe", true), T("Strobe", STBR, -16, 16, "elec", "strobe", true), T("Pitot tube", PIT, 36, 52, "elec"),
     T("Disc", DC, -40, 40, "brk"), T("Caliper", [XM - 0.3, 1.0, DZ + 0.06], -30, -50, "brk"), T("Brake line", LINE[1], 30, -40, "brk"),
     T("Toe brakes", [3.1, 3.95, -0.6], -30, -46, "pedals"), T("Master cylinders", [3.2, 3.35, -0.6], 30, 44, "pedals")];
   LBL.forEach((l) => (l.t.on = false));
   let live = null, raf = 0; const loop = () => { raf = 0;
     const on = live && live.includes("elec"), t = performance.now() / 1000;
-    glows.land.set(LDG, on ? 0.85 : 0); glows.navL.set(TIPL, on ? 0.95 : 0); glows.navR.set(TIPR, on ? 0.95 : 0); glows.navT.set(TAIL, on ? 0.8 : 0);
+    glows.land.set(LDG, on ? 1 : 0); beam.set(LDG, on ? 1 : 0); glows.navL.set(TIPL, on ? 0.95 : 0); glows.navR.set(TIPR, on ? 0.95 : 0); glows.navT.set(TAIL, on ? 0.8 : 0);
     glows.beacon.set(BCN, on ? lightPulse(t, "beacon") : 0); const fl = on ? lightPulse(t, "strobe") : 0; glows.strobesL.set(STBL, fl); glows.strobesR.set(STBR, fl);
     TG.place(LBL.filter((l) => l.t.on).map((l) => ({ t: l.t, q: S.project(l.at), qs: (l.ats || []).map((p) => S.project(p)) })), 34);
     LBL.filter((l) => !l.t.on).forEach((l) => TG.place([{ t: l.t, q: null }])); if (live) raf = requestAnimationFrame(loop); };
