@@ -6,11 +6,11 @@
 // the dashed white arrow is the direction of travel. Retractable gear cycles up and down on its own while on screen.
 // Sources: PHAK Ch 3 (landing gear: tricycle, conventional / tailwheel; floats, skis); PHAK 7 (retractable gear); AFH Ch 14
 // (tailwheel airplanes: CG behind the main wheels, ground loops). The 172 shape is kept for both CG cases so only the CG changes.
-import { frame, chips } from "./base.js?v=714b944f7b";
-import { planeStage } from "./planestage.js?v=714b944f7b";
-import { rich } from "../core/rich.js?v=714b944f7b";
-import { h, reduced } from "../core/util.js?v=714b944f7b";
-import { tags3d } from "./tags3d.js?v=714b944f7b";
+import { frame, chips } from "./base.js?v=093801d129";
+import { planeStage } from "./planestage.js?v=093801d129";
+import { rich } from "../core/rich.js?v=093801d129";
+import { h, reduced } from "../core/util.js?v=093801d129";
+import { tags3d } from "./tags3d.js?v=093801d129";
 const XM = -1.22, XN = 4.2, YEL = 0xffd23f, D = Math.PI / 180;
 const CASE = {
   ahead: { x: 0.4, chip: "CG ahead of mains", cap: ["Nosewheel (tricycle) gear", "CG ahead of the main wheels"],
@@ -21,12 +21,13 @@ const CASE = {
     end: "The swerve grew into a ground loop: with the CG behind the mains, a small swerve keeps getting bigger." },
 };
 // Low 3/4 front-side views: whole airplane in frame, gear visible. Overhead is reserved for the swerve.
+// Low, nearly side-on from the front-left (~22° off the side), just above wheel height, close enough that all three wheels read clearly.
 const VIEW = {
-  tri:   { tg: [-1.2, 2.3, 0], az: -40, el: 18, d: 64 },
-  tail:  { tg: [-2.0, 2.2, 0], az: -50, el: 16, d: 64 },
-  retr:  { tg: [-1.8, 2.8, 0], az: -46, el: 12, d: 60 },
-  float: { tg: [-2.5, 2.6, 0], az: -42, el: 14, d: 62 },
-  ski:   { tg: [-1.5, 2.2, 0], az: -44, el: 13, d: 58 }
+  tri:   { tg: [-1.4, 1.55, 0], az: -68, el: 6, d: 50 },
+  tail:  { tg: [-2.0, 1.55, 0], az: -68, el: 6, d: 50 },
+  retr:  { tg: [-1.4, 2.0, 0], az: -68, el: 8, d: 50 },
+  float: { tg: [-2.0, 1.8, 0], az: -68, el: 8, d: 54 },
+  ski:   { tg: [-1.4, 1.45, 0], az: -68, el: 6, d: 50 }
 };
 const SWERVEV = { tg: [-2.5, 0, 0], az: 205, el: 62, d: 78 };
 const RET_PERIOD = 6.4, RET_UP = 1.7, RET_HOLD = 1.45;

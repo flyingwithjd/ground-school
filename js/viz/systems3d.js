@@ -11,12 +11,12 @@
 //    tops of the pedals.
 // Coordinates are the model's (x forward, y up, z right; firewall x 3.62 = FS 0, mains x -1.22, track 4.1 ft each side).
 // Exact routing of wires and lines is schematic; locations of the parts follow the POH.
-import { chips } from "./base.js?v=714b944f7b";
-import { tags3d } from "./tags3d.js?v=714b944f7b";
-import { glowSprite, lightPulse } from "./lightglow.js?v=714b944f7b";
-import { buildPitot } from "./pitot3d.js?v=714b944f7b";
-import { rich } from "../core/rich.js?v=714b944f7b";
-import { h } from "../core/util.js?v=714b944f7b";
+import { chips } from "./base.js?v=093801d129";
+import { tags3d } from "./tags3d.js?v=093801d129";
+import { glowSprite, lightPulse } from "./lightglow.js?v=093801d129";
+import { buildPitot } from "./pitot3d.js?v=093801d129";
+import { rich } from "../core/rich.js?v=093801d129";
+import { h } from "../core/util.js?v=093801d129";
 const ACC = 0x3b82f6, XM = -1.22, WZ = -4.1;
 export function systems(S, F, { cowl, animatePose }) {
   const THREE = S.THREE, G = S.cueGroup, groups = { elec: new THREE.Group(), brk: new THREE.Group(), pedals: new THREE.Group() };
@@ -27,7 +27,7 @@ export function systems(S, F, { cowl, animatePose }) {
   const lines = []; const wire = (pts, grp, w = 2.2) => { const l = S.cueLine(pts.length, { color: ACC, width: w, opacity: 0.95 }); l.set(pts); l.obj.material.depthTest = false; l.obj.renderOrder = 9; G.remove(l.obj); grp.add(l.obj); lines.push(l); };
   // ---- electrical ----
   const E = groups.elec, BAT = [3.95, 4.2, -0.95], ALT = [6.7, 4.35, -0.65], STR = [6.5, 3.55, 0.45], BUS = [2.15, 4.55, -1.05], AV = [2.15, 5.35, 0];
-  const LDG = [1.62, 6.72, -7.6], TIPL = [0.1, 7.12, -18.0], TIPR = [0.1, 7.12, 18.0], BCN = [-17.75, 9.05, 0], TAIL = [-18.95, 8.55, 0], STBL = [-0.35, 7.22, -18.2], STBR = [-0.35, 7.22, 18.2];
+  const LDG = [1.62, 6.72, -7.6], TIPL = [0.1, 7.12, -18.0], TIPR = [0.1, 7.12, 18.0], BCN = [-17.75, 9.05, 0], TAIL = [-18.95, 8.55, 0], STBL = [-0.75, 7.30, -18.65], STBR = [-0.75, 7.30, 18.65];
   solid(new THREE.BoxGeometry(0.75, 0.6, 0.45), BAT, E); solid(new THREE.CylinderGeometry(0.28, 0.28, 0.32, 16), ALT, E, [Math.PI / 2, 0, 0]); solid(new THREE.CylinderGeometry(0.2, 0.2, 0.6, 14), STR, E, [0, 0, Math.PI / 2]);
   solid(new THREE.BoxGeometry(0.12, 0.42, 1.2), BUS, E); solid(new THREE.BoxGeometry(0.12, 0.5, 0.9), AV, E);
   [LDG, TIPL, TIPR, BCN, TAIL, STBL, STBR].forEach((p) => solid(new THREE.SphereGeometry(0.2, 12, 8), p, E));
@@ -39,10 +39,10 @@ export function systems(S, F, { cowl, animatePose }) {
   const PIT = pitot.tip;
   wire([[1.55, 6.7, -3.5], [1.4, 6.5, -7.2], pitot.plate], E, 1.6);
   const glows = {
-    land: glowSprite(S, { color: 0xfff4d4, size: 3.2 }),
-    navL: glowSprite(S, { color: 0xff2a2a, size: 3.4 }), navR: glowSprite(S, { color: 0x22c55e, size: 3.4 }), navT: glowSprite(S, { color: 0xf2f1ec, size: 2.8 }),
-    beacon: glowSprite(S, { color: 0xff2a2a, size: 3.8 }),
-    strobesL: glowSprite(S, { color: 0xffffff, size: 3.6 }), strobesR: glowSprite(S, { color: 0xffffff, size: 3.6 })
+    land: glowSprite(S, { color: 0xfff4d4, size: 2.4, tight: true }),
+    navL: glowSprite(S, { color: 0xff2a2a, size: 1.7, tight: true }), navR: glowSprite(S, { color: 0x22c55e, size: 1.7, tight: true }), navT: glowSprite(S, { color: 0xf2f1ec, size: 1.5, tight: true }),
+    beacon: glowSprite(S, { color: 0xff2a2a, size: 2.2, tight: true }),
+    strobesL: glowSprite(S, { color: 0xffffff, size: 2.0, tight: true }), strobesR: glowSprite(S, { color: 0xffffff, size: 2.0, tight: true })
   };
   Object.values(glows).forEach((g) => { G.remove(g.obj); groups.elec.add(g.obj); });
   // ---- brakes: left main wheel close-up ----
@@ -54,11 +54,10 @@ export function systems(S, F, { cowl, animatePose }) {
   const P = groups.pedals; [-0.85, -0.4].forEach((z) => { solid(new THREE.BoxGeometry(0.08, 0.5, 0.26), [3.1, 3.8, z], P, [0, 0, 0.35]); solid(new THREE.CylinderGeometry(0.07, 0.07, 0.4, 10), [3.2, 3.35, z], P, [0, 0, 0.5]); });
   wire([[3.05, 3.45, -0.62], [3.2, 3.35, -0.85]], P, 2); wire([[3.05, 3.45, -0.62], [3.2, 3.35, -0.4]], P, 2);
   // ---- labels ----
-  const TG = tags3d(F.stage); const T = (txt, at, dx, dy, grp) => ({ t: TG.add(txt, { dx, dy }), at, grp });
-  const Tnav = TG.add("Nav lights", { dx: -24, dy: -28, extras: 2, cls: "nav-l", extraCls: ["nav-r", "nav-w"] });
-  const Tst = TG.add("Strobes", { dx: 62, dy: 36, extras: 1, cls: "strobe", extraCls: ["strobe"] });
+  const TG = tags3d(F.stage); const T = (txt, at, dx, dy, grp, cls = "", tight = false) => ({ t: TG.add(txt, { dx, dy, cls: (tight ? "tight " : "") + cls, tight }), at, grp });
   const LBL = [T("Battery", BAT, -26, 46, "elec"), T("Alternator", ALT, 24, -46, "elec"), T("Starter", STR, 30, 34, "elec"), T("Master + breakers", BUS, -40, -58, "elec"),
-    T("Landing/taxi lts", LDG, -72, 20, "elec"), { t: Tnav, at: TIPL, ats: [TIPR, TAIL], grp: "elec" }, T("Beacon", BCN, 48, 24, "elec"), { t: Tst, at: STBL, ats: [STBR], grp: "elec" }, T("Pitot tube", PIT, 36, 52, "elec"),
+    T("Landing/taxi lts", LDG, -72, 20, "elec"), T("Nav · red", TIPL, 14, 10, "elec", "nav-l", true), T("Nav · green", TIPR, -16, -16, "elec", "nav-r", true), T("Nav · white", TAIL, 12, 12, "elec", "nav-w", true),
+    T("Beacon", BCN, 10, -16, "elec", "", true), T("Strobe", STBL, 14, 22, "elec", "strobe", true), T("Strobe", STBR, -16, 16, "elec", "strobe", true), T("Pitot tube", PIT, 36, 52, "elec"),
     T("Disc", DC, -40, 40, "brk"), T("Caliper", [XM - 0.3, 1.0, DZ + 0.06], -30, -50, "brk"), T("Brake line", LINE[1], 30, -40, "brk"),
     T("Toe brakes", [3.1, 3.95, -0.6], -30, -46, "pedals"), T("Master cylinders", [3.2, 3.35, -0.6], 30, 44, "pedals")];
   LBL.forEach((l) => (l.t.on = false));

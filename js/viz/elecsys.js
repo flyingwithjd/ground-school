@@ -7,16 +7,16 @@
 // G1000 172S POH Sec 3/7: normal bus about 28.0 V; HIGH VOLTS above 32.0; LOW VOLTS below 24.5; LOW VOLTS checklist with
 // M BUS 27.5 V minimum and M BATT charging; below 20 V on M BUS the standby battery powers the essential bus for at least 30 min.
 // Amps and the battery-time bar are illustrative, not published values.
-import { chips, row, frame } from "./base.js?v=714b944f7b";
-import { planeStage } from "./planestage.js?v=714b944f7b";
-import { tags3d } from "./tags3d.js?v=714b944f7b";
-import { glowSprite, lightPulse } from "./lightglow.js?v=714b944f7b";
-import { buildPitot } from "./pitot3d.js?v=714b944f7b";
-import { rich } from "../core/rich.js?v=714b944f7b";
-import { s as svgEl } from "../core/util.js?v=714b944f7b";
-import { h } from "../core/util.js?v=714b944f7b";
-import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC, ACCF } from "./kit.js?v=714b944f7b";
-import { dial, eisCell, anim, COL } from "./dial.js?v=714b944f7b";
+import { chips, row, frame } from "./base.js?v=093801d129";
+import { planeStage } from "./planestage.js?v=093801d129";
+import { tags3d } from "./tags3d.js?v=093801d129";
+import { glowSprite, lightPulse } from "./lightglow.js?v=093801d129";
+import { buildPitot } from "./pitot3d.js?v=093801d129";
+import { rich } from "../core/rich.js?v=093801d129";
+import { s as svgEl } from "../core/util.js?v=093801d129";
+import { h } from "../core/util.js?v=093801d129";
+import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC, ACCF } from "./kit.js?v=093801d129";
+import { dial, eisCell, anim, COL } from "./dial.js?v=093801d129";
 const CASES = { normal: "Normal", nuis: "Overvoltage trip", altfail: "Alternator failed", lowrpm: "Low-RPM taxi", sensor: "Too much charge" };
 const LIST = {
   round: { volts: ["Avionics master OFF", "ALT FLD breaker CHECK IN", "Master switch OFF (both sides)", "Master switch ON", "VOLTS CHECK OFF", "Avionics master ON"],
@@ -35,8 +35,9 @@ export function mount(host) {
   const r0 = row(F.ctrl, "Panel"); chips(r0, [["round", "Round dials"], ["g1000", "G1000"]], panel, (v) => { panel = v || "round"; setCase(fc); }, { label: "Panel" });
   const r1 = row(F.ctrl, "Case"); const cc = chips(r1, Object.entries(CASES), fc, (v) => setCase(v || "normal"), { label: "Case" });
   const r2 = row(F.ctrl, "Loads"); const ld = {}; const lg = h("div", { class: "chips", role: "group", "aria-label": "Loads" }); r2.append(lg);
+  let lastLoad = null;
   [["land", "Landing light"], ["pitot", "Pitot heat"], ["nav", "Nav lights"], ["beacon", "Beacon"], ["strobes", "Strobes"], ["avion", "Avionics"]].forEach(([k, t]) => { const b = h("button", { class: "chip", type: "button", "aria-pressed": "false" }, t); lg.append(b);
-    ld[k] = { set(v) { b.classList.toggle("on", !!v); b.setAttribute("aria-pressed", v ? "true" : "false"); } }; ld[k].set(st[k]); b.addEventListener("click", () => { st[k] = !st[k]; ld[k].set(st[k]); upd(); }); });
+    ld[k] = { set(v) { b.classList.toggle("on", !!v); b.setAttribute("aria-pressed", v ? "true" : "false"); } }; ld[k].set(st[k]); b.addEventListener("click", () => { st[k] = !st[k]; lastLoad = k; ld[k].set(st[k]); upd(); }); });
   const r3 = row(F.ctrl, "Checklist"); const cg = h("div", { class: "chips", role: "group", "aria-label": "Checklist" }); r3.append(cg); const nb = h("button", { class: "chip", type: "button" }, "Next step"); const rb = h("button", { class: "chip", type: "button" }, "Start over");
   cg.append(nb, rb); nb.addEventListener("click", next); rb.addEventListener("click", () => setCase(fc));
   function setCase(k) { fc = k; cc.set(k); st = fresh(); if (k === "nuis" || k === "altfail") st.fld = false; for (const x in ld) ld[x].set(st[x]); upd(); }
@@ -61,14 +62,23 @@ export function mount(host) {
     else if (t.startsWith("add rpm") || t.startsWith("throttle 1000")) st.rpm = true;
     for (const x in ld) ld[x].set(st[x]); }
   F.ctrl.prepend(gsv);
-  let lastT = performance.now();
+  let lastT = performance.now(), lightRaf = 0;
+  const lightsOn = (c) => (st.nav || st.beacon || st.strobes || st.land) && c.v > 0;
+  const flowNeeded = (c) => lightsOn(c) || (c.src === "bat" && st.charge > 0);
+  function tickLights(now) { const t = (now ?? performance.now()) / 1000, c = calc();
+    const on = { land: st.land && c.v > 0, nav: st.nav && c.v > 0, beacon: st.beacon && c.v > 0, strobes: st.strobes && c.v > 0 };
+    X.hint(lastLoad); X.pulse(t, on); X.place();
+    F.stage.dataset.strobe = String(Math.round((on.strobes ? lightPulse(t, "strobe") : 0) * 100));
+    F.stage.dataset.beacon = String(Math.round((on.beacon ? lightPulse(t, "beacon") : 0) * 100)); }
+  // Own rAF plus setFlow: planeStage only redraws the WebGL canvas while its loop is alive, so kick it each light frame
+  // (the systems panel already uses a dedicated rAF; the Electrical page's idle loop was dropping the strobe/beacon flash).
+  function lightLoop(now) { lightRaf = 0; tickLights(now); S3.kick(80); const c = calc(); if (flowNeeded(c) && F.stage.isConnected) lightRaf = requestAnimationFrame(lightLoop); }
+  function syncFlow() { const c = calc(); const on = flowNeeded(c); S3.setFlow(on, tickLights); S3.kick(); if (on && !lightRaf) lightRaf = requestAnimationFrame(lightLoop); else if (!on && lightRaf) { cancelAnimationFrame(lightRaf); lightRaf = 0; } }
   S3.animate(() => { const now = performance.now(), dt = Math.min(0.1, (now - lastT) / 1000); lastT = now; const c = calc(); if (c.src === "bat" && st.charge > 0) { st.charge = Math.max(0, st.charge - dt * 0.004 * c.n); if (Math.random() < 0.1) render(); }
-    const live = (st.nav || st.beacon || st.strobes || st.land) && c.v > 0;
-    X.pulse(now / 1000, { land: st.land && c.v > 0, nav: st.nav && c.v > 0, beacon: st.beacon && c.v > 0, strobes: st.strobes && c.v > 0 });
-    X.place(); S3.setFlow(live || (c.src === "bat" && st.charge > 0)); return live || (c.src === "bat" && st.charge > 0); }, { idle: true });
-  const A = { kick() {}, stop() {} };
+    tickLights(now); return flowNeeded(c); }, { idle: true });
+  const A = { kick() { syncFlow(); }, stop() {} };
   let gauges = [];
-  function upd() { S.redraw(); A.kick(); }
+  function upd() { S.redraw(); syncFlow(); }
   function render() {
     const c = calc(), busLive = c.v > 0;
     X.set({ bat: c.src === "bat" || (st.bat && busLive), batSrc: c.src === "bat", alt: c.src === "alt", altBad: fc === "altfail" || (fc === "sensor" && c.src === "alt") || !st.fld, bus: busLive,
@@ -92,8 +102,8 @@ export function mount(host) {
     F.caption(cap[0], cap[1]); nb.disabled = !k || st.done;
   }
   F.explain(rich(`<p>Blue parts and wires are powered; grey ones are dead. [[Position lights|Nav lights]] are red on the left wingtip, green on the right and white on the tail (14 CFR 23.2530, 23.1385, 91.209). The [[Beacon|beacon]] on top of the fin flashes red; white [[Strobe lights|strobes]] flash at each wingtip. The landing light sits in the left wing leading edge. Locations follow the C172S POH Sec 7; wiring routes are schematic. The battery starts the engine; once running, the alternator carries every load and recharges the battery. The magnetos don't use the bus. Your airplane's POH has the exact checklist.</p>`));
-  render();
-  return { destroy: () => { S3.destroy(); F.destroy(); } };
+  render(); syncFlow();
+  return { destroy: () => { if (lightRaf) cancelAnimationFrame(lightRaf); S3.destroy(); F.destroy(); } };
 }
 
 // ---- 3D x-ray of the electrical system (positions as in systems3d.js, per C172S POH 7) ----
@@ -106,7 +116,7 @@ function buildX(S) {
   const wire = (k, pts, w = 2.2) => { const l = S.cueLine(pts.length, { color: ACCH, width: w, opacity: 0.95 }); l.set(pts); l.obj.material.depthTest = false; l.obj.renderOrder = 8; (wires[k] ||= []).push(l); };
   const BAT = [3.95, 4.2, -0.95], ALT = [6.7, 4.35, -0.65], BUS = [2.15, 4.55, -1.05], AV = [2.15, 5.35, 0];
   const LDG = [1.62, 6.72, -7.6], TIPL = [0.1, 7.12, -18.0], TIPR = [0.1, 7.12, 18.0], TAIL = [-18.95, 8.55, 0], BCN = [-17.75, 9.05, 0];
-  const STL = [-0.35, 7.22, -18.2], STR = [-0.35, 7.22, 18.2], MAG = [3.9, 4.3, 0.55];   // landing light: left wing LE (C172S POH 7); strobes just aft of the tip
+  const STL = [-0.75, 7.30, -18.65], STR = [-0.75, 7.30, 18.65], MAG = [3.9, 4.3, 0.55];   // landing light: left wing LE (C172S POH 7); strobes slightly aft and outboard of the nav lights
   mk("bat", new THREE.BoxGeometry(0.75, 0.6, 0.45), BAT); mk("alt", new THREE.CylinderGeometry(0.28, 0.28, 0.32, 16), ALT, [Math.PI / 2, 0, 0]); mk("bus", new THREE.BoxGeometry(0.12, 0.42, 1.2), BUS); mk("avion", new THREE.BoxGeometry(0.12, 0.5, 0.9), AV);
   mk("land", new THREE.SphereGeometry(0.24, 12, 8), LDG);
   mk("navL", new THREE.SphereGeometry(0.22, 12, 8), TIPL); mk("navR", new THREE.SphereGeometry(0.22, 12, 8), TIPR); mk("navT", new THREE.SphereGeometry(0.2, 12, 8), TAIL);
@@ -126,21 +136,23 @@ function buildX(S) {
   wire("pitot", [[1.55, 6.7, -3.5], [1.4, 6.5, -7.2], pitot.plate], 1.6);
   const NAVCOL = { navL: 0xff2a2a, navR: 0x22c55e, navT: 0xf2f1ec };
   const glows = {
-    land: glowSprite(S, { color: 0xfff4d4, size: 3.2 }),
-    navL: glowSprite(S, { color: 0xff2a2a, size: 3.4 }),
-    navR: glowSprite(S, { color: 0x22c55e, size: 3.4 }),
-    navT: glowSprite(S, { color: 0xf2f1ec, size: 2.8 }),
-    beacon: glowSprite(S, { color: 0xff2a2a, size: 3.8 }),
-    strobesL: glowSprite(S, { color: 0xffffff, size: 3.6 }),
-    strobesR: glowSprite(S, { color: 0xffffff, size: 3.6 })
+    land: glowSprite(S, { color: 0xfff4d4, size: 2.4, tight: true }),
+    navL: glowSprite(S, { color: 0xff2a2a, size: 1.7, tight: true }),
+    navR: glowSprite(S, { color: 0x22c55e, size: 1.7, tight: true }),
+    navT: glowSprite(S, { color: 0xf2f1ec, size: 1.5, tight: true }),
+    beacon: glowSprite(S, { color: 0xff2a2a, size: 2.2, tight: true }),
+    strobesL: glowSprite(S, { color: 0xffffff, size: 2.0, tight: true }),
+    strobesR: glowSprite(S, { color: 0xffffff, size: 2.0, tight: true })
   };
-  const TG = tags3d(S.renderer.domElement.parentElement), T = {
+  const TG = tags3d(S.renderer.domElement.parentElement), tight = (text, cls, dx, dy) => TG.add(text, { cls: "tight " + cls, dx, dy, tight: true });
+  const T = {
     bat: [TG.add("Battery", { dx: -30, dy: 44 }), BAT], alt: [TG.add("Alternator", { dx: 30, dy: 44 }), ALT], bus: [TG.add("Bus + breakers", { dx: -40, dy: -44 }), BUS],
     land: [TG.add("Landing light", { dx: -72, dy: 20 }), LDG],
-    nav: [TG.add("Nav lights", { dx: -24, dy: -28, extras: 2, cls: "nav-l", extraCls: ["nav-r", "nav-w"] }), TIPL],
-    beacon: [TG.add("Beacon", { dx: 48, dy: 24 }), BCN],
-    strobes: [TG.add("Strobes", { dx: 62, dy: 36, extras: 1, cls: "strobe", extraCls: ["strobe"] }), STL],
+    navL: [tight("Nav · red", "nav-l", 14, 10), TIPL], navR: [tight("Nav · green", "nav-r", -16, -16), TIPR], navT: [tight("Nav · white", "nav-w", 12, 12), TAIL],
+    beacon: [tight("Beacon", "", 10, -16), BCN],
+    strobeL: [tight("Strobe", "strobe", 14, 22), STL], strobeR: [tight("Strobe", "strobe", -16, 16), STR],
     pitot: [TG.add("Pitot heat", { dx: 36, dy: 52 }), PIT], mag: [TG.add("Magnetos (own circuit)", { dx: -10, dy: 52 }), MAG] };
+  let hint = null;
   const paint = (k, on, lit, hex) => { (parts[k] || []).forEach((p) => { p.edge.color.setHex(on ? (hex || lit || ACCH) : OFFH); p.fill.color.setHex(on ? (hex || (lit ? 0x0c2c6e : 0x1a1d24)) : 0x1a1d24); p.fill.opacity = on && hex ? 0.95 : 0.85; }); (wires[k] || []).forEach((l) => { l.obj.material.color.setHex(on ? ACCH : OFFH); l.opacity = on ? 0.95 : 0.55; }); };
   paint("mag", true, ACCH, 0xffffff);
   let st = { land: false, nav: false, beacon: false, strobes: false };
@@ -150,6 +162,7 @@ function buildX(S) {
       paint("beacon", o.beacon, ACCH, o.beacon ? 0xff2a2a : 0); paint("strobes", o.strobes, ACCH, o.strobes ? 0xf2f1ec : 0);
       st = { land: !!o.land, nav: !!o.nav, beacon: !!o.beacon, strobes: !!o.strobes };
       T.alt[0].el.classList.toggle("bad", !!o.altBad); S.kick(); },
+    hint(k) { hint = k; },
     pulse(t, on = st) {
       glows.land.set(LDG, on.land ? 0.85 : 0);
       glows.navL.set(TIPL, on.nav ? 0.95 : 0); glows.navR.set(TIPR, on.nav ? 0.95 : 0); glows.navT.set(TAIL, on.nav ? 0.8 : 0);
@@ -157,13 +170,15 @@ function buildX(S) {
       const fl = on.strobes ? lightPulse(t, "strobe") : 0; glows.strobesL.set(STL, fl); glows.strobesR.set(STR, fl);
     },
     place() { const stg = S.renderer.domElement.parentElement, top = Math.max(34, ...[...stg.querySelectorAll(".corner")].map((e) => e.offsetTop + e.offsetHeight + 6));
-      TG.place([
+      const narrow = stg.clientWidth <= 430, show = (k) => !narrow || !!st[k] || hint === k;
+      T.navL[0].on = T.navR[0].on = T.navT[0].on = show("nav");
+      T.beacon[0].on = show("beacon"); T.strobeL[0].on = T.strobeR[0].on = show("strobes");
+      const items = [
         { t: T.bat[0], q: S.project(BAT) }, { t: T.alt[0], q: S.project(ALT) }, { t: T.bus[0], q: S.project(BUS) },
-        { t: T.land[0], q: S.project(LDG) },
-        { t: T.nav[0], q: S.project(TIPL), qs: [S.project(TIPR), S.project(TAIL)] },
-        { t: T.beacon[0], q: S.project(BCN) },
-        { t: T.strobes[0], q: S.project(STL), qs: [S.project(STR)] },
-        { t: T.pitot[0], q: S.project(PIT) }, { t: T.mag[0], q: S.project(MAG) }
-      ], top); }
+        { t: T.land[0], q: S.project(LDG) }, { t: T.pitot[0], q: S.project(PIT) }, { t: T.mag[0], q: S.project(MAG) },
+        { t: T.navL[0], q: S.project(TIPL) }, { t: T.navR[0], q: S.project(TIPR) }, { t: T.navT[0], q: S.project(TAIL) },
+        { t: T.beacon[0], q: S.project(BCN) }, { t: T.strobeL[0], q: S.project(STL) }, { t: T.strobeR[0], q: S.project(STR) }
+      ];
+      TG.place(items, top); }
   };
 }

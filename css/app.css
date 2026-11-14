@@ -837,6 +837,10 @@ html.locked #gate { display: flex; }
 .t3-tag { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; white-space: nowrap; font: 600 10.5px/1 var(--mono, ui-monospace, monospace); letter-spacing: .1em; text-transform: uppercase; color: rgba(242,241,236,.85); padding: 4px 6px; border: 1px solid rgba(242,241,236,.25); border-radius: 6px; background: rgba(10,10,11,.82); }
 .t3-tag.cg { color: #FFD23F; border-color: rgba(255,210,63,.55); }
 .t3-tag.on { color: #fff; border-color: var(--acc); background: rgba(59,130,246,.25); }
+.t3-tag.tight { padding: 3px 5px; font-size: 10px; letter-spacing: .08em; }
+.t3-tag.nav-l { color: #ff8a8a; border-color: rgba(255,42,42,.5); }
+.t3-tag.nav-r { color: #4ade80; border-color: rgba(34,197,94,.5); }
+.t3-tag.nav-w, .t3-tag.strobe { color: #f2f1ec; border-color: rgba(242,241,236,.4); }
 .t3-tag.pick { pointer-events: auto; cursor: pointer; padding: 7px 9px; min-height: 28px; }
 .viz.forces3d .stage { aspect-ratio: 4 / 3.3; }
 
