@@ -1,8 +1,8 @@
 // Shared pieces for the GL2 systems visuals: round instrument dials in screen px, a G1000-style EIS strip cell,
 // and an animation driver capped at 30 fps that stops itself (zero frames) as soon as nothing is moving.
-import { loop } from "./base.js?v=6dadda2251";
-import { s, reduced } from "../core/util.js?v=6dadda2251";
-import { T, P, L, C, R, INK, GRAY, DIM, ACC, r1 } from "./kit.js?v=6dadda2251";
+import { loop } from "./base.js?v=494609bb62";
+import { s, reduced } from "../core/util.js?v=494609bb62";
+import { T, P, L, C, R, INK, GRAY, DIM, ACC, r1 } from "./kit.js?v=494609bb62";
 export const COL = { white: "#F2F1EC", green: "#3FA66B", yellow: "#D9B23A", red: "#D9493E", cyan: "#4FC3E0" };
 const D2R = Math.PI / 180;
 // step(dt) returns true while something is still changing; the loop sleeps when it returns false and wakes on kick().

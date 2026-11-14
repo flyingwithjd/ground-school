@@ -3,9 +3,9 @@
 // performance instruments follow a moment later (PHAK 3 / AFH attitude flying). Readings are examples, not POH numbers.
 // Faces are simplified from the PHAK Ch 8 figures and a round-gauge C172S panel.
 // Airspeed markings reuse the V-speeds dial (C172S POH Fig 2-2); tachometer markings are C172S POH Fig 2-3 (sea-level green arc).
-import { frame, chips, FAINT, FAINT2 } from "./base.js?v=6dadda2251";
-import { s, h, reduced } from "../core/util.js?v=6dadda2251";
-import { rich } from "../core/rich.js?v=6dadda2251";
+import { frame, chips, FAINT, FAINT2 } from "./base.js?v=494609bb62";
+import { s, h, reduced } from "../core/util.js?v=494609bb62";
+import { rich } from "../core/rich.js?v=494609bb62";
 const INK = "#F2F1EC", DIM = "rgba(242,241,236,.6)", FACE = "#111113";
 const COL = { white: "#F2F1EC", green: "#3FA66B", yellow: "#D9B23A", red: "#D9493E", sky: "#2E4D6B", ground: "#634631" };
 const P = (a, r) => { const t = (a * Math.PI) / 180; return [+(Math.sin(t) * r).toFixed(2), +(-Math.cos(t) * r).toFixed(2)]; };

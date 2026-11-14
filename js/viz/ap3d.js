@@ -9,12 +9,12 @@
 // airplane master also remove autopilot power. Default modes on engage (roll and pitch hold) follow the GFC 700; the
 // sped-up time, turn rate and climb rate shown here are illustrative.
 // The servos lit here are the generic idea (roll servo -> ailerons, pitch servo -> elevator, trim servo -> trim tab).
-import { frame, chips, row } from "./base.js?v=6dadda2251";
-import { h } from "../core/util.js?v=6dadda2251";
-import { planeStage } from "./planestage.js?v=6dadda2251";
-import { tags3d } from "./tags3d.js?v=6dadda2251";
+import { frame, chips, row } from "./base.js?v=494609bb62";
+import { h } from "../core/util.js?v=494609bb62";
+import { planeStage } from "./planestage.js?v=494609bb62";
+import { tags3d } from "./tags3d.js?v=494609bb62";
 const tw = (v, t, s) => (Math.abs(t - v) <= s ? t : v + Math.sign(t - v) * s);
-const STEPS = [["grasp", "Grasp wheel"], ["disc", "Hold A/P DISC"], ["trim", "Trim by hand"], ["cb", "Pull AP breaker"], ["rel", "Release DISC"]];
+const STEPS = [["grasp", "1 · Grasp wheel"], ["disc", "2 · Hold A/P DISC"], ["trim", "3 · Trim by hand"], ["cb", "4 · Pull AP breaker"], ["rel", "5 · Release DISC"]];
 const SAY = {
   grasp: ["Wheel in hand", "Good: fly the airplane first. Now press and hold the autopilot disconnect for the whole recovery."],
   disc: ["Disconnect held", "Holding the disconnect stops the trim motor. Now retrim by hand to take the pressure off the wheel."],
@@ -25,7 +25,7 @@ const SAY = {
 export function mount(host) {
   let axes = 2, ap = false, lat = "ROL", vert = "PIT", hdg = 90, bank = 0, alt = 5500, sel = 6500, pitch = 0, run = false, step = 0, cb = true, msg = null, flash = 0;
   const F = frame(host, { cls: "ap3d capin", corners: { tl: "Autopilot", tr: "PHAK 6 · POH 3, 9" } });
-  const S = planeStage(F.stage, { view: { tg: [-4, 4.8, 0], az: 205, el: 14, d: 41 }, maxFps: 30 });
+  const S = planeStage(F.stage, { view: { tg: [-2.0, 4.55, 0], az: 214, el: 16, d: 31 }, maxFps: 30 });
   const ann = h("div", { class: "ap-ann" }); const AC = Array.from({ length: 5 }, () => { const c = h("span"); ann.append(c); return c; }); F.stage.append(ann);
   const band = () => S.setTopBand(ann.offsetTop + ann.offsetHeight + 6); requestAnimationFrame(band);
   const TG = tags3d(F.stage), tR = TG.add("Roll servo → ailerons", { dx: -30, dy: -44 }), tP = TG.add("Pitch servo → elevator", { dx: 30, dy: -40 }), tT = TG.add("Trim running", { dx: 30, dy: 44 });
@@ -86,7 +86,12 @@ export function mount(host) {
     } else if (Math.abs(bank) > 0.2) busy = true;
     return busy; }, { idle: true });
   function upd() { B.AP.classList.toggle("on", ap); ["HDG", "NAV"].forEach((m) => B[m].classList.toggle("on", ap && lat === m)); ["ALT", "VS"].forEach((m) => B[m].classList.toggle("on", ap && vert === m));
-    SB.forEach((b, i) => { b.disabled = !run; b.classList.toggle("on", run && i < step); }); rb.disabled = run; S.kick(); }
+    SB.forEach((b, i) => {
+      const visible = run && i <= Math.min(step, STEPS.length - 1);
+      b.hidden = !visible; b.disabled = !(run && i === step && step < STEPS.length);
+      b.classList.toggle("on", run && i < step); b.classList.toggle("pri", run && i === step && step < STEPS.length);
+    });
+    rb.disabled = run; S.kick(); }
   F.explain(`<p>A generic panel; your airplane's autopilot supplement has the real buttons and limits. Blue shows which surfaces the autopilot's servos are moving. Time is sped up. <span class="src">PHAK 6 · C172S POH 3, 9</span></p>`);
   upd();
   return { destroy() { S.destroy(); F.destroy(); } };

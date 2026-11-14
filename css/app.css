@@ -835,6 +835,18 @@ html.locked #gate { display: flex; }
 .t3-tag.on { color: #fff; border-color: var(--acc); background: rgba(59,130,246,.25); }
 .t3-tag.pick { pointer-events: auto; cursor: pointer; padding: 7px 9px; min-height: 28px; }
 .viz.forces3d .stage { aspect-ratio: 4 / 3.3; }
+
+.forces3d .f3-asi { position: absolute; right: 10px; bottom: 10px; z-index: 3; min-width: 74px; padding: 6px 8px; border: 1px solid #2c2c31; border-radius: 8px; background: rgba(10,10,11,.88); text-align: right; pointer-events: none; }
+.forces3d .f3-asi span { display: block; font: 600 10px/1 var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; color: var(--muted, #9aa0a6); }
+.forces3d .f3-asi b { display: block; margin-top: 3px; font: 700 18px/1 var(--mono, ui-monospace, monospace); font-variant-numeric: tabular-nums; color: #F2F1EC; }
+.forces3d .f3-row { display: flex; gap: 8px; margin-top: 8px; }
+.forces3d .f3-replay { min-width: 120px; }
+.forces3d .f3-bars { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-top: 8px; }
+.forces3d .f3-bar { display: flex; flex-direction: column; gap: 3px; font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted, #9aa0a6); }
+.forces3d .f3-bar b { display: block; height: 8px; border: 1px solid #3a3a3f; border-radius: 4px; overflow: hidden; background: #141416; }
+.forces3d .f3-bar i { display: block; height: 100%; width: 0; background: rgba(242,241,236,.55); transition: width .15s linear; }
+.forces3d .f3-bar.win i, .forces3d .f3-pair.win .f3-bar:first-child i { background: var(--acc, #3b82f6); }
+.ctrl-row[hidden] { display: none !important; }
 /* plane3d / walkaround: caption right under the stage with room for a two-line headline, so the chip rows never move */
 .viz.p3cap > .caption { min-height: 104px; box-sizing: border-box; }
 @media (min-width: 701px) { .viz.p3cap > .caption { min-height: 96px; } }
@@ -872,7 +884,8 @@ html.locked #gate { display: flex; }
 .viz.ap3d .stage { aspect-ratio: 4/3.1; }
 .ap-ann { position: absolute; left: 12px; right: 12px; top: 40px; z-index: 3; display: grid; grid-template-columns: repeat(5, 1fr); background: #0A0A0B; border: 1px solid #2c2c31; border-radius: 6px; height: 30px; align-items: center; text-align: center; font: 700 13px/1 "IBM Plex Mono", monospace; }
 .ap-ann span + span { border-left: 1px solid #2c2c31; }
-.ap-ann span { height: 18px; line-height: 18px; } .ap-ann .g { color: #3FA66B; } .ap-ann .y { color: #D9B23A; } .ap-ann .w { color: #F2F1EC; } .ap-ann .r { color: #D9493E; }
+.ap-ann span { height: 18px; line-height: 18px; } .ap3d .chip.pri { border-color: var(--acc, #3b82f6); background: rgba(59,130,246,.18); }
+.ap-ann .g { color: #3FA66B; } .ap-ann .y { color: #D9B23A; } .ap-ann .w { color: #F2F1EC; } .ap-ann .r { color: #D9493E; }
 .pr-t.bad b { color: #ef4444; }
 .viz.hyp2 .stage { aspect-ratio: auto; height: auto; min-height: 0; padding: 44px 12px 12px; display: flex; flex-direction: column; gap: 10px; }
 .hy-top { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
@@ -895,4 +908,4 @@ html.locked #gate { display: flex; }
 .hy-card p { margin: 3px 0 0; font-size: 14px; line-height: 1.4; }
 @media (max-width: 420px) { .hy-o2 { font-size: 28px; } .hy-alt { font-size: 19px; } }
 .viz.elec3d .stage { aspect-ratio: 4/3.2; } .el-g { display: block; width: 100%; max-width: 420px; height: auto; margin: 0 auto 4px; } .t3-tag.bad { border-color: #ef4444; color: #fca5a5; }
-@media (max-width: 600px) { .viz.fuel3d.lim .stage { aspect-ratio: 4/2.45; } .viz.ap3d .stage { aspect-ratio: 4/2.75; } .viz.press3d .stage { aspect-ratio: 4/2.9; } }
+@media (max-width: 600px) { .viz.fuel3d.lim .stage { aspect-ratio: 4/2.45; } .viz.ap3d .stage { aspect-ratio: 4/3.0; } .viz.press3d .stage { aspect-ratio: 4/2.9; } }

@@ -1,11 +1,11 @@
 // Stage checks (timed written), the pre-solo written practice exam, and the syllabus coverage checklist.
-import { h, esc, shuffle } from "../core/util.js?v=6dadda2251";
-import { S, save } from "../core/store.js?v=6dadda2251";
-import { STAGES, STAGE_CHECK } from "../../data/course.js?v=6dadda2251";
-import { LESSONS, QUESTIONS, TOPICS, lessonItems } from "../../data/index.js?v=6dadda2251";
-import { stats, reachedSet, isReached } from "../core/progress.js?v=6dadda2251";
-import { session } from "./quiz.js?v=6dadda2251";
-import { rich } from "../core/rich.js?v=6dadda2251";
+import { h, esc, shuffle } from "../core/util.js?v=494609bb62";
+import { S, save } from "../core/store.js?v=494609bb62";
+import { STAGES, STAGE_CHECK } from "../../data/course.js?v=494609bb62";
+import { LESSONS, QUESTIONS, TOPICS, lessonItems } from "../../data/index.js?v=494609bb62";
+import { stats, reachedSet, isReached } from "../core/progress.js?v=494609bb62";
+import { session } from "./quiz.js?v=494609bb62";
+import { rich } from "../core/rich.js?v=494609bb62";
 const page = (host) => { const p = h("div", { class: "page" }); host.append(p); return p; };
 const foot = `<div class="footer">Squawk School is a study aid. Your school's syllabus, your instructor and the FAA sources decide what a stage check covers and how it is graded.</div>`;
 const sid = (k) => STAGES.find((s) => s.id === k);

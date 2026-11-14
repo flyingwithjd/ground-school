@@ -10,10 +10,10 @@
 // don't "bridge"); thermal anti-ice should be on before entering icing; a weeping wing pumps antifreeze through small
 // holes to prevent ice and can also deice; none is meant for long flight in icing. AC 91-74B: water that runs back past a
 // heated area can refreeze behind it (runback ice). Ice growth rates and the lift/drag meters are illustrative.
-import { frame, chips, row } from "./base.js?v=6dadda2251";
-import { h } from "../core/util.js?v=6dadda2251";
-import { planeStage } from "./planestage.js?v=6dadda2251";
-import { tags3d } from "./tags3d.js?v=6dadda2251";
+import { frame, chips, row } from "./base.js?v=494609bb62";
+import { h } from "../core/util.js?v=494609bb62";
+import { planeStage } from "./planestage.js?v=494609bb62";
+import { tags3d } from "./tags3d.js?v=494609bb62";
 const ACC = 0x3b82f6, ICE = 0xd6ecff, HEAT = 0xef4444, FLUID = 0x22d3ee, DIH = Math.tan(1.73 * Math.PI / 180);
 const SAY = {
   none: ["No protection", "Most trainers aren't certified for icing. If you meet it, exit at once: turn back or change altitude."],
@@ -26,7 +26,7 @@ const LE = (a) => { const o = Math.min(1, Math.max(0, (a - 7.5) / 10.54)); retur
 export function mount(host) {
   const F = frame(host, { cls: "icing3d capin", corners: { tl: "Anti-ice and deice", tr: "PHAK 7" } });
   // 3/4 view of the mid-span leading edge and pitot, high enough to see runback ice sitting aft on the upper surface
-  const S = planeStage(F.stage, { view: { tg: [0.9, 6.45, -8.6], az: -36, el: 26, d: 15 }, maxFps: 30 }), THREE = S.THREE, G = S.cueGroup;
+  const S = planeStage(F.stage, { view: { tg: [1.15, 6.35, -8.6], az: -40, el: 20, d: 15.5 }, maxFps: 30 }), THREE = S.THREE, G = S.cueGroup;
   const topY = () => { const c = F.stage.querySelector(".corner.tl"), r = F.stage.querySelector(".corner.tr"); return Math.max(34, ...[c, r].filter(Boolean).map((e) => e.offsetTop + e.offsetHeight + 6)); };
   const band = () => S.setTopBand(topY()); band(); requestAnimationFrame(band);
   S.highlight([]);
@@ -39,7 +39,7 @@ export function mount(host) {
   const weep = new THREE.Group(); G.add(weep); for (let i = 0; i < 22; i++) { const p = LE(2.4 + i * 0.68); const d = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 6), mat(FLUID)); d.position.set(p[0] - 0.33, p[1], p[2]); weep.add(d); }
   const panel = tube(curve(2.2, 17.3, -0.02), 0.17, mat(0x0e3a44, 0.9)); panel.add(new THREE.LineSegments(new THREE.EdgesGeometry(panel.geometry, 40), new THREE.LineBasicMaterial({ color: FLUID })));
   // pitot: just outboard of the strut (8.4 ft), under the left wing, tip clearly ahead of the leading edge (POH 7)
-  const STA = 9.0, leP = LE(STA), mastX = leP[0] - 0.08, mastY0 = leP[1] - 0.16, tipY = mastY0 - 0.48, tipX = leP[0] + 0.95;
+  const STA = 9.0, leP = LE(STA), mastX = leP[0] - 0.06, mastY0 = leP[1] - 0.18, tipY = mastY0 - 0.42, tipX = leP[0] + 1.7;
   const PIT = [tipX, tipY, leP[2]], pit = new THREE.Group(); G.add(pit);
   const mastG = new THREE.CylinderGeometry(0.04, 0.05, mastY0 - tipY, 8); mastG.translate(mastX, (mastY0 + tipY) / 2, leP[2]);
   const tubeLen = tipX - mastX, tubeG = new THREE.CylinderGeometry(0.045, 0.055, tubeLen, 10); tubeG.rotateZ(Math.PI / 2); tubeG.translate(mastX + tubeLen / 2, tipY, leP[2]);
@@ -50,7 +50,7 @@ export function mount(host) {
   const pIce = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 8), mat(ICE, 0.9)); pIce.position.set(PIT[0], PIT[1], PIT[2]); G.add(pIce);
   // ice on the leading edge and runback ice behind a heated strip
   const iceM = mat(ICE, 0.95); iceM.depthTest = false; iceM.depthWrite = false; let iceMesh = null, iceR = -1, runMesh = null, runR = -1;
-  const TG = tags3d(F.stage), tIce = TG.add("Ice", { dx: -42, dy: -48 }), tProt = TG.add("Rubber boot", { dx: 28, dy: 54 }), tPit = TG.add("Pitot tube", { dx: 36, dy: 28 }), tRun = TG.add("Runback ice", { dx: -36, dy: 44 });
+  const TG = tags3d(F.stage), tIce = TG.add("Ice", { dx: -42, dy: -56 }), tProt = TG.add("Rubber boot", { dx: -78, dy: 58 }), tPit = TG.add("Pitot tube", { dx: 64, dy: 46 }), tRun = TG.add("Runback ice", { dx: 8, dy: -62 });
   // meters
   const meters = h("div", { class: "ice-m" }); const mk = (t, cls) => { const b = h("i"); meters.append(h("div", { class: "ice-r " + cls }, h("span", {}, t), h("b", {}, b))); return b; };
   const mLift = mk("Lift", "lift"), mDrag = mk("Drag", "drag");
@@ -82,7 +82,7 @@ export function mount(host) {
     const liftV = 1 - ice * 0.45 - run * 0.2, dragV = 0.3 + ice * 0.6 + run * 0.3; mLift.style.width = `${Math.round(liftV * 100)}%`; mDrag.style.width = `${Math.round(Math.min(1, dragV) * 100)}%`;
     tIce.on = ice > 0.05; tRun.on = run > 0.1; tProt.on = prot === "boots" || prot === "heated" || prot === "weep"; tPit.on = true;
     tProt.el.textContent = { boots: "Rubber boot", heated: "Heated leading edge", weep: "Antifreeze holes" }[prot] || "";
-    const runAt = LE(7.2); TG.place([{ t: tIce, q: S.project(LE(11.2)) }, { t: tProt, q: S.project(LE(4.6)) }, { t: tPit, q: S.project(PIT) }, { t: tRun, q: S.project([runAt[0] - 1.15, runAt[1] + 0.3, runAt[2]]) }], topY());
+    const heatAt = LE(3.4), runAt = LE(10.4); TG.place([{ t: tIce, q: S.project(LE(12.4)) }, { t: tProt, q: S.project(heatAt) }, { t: tPit, q: S.project(PIT) }, { t: tRun, q: S.project([runAt[0] - 1.2, runAt[1] + 0.32, runAt[2]]) }], topY());
     caption();
     const prevent = prot === "heated" || prot === "weep";
     const iceMoving = icing && (prevent ? (ice > 0 || (prot === "heated" && run < 0.6)) : ice < 1);
