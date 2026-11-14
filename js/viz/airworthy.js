@@ -2,9 +2,9 @@
 // and the verdict flips between "Records say go" and "Grounded" (or "No-go until fixed" where the rule is narrower).
 // The use toggle matters only for the 100-hour line (required for hire or instruction, not for private use).
 // Sources: 14 CFR 91.203(a), 91.207(c),(d),(f), 91.215, 91.409(a),(b), 91.413; AFH Ch 2.
-import { htmlScene } from "./kit.js?v=0134b87946";
-import { chips } from "./base.js?v=0134b87946";
-import { h } from "../core/util.js?v=0134b87946";
+import { htmlScene } from "./kit.js?v=61cdb9ff8d";
+import { chips } from "./base.js?v=61cdb9ff8d";
+import { h } from "../core/util.js?v=61cdb9ff8d";
 const MO = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const lastDay = (y, m) => new Date(y, m + 1, 0).getDate();
 // months ago each item was done (battery: months until the replace-by date), hours since the 100-hour, papers on board

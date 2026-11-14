@@ -24,7 +24,7 @@ const read = () => pg.evaluate(() => {
   const forceChips = chips.filter((t) => /^(Lift|Weight|Thrust|Drag)$/i.test(t));
   return fig ? {
     v: +fig.dataset.v, T: +fig.dataset.thrust, D: +fig.dataset.drag, L: +fig.dataset.lift, W: +fig.dataset.weight,
-    mode: fig.dataset.mode, path: fig.dataset.path, pitch: +fig.dataset.pitch, busy: fig.dataset.busy, ghost: fig.dataset.ghost,
+    mode: fig.dataset.mode, path: fig.dataset.path, pitch: +fig.dataset.pitch, busy: fig.dataset.busy, ghost: fig.dataset.ghost, settled: fig.dataset.settled,
     cap: cap ? cap.innerText.replace(/\s+/g, " ").trim() : "", thenVisible, chips, forceChips,
     asi: v.querySelector(".f3-asi b")?.textContent.trim() || "",
   } : { missing: true };
@@ -69,7 +69,7 @@ ok(settled.busy === "0", `hands-off settled (busy=${settled.busy})`);
 ok(Math.abs(settled.T - settled.D) < 0.08, `drag caught thrust (T=${settled.T} D=${settled.D})`);
 ok(settled.v > 114, `new balance at a higher speed (got ${settled.v} kt)`);
 ok(settled.T > 1.25 && settled.D > 1.25, `hands off: thrust and drag both larger than Steady (T=${settled.T} D=${settled.D})`);
-ok(Math.abs(settled.L - settled.W) < 0.12, `hands off settled: lift ~ weight in a steady climb (L=${settled.L} W=${settled.W})`);
+ok(Math.abs(settled.L - settled.W) < 0.02 && Math.abs(settled.L - 1) < 0.02, `hands off settled: lift equals weight (L=${settled.L} W=${settled.W})`);
 ok(settled.pitch > 3, `hands off: nose up / climb (pitch ${settled.pitch})`);
 ok(settled.ghost === "1", "ghost arrows on when T/D changed");
 ok(/Balanced again — thrust and drag are both larger/i.test(settled.cap), `settled caption "${settled.cap}"`);
@@ -84,10 +84,11 @@ const hold = await waitSettle(8000);
 ok(Math.abs(hold.T - hold.D) < 0.08, `hold: drag caught thrust (T=${hold.T} D=${hold.D})`);
 ok(hold.v > 114, `hold: still a higher speed (got ${hold.v})`);
 ok(hold.T > 1.25 && hold.D > 1.25, `hold: thrust and drag both larger than Steady (T=${hold.T} D=${hold.D})`);
-ok(Math.abs(hold.L - hold.W) < 0.1, `hold: lift returns to weight (L=${hold.L} W=${hold.W})`);
+ok(Math.abs(hold.L - hold.W) < 0.02 && Math.abs(hold.L - 1) < 0.02, `hold: lift equals weight exactly (L=${hold.L} W=${hold.W})`);
 ok(hold.pitch < 0, `hold: nose lowered (pitch ${hold.pitch})`);
 ok(hold.ghost === "1", "hold shows ghost arrows");
 ok(/Balanced again — thrust and drag are both larger/i.test(hold.cap), `hold caption "${hold.cap}"`);
+ok(hold.settled === "1", "hold is marked settled");
 
 ok(await click("Steady") === "Steady", "clicked Steady");
 await pg.waitForTimeout(600);
@@ -104,7 +105,7 @@ const rset = await waitSettle(8000);
 ok(rset.v < 85, `new balance at a lower speed (got ${rset.v})`);
 ok(Math.abs(rset.T - rset.D) < 0.1, `reduce: drag shrank to match (T=${rset.T} D=${rset.D})`);
 ok(rset.T < 0.75 && rset.D < 0.75, `reduce: thrust and drag both smaller than Steady (T=${rset.T} D=${rset.D})`);
-ok(Math.abs(rset.L - rset.W) < 0.12, `hands off reduce settled: lift ~ weight in a steady descent (L=${rset.L} W=${rset.W})`);
+ok(Math.abs(rset.L - rset.W) < 0.02 && Math.abs(rset.L - 1) < 0.02, `hands off reduce settled: lift equals weight (L=${rset.L} W=${rset.W})`);
 ok(rset.pitch < -3, `hands off reduce: nose down (pitch ${rset.pitch})`);
 ok(/Balanced again — thrust and drag are both smaller/i.test(rset.cap), `reduce caption "${rset.cap}"`);
 
@@ -115,7 +116,8 @@ ok(await click("Hold altitude") === "Hold altitude", "clicked Hold altitude on r
 await pg.waitForTimeout(300);
 const rhold = await waitSettle(8000);
 ok(rhold.T < 0.75 && rhold.D < 0.75 && Math.abs(rhold.T - rhold.D) < 0.1, `reduce+hold: T and D both smaller and equal (T=${rhold.T} D=${rhold.D})`);
-ok(Math.abs(rhold.L - rhold.W) < 0.1, `reduce+hold: lift equals weight (L=${rhold.L} W=${rhold.W})`);
+ok(Math.abs(rhold.L - rhold.W) < 0.02 && Math.abs(rhold.L - 1) < 0.02, `reduce+hold: lift equals weight exactly (L=${rhold.L} W=${rhold.W})`);
+ok(rhold.settled === "1", "reduce+hold is marked settled");
 ok(rhold.pitch > 3, `reduce+hold: nose up (pitch ${rhold.pitch})`);
 ok(/both smaller/i.test(rhold.cap), `reduce+hold caption "${rhold.cap}"`);
 
