@@ -8,12 +8,12 @@
 // with ice, power drops then rises as it melts; without ice it drops and stays; full heat, not partial; especially dangerous
 // at reduced power in a descent. C172S POH 7: a fuel-injected engine's spring-loaded alternate air door opens if the filter
 // is blocked, costing about 10% power at full throttle. RPM and MP values shown are examples, not published numbers.
-import { frame, chips, slider, row } from "./base.js?v=61cdb9ff8d";
-import { planeStage } from "./planestage.js?v=61cdb9ff8d";
-import { modelKit } from "./section-models.js?v=61cdb9ff8d";
-import { T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=61cdb9ff8d";
-import { dial, anim, toward, COL } from "./dial.js?v=61cdb9ff8d";
-import { s, h, reduced } from "../core/util.js?v=61cdb9ff8d";
+import { frame, chips, slider, row } from "./base.js?v=714b944f7b";
+import { planeStage } from "./planestage.js?v=714b944f7b";
+import { modelKit } from "./section-models.js?v=714b944f7b";
+import { T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=714b944f7b";
+import { dial, anim, toward, COL } from "./dial.js?v=714b944f7b";
+import { s, h, reduced } from "../core/util.js?v=714b944f7b";
 const ICE = "#CFE6FF", WARM = "#E0894A", D = Math.PI / 180;
 export function risk(oat, rh) { if (oat < 70 && rh > 80) return 2; if (oat <= 100 && rh >= 50) return 1; return 0; }
 // ---------- 3D model (arbitrary units, about inches/2): flow along +x, the cut plane is z = 0 and the back half (z < 0) is kept ----------

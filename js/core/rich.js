@@ -1,9 +1,9 @@
-import { GLOSSARY } from "../../data/glossary.js?v=61cdb9ff8d";
-import { esc } from "./util.js?v=61cdb9ff8d";
+import { GLOSSARY } from "../../data/glossary.js?v=714b944f7b";
+import { esc } from "./util.js?v=714b944f7b";
 const norm = (k) => k.toLowerCase().replace(/[’']/g, "'").trim();
 export const G = Object.fromEntries(Object.entries(GLOSSARY).map(([k, v]) => [norm(k), { term: k, ...v }]));
 // Other spellings that point at one entry (VSO is often written VS0; ACS is the short name).
-const ALIAS = { vso: "vs0", acs: "airman certification standards", vmc: "vmc (speed)", "best glide": "vg", "best glide speed": "vg" };
+const ALIAS = { vso: "vs0", acs: "airman certification standards", vmc: "vmc (speed)", "best glide": "vg", "best glide speed": "vg", "nav lights": "position lights", "navigation lights": "position lights", strobes: "strobe lights", "flashing beacon": "beacon", "anti-collision beacon": "beacon" };
 const find = (k) => { k = norm(k); if (ALIAS[k]) k = ALIAS[k]; if (G[k]) return k; return [k.replace(/s$/, ""), k.replace(/es$/, ""), k.replace(/ies$/, "y")].find((x) => G[x]) || null; };
 export function term(key) { const k = find(key); return k ? G[k] : null; }
 export const glossaryHref = (k) => "#/glossary/" + encodeURIComponent(norm(k).replace(/\s+/g, "-"));

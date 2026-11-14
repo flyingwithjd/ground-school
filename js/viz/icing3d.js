@@ -1,6 +1,6 @@
 // Anti-ice vs deice, in 3D on the 172's left wing. Fly into icing and watch ice build on the leading edge and pitot tube;
 // C172S POH 7: a heated pitot tube is mounted on the lower surface of the left wing; the model's lift-strut wing attach is at
-// 8.4 ft span, so the pitot sits just outboard of that (mid-span), hanging under the wing with its tip ahead of the leading edge.
+// 8.4 ft span, so the pitot sits just outboard of that — a short L (plate + stubby mast + short forward tube) under the wing.
 // pick the protection: none, pitot heat only, pneumatic deice boots (cycle them to crack the ice off), thermal (heated)
 // anti-ice, or a weeping wing (antifreeze fluid). The 172 itself has only pitot heat; boots, heat and weeping-wing panels
 // are drawn on it to show where they go on airplanes that have them.
@@ -10,10 +10,11 @@
 // don't "bridge"); thermal anti-ice should be on before entering icing; a weeping wing pumps antifreeze through small
 // holes to prevent ice and can also deice; none is meant for long flight in icing. AC 91-74B: water that runs back past a
 // heated area can refreeze behind it (runback ice). Ice growth rates and the lift/drag meters are illustrative.
-import { frame, chips, row } from "./base.js?v=61cdb9ff8d";
-import { h } from "../core/util.js?v=61cdb9ff8d";
-import { planeStage } from "./planestage.js?v=61cdb9ff8d";
-import { tags3d } from "./tags3d.js?v=61cdb9ff8d";
+import { frame, chips, row } from "./base.js?v=714b944f7b";
+import { h } from "../core/util.js?v=714b944f7b";
+import { planeStage } from "./planestage.js?v=714b944f7b";
+import { tags3d } from "./tags3d.js?v=714b944f7b";
+import { buildPitot } from "./pitot3d.js?v=714b944f7b";
 const ACC = 0x3b82f6, ICE = 0xd6ecff, HEAT = 0xef4444, FLUID = 0x22d3ee, DIH = Math.tan(1.73 * Math.PI / 180);
 const SAY = {
   none: ["No protection", "Most trainers aren't certified for icing. If you meet it, exit at once: turn back or change altitude."],
@@ -25,8 +26,8 @@ const SAY = {
 const LE = (a) => { const o = Math.min(1, Math.max(0, (a - 7.5) / 10.54)); return [1.6 + (1.15 - 1.6) * o, 6.62 + Math.max(0, a - 1.9) * DIH, -a]; };
 export function mount(host) {
   const F = frame(host, { cls: "icing3d capin", corners: { tl: "Anti-ice and deice", tr: "PHAK 7" } });
-  // Side-front view of the mid-span leading edge and pitot, low enough that the pitot tip clearly stands ahead of the LE; still high enough to see runback ice on the upper surface
-  const S = planeStage(F.stage, { view: { tg: [1.9, 6.05, -9.0], az: -70, el: 11, d: 13.8 }, maxFps: 30 }), THREE = S.THREE, G = S.cueGroup;
+  // Side-front view of the mid-span leading edge and the short L-shaped pitot under the left wing; high enough to see runback ice
+  const S = planeStage(F.stage, { view: { tg: [0.85, 6.35, -9.0], az: -72, el: 8, d: 11.5 }, maxFps: 30 }), THREE = S.THREE, G = S.cueGroup;
   const topY = () => { const c = F.stage.querySelector(".corner.tl"), r = F.stage.querySelector(".corner.tr"); return Math.max(34, ...[c, r].filter(Boolean).map((e) => e.offsetTop + e.offsetHeight + 6)); };
   const band = () => S.setTopBand(topY()); band(); requestAnimationFrame(band);
   S.highlight([]);
@@ -38,15 +39,9 @@ export function mount(host) {
   const heat = tube(curve(2.2, 17.3, -0.02), 0.19, mat(HEAT, 0.75));
   const weep = new THREE.Group(); G.add(weep); for (let i = 0; i < 22; i++) { const p = LE(2.4 + i * 0.68); const d = new THREE.Mesh(new THREE.SphereGeometry(0.07, 8, 6), mat(FLUID)); d.position.set(p[0] - 0.33, p[1], p[2]); weep.add(d); }
   const panel = tube(curve(2.2, 17.3, -0.02), 0.17, mat(0x0e3a44, 0.9)); panel.add(new THREE.LineSegments(new THREE.EdgesGeometry(panel.geometry, 40), new THREE.LineBasicMaterial({ color: FLUID })));
-  // pitot: just outboard of the strut (8.4 ft), under the left wing, tip clearly ahead of the leading edge (POH 7)
-  const STA = 9.0, leP = LE(STA), mastX = leP[0] - 0.05, mastY0 = leP[1] - 0.20, tipY = mastY0 - 0.38, tipX = leP[0] + 2.15;
-  const PIT = [tipX, tipY, leP[2]], pit = new THREE.Group(); G.add(pit);
-  const mastG = new THREE.CylinderGeometry(0.04, 0.05, mastY0 - tipY, 8); mastG.translate(mastX, (mastY0 + tipY) / 2, leP[2]);
-  const tubeLen = tipX - mastX, tubeG = new THREE.CylinderGeometry(0.045, 0.055, tubeLen, 10); tubeG.rotateZ(Math.PI / 2); tubeG.translate(mastX + tubeLen / 2, tipY, leP[2]);
-  const inkP = new THREE.LineBasicMaterial({ color: 0xffffff });
-  pit.add(new THREE.Mesh(mastG, mat(0x0a0a0b)), new THREE.LineSegments(new THREE.EdgesGeometry(mastG, 30), inkP));
-  pit.add(new THREE.Mesh(tubeG, mat(0x0a0a0b)), new THREE.LineSegments(new THREE.EdgesGeometry(tubeG, 30), inkP));
-  const pe = inkP;   // used below to flash the tube when pitot heat is on
+  // pitot: short L under the left wing, just outboard of the strut (shared with elecsys / systems3d / the airplane model)
+  const pit = buildPitot(THREE, { parent: G, depthTest: false, renderOrder: 9, fillColor: 0x0a0a0b, inkColor: 0xffffff });
+  const PIT = pit.tip, pe = pit.edge;   // pe flashes red when pitot heat is on
   const pIce = new THREE.Mesh(new THREE.SphereGeometry(1, 12, 8), mat(ICE, 0.9)); pIce.position.set(PIT[0], PIT[1], PIT[2]); G.add(pIce);
   // ice on the leading edge and runback ice behind a heated strip
   const iceM = mat(ICE, 0.95); iceM.depthTest = false; iceM.depthWrite = false; let iceMesh = null, iceR = -1, runMesh = null, runR = -1;

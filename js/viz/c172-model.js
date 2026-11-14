@@ -1,3 +1,4 @@
+import { buildPitot } from "./pitot3d.js?v=714b944f7b";
 // Cessna 172S, minimal technical model (v4: separated control surfaces, trim tab, IO-360 engine, fuel tank outlines, nose steering).
 // Cessna 172S, minimal technical model. Units: feet. x forward (spinner tip x=+8.0), y up (ground y=0), z right.
 // Sourced: span 36 ft 1 in, length 27 ft 2 in, height 8 ft 11 in, horizontal tail span 11 ft 4 in, wheelbase 65 in,
@@ -148,6 +149,8 @@ export function buildPlane(THREE, opts = {}) {
   for (const sd of [1, -1]) { const up = (a, u) => { const w = wst(a), c = w.le - w.te; return V(w.le - u * c, w.y + 0.6 * w.t * Nn(Math.max(u, 1e-4)) + 0.03, sd * a); };
     const pts = [...range(2.3, 7.2, 10).map((a) => up(a, 0.06)), ...range(0.06, 0.5, 6).map((u) => up(7.2, u)), ...range(7.2, 2.3, 10).map((a) => up(a, 0.5)), ...range(0.5, 0.06, 6).map((u) => up(2.3, u))];
     tag(sd > 0 ? "tankR" : "tankL"); addSub("fuel", body, null, polyl(pts, true)); }
+  // ---------- pitot: short L under the left wing, just outboard of the strut (POH 7) ----------
+  { const pit = buildPitot(THREE, { style: "model", fill: faceMat, parent: body }); tag("pitot"); addSub("pitot", body, null, pit.segs, pit.group); }
   // ---------- 76 in propeller diameter dimension (lines only) ----------
   { const R = 38 / 12, xd = 8.45; tag("propDim"); addSub("propDim", body, null, [...polyl([V(xd, PROP_Y - R, 0), V(xd, PROP_Y + R, 0)], false), ...polyl([V(7.6, PROP_Y + R, 0), V(xd + 0.15, PROP_Y + R, 0)], false), ...polyl([V(7.6, PROP_Y - R, 0), V(xd + 0.15, PROP_Y - R, 0)], false)]); }
   // ---------- animation (pure function of t) ----------

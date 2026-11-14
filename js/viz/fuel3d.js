@@ -5,12 +5,12 @@
 // opts.limits: the POH Sec 2 fuel limitations (fuelState() from fuellim.js): 28 gal per tank, 1.5 unusable each;
 // BOTH for takeoff and landing; LEFT/RIGHT for level flight only; one tank dry: slips/skids 30 s max; engine-driven pump
 // failure stops the engine until the aux pump is ON (POH 3).
-import { frame, chips, slider, row } from "./base.js?v=61cdb9ff8d";
-import { h } from "../core/util.js?v=61cdb9ff8d";
-import { rich } from "../core/rich.js?v=61cdb9ff8d";
-import { planeStage } from "./planestage.js?v=61cdb9ff8d";
-import { tags3d } from "./tags3d.js?v=61cdb9ff8d";
-import { fuelState } from "./fuellim.js?v=61cdb9ff8d";
+import { frame, chips, slider, row } from "./base.js?v=714b944f7b";
+import { h } from "../core/util.js?v=714b944f7b";
+import { rich } from "../core/rich.js?v=714b944f7b";
+import { planeStage } from "./planestage.js?v=714b944f7b";
+import { tags3d } from "./tags3d.js?v=714b944f7b";
+import { fuelState } from "./fuellim.js?v=714b944f7b";
 const ACC = 0x3b82f6, OFF = 0x4b5160, RED = 0xef4444, CAP = 28, UNUSE = 1.5;
 const NODES = [
   ["tank", "Wing tanks", "Vented integral tanks in each wing: 28 gal each, 26.5 usable. Fuel flows to the selector by gravity.", { tg: [0.2, 5.6, 0], az: -32, el: 30, d: 30 }],

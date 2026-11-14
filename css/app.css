@@ -830,6 +830,10 @@ html.locked #gate { display: flex; }
 .t3-lines circle { fill: #F2F1EC; }
 .t3-lines line.cg { stroke: rgba(255,210,63,.8); } .t3-lines circle.cg { fill: #FFD23F; }
 .t3-lines line.on { stroke: var(--acc); } .t3-lines circle.on { fill: var(--acc); }
+.t3-lines line.nav-l { stroke: rgba(255,42,42,.7); } .t3-lines circle.nav-l { fill: #ff2a2a; }
+.t3-lines line.nav-r { stroke: rgba(34,197,94,.7); } .t3-lines circle.nav-r { fill: #22c55e; }
+.t3-lines line.nav-w { stroke: rgba(242,241,236,.7); } .t3-lines circle.nav-w { fill: #F2F1EC; }
+.t3-lines line.strobe { stroke: rgba(242,241,236,.7); } .t3-lines circle.strobe { fill: #F2F1EC; }
 .t3-tag { position: absolute; left: 0; top: 0; z-index: 3; pointer-events: none; white-space: nowrap; font: 600 10.5px/1 var(--mono, ui-monospace, monospace); letter-spacing: .1em; text-transform: uppercase; color: rgba(242,241,236,.85); padding: 4px 6px; border: 1px solid rgba(242,241,236,.25); border-radius: 6px; background: rgba(10,10,11,.82); }
 .t3-tag.cg { color: #FFD23F; border-color: rgba(255,210,63,.55); }
 .t3-tag.on { color: #fff; border-color: var(--acc); background: rgba(59,130,246,.25); }
