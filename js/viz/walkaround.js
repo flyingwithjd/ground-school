@@ -53,7 +53,7 @@ export function mount(host) {
   const ft = h("div", { class: "wk-f" }); card.append(h("div", { class: "wk-btns" }, bGround, bOk, bNext), ft); F.ctrl.append(card);
   // the ring follows the model while the camera glides or you orbit
   const place = () => { const f = STATIONS[si].f[fi]; const q = S.project(f.p); mark.style.transform = `translate(${q.x - 14}px, ${q.y - 14}px)`; mark.style.opacity = q.z < 1 ? 1 : 0; };
-  S.animate(place);
+  S.animate(place, { idle: true });   // ring only needs a frame when the camera moves (glide or orbit already kicks)
   function show() { const s = STATIONS[si], f = s.f[fi]; answered = false; mark.classList.remove("bad", "ok");
     ft.innerHTML = `<span class="wk-n">Finding ${fi + 1} of ${s.f.length}</span><b>${rich(f.t)}</b><p>${rich(f.d)}</p><p class="wk-v">Your call: ground it, or all clear?</p>`;
     bGround.disabled = bOk.disabled = false; }

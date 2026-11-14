@@ -95,13 +95,14 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
   // once, at its end, whether to continue. (Bug fixed 2026-10-31: kick() inside loop() used to schedule a second
   // loop while the tail scheduled another, doubling the live loops every frame during any part switch or animation.)
   let raf = 0, alive = true, visible = true, pageVisible = !document.hidden, idleUntil = 0, extra = null, inLoop = false;
-  function kick(ms = 400) { idleUntil = Math.max(idleUntil, performance.now() + ms); if (!raf && !inLoop && alive && visible && pageVisible) raf = requestAnimationFrame(loop); }
+  let extraIdle = false, quiet = false;   // animate(fn, { idle: true }): fn returns true while it still needs frames; kicks from inside it don't keep the loop alive
+  function kick(ms = 400) { if (!quiet) idleUntil = Math.max(idleUntil, performance.now() + ms); if (!raf && !inLoop && alive && visible && pageVisible) raf = requestAnimationFrame(loop); }
   // Frame cap: 120 Hz displays (ProMotion Mac / iPad) would otherwise draw every animation twice as often for no visible gain.
   let lastDraw = 0; const MIN_DT = maxFps === 30 ? 1000 / 30 - 0.4 : 1000 / maxFps;   // sub-ms tolerance prevents missing the next 30 Hz slot due to rAF timestamp rounding
   function loop(now) { raf = 0; if (!alive || !visible || !pageVisible) return; if (now - lastDraw < MIN_DT && visible) { raf = requestAnimationFrame(loop); return; } lastDraw = now; inLoop = true;
     try {
       if (camTw) camTw(now); if (controls) controls.update();
-      if (extra) extra(now);
+      if (extra) { quiet = extraIdle; let more = false; try { more = extra(now); } finally { quiet = false; } if (extraIdle && more) idleUntil = Math.max(idleUntil, now + 50); }
       lights.forEach((l) => (l.visible = false));
       { const k = clamp((now - fadeT0) / fadeDur, 0, 1); coreMat.opacity = k; glowMat.opacity = glowOp * k; if (k < 1) idleUntil = Math.max(idleUntil, now + 50); }
       if (hl.length) { prog = clamp((now - progT0) / drawDur, 0, 1); const p = s5(prog); hl.forEach((n, i) => setAccent(n, p, lights[i % 4])); if (prog < 1) idleUntil = Math.max(idleUntil, now + 50); }
@@ -109,7 +110,7 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
       if (flowOn && flowUpdate) flowUpdate(now);
       renderer.render(scene, camera);
     } finally { inLoop = false; }
-    if (alive && visible && pageVisible && !raf && (now < idleUntil || camTw || extra || (flowOn && !reduced()))) raf = requestAnimationFrame(loop); }
+    if (alive && visible && pageVisible && !raf && (now < idleUntil || camTw || (extra && !extraIdle) || (flowOn && !reduced()))) raf = requestAnimationFrame(loop); }
   const io = new IntersectionObserver((es) => { visible = es[0].isIntersecting; if (visible) kick(); else { cancelAnimationFrame(raf); raf = 0; } }); io.observe(stage);
   // Continuous airflow: while flow is on, the loop keeps drawing as long as the stage is on screen (independent of the
   // surface tweens and of animate()). Off-screen the IntersectionObserver stops it; a hidden tab gets no frames at all;
@@ -147,7 +148,7 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
       set opacity(o) { op = o; ln.opacity = o; hm.opacity = o; cone.visible = vis && o > 0.004; }, set visible(v) { vis = v; ln.visible = v && op > 0.004; cone.visible = v && op > 0.004; kick(); } };
   }
   return { THREE, P, scene, camera, renderer, pivot, CG, highlight, focus, tint, setView, setAttitude, pose, project, kick, setTopBand, parts: Object.keys(P.parts), inkLines, cueLine, cueArrow, cueGroup: cueG,
-    animate(fn) { extra = fn; kick(); }, setFlow, flowPhase: () => flowPhase, setInkOpacity(o) { inkMat.opacity = o; kick(); },
+    animate(fn, { idle = false } = {}) { extra = fn; extraIdle = idle; kick(); }, setFlow, flowPhase: () => flowPhase, setInkOpacity(o) { inkMat.opacity = o; kick(); },
     destroy() { alive = false; document.removeEventListener("visibilitychange", onVis); cancelAnimationFrame(raf); raf = 0; ro.disconnect(); io.disconnect(); controls && controls.dispose();
       // Dispose GPU resources as well as the renderer; shared geometries/materials are released just once.
       const geometries = new Set(), materials = new Set(), textures = new Set();

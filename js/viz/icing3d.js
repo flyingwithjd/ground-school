@@ -72,7 +72,11 @@ export function mount(host) {
     tIce.on = ice > 0.05; tRun.on = run > 0.1; tProt.on = prot === "boots" || prot === "heated" || prot === "weep";
     tProt.el.textContent = { boots: "Rubber boot", heated: "Heated leading edge", weep: "Antifreeze holes" }[prot] || "";
     TG.place([{ t: tIce, q: S.project([...LE(14)].map((v, i) => (i === 0 ? v - 0.3 : v))) }, { t: tProt, q: S.project(LE(5.5)) }, { t: tPit, q: S.project([PIT[0] - 0.2, PIT[1], PIT[2]]) }, { t: tRun, q: S.project([LE(9)[0] - 1.15, LE(9)[1] + 0.4, -9]) }], topY());
-    caption(); });
+    caption();
+    const prevent = prot === "heated" || prot === "weep";
+    const iceMoving = icing && (prevent ? (ice > 0 || (prot === "heated" && run < 0.6)) : ice < 1);
+    const piceMoving = icing && (prot === "none" ? pice < 1 : pice > 0);
+    return bootT > 0 || iceMoving || piceMoving; }, { idle: true });
   let capK = "";
   function caption() { let cap = SAY[prot];
     if (prot === "none" && ice > 0.05) cap = ["Ice building", "Ice adds drag and destroys lift, and it blocks the pitot tube. With no protection, leave icing now."];

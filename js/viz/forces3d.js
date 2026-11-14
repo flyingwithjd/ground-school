@@ -31,8 +31,11 @@ export function mount(host) {
       const a = k === "thrust" ? p0 : keep(p0), b = k === "thrust" ? p1 : keep(p1); A[k].ink.set(a, b); A[k].blue.set(a, b);
       const on = sel ? sel === k : HL[st] === k; A[k].blue.opacity = on ? 1 : 0; A[k].ink.opacity = on ? 0 : 0.9;
       tag[k].el.classList.toggle("on", on); tag[k].ln.setAttribute("class", on ? "on" : ""); tag[k].dot.setAttribute("class", on ? "on" : ""); items.push({ t: tag[k], q: S.project(b) }); }
-    TG.place(items, 30); }
-  S.animate(place);
+    TG.place(items, 30);
+    let busy = Math.abs(pitch - pT) > 0.05;
+    for (const k in cur) if (Math.abs(cur[k] - want[k]) > 0.005) busy = true;
+    return busy; }
+  S.animate(place, { idle: true });
   const say = () => { if (sel) { F.caption("Tap again to go back", INFO[sel][0]); F.explain(INFO[sel][1] + ' <span class="src">PHAK 5</span>'); return; }
     const s = STATES[st]; F.caption(s.cap[0], s.cap[1]); F.explain(s.t + ' <span class="dim">Tap a force\'s label to read about it.</span> <span class="src">PHAK 5</span>'); };
   function pickForce(k) { sel = k; say(); }

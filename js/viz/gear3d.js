@@ -52,7 +52,7 @@ export function mount(host, opts = {}) {
       if (t > 3.2) { run = false; if (cs === "ahead") yaw = 0; done(); }
       S.setAttitude({ yaw, pitch: 0, bank: 0 }); }
     if (retract !== retractTo) { retract += Math.sign(retractTo - retract) * Math.min(Math.abs(retractTo - retract), 0.025); gearObjs.forEach((o, i) => { o.position.y = gearY[i] + retract * 2.3; o.position.z = gearZ[i] + retract * gearDz[i]; }); }
-    cues(); });
+    cues(); return run || retract !== retractTo; }, { idle: true });
   let gt = "tri"; const cgOn = () => !TYPES || gt === "tri" || gt === "tail";
   const pick = TYPES ? chips(F.ctrl, [["tri", "Tricycle"], ["tail", "Tailwheel"], ["retr", "Retractable"], ["float", "Floats"], ["ski", "Skis"]], gt, (v) => { gt = v; if (cgOn()) cs = v === "tri" ? "ahead" : "behind"; reset(); }, { label: "Gear type" })
     : chips(F.ctrl, Object.entries(CASE).map(([k, c]) => [k, c.chip]), cs, (v) => { cs = v; reset(); }, { label: "Where is the CG?" });

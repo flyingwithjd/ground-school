@@ -53,7 +53,8 @@ export function mount(host) {
     tA.v.textContent = ft(a); tA.s.textContent = psi(a).toFixed(1) + " psi outside"; tC.v.textContent = ft(cab); tC.el.classList.toggle("bad", mode !== "ok");
     const t = tucAt(cab); tC.s.textContent = mode !== "ok" && t ? "useful consciousness " + t[1] : psi(cab).toFixed(1) + " psi inside";
     tD.v.textContent = d.toFixed(1) + " psid"; dbar.style.width = `${Math.min(100, (d / 7) * 100)}%`; dbar.classList.toggle("max", d >= MAXD - 0.01);
-    caption(d); });
+    caption(d);
+    return mode !== "ok" && cab < a; }, { idle: true });
   let capK = "";
   function caption(d) { let cap;
     if (mode === "expl") cap = ["Explosive decompression", "Faster than your lungs can empty, under half a second: noise, fog, flying debris. Oxygen mask on now."];

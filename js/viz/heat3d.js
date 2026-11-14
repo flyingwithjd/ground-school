@@ -65,7 +65,8 @@ export function mount(host) {
     else if (crack) cap = ["Heat off, air in", "Fresh air is flushing the cabin. If the alarm or the symptoms stay, land as soon as practical."];
     else if (heat) cap = ["Cabin heat on", "Outside air warms around the exhaust muffler, then flows into the cabin and the defroster."];
     else cap = ["Cabin heat off", "The cabin heat valve is closed. Fresh air still comes in through the cabin air knob and vents."];
-    if (cap[0] !== capK) { capK = cap[0]; F.caption(cap[0], cap[1]); } });
+    if (cap[0] !== capK) { capK = cap[0]; F.caption(cap[0], cap[1]); }
+    return flows.some((o) => o.on) || Math.abs(ppm - t) >= 0.5; }, { idle: true });
   F.explain(`<p>Orange dots are heated air, blue is fresh outside air, red is exhaust. The alarm point is the G1000 172S POH's (50 ppm); the ppm readings are illustrations. Your airplane's POH has its own checklist. <span class="src">PHAK 7 · C172S POH 3, 7</span></p>`);
   upd();
   return { destroy() { S.destroy(); F.destroy(); } };

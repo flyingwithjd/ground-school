@@ -75,7 +75,16 @@ export function mount(host) {
       : vert === "VS" ? ["Vertical speed", "Climbing at the set rate toward the selected altitude (6,500 ft), then it captures and holds it."]
       : vert === "ALT" ? ["Altitude hold", "Holding the current altitude with the elevator. Power is still yours: watch the airspeed."]
       : ["Roll and pitch hold", "Engaged in its basic modes: wings level and the current pitch. Pick a mode to do more."]);
-    if (cap[0] + cap[1] !== capK) { capK = cap[0] + cap[1]; F.caption(cap[0], cap[1]); } });
+    if (cap[0] + cap[1] !== capK) { capK = cap[0] + cap[1]; F.caption(cap[0], cap[1]); }
+    let busy = flash > 0 || (run && step < 3);
+    if (Math.abs(pitch) > 0.05 && (!ap || vert !== "VS") && !(run && step < 3)) busy = true;
+    if (ap && !run) {
+      const tgt = lat === "HDG" ? 120 : lat === "NAV" ? 60 : null;
+      if (tgt != null && Math.abs(tgt - hdg) > 0.3) busy = true;
+      else if (Math.abs(bank) > 0.2) busy = true;
+      if (vert === "VS" && alt < sel - 1) busy = true;
+    } else if (Math.abs(bank) > 0.2) busy = true;
+    return busy; }, { idle: true });
   function upd() { B.AP.classList.toggle("on", ap); ["HDG", "NAV"].forEach((m) => B[m].classList.toggle("on", ap && lat === m)); ["ALT", "VS"].forEach((m) => B[m].classList.toggle("on", ap && vert === m));
     SB.forEach((b, i) => { b.disabled = !run; b.classList.toggle("on", run && i < step); }); rb.disabled = run; S.kick(); }
   F.explain(`<p>A generic panel; your airplane's autopilot supplement has the real buttons and limits. Blue shows which surfaces the autopilot's servos are moving. Time is sped up. <span class="src">PHAK 6 · C172S POH 3, 9</span></p>`);

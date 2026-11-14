@@ -59,7 +59,7 @@ export function mount(host) {
     for (const x in ld) ld[x].set(st[x]); }
   F.ctrl.prepend(gsv);
   let lastT = performance.now();
-  S3.animate(() => { const now = performance.now(), dt = Math.min(0.1, (now - lastT) / 1000); lastT = now; const c = calc(); if (c.src === "bat" && st.charge > 0) { st.charge = Math.max(0, st.charge - dt * 0.004 * c.n); if (Math.random() < 0.1) render(); } X.place(); });
+  S3.animate(() => { const now = performance.now(), dt = Math.min(0.1, (now - lastT) / 1000); lastT = now; const c = calc(); if (c.src === "bat" && st.charge > 0) { st.charge = Math.max(0, st.charge - dt * 0.004 * c.n); if (Math.random() < 0.1) render(); } X.place(); return c.src === "bat" && st.charge > 0; }, { idle: true });
   const A = { kick() {}, stop() {} };
   let gauges = [];
   function upd() { S.redraw(); A.kick(); }

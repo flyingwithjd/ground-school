@@ -99,7 +99,8 @@ export function mount(host, opts = {}) {
     const showT = step <= 0; tL.on = tR.on = showT && (LIM || step === 0);
     if (LIM) { tL.el.textContent = `Left: ${Math.max(0, qL - UNUSE).toFixed(1)} gal usable`; tR.el.textContent = `Right: ${Math.max(0, qR - UNUSE).toFixed(1)} gal usable`; tL.dx = 10; tL.dy = 50; tR.dx = -10; tR.dy = 50; }
     items.push({ t: tL, q: S.project([TK(-1).x, TK(-1).y, TK(-1).z - 1.5]) }, { t: tR, q: S.project([TK(1).x, TK(1).y, TK(1).z + 1.5]) });
-    TG.place(items, topY()); });
+    TG.place(items, topY());
+    return lines.some((o) => o.on) || (LIM && st && st.warn && st.warn[0] === "dry" && t < 30); }, { idle: true });
   upd();
   return { destroy() { S.destroy(); F.destroy(); } };
 }
