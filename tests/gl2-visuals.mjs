@@ -1,7 +1,7 @@
 // GL2 systems visuals (V-g, ignition, fuel limits, carb ice, electrical, engine gauges, mixture, combustion, propeller, flap and tab types) at iPad 744x1133 (touch), phone 390x844
 // and desktop 1440x900. For each visual: tap every control and check that no two SVG labels overlap, every label stays inside
 // the stage, and labels are at least 11 px; the page never throws; once settled the visual draws zero frames (idle);
-// and at iPad size a touch swipe that starts on the visual scrolls the page. Usage: node tests/gl2-visuals.mjs [sectionId ...]
+// and at iPad size a touch swipe that starts on a 2D visual scrolls the page (3D orbit canvases keep the swipe). Usage: node tests/gl2-visuals.mjs [sectionId ...]
 import { createRequire } from "module"; const { chromium } = createRequire("/workspace/pgs-build/")("playwright-core");
 const BASE = process.env.BASE || "http://localhost:8765/index.html";
 const ALL = { catlim: "vg", ignition: "magcheck", fuellim: "fuel3d", induct: "carbice", elec: "elecsys", oilcool: "enginegauges", mixture: "mixture", combust: "combustion", prop: "prop", secctl: "flaptypes", icing: "icing3d", oxygen: "hypoxia", koel: "koel", press: "press3d", heat: "heat3d", ap: "ap3d", airframe: "gear3d", starting: "starter" };
@@ -41,11 +41,16 @@ for (const [w, h, touch] of SIZES) {
     else { const y1 = await pg.evaluate(() => scrollY); await pg.evaluate((type) => { const v = document.querySelector(`[data-viz="${type}"]`); window.scrollTo(0, v.getBoundingClientRect().bottom + scrollY + 40); }, type); await pg.waitForTimeout(700);
       const g0 = await pg.evaluate(() => window.__raf); await pg.waitForTimeout(1500); const g1 = await pg.evaluate(() => window.__raf);
       ok(g1 - g0 <= 1, `${tag}: live visual drew ${g1 - g0} frames in 1.5 s while offscreen`); await pg.evaluate((y) => window.scrollTo(0, y), y1); await pg.waitForTimeout(400); }
-    if (touch && w === 744) { const r = await pg.evaluate((type) => { const s = document.querySelector(`[data-viz="${type}"] .stage`).getBoundingClientRect(); return { x: s.left + s.width * 0.08, y: Math.min(s.top + s.height * 0.6, innerHeight - 260) }; }, type);
-      const y0 = await pg.evaluate(() => scrollY); await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: r.x, y: r.y }] });
-      for (let k = 1; k <= 12; k++) { await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: r.x, y: r.y - k * 20 }] }); await pg.waitForTimeout(16); }
-      await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] }); await pg.waitForTimeout(500);
-      ok((await pg.evaluate(() => scrollY)) - y0 > 100, `${tag}: a swipe on the visual should scroll the page`); }
+    if (touch && w === 744) {
+      const orbit = await pg.evaluate((type) => { const c = document.querySelector(`[data-viz="${type}"] .stage canvas`); return !!c && getComputedStyle(c).touchAction === "none"; }, type);
+      if (!orbit) {
+        const r = await pg.evaluate((type) => { const s = document.querySelector(`[data-viz="${type}"] .stage`).getBoundingClientRect(); return { x: s.left + s.width * 0.08, y: Math.min(s.top + s.height * 0.6, innerHeight - 260) }; }, type);
+        const y0 = await pg.evaluate(() => scrollY); await cdp.send("Input.dispatchTouchEvent", { type: "touchStart", touchPoints: [{ x: r.x, y: r.y }] });
+        for (let k = 1; k <= 12; k++) { await cdp.send("Input.dispatchTouchEvent", { type: "touchMove", touchPoints: [{ x: r.x, y: r.y - k * 20 }] }); await pg.waitForTimeout(16); }
+        await cdp.send("Input.dispatchTouchEvent", { type: "touchEnd", touchPoints: [] }); await pg.waitForTimeout(500);
+        ok((await pg.evaluate(() => scrollY)) - y0 > 100, `${tag}: a swipe on the visual should scroll the page`);
+      }
+    }
     console.log(`${tag}: ${probs.size ? probs.size + " layout problem(s)" : "ok"}`);
   }
   ok(!errs.length, `${w}: page errors: ${errs.slice(0, 3).join(" | ")}`); await ctx.close();
