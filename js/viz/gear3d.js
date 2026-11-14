@@ -4,11 +4,11 @@
 // its drop line and the white main-axle line ride with it; the dashed white arrow is the direction of travel.
 // Sources: PHAK Ch 3 (landing gear: tricycle, conventional / tailwheel; floats, skis); AFH Ch 14 (tailwheel airplanes: CG
 // behind the main wheels, ground loops). The 172 shape is kept for both cases so only the CG changes.
-import { frame, chips } from "./base.js?v=7109f603b7";
-import { planeStage } from "./planestage.js?v=7109f603b7";
-import { rich } from "../core/rich.js?v=7109f603b7";
-import { h, reduced } from "../core/util.js?v=7109f603b7";
-import { tags3d } from "./tags3d.js?v=7109f603b7";
+import { frame, chips } from "./base.js?v=8703609faa";
+import { planeStage } from "./planestage.js?v=8703609faa";
+import { rich } from "../core/rich.js?v=8703609faa";
+import { h, reduced } from "../core/util.js?v=8703609faa";
+import { tags3d } from "./tags3d.js?v=8703609faa";
 const XM = -1.22, YEL = 0xffd23f, D = Math.PI / 180;
 const CASE = {
   ahead: { x: 0.4, chip: "CG ahead of mains", cap: ["Nosewheel (tricycle) gear", "CG ahead of the main wheels"],

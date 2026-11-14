@@ -5,8 +5,8 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
-import { buildPlane } from "./c172-model.js?v=7109f603b7";
-import { reduced, clamp } from "../core/util.js?v=7109f603b7";
+import { buildPlane } from "./c172-model.js?v=8703609faa";
+import { reduced, clamp } from "../core/util.js?v=8703609faa";
 const ACC = 0x3b82f6, INK = 0xf2f1ec, BG = 0x0a0a0b, D = Math.PI / 180;
 const s5 = (t) => { t = clamp(t, 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
 export const VIEWS = {
@@ -144,8 +144,8 @@ export function planeStage(stage, { view = "iso", orbit = true, onPick = null, o
       set opacity(o) { mat.opacity = o; l.visible = o > 0.004; }, set visible(v) { l.visible = v; } };
   }
   const UPV = new THREE.Vector3(0, 1, 0);
-  function cueArrow({ color = INK, width = 2.6, head = 0.3 } = {}) {
-    const ln = cueLine(2, { color, width, opacity: 1 }), hm = new THREE.MeshBasicMaterial({ color, transparent: true, depthTest: false, depthWrite: false });
+  function cueArrow({ color = INK, width = 2.6, head = 0.3, dash = null, opacity = 1 } = {}) {
+    const ln = cueLine(2, { color, width, opacity, dash }), hm = new THREE.MeshBasicMaterial({ color, transparent: true, depthTest: false, depthWrite: false, opacity });
     const cone = new THREE.Mesh(new THREE.ConeGeometry(head * 0.42, head, 14), hm); cone.renderOrder = 7; cone.frustumCulled = false; cueG.add(cone); let hd = head, vis = true, op = 1;
     const a = new THREE.Vector3(), b = new THREE.Vector3(), dv = new THREE.Vector3();
     return { set(p0, p1) { a.set(...p0); b.set(...p1); dv.subVectors(b, a); const L = dv.length(); if (L < 1e-5) return; dv.divideScalar(L); const h = Math.min(hd, L * 0.6);

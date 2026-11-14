@@ -24,7 +24,7 @@ const read = () => pg.evaluate(() => {
   const forceChips = chips.filter((t) => /^(Lift|Weight|Thrust|Drag)$/i.test(t));
   return fig ? {
     v: +fig.dataset.v, T: +fig.dataset.thrust, D: +fig.dataset.drag, L: +fig.dataset.lift, W: +fig.dataset.weight,
-    mode: fig.dataset.mode, path: fig.dataset.path, pitch: +fig.dataset.pitch, busy: fig.dataset.busy,
+    mode: fig.dataset.mode, path: fig.dataset.path, pitch: +fig.dataset.pitch, busy: fig.dataset.busy, ghost: fig.dataset.ghost,
     cap: cap ? cap.innerText.replace(/\s+/g, " ").trim() : "", thenVisible, chips, forceChips,
     asi: v.querySelector(".f3-asi b")?.textContent.trim() || "",
   } : { missing: true };
@@ -62,14 +62,17 @@ ok(mid.T > mid.D + 0.1, `mid: thrust exceeds drag (T=${mid.T} D=${mid.D})`);
 ok(mid.v > 102, `mid: airspeed rising (got ${mid.v})`);
 ok(mid.thenVisible, "Then chips visible after Add power");
 ok(/Thrust exceeds drag|Add power|speeds up/i.test(mid.cap), `mid caption "${mid.cap}"`);
+ok(mid.L > mid.W, `mid hands off: lift growing past weight (L=${mid.L} W=${mid.W})`);
 
 const settled = await waitSettle(8000);
 ok(settled.busy === "0", `hands-off settled (busy=${settled.busy})`);
 ok(Math.abs(settled.T - settled.D) < 0.08, `drag caught thrust (T=${settled.T} D=${settled.D})`);
 ok(settled.v > 114, `new balance at a higher speed (got ${settled.v} kt)`);
-ok(settled.L > settled.W + 0.15, `hands off: lift exceeds weight (L=${settled.L} W=${settled.W})`);
+ok(settled.T > 1.25 && settled.D > 1.25, `hands off: thrust and drag both larger than Steady (T=${settled.T} D=${settled.D})`);
+ok(Math.abs(settled.L - settled.W) < 0.12, `hands off settled: lift ~ weight in a steady climb (L=${settled.L} W=${settled.W})`);
 ok(settled.pitch > 3, `hands off: nose up / climb (pitch ${settled.pitch})`);
-ok(/New balance at a higher speed/i.test(settled.cap), `settled caption "${settled.cap}"`);
+ok(settled.ghost === "1", "ghost arrows on when T/D changed");
+ok(/Balanced again — thrust and drag are both larger/i.test(settled.cap), `settled caption "${settled.cap}"`);
 
 ok(await click("Replay") === "Replay", "clicked Replay");
 await pg.waitForTimeout(500);
@@ -80,9 +83,11 @@ ok(await click("Hold altitude") === "Hold altitude", "clicked Hold altitude");
 const hold = await waitSettle(8000);
 ok(Math.abs(hold.T - hold.D) < 0.08, `hold: drag caught thrust (T=${hold.T} D=${hold.D})`);
 ok(hold.v > 114, `hold: still a higher speed (got ${hold.v})`);
+ok(hold.T > 1.25 && hold.D > 1.25, `hold: thrust and drag both larger than Steady (T=${hold.T} D=${hold.D})`);
 ok(Math.abs(hold.L - hold.W) < 0.1, `hold: lift returns to weight (L=${hold.L} W=${hold.W})`);
 ok(hold.pitch < 0, `hold: nose lowered (pitch ${hold.pitch})`);
-ok(/faster cruise|equals weight/i.test(hold.cap), `hold caption "${hold.cap}"`);
+ok(hold.ghost === "1", "hold shows ghost arrows");
+ok(/Balanced again — thrust and drag are both larger/i.test(hold.cap), `hold caption "${hold.cap}"`);
 
 ok(await click("Steady") === "Steady", "clicked Steady");
 await pg.waitForTimeout(600);
@@ -98,8 +103,21 @@ ok(rmid.v < 98, `reduce mid: slowing (got ${rmid.v})`);
 const rset = await waitSettle(8000);
 ok(rset.v < 85, `new balance at a lower speed (got ${rset.v})`);
 ok(Math.abs(rset.T - rset.D) < 0.1, `reduce: drag shrank to match (T=${rset.T} D=${rset.D})`);
-ok(rset.L < rset.W - 0.1, `hands off reduce: weight exceeds lift (L=${rset.L} W=${rset.W})`);
+ok(rset.T < 0.75 && rset.D < 0.75, `reduce: thrust and drag both smaller than Steady (T=${rset.T} D=${rset.D})`);
+ok(Math.abs(rset.L - rset.W) < 0.12, `hands off reduce settled: lift ~ weight in a steady descent (L=${rset.L} W=${rset.W})`);
 ok(rset.pitch < -3, `hands off reduce: nose down (pitch ${rset.pitch})`);
+ok(/Balanced again — thrust and drag are both smaller/i.test(rset.cap), `reduce caption "${rset.cap}"`);
+
+ok(await click("Steady") === "Steady", "reset before reduce-hold");
+await pg.waitForTimeout(400);
+ok(await click("Reduce power") === "Reduce power", "clicked Reduce power for hold");
+ok(await click("Hold altitude") === "Hold altitude", "clicked Hold altitude on reduce");
+await pg.waitForTimeout(300);
+const rhold = await waitSettle(8000);
+ok(rhold.T < 0.75 && rhold.D < 0.75 && Math.abs(rhold.T - rhold.D) < 0.1, `reduce+hold: T and D both smaller and equal (T=${rhold.T} D=${rhold.D})`);
+ok(Math.abs(rhold.L - rhold.W) < 0.1, `reduce+hold: lift equals weight (L=${rhold.L} W=${rhold.W})`);
+ok(rhold.pitch > 3, `reduce+hold: nose up (pitch ${rhold.pitch})`);
+ok(/both smaller/i.test(rhold.cap), `reduce+hold caption "${rhold.cap}"`);
 
 ok(await click("Steady") === "Steady", "reset before pitch up");
 await pg.waitForTimeout(400);

@@ -5,9 +5,9 @@
 // AC 150/5345-27F 3.2.2 (sock fully extends at 15 kt) and 3.5 (swings to the wind within 5 deg at 3 kt or more).
 // Example airport: runway 9-27, left traffic for 9 and right traffic for 27, so both patterns are north of the runway.
 // Runway choice has a dead band: within 5 deg of a direct crosswind the shown runway is kept (no flip-flop at 360/180).
-import { frame, chips, slider, svg, loop, ACC, FAINT, FAINT2, INK } from "./base.js?v=7109f603b7";
-import { h, s, reduced } from "../core/util.js?v=7109f603b7";
-import { T } from "./shapes.js?v=7109f603b7";
+import { frame, chips, slider, svg, loop, ACC, FAINT, FAINT2, INK } from "./base.js?v=8703609faa";
+import { h, s, reduced } from "../core/util.js?v=8703609faa";
+import { T } from "./shapes.js?v=8703609faa";
 const D2R = Math.PI / 180, BAND = 5;
 // two compositions: wide (16:9 stage) and narrow (phones, taller stage); everything is placed from these numbers
 const LAY = {

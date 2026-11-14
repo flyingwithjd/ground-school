@@ -843,8 +843,9 @@ html.locked #gate { display: flex; }
 .forces3d .f3-replay { min-width: 120px; }
 .forces3d .f3-bars { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; margin-top: 8px; }
 .forces3d .f3-bar { display: flex; flex-direction: column; gap: 3px; font-size: 11px; letter-spacing: .04em; text-transform: uppercase; color: var(--muted, #9aa0a6); }
-.forces3d .f3-bar b { display: block; height: 8px; border: 1px solid #3a3a3f; border-radius: 4px; overflow: hidden; background: #141416; }
+.forces3d .f3-bar b { display: block; position: relative; height: 8px; border: 1px solid #3a3a3f; border-radius: 4px; overflow: hidden; background: #141416; }
 .forces3d .f3-bar i { display: block; height: 100%; width: 0; background: rgba(242,241,236,.55); transition: width .15s linear; }
+.forces3d .f3-tick { position: absolute; top: 0; bottom: 0; width: 2px; margin-left: -1px; background: #F2F1EC; opacity: .9; pointer-events: none; z-index: 1; box-shadow: 0 0 0 1px rgba(10,10,11,.7); }
 .forces3d .f3-bar.win i, .forces3d .f3-pair.win .f3-bar:first-child i { background: var(--acc, #3b82f6); }
 .ctrl-row[hidden] { display: none !important; }
 /* plane3d / walkaround: caption right under the stage with room for a two-line headline, so the chip rows never move */
