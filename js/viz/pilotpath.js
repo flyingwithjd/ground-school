@@ -1,8 +1,8 @@
 // The pilot's path (GL1 "cert"): milestone cards from student pilot certificate to private pilot certificate. Tap one for
 // what it takes. A two-column note under the path gives the real Part 61 vs Part 141 differences. Pilot certificates, not aircraft papers.
 // Sources: 14 CFR 61.83, 61.87, 61.103, 61.109(a), 61.23, 61.113(i); 14 CFR 141 Appendix B; FAA-S-ACS-6C; PHAK Ch 1.
-import { htmlScene } from "./kit.js?v=43931b26b4";
-import { h } from "../core/util.js?v=43931b26b4";
+import { htmlScene } from "./kit.js?v=964a60d052";
+import { h } from "../core/util.js?v=964a60d052";
 const STEPS = [
   { k: "stu", t: "Student pilot certificate", s: "Age 16 · English", d: "At least 16 for airplanes, and able to read, speak, write and understand English. Apply early, through IACRA with your instructor.", src: "14 CFR 61.83" },
   { k: "solo", t: "Pre-solo test and solo endorsement", s: "Instructor's test · 90-day endorsement", d: "Your instructor's knowledge test on Parts 61 and 91, the solo airport and your airplane, every miss reviewed; the pre-solo flight training; then a make-and-model endorsement dated within the preceding 90 days. You also need a medical certificate, or BasicMed if eligible.", src: "14 CFR 61.87, 61.23" },

@@ -8,10 +8,10 @@
 // verify the autopilot can be overpowered and that A/P TRIM DISC disengages it. KAP 140 supplement: avionics master or the
 // airplane master also remove autopilot power. Default modes on engage (roll and pitch hold) follow the GFC 700; the
 // sped-up time, turn rate and climb rate shown here are illustrative.
-import { chips, row } from "./base.js?v=43931b26b4";
-import { h } from "../core/util.js?v=43931b26b4";
-import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=43931b26b4";
-import { anim, COL } from "./dial.js?v=43931b26b4";
+import { chips, row } from "./base.js?v=964a60d052";
+import { h } from "../core/util.js?v=964a60d052";
+import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=964a60d052";
+import { anim, COL } from "./dial.js?v=964a60d052";
 const tw = (v, t, s) => (Math.abs(t - v) <= s ? t : v + Math.sign(t - v) * s);
 const STEPS = [["grasp", "Grasp wheel"], ["disc", "Hold A/P DISC"], ["trim", "Trim by hand"], ["cb", "Pull AP breaker"], ["rel", "Release DISC"]];
 const SAY = {
