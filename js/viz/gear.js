@@ -5,9 +5,9 @@
 // the CG, more prop clearance, better on rough fields, CG behind the mains makes ground control harder (ground loop) and
 // forward view is poorer, so specific training is required (14 CFR 61.31(i)); fixed gear is simple and low maintenance;
 // retractable gear streamlines the airplane in cruise.
-import { chips, row } from "./base.js?v=ac7792ed3c";
-import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=ac7792ed3c";
-import { COL } from "./dial.js?v=ac7792ed3c";
+import { chips, row } from "./base.js?v=6dadda2251";
+import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=6dadda2251";
+import { COL } from "./dial.js?v=6dadda2251";
 const TYPES = { tri: "Tricycle", tail: "Tailwheel", retr: "Retractable", float: "Floats", ski: "Skis" };
 const SAY = {
   tri: ["Tricycle gear", "The CG is ahead of the main wheels, so it tracks straight, brakes hard and gives a good view ahead."],

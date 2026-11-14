@@ -4,12 +4,12 @@
 // Numbers: an example airplane holds an 8,000 ft cabin until it reaches its maximum differential (6.1 psid, the PHAK
 // example), then the cabin climbs with the airplane. Facts and pressure table: see pressurization.js (PHAK 7, Fig 7-41;
 // TUC PHAK Fig 17-1). Decompression durations are illustrative.
-import { frame, slider, chips, row } from "./base.js?v=ac7792ed3c";
-import { h } from "../core/util.js?v=ac7792ed3c";
-import { planeStage } from "./planestage.js?v=ac7792ed3c";
-import { tags3d } from "./tags3d.js?v=ac7792ed3c";
-import { psi, cabin } from "./pressurization.js?v=ac7792ed3c";
-import { TUC } from "./hypoxia.js?v=ac7792ed3c";
+import { frame, slider, chips, row } from "./base.js?v=6dadda2251";
+import { h } from "../core/util.js?v=6dadda2251";
+import { planeStage } from "./planestage.js?v=6dadda2251";
+import { tags3d } from "./tags3d.js?v=6dadda2251";
+import { psi, cabin } from "./pressurization.js?v=6dadda2251";
+import { TUC } from "./hypoxia.js?v=6dadda2251";
 const ACC = 0x3b82f6, RED = 0xef4444, MAXD = 6.1, SEL = 8000, TOP = 30000;
 const tucAt = (a) => { let t = null; for (const [hh, x] of TUC) if (a >= hh) t = [hh, x]; return t; };
 const ft = (v) => (Math.round(v / 100) * 100).toLocaleString() + " ft";
@@ -54,15 +54,17 @@ export function mount(host) {
     const t = tucAt(cab); tC.s.textContent = mode !== "ok" && t ? "useful consciousness " + t[1] : psi(cab).toFixed(1) + " psi inside";
     tD.v.textContent = d.toFixed(1) + " psid"; dbar.style.width = `${Math.min(100, (d / 7) * 100)}%`; dbar.classList.toggle("max", d >= MAXD - 0.01);
     caption(d);
-    return mode !== "ok" && cab < a; }, { idle: true });
+    const flowing = mode === "ok" ? a > 0 : cab < a; S.setFlow(flowing); if (flowing) F.root.dataset.live = "1";
+    return flowing; }, { idle: true });
   let capK = "";
   function caption(d) { let cap;
-    if (mode === "expl") cap = ["Explosive decompression", "Faster than your lungs can empty, under half a second: noise, fog, flying debris. Oxygen mask on now."];
+    if (mode !== "ok" && cab >= a - 1) cap = ["Cabin equals airplane altitude", "The cabin is now at " + ft(cab) + ", the same as the airplane. Oxygen mask on, then descend."];
+    else if (mode === "expl") cap = ["Explosive decompression", "Faster than your lungs can empty, under half a second: noise, fog, flying debris. Oxygen mask on now."];
     else if (mode === "rapid") cap = ["Rapid decompression", "The cabin climbs to the airplane's altitude in seconds. Oxygen mask on first, then descend."];
     else if (a <= SEL) cap = ["Below the cabin setting", "The outflow valve is open, so the cabin climbs with the airplane until the set cabin altitude."];
     else if (d >= MAXD - 0.01) cap = ["Maximum differential", "The structure can't hold more pressure difference, so above this the cabin climbs with you."];
     else cap = ["Cabin held at 8,000 ft", "The outflow valve closes as you climb, holding the cabin while the pressure difference builds."];
-    const k = cap[0]; if (k !== capK) { capK = k; F.caption(cap[0], cap[1]); } }
+    const k = cap[0] + cap[1]; if (k !== capK) { capK = k; F.caption(cap[0], cap[1]); } }
   F.explain(`<p>An example airplane with a 6.1 psid limit and the cabin set to 8,000 ft, drawn on the 172's shape (a 172 is not pressurized). Air is pumped into the sealed cabin and the <b>outflow valve</b> at the rear bulkhead lets it out at a controlled rate; closing it holds the cabin lower than the airplane. Your airplane's POH gives its own limits. Decompression speeds are illustrations. <span class="src">PHAK 7 · PHAK 17</span></p>`);
   return { destroy() { S.destroy(); F.destroy(); } };
 }

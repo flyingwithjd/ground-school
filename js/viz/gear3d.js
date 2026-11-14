@@ -4,11 +4,11 @@
 // its drop line and the white main-axle line ride with it; the dashed white arrow is the direction of travel.
 // Sources: PHAK Ch 3 (landing gear: tricycle, conventional / tailwheel; floats, skis); AFH Ch 14 (tailwheel airplanes: CG
 // behind the main wheels, ground loops). The 172 shape is kept for both cases so only the CG changes.
-import { frame, chips } from "./base.js?v=ac7792ed3c";
-import { planeStage } from "./planestage.js?v=ac7792ed3c";
-import { rich } from "../core/rich.js?v=ac7792ed3c";
-import { h, reduced } from "../core/util.js?v=ac7792ed3c";
-import { tags3d } from "./tags3d.js?v=ac7792ed3c";
+import { frame, chips } from "./base.js?v=6dadda2251";
+import { planeStage } from "./planestage.js?v=6dadda2251";
+import { rich } from "../core/rich.js?v=6dadda2251";
+import { h, reduced } from "../core/util.js?v=6dadda2251";
+import { tags3d } from "./tags3d.js?v=6dadda2251";
 const XM = -1.22, YEL = 0xffd23f, D = Math.PI / 180;
 const CASE = {
   ahead: { x: 0.4, chip: "CG ahead of mains", cap: ["Nosewheel (tricycle) gear", "CG ahead of the main wheels"],
@@ -52,20 +52,20 @@ export function mount(host, opts = {}) {
       if (t > 3.2) { run = false; if (cs === "ahead") yaw = 0; done(); }
       S.setAttitude({ yaw, pitch: 0, bank: 0 }); }
     if (retract !== retractTo) { retract += Math.sign(retractTo - retract) * Math.min(Math.abs(retractTo - retract), 0.025); gearObjs.forEach((o, i) => { o.position.y = gearY[i] + retract * 2.3; o.position.z = gearZ[i] + retract * gearDz[i]; }); }
-    cues(); return run || retract !== retractTo; }, { idle: true });
+    F.root.dataset.yaw = yaw.toFixed(2); cues(); return run || retract !== retractTo; }, { idle: true });
   let gt = "tri"; const cgOn = () => !TYPES || gt === "tri" || gt === "tail";
   const pick = TYPES ? chips(F.ctrl, [["tri", "Tricycle"], ["tail", "Tailwheel"], ["retr", "Retractable"], ["float", "Floats"], ["ski", "Skis"]], gt, (v) => { gt = v; if (cgOn()) cs = v === "tri" ? "ahead" : "behind"; reset(); }, { label: "Gear type" })
     : chips(F.ctrl, Object.entries(CASE).map(([k, c]) => [k, c.chip]), cs, (v) => { cs = v; reset(); }, { label: "Where is the CG?" });
   const go = h("button", { type: "button", class: "btn pri g3-go" }, "Start a swerve"); F.ctrl.append(h("div", { class: "g3-row" }, go));
-  go.onclick = () => { if (!cgOn()) { retractTo = retractTo ? 0 : 1; go.textContent = retractTo ? "Extend gear" : "Retract gear"; F.caption("Retractable gear", retractTo ? "Gear up: less drag in cruise" : "Gear down for landing"); return; }
-    if (run) return; if (go.dataset.done) { reset(); return; } yaw = 0; t0 = performance.now(); run = true; go.textContent = "Swerving…"; F.caption("Swerving…", CASE[cs].cap[1]);
-    if (reduced()) { t0 -= 3300; } };
-  function done() { go.dataset.done = "1"; go.textContent = "Reset"; F.caption(cs === "ahead" ? "Straightens out" : "Ground loop", CASE[cs].cap[0]); F.explain(`<b>${CASE[cs].end}</b> ${rich(CASE[cs].text)} <span class="src">PHAK 3 · AFH 14</span>`); }
+  go.onclick = () => { if (!cgOn()) { retractTo = retractTo ? 0 : 1; go.textContent = retractTo ? "Extend gear" : "Retract gear"; F.caption("Retractable gear", retractTo ? "Gear up: less drag in cruise" : "Gear down for landing"); S.kick(); return; }
+    if (run) return; if (go.dataset.done) { reset(); return; } yaw = 0; t0 = performance.now(); run = true; go.textContent = "Swerving…"; F.caption("Swerving…", CASE[cs].cap[1]); F.root.dataset.swerve = "1";
+    if (reduced()) { t0 -= 3300; } S.kick(); };
+  function done() { go.dataset.done = "1"; go.textContent = "Reset"; F.root.dataset.swerve = "done"; F.root.dataset.yaw = yaw.toFixed(2); F.caption(cs === "ahead" ? "Straightens out" : "Ground loop", CASE[cs].cap[0]); F.explain(`<b>${CASE[cs].end}</b> ${rich(CASE[cs].text)} <span class="src">PHAK 3 · AFH 14</span>`); }
   const OTHER = { retr: ["Retractable gear", "Gear folds away", "The wheels fold into the airplane in cruise to cut drag. More to check, and gear-up landings happen. Tap <b>Retract gear</b> to see it.", { tg: [-3, 3.4, 0], az: -48, el: 6, d: 46 }],
     float: ["Floats", "Land on water", "[[Floats]] replace the wheels so the airplane can take off and land on water. Seaplane flying needs its own rating and training.", { tg: [-2.5, 3.0, 0], az: -42, el: 14, d: 52 }],
     ski: ["Skis", "Land on snow", "Skis let the airplane land on snow; on many installations they mount around the wheels. Fixed gear is simplest; each option trades simplicity for capability.", { tg: [-1.5, 2.4, 0], az: -44, el: 12, d: 44 }] };
   const CGV = { tg: [-2.5, 0, 0], az: 205, el: 62, d: 68 };
-  function reset() { run = false; yaw = 0; S.setAttitude({ yaw: 0, pitch: 0, bank: 0 }); delete go.dataset.done; pick.set(TYPES ? gt : cs);
+  function reset() { run = false; yaw = 0; F.root.dataset.yaw = "0"; F.root.dataset.swerve = ""; S.setAttitude({ yaw: 0, pitch: 0, bank: 0 }); delete go.dataset.done; pick.set(TYPES ? gt : cs);
     const on = cgOn(); [drop, ring, axle].forEach((l) => (l.opacity = on ? 0.9 : 0)); path.opacity = on ? 1 : 0; tag.on = atag.on = on;
     floats.visible = gt === "float"; skis.visible = gt === "ski"; gearObjs.forEach((o) => (o.visible = gt !== "float")); retractTo = 0; S.highlight(gt === "float" || gt === "ski" ? [] : ["gear"]);
     if (TYPES) S.setView(on ? CGV : OTHER[gt][3]);

@@ -7,13 +7,13 @@
 // G1000 172S POH Sec 3/7: normal bus about 28.0 V; HIGH VOLTS above 32.0; LOW VOLTS below 24.5; LOW VOLTS checklist with
 // M BUS 27.5 V minimum and M BATT charging; below 20 V on M BUS the standby battery powers the essential bus for at least 30 min.
 // Amps and the battery-time bar are illustrative, not published values.
-import { chips, row, frame } from "./base.js?v=ac7792ed3c";
-import { planeStage } from "./planestage.js?v=ac7792ed3c";
-import { tags3d } from "./tags3d.js?v=ac7792ed3c";
-import { s as svgEl } from "../core/util.js?v=ac7792ed3c";
-import { h } from "../core/util.js?v=ac7792ed3c";
-import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC, ACCF } from "./kit.js?v=ac7792ed3c";
-import { dial, eisCell, anim, COL } from "./dial.js?v=ac7792ed3c";
+import { chips, row, frame } from "./base.js?v=6dadda2251";
+import { planeStage } from "./planestage.js?v=6dadda2251";
+import { tags3d } from "./tags3d.js?v=6dadda2251";
+import { s as svgEl } from "../core/util.js?v=6dadda2251";
+import { h } from "../core/util.js?v=6dadda2251";
+import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC, ACCF } from "./kit.js?v=6dadda2251";
+import { dial, eisCell, anim, COL } from "./dial.js?v=6dadda2251";
 const CASES = { normal: "Normal", nuis: "Overvoltage trip", altfail: "Alternator failed", lowrpm: "Low-RPM taxi", sensor: "Too much charge" };
 const LIST = {
   round: { volts: ["Avionics master OFF", "ALT FLD breaker CHECK IN", "Master switch OFF (both sides)", "Master switch ON", "VOLTS CHECK OFF", "Avionics master ON"],
@@ -98,7 +98,7 @@ function buildX(S) {
   const mk = (k, geo, at, rot) => { const fill = new THREE.MeshBasicMaterial({ color: 0x0c2c6e, transparent: true, opacity: 0.85, depthTest: false, depthWrite: false }), edge = new THREE.LineBasicMaterial({ color: ACCH, transparent: true, depthTest: false });
     const m = new THREE.Mesh(geo, fill), e = new THREE.LineSegments(new THREE.EdgesGeometry(geo, 25), edge); [m, e].forEach((o) => { o.position.set(...at); if (rot) o.rotation.set(...rot); o.renderOrder = 9; G.add(o); }); (parts[k] ||= []).push({ fill, edge }); };
   const wire = (k, pts, w = 2.2) => { const l = S.cueLine(pts.length, { color: ACCH, width: w, opacity: 0.95 }); l.set(pts); l.obj.material.depthTest = false; l.obj.renderOrder = 8; (wires[k] ||= []).push(l); };
-  const BAT = [3.95, 4.2, -0.95], ALT = [6.7, 4.35, -0.65], BUS = [2.15, 4.55, -1.05], AV = [2.15, 5.35, 0], LDG = [1.62, 6.72, -7.6], TIPL = [0.1, 7.12, -18.0], TIPR = [0.1, 7.12, 18.0], TAIL = [-18.95, 8.55, 0], PIT = [2.2, 6.25, -11.8], MAG = [3.9, 4.3, 0.55];
+  const BAT = [3.95, 4.2, -0.95], ALT = [6.7, 4.35, -0.65], BUS = [2.15, 4.55, -1.05], AV = [2.15, 5.35, 0], LDG = [1.62, 6.72, -7.6], TIPL = [0.1, 7.12, -18.0], TIPR = [0.1, 7.12, 18.0], TAIL = [-18.95, 8.55, 0], PIT = [1.95, 6.20, -9.0], MAG = [3.9, 4.3, 0.55];   // mid-span, just outboard of the strut, under the left wing (C172S POH 7)
   mk("bat", new THREE.BoxGeometry(0.75, 0.6, 0.45), BAT); mk("alt", new THREE.CylinderGeometry(0.28, 0.28, 0.32, 16), ALT, [Math.PI / 2, 0, 0]); mk("bus", new THREE.BoxGeometry(0.12, 0.42, 1.2), BUS); mk("avion", new THREE.BoxGeometry(0.12, 0.5, 0.9), AV);
   mk("land", new THREE.SphereGeometry(0.22, 12, 8), LDG); [TIPL, TIPR, TAIL].forEach((p) => mk("nav", new THREE.SphereGeometry(0.2, 12, 8), p));
   const pg = new THREE.CylinderGeometry(0.06, 0.06, 1.2, 10); pg.rotateZ(Math.PI / 2); mk("pitot", pg, PIT);
@@ -106,7 +106,7 @@ function buildX(S) {
   const FW = (z, y = 4.6) => [3.55, y, z];
   wire("bat", [BAT, FW(-0.95, 4.3), BUS]); wire("alt", [ALT, [5.2, 4.6, -0.8], FW(-0.8), BUS]); wire("avion", [BUS, AV], 1.8);
   wire("land", [BUS, [1.4, 6.3, -1.1], [1.55, 6.7, -3.5], LDG], 1.8); wire("nav", [[1.4, 6.3, -1.1], [0.9, 6.9, -9], [0.4, 7.05, -14], TIPL], 1.6); wire("nav", [[1.4, 6.3, -1.1], [1.4, 6.3, 1.0], [0.6, 6.8, 6], [0.4, 7.0, 12], TIPR], 1.6);
-  wire("nav", [BUS, [0.5, 3.6, -0.6], [-12, 4.6, 0], [-17.2, 6.0, 0], TAIL], 1.6); wire("pitot", [[1.55, 6.7, -3.5], [1.9, 6.45, -8], [2.0, 6.3, -11.2], PIT], 1.6);
+  wire("nav", [BUS, [0.5, 3.6, -0.6], [-12, 4.6, 0], [-17.2, 6.0, 0], TAIL], 1.6); wire("pitot", [[1.55, 6.7, -3.5], [1.9, 6.45, -8], [1.7, 6.35, -9.0], PIT], 1.6);
   const TG = tags3d(S.renderer.domElement.parentElement), T = {
     bat: [TG.add("Battery", { dx: -30, dy: 44 }), BAT], alt: [TG.add("Alternator", { dx: 30, dy: 44 }), ALT], bus: [TG.add("Bus + breakers", { dx: -40, dy: -44 }), BUS],
     land: [TG.add("Landing light", { dx: -24, dy: -40 }), LDG], nav: [TG.add("Nav lights", { dx: 30, dy: -36 }), TIPR], pitot: [TG.add("Pitot heat", { dx: -26, dy: 40 }), PIT], mag: [TG.add("Magnetos (own circuit)", { dx: 30, dy: -46 }), MAG] };

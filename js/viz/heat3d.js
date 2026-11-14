@@ -6,10 +6,10 @@
 // crack in the exhaust inside the shroud lets fumes into the cabin; CO LVL HIGH at 50 ppm or more; checklist: CABIN HT OFF,
 // CABIN AIR ON, vents OPEN, windows OPEN (163 KIAS max), land as soon as practical if it stays on. The ppm values are
 // illustrative; only the 50 ppm alarm point is from the POH. Duct routing and part positions are approximate.
-import { frame, chips, row } from "./base.js?v=ac7792ed3c";
-import { h } from "../core/util.js?v=ac7792ed3c";
-import { planeStage } from "./planestage.js?v=ac7792ed3c";
-import { tags3d } from "./tags3d.js?v=ac7792ed3c";
+import { frame, chips, row } from "./base.js?v=6dadda2251";
+import { h } from "../core/util.js?v=6dadda2251";
+import { planeStage } from "./planestage.js?v=6dadda2251";
+import { tags3d } from "./tags3d.js?v=6dadda2251";
 const ACC = 0x3b82f6, HOT = 0xf59e0b, RED = 0xef4444, OFF = 0x4b5160, ALARM = 50;
 export function mount(host) {
   const F = frame(host, { cls: "heat3d capin", corners: { tl: "Cabin heat and CO", tr: "PHAK 7 · POH 3, 7" } });
@@ -51,7 +51,7 @@ export function mount(host) {
   function upd() { kb.textContent = crack ? "Fix the muffler" : "Crack the muffler"; kb.classList.toggle("on", crack);
     fIn.on = true; fHeat.on = fFloor.on = fDef.on = heat; fAir.on = air; fCO.on = crack && heat; crackM.g.visible = crack;
     flap.g.rotation.y = heat ? Math.PI / 2 : 0; shroud.e.material.color.setHex(crack && heat ? RED : HOT);
-    flows.forEach((o) => o.l.obj.material.color.setHex(o.on ? o.col : OFF)); S.kick(); }
+    flows.forEach((o) => o.l.obj.material.color.setHex(o.on ? o.col : OFF)); const flowing = flows.some((o) => o.on); S.setFlow(flowing); if (flowing) F.root.dataset.live = "1"; }
   let last = performance.now(), ph = 0, capK = "";
   S.animate(() => { const now = performance.now(), dt = Math.min(0.1, (now - last) / 1000); last = now; ph = (ph + dt * 0.45) % 1;
     const t = target(); ppm += (t - ppm) * Math.min(1, dt * 0.8); if (Math.abs(ppm - t) < 0.5) ppm = t;
