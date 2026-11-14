@@ -10,9 +10,9 @@
 //    tops of the pedals.
 // Coordinates are the model's (x forward, y up, z right; firewall x 3.62 = FS 0, mains x -1.22, track 4.1 ft each side).
 // Exact routing of wires and lines is schematic; locations of the parts follow the POH.
-import { chips } from "./base.js?v=494609bb62";
-import { tags3d } from "./tags3d.js?v=494609bb62";
-import { h } from "../core/util.js?v=494609bb62";
+import { chips } from "./base.js?v=7109f603b7";
+import { tags3d } from "./tags3d.js?v=7109f603b7";
+import { h } from "../core/util.js?v=7109f603b7";
 const ACC = 0x3b82f6, XM = -1.22, WZ = -4.1;
 export function systems(S, F, { cowl, animatePose }) {
   const THREE = S.THREE, G = S.cueGroup, groups = { elec: new THREE.Group(), brk: new THREE.Group(), pedals: new THREE.Group() };

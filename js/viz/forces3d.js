@@ -5,11 +5,11 @@
 // (hands off, you descend). Pitch up: lift increases and the airplane climbs as airspeed bleeds off. Tappable
 // labels on the model explain each force; there is no separate force-chip row. Arrows show direction and
 // relative change, not scale. Sources: PHAK Ch 5.
-import { frame, chips, row } from "./base.js?v=494609bb62";
-import { h } from "../core/util.js?v=494609bb62";
-import { planeStage } from "./planestage.js?v=494609bb62";
-import { tags3d } from "./tags3d.js?v=494609bb62";
-import { INFO } from "./forces.js?v=494609bb62";
+import { frame, chips, row } from "./base.js?v=7109f603b7";
+import { h } from "../core/util.js?v=7109f603b7";
+import { planeStage } from "./planestage.js?v=7109f603b7";
+import { tags3d } from "./tags3d.js?v=7109f603b7";
+import { INFO } from "./forces.js?v=7109f603b7";
 const CG = [-1.2, 4.6, 0], D2R = Math.PI / 180, ACC = 0x3b82f6, V0 = 100;
 // [start, direction, base length, label offset dx, dy]
 const BASE = { lift: [[-0.6, 7.5, 0], [0, 1, 0], 5.2, 30, -10], weight: [[-1.2, 3.0, 0], [0, -1, 0], 5.2, 30, 14], thrust: [[6.6, 4.1, 0], [1, 0, 0], 4.4, -20, -34], drag: [[-19.4, 5.0, 0], [-1, 0, 0], 4.4, 16, -34] };
