@@ -10,13 +10,13 @@
 // falls) and lowers it when airspeed falls (or load rises); manifold pressure shows power; at the pitch stops it acts
 // like a fixed-pitch propeller. C172S POH 2: static full-throttle RPM 2,300-2,400, red line 2,700.
 // RPM and manifold pressure values, blade pitch and pitch stops are illustrative, not published numbers.
-import { frame, chips, slider, row } from "./base.js?v=5436de0cbc";
-import { planeStage } from "./planestage.js?v=5436de0cbc";
-import { airfoil, loftGeo } from "./section-models.js?v=5436de0cbc";
-import { buildPlane } from "./c172-model.js?v=5436de0cbc";
-import { T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=5436de0cbc";
-import { dial, anim, toward, COL } from "./dial.js?v=5436de0cbc";
-import { s, h, reduced } from "../core/util.js?v=5436de0cbc";
+import { frame, chips, slider, row } from "./base.js?v=ac7792ed3c";
+import { planeStage } from "./planestage.js?v=ac7792ed3c";
+import { airfoil, loftGeo } from "./section-models.js?v=ac7792ed3c";
+import { buildPlane } from "./c172-model.js?v=ac7792ed3c";
+import { T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=ac7792ed3c";
+import { dial, anim, toward, COL } from "./dial.js?v=ac7792ed3c";
+import { s, h, reduced } from "../core/util.js?v=ac7792ed3c";
 import * as THREE from "three";
 const RAD = 0.96, ST = [0.3, 0.6, 0.9], KT = 0.5144, D = Math.PI / 180, PITCH = 1.71, LOW = 10, HIGH = 38;
 export const fixedRpm = (thr, v) => 600 + thr * (1750 + 2.2 * v) + v * 0.8; // thr 0-1, v knots

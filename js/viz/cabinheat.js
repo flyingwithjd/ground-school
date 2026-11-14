@@ -6,10 +6,10 @@
 // exhaust inside the shroud lets fumes into the cabin; CO LVL HIGH comes on at 50 ppm or more; checklist: CABIN HT OFF, CABIN
 // AIR ON, vents OPEN, windows OPEN (163 KIAS max), and if it stays on, land as soon as practical. The ppm values are
 // illustrative; only the 50 ppm alarm point is from the POH.
-import { chips, row } from "./base.js?v=5436de0cbc";
-import { h } from "../core/util.js?v=5436de0cbc";
-import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=5436de0cbc";
-import { anim, COL } from "./dial.js?v=5436de0cbc";
+import { chips, row } from "./base.js?v=ac7792ed3c";
+import { h } from "../core/util.js?v=ac7792ed3c";
+import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=ac7792ed3c";
+import { anim, COL } from "./dial.js?v=ac7792ed3c";
 const ALARM = 50;
 export function mount(host) {
   let heat = true, air = false, vents = false, crack = false, ppm = 0;

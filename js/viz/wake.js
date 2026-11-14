@@ -1,9 +1,9 @@
 // Wake turbulence (AIM 7-4). Side view: a larger airplane's vortices sink behind and below its path, so stay at or above it.
 // Rear view: near the ground the vortices spread out at 2-3 kt; a light crosswind can hold the upwind vortex over the runway.
 // Schematic, not to scale.
-import { frame, chips, slider, svg, loop, ACC, FAINT, FAINT2, INK } from "./base.js?v=5436de0cbc";
-import { s } from "../core/util.js?v=5436de0cbc";
-import { T } from "./shapes.js?v=5436de0cbc";
+import { frame, chips, slider, svg, loop, ACC, FAINT, FAINT2, INK } from "./base.js?v=ac7792ed3c";
+import { s } from "../core/util.js?v=ac7792ed3c";
+import { T } from "./shapes.js?v=ac7792ed3c";
 const GY = 700;
 const MODES = {
   land: { cap: "Landing behind a larger airplane", big: "Stay at or above its path. Land beyond its touchdown point.",

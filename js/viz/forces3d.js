@@ -2,10 +2,10 @@
 // force is winning (qualitative, not to scale) and the camera glides to a clear 3/4 view. Tap a force's label to light it
 // and read what it does. Weight always points to the earth and lift and drag follow the relative wind, so on "Pitch up"
 // they stay put while the nose (and thrust) rises. Text from forces.js. Sources: PHAK Ch 5.
-import { frame, chips } from "./base.js?v=5436de0cbc";
-import { planeStage } from "./planestage.js?v=5436de0cbc";
-import { tags3d } from "./tags3d.js?v=5436de0cbc";
-import { INFO, STATES } from "./forces.js?v=5436de0cbc";
+import { frame, chips } from "./base.js?v=ac7792ed3c";
+import { planeStage } from "./planestage.js?v=ac7792ed3c";
+import { tags3d } from "./tags3d.js?v=ac7792ed3c";
+import { INFO, STATES } from "./forces.js?v=ac7792ed3c";
 const CG = [-1.2, 4.6, 0], D = Math.PI / 180, ACC = 0x3b82f6;
 // [start, direction, base length, label offset dx, dy]
 const BASE = { lift: [[-0.6, 7.5, 0], [0, 1, 0], 5.2, 30, -10], weight: [[-1.2, 3.0, 0], [0, -1, 0], 5.2, 30, 14], thrust: [[6.6, 4.1, 0], [1, 0, 0], 4.4, -20, -34], drag: [[-19.4, 5.0, 0], [-1, 0, 0], 4.4, 16, -34] };

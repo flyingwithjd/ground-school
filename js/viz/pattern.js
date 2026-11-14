@@ -1,8 +1,8 @@
 // Traffic pattern (AC 90-66C, AIM 4-3-3). Tap a leg for its name and what to do there; switch entries;
 // fly a point of light around the circuit. Geometry is schematic; distances are not to scale.
-import { frame, chips, svg, drawOn, loop, ACC, FAINT, FAINT2 } from "./base.js?v=5436de0cbc";
-import { s, h, reduced } from "../core/util.js?v=5436de0cbc";
-import { T } from "./shapes.js?v=5436de0cbc";
+import { frame, chips, svg, drawOn, loop, ACC, FAINT, FAINT2 } from "./base.js?v=ac7792ed3c";
+import { s, h, reduced } from "../core/util.js?v=ac7792ed3c";
+import { T } from "./shapes.js?v=ac7792ed3c";
 const RW0 = 520, RW1 = 1080, CY = 450, OFF = 280, BX = RW0 - OFF, XX = 1300;
 const LEGS = {
   dep: ["Upwind / departure", "Climb straight ahead", "After takeoff, continue straight ahead until beyond the departure end of the runway. Climb at VY (74 KIAS in the 172S, POH) unless a different speed is called for."],

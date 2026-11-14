@@ -1,6 +1,6 @@
 // Left-turning tendencies (PHAK 5). Pick an effect; the view switches to where it's easiest to see. Power sets how strong it is. Labels in screen px.
-import { chips, slider } from "./base.js?v=5436de0cbc";
-import { pxScene, T, L, P, C, R, planeTop, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=5436de0cbc";
+import { chips, slider } from "./base.js?v=ac7792ed3c";
+import { pxScene, T, L, P, C, R, planeTop, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=ac7792ed3c";
 const FX = {
   torque: { view: "rear", cap: ["Torque", "The airplane rolls left"], t: "Newton's third law: the engine turns the propeller clockwise (seen from the cockpit), so the propeller turns the airplane the other way. The left wing is pressed down and the left tire takes more load on the takeoff roll." },
   slip: { view: "top", cap: ["Spiraling slipstream", "Prop wash hits the left fin"], t: "The propeller pushes its wash back in a corkscrew around the fuselage. It strikes the <strong>left</strong> side of the vertical fin, pushing the tail right and yawing the nose left. Strongest at high power and low airspeed." },

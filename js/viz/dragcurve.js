@@ -1,7 +1,7 @@
 // Drag vs airspeed: slide the airspeed, watch parasite and induced drag trade off. Simple textbook model:
 // parasite ∝ V², induced ∝ 1/V², with the minimum placed at the 172S best-glide speed (68 KIAS, POH Sec 3). Labels in screen px.
-import { slider, chips } from "./base.js?v=5436de0cbc";
-import { pxScene, T, L, P, C, ACC, INK, GRAY, DIM } from "./kit.js?v=5436de0cbc";
+import { slider, chips } from "./base.js?v=ac7792ed3c";
+import { pxScene, T, L, P, C, ACC, INK, GRAY, DIM } from "./kit.js?v=ac7792ed3c";
 const VLD = 68, V0 = 42, V1 = 140, VMP = VLD / Math.pow(3, 0.25);
 const par = (v) => (v / VLD) ** 2, ind = (v) => (VLD / v) ** 2, tot = (v) => par(v) + ind(v);
 export function mount(host) {
