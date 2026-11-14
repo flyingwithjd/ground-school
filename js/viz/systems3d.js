@@ -11,12 +11,12 @@
 //    tops of the pedals.
 // Coordinates are the model's (x forward, y up, z right; firewall x 3.62 = FS 0, mains x -1.22, track 4.1 ft each side).
 // Exact routing of wires and lines is schematic; locations of the parts follow the POH.
-import { chips } from "./base.js?v=e5f54f3664";
-import { tags3d } from "./tags3d.js?v=e5f54f3664";
-import { glowSprite, lightPulse, landingBeam } from "./lightglow.js?v=e5f54f3664";
-import { buildPitot } from "./pitot3d.js?v=e5f54f3664";
-import { rich } from "../core/rich.js?v=e5f54f3664";
-import { h } from "../core/util.js?v=e5f54f3664";
+import { chips } from "./base.js?v=43931b26b4";
+import { tags3d } from "./tags3d.js?v=43931b26b4";
+import { glowSprite, lightPulse, landingBeam } from "./lightglow.js?v=43931b26b4";
+import { buildPitot } from "./pitot3d.js?v=43931b26b4";
+import { rich } from "../core/rich.js?v=43931b26b4";
+import { h } from "../core/util.js?v=43931b26b4";
 const ACC = 0x3b82f6, XM = -1.22, WZ = -4.1;
 export function systems(S, F, { cowl, animatePose }) {
   const THREE = S.THREE, G = S.cueGroup, groups = { elec: new THREE.Group(), brk: new THREE.Group(), pedals: new THREE.Group() };
@@ -48,10 +48,37 @@ export function systems(S, F, { cowl, animatePose }) {
   Object.values(glows).forEach((g) => { G.remove(g.obj); groups.elec.add(g.obj); });
   G.remove(beam.obj); groups.elec.add(beam.obj);
   // ---- brakes: left main wheel close-up ----
+  // Cleveland-style single-piston caliper (C172): a C-shaped body straddles the inboard
+  // disc, with pads on both faces, a cylindrical piston housing inboard, a bleeder on top,
+  // and the brake line entering the housing. Ink-3D, same blue fill as the other x-ray parts.
   const B = groups.brk, DZ = WZ + 0.36, DC = [XM, 0.73, DZ];
-  solid(new THREE.CylinderGeometry(0.42, 0.42, 0.05, 28), DC, B, [Math.PI / 2, 0, 0]);
-  solid(new THREE.BoxGeometry(0.26, 0.24, 0.18), [XM - 0.3, 1.0, DZ + 0.06], B);
-  const LINE = [[XM - 0.3, 1.12, DZ + 0.06], [XM - 0.15, 1.9, -3.0], [XM, 2.7, -1.6], [XM + 0.2, 3.05, -0.7], [1.6, 3.2, -0.65], [3.05, 3.45, -0.62]]; wire(LINE, B, 2.4);
+  solid(new THREE.CylinderGeometry(0.42, 0.42, 0.04, 32), DC, B, [Math.PI / 2, 0, 0]);
+  solid(new THREE.CylinderGeometry(0.16, 0.18, 0.07, 16), [XM, 0.73, DZ - 0.05], B, [Math.PI / 2, 0, 0]);
+  const calAng = 158 * Math.PI / 180, calR = 0.42;
+  const calO = [DC[0] + calR * Math.cos(calAng), DC[1] + calR * Math.sin(calAng), DC[2]];
+  const calG = new THREE.Group(); calG.position.set(...calO); calG.rotation.z = calAng - Math.PI / 2; B.add(calG);
+  const calPart = (geo, at, rot) => { const m = new THREE.Mesh(geo, fill); const e = new THREE.LineSegments(new THREE.EdgesGeometry(geo, 25), edge); [m, e].forEach((o) => { o.position.set(...at); if (rot) o.rotation.set(...rot); o.renderOrder = 8; calG.add(o); }); };
+  // pads on both faces of the disc
+  calPart(new THREE.BoxGeometry(0.26, 0.18, 0.022), [0, -0.07, 0.032]);
+  calPart(new THREE.BoxGeometry(0.26, 0.18, 0.022), [0, -0.07, -0.032]);
+  // outboard anvil and inboard body
+  calPart(new THREE.BoxGeometry(0.28, 0.20, 0.07), [0, -0.05, -0.095]);
+  calPart(new THREE.BoxGeometry(0.28, 0.20, 0.08), [0, -0.05, 0.10]);
+  // bridge over the disc OD, rounded back
+  calPart(new THREE.BoxGeometry(0.28, 0.09, 0.30), [0, 0.075, 0]);
+  calPart(new THREE.CylinderGeometry(0.045, 0.045, 0.28, 16), [0, 0.112, 0], [0, 0, Math.PI / 2]);
+  // cylindrical piston housing on the inboard side, with a cap
+  calPart(new THREE.CylinderGeometry(0.115, 0.115, 0.15, 20), [0, -0.04, 0.18], [Math.PI / 2, 0, 0]);
+  calPart(new THREE.CylinderGeometry(0.09, 0.09, 0.035, 18), [0, -0.04, 0.265], [Math.PI / 2, 0, 0]);
+  // bleeder screw on top of the inboard body
+  calPart(new THREE.CylinderGeometry(0.02, 0.02, 0.07, 8), [0.05, 0.10, 0.12]);
+  calPart(new THREE.CylinderGeometry(0.014, 0.014, 0.024, 8), [0.05, 0.14, 0.12]);
+  const FIT = [0, 0.12, 0.11];
+  calPart(new THREE.CylinderGeometry(0.024, 0.024, 0.07, 10), FIT);
+  const ca = calAng - Math.PI / 2, cc = Math.cos(ca), cs = Math.sin(ca);
+  const toW = (lx, ly, lz) => [calO[0] + cc * lx - cs * ly, calO[1] + cs * lx + cc * ly, calO[2] + lz];
+  const fitW = toW(...FIT), CAL = toW(0, -0.03, 0.135);
+  const LINE = [fitW, [XM - 0.15, 1.9, -3.0], [XM, 2.7, -1.6], [XM + 0.2, 3.05, -0.7], [1.6, 3.2, -0.65], [3.05, 3.45, -0.62]]; wire(LINE, B, 2.4);
   // ---- pedals: two pilot pedals with master cylinders (toe brakes) ----
   const P = groups.pedals; [-0.85, -0.4].forEach((z) => { solid(new THREE.BoxGeometry(0.08, 0.5, 0.26), [3.1, 3.8, z], P, [0, 0, 0.35]); solid(new THREE.CylinderGeometry(0.07, 0.07, 0.4, 10), [3.2, 3.35, z], P, [0, 0, 0.5]); });
   wire([[3.05, 3.45, -0.62], [3.2, 3.35, -0.85]], P, 2); wire([[3.05, 3.45, -0.62], [3.2, 3.35, -0.4]], P, 2);
@@ -60,7 +87,7 @@ export function systems(S, F, { cowl, animatePose }) {
   const LBL = [T("Battery", BAT, -26, 46, "elec"), T("Alternator", ALT, 24, -46, "elec"), T("Starter", STR, 30, 34, "elec"), T("Master + breakers", BUS, -56, 22, "elec"),
     T("Landing/taxi lts", LDG, 44, -16, "elec", "", true), T("Nav · red", TIPL, 14, 10, "elec", "nav-l", true), T("Nav · green", TIPR, -16, -16, "elec", "nav-r", true), T("Nav · white", TAIL, 12, 12, "elec", "nav-w", true),
     T("Beacon", BCN, 10, -16, "elec", "", true), T("Strobe", STBL, 14, 22, "elec", "strobe", true), T("Strobe", STBR, -16, 16, "elec", "strobe", true), T("Pitot tube", PIT, 36, 52, "elec"),
-    T("Disc", DC, -40, 40, "brk"), T("Caliper", [XM - 0.3, 1.0, DZ + 0.06], -30, -50, "brk"), T("Brake line", LINE[1], 30, -40, "brk"),
+    T("Disc", DC, -40, 40, "brk"), T("Caliper", CAL, -30, -50, "brk"), T("Brake line", LINE[1], 30, -40, "brk"),
     T("Toe brakes", [3.1, 3.95, -0.6], -30, -46, "pedals"), T("Master cylinders", [3.2, 3.35, -0.6], 30, 44, "pedals")];
   LBL.forEach((l) => (l.t.on = false));
   let live = null, raf = 0; const loop = () => { raf = 0;
@@ -70,7 +97,7 @@ export function systems(S, F, { cowl, animatePose }) {
     TG.place(LBL.filter((l) => l.t.on).map((l) => ({ t: l.t, q: S.project(l.at), qs: (l.ats || []).map((p) => S.project(p)) })), 34);
     LBL.filter((l) => !l.t.on).forEach((l) => TG.place([{ t: l.t, q: null }])); if (live) raf = requestAnimationFrame(loop); };
   const show = (keys) => { Object.entries(groups).forEach(([k, g]) => (g.visible = keys.includes(k))); LBL.forEach((l) => (l.t.on = keys.includes(l.grp))); live = keys.length ? keys : null; S.setFlow(!!(live && live.includes("elec"))); if (live && !raf) raf = requestAnimationFrame(loop); if (!live) loop(); S.kick(); };
-  const VIEW = { elec: { tg: [-3.5, 4.8, 0], az: -38, el: 24, d: 52 }, brk: { tg: [XM - 0.1, 1.05, DZ], az: 62, el: -14, d: 5.2 }, pedals: { tg: [2.6, 3.55, -0.62], az: -58, el: 22, d: 6.5 } };
+  const VIEW = { elec: { tg: [-3.5, 4.8, 0], az: -38, el: 24, d: 52 }, brk: { tg: [XM - 0.18, 0.88, DZ + 0.1], az: 52, el: 8, d: 4.1 }, pedals: { tg: [2.6, 3.55, -0.62], az: -58, el: 22, d: 6.5 } };
   const SYS = {
     air: ["Airframe", "The basic structure", ["fuselage", "fairing", "wing", "fin", "hstab", "struts"], "iso", {}, "Fuselage, wings, struts and tail: built to carry the air loads plus the weight of fuel, crew and payload.", "PHAK 3"],
     elec: ["Electrical system", "28-volt DC", [], VIEW.elec, {}, "The engine-driven alternator and the battery feed the buses through the MASTER switch (ALT and BAT halves); circuit breakers protect each circuit out to the starter, avionics and lights. [[Position lights|Nav lights]] are red on the left wingtip, green on the right and white on the tail. The [[Beacon|beacon]] on top of the fin flashes red; white [[Strobe lights|strobes]] flash at each wingtip. The landing and taxi lights sit in the left wing leading edge. A heated pitot tube hangs under the left wing, just outboard of the strut. Seen x-ray through the cowling and skin; wire routes are schematic.", "C172S POH 7 · PHAK 7 · 14 CFR 91.209"],

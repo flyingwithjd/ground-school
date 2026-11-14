@@ -7,16 +7,16 @@
 // G1000 172S POH Sec 3/7: normal bus about 28.0 V; HIGH VOLTS above 32.0; LOW VOLTS below 24.5; LOW VOLTS checklist with
 // M BUS 27.5 V minimum and M BATT charging; below 20 V on M BUS the standby battery powers the essential bus for at least 30 min.
 // Amps and the battery-time bar are illustrative, not published values.
-import { chips, row, frame } from "./base.js?v=e5f54f3664";
-import { planeStage } from "./planestage.js?v=e5f54f3664";
-import { tags3d } from "./tags3d.js?v=e5f54f3664";
-import { glowSprite, lightPulse, landingBeam } from "./lightglow.js?v=e5f54f3664";
-import { buildPitot } from "./pitot3d.js?v=e5f54f3664";
-import { rich } from "../core/rich.js?v=e5f54f3664";
-import { s as svgEl } from "../core/util.js?v=e5f54f3664";
-import { h } from "../core/util.js?v=e5f54f3664";
-import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC, ACCF } from "./kit.js?v=e5f54f3664";
-import { dial, eisCell, anim, COL } from "./dial.js?v=e5f54f3664";
+import { chips, row, frame } from "./base.js?v=43931b26b4";
+import { planeStage } from "./planestage.js?v=43931b26b4";
+import { tags3d } from "./tags3d.js?v=43931b26b4";
+import { glowSprite, lightPulse, landingBeam } from "./lightglow.js?v=43931b26b4";
+import { buildPitot } from "./pitot3d.js?v=43931b26b4";
+import { rich } from "../core/rich.js?v=43931b26b4";
+import { s as svgEl } from "../core/util.js?v=43931b26b4";
+import { h } from "../core/util.js?v=43931b26b4";
+import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC, ACCF } from "./kit.js?v=43931b26b4";
+import { dial, eisCell, anim, COL } from "./dial.js?v=43931b26b4";
 const CASES = { normal: "Normal", nuis: "Overvoltage trip", altfail: "Alternator failed", lowrpm: "Low-RPM taxi", sensor: "Too much charge" };
 const LIST = {
   round: { volts: ["Avionics master OFF", "ALT FLD breaker CHECK IN", "Master switch OFF (both sides)", "Master switch ON", "VOLTS CHECK OFF", "Avionics master ON"],

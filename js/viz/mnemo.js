@@ -1,7 +1,7 @@
 // Mnemonic unpacker: tap a letter to open the item, the reason it matters and its source.
 // Recall mode hides the items so you can say each one before you tap. HTML only; every set is cited.
-import { frame, chips } from "./base.js?v=e5f54f3664";
-import { h, esc } from "../core/util.js?v=e5f54f3664";
+import { frame, chips } from "./base.js?v=43931b26b4";
+import { h, esc } from "../core/util.js?v=43931b26b4";
 export const SETS = {
   handprop: { name: "Hand propping", what: "Steps and safeguards, in order", src: "AFH 2", items: [
     ["1", "Assume the ignition is on", "A faulty magneto switch can read OFF and still let the engine fire."],
