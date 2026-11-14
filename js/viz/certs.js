@@ -3,9 +3,9 @@
 // aircraft registration (AC Form 8050-3), O = operating limitations, W = weight and balance; the ghosted fifth tile is the
 // radio station license, needed only outside the US. Tap a field to light it in blue and read what it means.
 // Sources: PHAK Ch 9 (Fig 9-8, 9-9); 14 CFR 21.175, 21.181, 47.31(c), 47.40, 47.41, 91.9, 91.203.
-import { pxScene, T, R, L, hit, INK, GRAY, DIM, ACC, ACCF } from "./kit.js?v=8703609faa";
-import { chips } from "./base.js?v=8703609faa";
-import { s } from "../core/util.js?v=8703609faa";
+import { pxScene, T, R, L, hit, INK, GRAY, DIM, ACC, ACCF } from "./kit.js?v=0134b87946";
+import { chips } from "./base.js?v=0134b87946";
+import { s } from "../core/util.js?v=0134b87946";
 const PINK = "#F2A7C3", PINKF = "rgba(242,167,195,.13)", WHITEF = "rgba(242,241,236,.07)";
 const wrapT = (str, n) => { const out = []; let line = ""; for (const w of String(str).split(" ")) { if ((line + " " + w).trim().length > n) { out.push(line.trim()); line = w; } else line += " " + w; } if (line.trim()) out.push(line.trim()); return out; };
 const TILES = [

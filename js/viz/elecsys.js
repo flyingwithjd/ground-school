@@ -7,13 +7,13 @@
 // G1000 172S POH Sec 3/7: normal bus about 28.0 V; HIGH VOLTS above 32.0; LOW VOLTS below 24.5; LOW VOLTS checklist with
 // M BUS 27.5 V minimum and M BATT charging; below 20 V on M BUS the standby battery powers the essential bus for at least 30 min.
 // Amps and the battery-time bar are illustrative, not published values.
-import { chips, row, frame } from "./base.js?v=8703609faa";
-import { planeStage } from "./planestage.js?v=8703609faa";
-import { tags3d } from "./tags3d.js?v=8703609faa";
-import { s as svgEl } from "../core/util.js?v=8703609faa";
-import { h } from "../core/util.js?v=8703609faa";
-import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC, ACCF } from "./kit.js?v=8703609faa";
-import { dial, eisCell, anim, COL } from "./dial.js?v=8703609faa";
+import { chips, row, frame } from "./base.js?v=0134b87946";
+import { planeStage } from "./planestage.js?v=0134b87946";
+import { tags3d } from "./tags3d.js?v=0134b87946";
+import { s as svgEl } from "../core/util.js?v=0134b87946";
+import { h } from "../core/util.js?v=0134b87946";
+import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC, ACCF } from "./kit.js?v=0134b87946";
+import { dial, eisCell, anim, COL } from "./dial.js?v=0134b87946";
 const CASES = { normal: "Normal", nuis: "Overvoltage trip", altfail: "Alternator failed", lowrpm: "Low-RPM taxi", sensor: "Too much charge" };
 const LIST = {
   round: { volts: ["Avionics master OFF", "ALT FLD breaker CHECK IN", "Master switch OFF (both sides)", "Master switch ON", "VOLTS CHECK OFF", "Avionics master ON"],
@@ -109,7 +109,7 @@ function buildX(S) {
   wire("nav", [BUS, [0.5, 3.6, -0.6], [-12, 4.6, 0], [-17.2, 6.0, 0], TAIL], 1.6); wire("pitot", [[1.55, 6.7, -3.5], [1.9, 6.45, -8], [1.7, 6.35, -9.0], PIT], 1.6);
   const TG = tags3d(S.renderer.domElement.parentElement), T = {
     bat: [TG.add("Battery", { dx: -30, dy: 44 }), BAT], alt: [TG.add("Alternator", { dx: 30, dy: 44 }), ALT], bus: [TG.add("Bus + breakers", { dx: -40, dy: -44 }), BUS],
-    land: [TG.add("Landing light", { dx: -24, dy: -40 }), LDG], nav: [TG.add("Nav lights", { dx: 30, dy: -36 }), TIPR], pitot: [TG.add("Pitot heat", { dx: -26, dy: 40 }), PIT], mag: [TG.add("Magnetos (own circuit)", { dx: 30, dy: -46 }), MAG] };
+    land: [TG.add("Landing light", { dx: -48, dy: -52 }), LDG], nav: [TG.add("Nav lights", { dx: 56, dy: 40 }), TIPR], pitot: [TG.add("Pitot heat", { dx: -26, dy: 40 }), PIT], mag: [TG.add("Magnetos (own circuit)", { dx: 30, dy: -46 }), MAG] };
   const col = (k, c) => { (parts[k] || []).forEach((p) => { p.edge.color.setHex(c); p.fill.color.setHex(c === OFFH ? 0x1a1d24 : c === REDH ? 0x4a0d0d : 0x0c2c6e); }); (wires[k] || []).forEach((l) => { l.obj.material.color.setHex(c); l.opacity = c === OFFH ? 0.55 : 0.95; }); };
   col("mag", 0xffffff);
   return {

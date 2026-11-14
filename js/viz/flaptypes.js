@@ -13,10 +13,10 @@
 // Servo tab: the cockpit control moves only the tab, and the tab's force moves the surface. Antiservo tab: moves in the
 // same direction as the stabilator's trailing edge, making it less sensitive (more feel); it also trims.
 // Lift/drag values, deflection angles and stall angles are illustrative, not published values.
-import { frame, chips, slider, row } from "./base.js?v=8703609faa";
-import { planeStage } from "./planestage.js?v=8703609faa";
-import { sectionModel, airfoil, rotP } from "./section-models.js?v=8703609faa";
-import { h, clamp, reduced } from "../core/util.js?v=8703609faa";
+import { frame, chips, slider, row } from "./base.js?v=0134b87946";
+import { planeStage } from "./planestage.js?v=0134b87946";
+import { sectionModel, airfoil, rotP } from "./section-models.js?v=0134b87946";
+import { h, clamp, reduced } from "../core/util.js?v=0134b87946";
 const D = Math.PI / 180;
 export const WING = {
   plain: { name: "Plain flap", dl: 0.5, dd: 0.6, crit: 16, say: ["Plain flap", "The simplest flap: more camber, more lift and a lot more drag. The nose tends to pitch down."] },

@@ -1,10 +1,10 @@
 // Taxiing in wind (nosewheel airplane): pick where the wind comes from; 3D wind streaks drift in from that side and the
 // ailerons and elevator move to the AFH Fig 2-15 positions, with a drawn yoke beside the stage showing the matching input.
 // Only the deflected surfaces are lit; everything else stays ink. Continuous camera-facing wind ribbons at 30 fps while visible; offscreen/hidden tabs pause rendering. AFH Ch 2 (FAA-H-8083-3C), Fig 2-15.
-import { frame, chips, row } from "./base.js?v=8703609faa";
-import { planeStage } from "./planestage.js?v=8703609faa";
-import { rich } from "../core/rich.js?v=8703609faa";
-import { h, s, reduced, clamp } from "../core/util.js?v=8703609faa";
+import { frame, chips, row } from "./base.js?v=0134b87946";
+import { planeStage } from "./planestage.js?v=0134b87946";
+import { rich } from "../core/rich.js?v=0134b87946";
+import { h, s, reduced, clamp } from "../core/util.js?v=0134b87946";
 const D = Math.PI / 180, INKC = "rgba(242,241,236,", ACCC = "#3B82F6";
 const AIL = 20, ELEV = 16;   // degrees shown, exaggerated for clarity. Model signs: ail>0 rolls right (left aileron down); elev>0 = trailing edge down.
 // a = where the wind comes FROM, degrees clockwise from the nose. ail/elev = -1, 0, 1 (unit input), side = upwind wing.

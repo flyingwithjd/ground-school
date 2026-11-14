@@ -7,10 +7,10 @@
 // duty cycle 10 s cranking then 20 s cool down, repeat two more times, then 10 minutes cool down. AFH 2: a starter that stays
 // engaged shows a continuous, very high current draw on the ammeter (some airplanes have a starter-engaged light): shut down.
 // The cranking time before the engine catches and the amps are illustrative.
-import { chips, row } from "./base.js?v=8703609faa";
-import { h, s } from "../core/util.js?v=8703609faa";
-import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=8703609faa";
-import { anim, COL } from "./dial.js?v=8703609faa";
+import { chips, row } from "./base.js?v=0134b87946";
+import { h, s } from "../core/util.js?v=0134b87946";
+import { pxScene, T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=0134b87946";
+import { anim, COL } from "./dial.js?v=0134b87946";
 const CASES = { normal: "Normal start", nostart: "Won't start", stuck: "Starter stays engaged" };
 export function mount(host) {
   let cs = "normal", master = false, hold = false, crank = 0, cool = 0, cycles = 0, running = false, spun = 0, t = 0, over = false;
@@ -19,15 +19,33 @@ export function mount(host) {
   const r1 = row(S.F.ctrl, "Switches"); const g1 = h("div", { class: "chips", role: "group", "aria-label": "Switches" }); r1.append(g1);
   const mb = h("button", { class: "chip", type: "button" }, "Master ON"), sb = h("button", { class: "chip", type: "button" }, "Hold START"), xb = h("button", { class: "chip", type: "button" }, "Shut down / reset");
   g1.append(mb, sb, xb);
-  mb.addEventListener("click", () => { master = !master; if (!master) hold = false; upd(); });
-  const down = (e) => { e.preventDefault(); if (sb.disabled) return; hold = true; upd(); }, up = () => { if (!hold) return; hold = false; if (crank > 0) { cycles++; cool = 20; } upd(); };
-  sb.addEventListener("pointerdown", down); ["pointerup", "pointerleave", "pointercancel"].forEach((ev) => sb.addEventListener(ev, up));
-  sb.addEventListener("keydown", (e) => { if ((e.key === " " || e.key === "Enter") && !e.repeat) down(e); }); sb.addEventListener("keyup", (e) => { if (e.key === " " || e.key === "Enter") up(); });
+  mb.addEventListener("click", () => { master = !master; if (!master) { hold = false; latched = false; } upd(); });
+  let latched = false;
+  const down = (e) => { e.preventDefault(); if (sb.disabled) return;
+    if (latched) { latched = false; hold = false; if (crank > 0) { cycles++; cool = 20; } upd(); return; }
+    hold = true; latched = false; upd(); };
+  const up = () => { if (!hold || latched) return;
+    // A tap is too short to crank; latch the hold so the starter keeps running until the next tap (or the engine catches).
+    if (crank < 0.25 && !running) { latched = true; upd(); return; }
+    hold = false; if (crank > 0) { cycles++; cool = 20; } upd(); };
+  let fromPointer = false;
+  sb.addEventListener("pointerdown", (e) => { fromPointer = true; down(e); });
+  ["pointerup", "pointercancel"].forEach((ev) => sb.addEventListener(ev, up));
+  sb.addEventListener("pointerleave", (e) => { if (latched) return; up(e); });
+  sb.addEventListener("keydown", (e) => { if ((e.key === " " || e.key === "Enter") && !e.repeat) { fromPointer = true; down(e); } });
+  sb.addEventListener("keyup", (e) => { if (e.key === " " || e.key === "Enter") up(); });
+  // A synthesized click (or a tap that only fires click) should still crank: latch the hold until the next tap, or the engine catches.
+  sb.addEventListener("click", () => {
+    if (fromPointer) { fromPointer = false; return; }
+    if (sb.disabled) return;
+    if (hold) { hold = false; latched = false; if (crank > 0) { cycles++; cool = 20; } upd(); return; }
+    hold = true; latched = true; upd();
+  });
   xb.addEventListener("click", () => reset());
-  function reset() { master = false; hold = false; crank = 0; cool = 0; cycles = 0; running = false; spun = 0; over = false; upd(); }
+  function reset() { master = false; hold = false; latched = false; crank = 0; cool = 0; cycles = 0; running = false; spun = 0; over = false; upd(); }
   const A = anim(S.F, (dt) => { t += dt; let more = false;
     if (hold && master) { crank += dt; spun += dt; more = true; if (crank > 10) over = true;
-      if (cs !== "nostart" && spun > 2.5) { running = true; if (cs !== "stuck") { hold = false; cycles++; crank = 0; } } }
+      if (cs !== "nostart" && spun > 2.5) { running = true; if (cs !== "stuck") { hold = false; latched = false; cycles++; crank = 0; } } }
     else if (cool > 0) { cool = Math.max(0, cool - dt); if (cool === 0) { crank = 0; over = false; } more = true; }
     if (running && cs === "stuck" && master) more = true;
     S.redraw(); return more; });

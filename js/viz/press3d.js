@@ -4,12 +4,12 @@
 // Numbers: an example airplane holds an 8,000 ft cabin until it reaches its maximum differential (6.1 psid, the PHAK
 // example), then the cabin climbs with the airplane. Facts and pressure table: see pressurization.js (PHAK 7, Fig 7-41;
 // TUC PHAK Fig 17-1). Decompression durations are illustrative.
-import { frame, slider, chips, row } from "./base.js?v=8703609faa";
-import { h } from "../core/util.js?v=8703609faa";
-import { planeStage } from "./planestage.js?v=8703609faa";
-import { tags3d } from "./tags3d.js?v=8703609faa";
-import { psi, cabin } from "./pressurization.js?v=8703609faa";
-import { TUC } from "./hypoxia.js?v=8703609faa";
+import { frame, slider, chips, row } from "./base.js?v=0134b87946";
+import { h } from "../core/util.js?v=0134b87946";
+import { planeStage } from "./planestage.js?v=0134b87946";
+import { tags3d } from "./tags3d.js?v=0134b87946";
+import { psi, cabin } from "./pressurization.js?v=0134b87946";
+import { TUC } from "./hypoxia.js?v=0134b87946";
 const ACC = 0x3b82f6, RED = 0xef4444, MAXD = 6.1, SEL = 8000, TOP = 30000;
 const tucAt = (a) => { let t = null; for (const [hh, x] of TUC) if (a >= hh) t = [hh, x]; return t; };
 const ft = (v) => (Math.round(v / 100) * 100).toLocaleString() + " ft";
