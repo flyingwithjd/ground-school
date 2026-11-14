@@ -29,7 +29,7 @@ export default {
 <p>Tanks must be <strong>vented</strong> so air replaces fuel as it is used; a blocked vent can starve the engine. Sump every drain before each flight and after refueling. Water is heavier than fuel and sits at the bottom of the cup as clear beads. Drain until it is gone. <span class="src">PHAK 7 · POH 4, 7</span></p>
 <p>Approved fuel is 100LL (blue) or 100 (green). Jet fuel is clear or straw-colored and will destroy a piston engine.</p>
 <p><strong>If the engine-driven pump fails</strong>, fuel flow drops to zero and the engine loses power even with fuel in the tank. Turn the auxiliary fuel pump ON to restore it, and land as soon as practical. That is also why the aux pump goes back ON if fuel flow drops to zero when you switch it off after takeoff. <span class="src">POH 3, 4</span></p>`,
-      viz: { type: "fuelsys" },
+      viz: { type: "fuel3d" },
       kdr: { k: "Fuel flow path; selector positions; sumping; fuel grades.", d: "Sample all drains; check vents; confirm fuel quantity visually.", r: "Fuel starvation (selector or vent) and contamination are common causes of engine failure.", codes: ["PA.I.G.K1e"] } },
     { id: "elec", label: "Electrical · POH 7", title: "Alternator runs, battery waits",
       body: `<p>The 172S has a 28-volt [[DC|direct current]] system. A 60-amp belt-driven [[alternator]] powers everything once the engine runs and recharges the 24-volt battery. The battery starts the engine and is the backup if the alternator fails. The [[master switch]] is split: BAT and ALT halves. An [[avionics master]] feeds the radios separately so they are off during engine start. <span class="src">POH 7</span></p>
@@ -55,7 +55,7 @@ export default {
       body: `<p>A gyro wheel spun fast resists being tilted: [[rigidity in space]]. A force applied to it shows up 90° later in the direction of rotation: [[precession]]. <span class="src">PHAK 8</span></p>
 <p>In the 172S the [[attitude indicator]] and [[heading indicator]] are vacuum-driven; the [[turn coordinator]] is electric, so one failure does not take out every gyro. The heading indicator drifts with precession, so realign it with the [[magnetic compass]] about every 15 minutes in straight-and-level flight.</p>
 <p>A suction gauge should read in its green range (4.5 to 5.5 in. Hg in the 172S) to trust the vacuum gyros. <span class="src">POH 2</span></p>`,
-      viz: { type: "instruments" },
+      viz: { type: "instpanel", opts: { power: true } },
       kdr: { k: "Gyro principles; power source for each instrument.", d: "Check vacuum and align the heading indicator before takeoff.", r: "A failing vacuum gyro gives slowly wrong information; cross-check.", codes: ["PA.I.G.K1h"] } },
     { id: "limits", label: "Limitations · POH 2", title: "The numbers on the dial",
       body: `<p>Section 2 of the POH holds the limitations: the speeds, weights, loads and engine values the airplane was certificated to. They are not suggestions. Tap each arc. <span class="src">POH 2</span></p>`,

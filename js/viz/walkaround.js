@@ -42,7 +42,7 @@ export const STATIONS = [
       { t: "Smooth leading edge", d: "No dents, the stall warning opening is clear, the fuel cap is tight.", bad: false, why: "All good. Finish the wing and the walkaround is done.", p: [-0.4, 8.3, -5.5] } ] },
 ];
 export function mount(host) {
-  const F = frame(host, { cls: "walk", corners: { tl: "Walkaround · POH order", tr: "" } });
+  const F = frame(host, { cls: "walk capin p3cap", corners: { tl: "Walkaround · POH order", tr: "" } });
   const S = planeStage(F.stage, { view: "iso", maxFps: 30 });
   const band = () => { const c = F.stage.querySelector(".corner.tl"); if (c) S.setTopBand(c.offsetTop + c.offsetHeight + 6); }; band(); requestAnimationFrame(band);   // corner labels never sit over the model
   const mark = h("div", { class: "wk-mark", "aria-hidden": "true" }); F.stage.append(mark);

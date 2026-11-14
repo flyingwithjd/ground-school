@@ -4,6 +4,7 @@ import { planeStage } from "./planestage.js?v=5436de0cbc";
 import { h, reduced } from "../core/util.js?v=5436de0cbc";
 import { mount as taxiWind } from "./taxiwind.js?v=5436de0cbc";
 import { mount as walkaround } from "./walkaround.js?v=5436de0cbc";
+import { systems } from "./systems3d.js?v=5436de0cbc";
 // Pose sign conventions (model): ail>0 rolls right, elev<0 = trailing edge up (nose up), rud>0 = right rudder, steer>0 = nose wheel left.
 const PARTS = {
   fuselage: { name: "Fuselage", group: "Major component", hl: ["fuselage", "fairing"], view: "iso", text: "The central body. Carries crew, passengers and cargo, and joins the wings and tail. Semimonocoque aluminum on the 172." },
@@ -41,7 +42,7 @@ export function mount(host, opts = {}) {
   if (mode === "walk") return walkaround(host, opts);   // walkaround stations with Spot the defect (AFH Ch 2)
   // Dimensions sit top-right on two lines, clear of the part title at bottom-left at every width.
   const SPEC = "Span 36 ft 1 in\nLength 27 ft 2 in".replace(/ /g, "\u00a0");   // each line stays whole on narrow phones
-  const F = frame(host, { corners: { tl: "Cessna 172S", tr: SPEC } });
+  const F = frame(host, { cls: "capin p3cap", corners: { tl: "Cessna 172S", tr: SPEC } });   // caption under the stage, so it never covers the model on a phone
   let cur = null, anim = null, ti = 0; const groups = [];
   // Tap a part on the model to select it; tap empty space to clear back to the default view.
   const S = planeStage(F.stage, { view: "iso", onPick: mode === "explore" ? (p) => (p && MAP[p] ? select(MAP[p]) : !p && cur && reset()) : null });
@@ -66,18 +67,7 @@ export function mount(host, opts = {}) {
     groups.push(chips(F.ctrl, [["ailerons", "Ailerons"], ["flaps", "Flaps"], ["struts", "Lift struts"], ["fuel", "Fuel tanks"], ["hstab", "Horizontal stabilizer"], ["elevator", "Elevator"], ["trimtab", "Trim tab"], ["fin", "Vertical stabilizer"], ["rudder", "Rudder"], ["engine", "Engine"], ["cowling", "Cowling"], ["propeller", "Propeller"]], null, (k) => (k ? select(k) : reset()), { label: "Parts", toggle: true }));
     F.caption(INTRO[0], INTRO[1]); F.explain(INTRO[2]);
   } else if (mode === "systems") {
-    // PHAK 3 subcomponents: only the parts of the chosen system go blue; the rest stays ink.
-    const SYS = {
-      air: ["Airframe", "The basic structure", ["fuselage", "fairing", "wing", "fin", "hstab", "struts"], "iso", {}, "Fuselage, wings, struts and tail: built to carry the air loads plus the weight of fuel, crew and payload."],
-      elec: ["Electrical system", "Engine-driven alternator", ["engine"], "nose", {}, "The engine turns the alternator; with the battery it powers lights, radios and instruments through the panel. Battery and wiring aren't drawn on this model. 172S: 28 volts.", true],
-      ctl: ["Flight controls", "Ailerons, elevator, rudder, flaps, trim", ["ailerons", "elevator", "rudder", "flaps", "trimtab"], "iso", { ail: 18, elev: -16, rud: 16, flap: 20, trim: 8 }, "The surfaces that change the airplane's attitude, worked from the yoke, pedals, flap switch and trim wheel. Shown deflected for clarity."],
-      brk: ["Brakes", "Discs on the main wheels", ["gear"], "gear", {}, "Hydraulic disc brakes on the two main wheels, worked by the tops of the rudder pedals. Look at discs, pads and the brake line on the walkaround."],
-    };
-    const SY0 = ["Four subcomponents", "Pick a system"];
-    const sysPick = (k) => { if (!k) { cowl(true); S.highlight([]); S.setView("iso"); animatePose({}); F.caption(...SY0); F.explain("Each chip lights only that system's parts. Drag to orbit."); return; }
-      const [name, big, hl, view, pose, text, hideCowl] = SYS[k]; cowl(!hideCowl); S.highlight(hl); S.setView(view); animatePose(pose); F.caption(name, big); F.explain(text + ' <span class="src">PHAK 3 · C172S POH 7</span>'); };
-    chips(F.ctrl, Object.entries(SYS).map(([k, v]) => [k, v[0]]), null, sysPick, { label: "System", toggle: true });
-    sysPick(null);
+    const stop = systems(S, F, { cowl, animatePose }); F.on(stop);
   } else {
     const prev = h("button", { class: "btn ghost", type: "button" }, "←"), next = h("button", { class: "btn pri arrow", type: "button" }, "Next");
     const dots = chips(F.ctrl, TOUR.map((t, i) => [String(i), t.big]), "0", (v) => show(+v), { label: "Tour stops" }); F.ctrl.append(h("div", { class: "btns" }, prev, next));

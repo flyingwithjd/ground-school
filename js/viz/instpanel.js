@@ -118,7 +118,32 @@ const CELLS = [
   ["tach", "Tachometer", "ctl", (v) => tach(v.rpm), (v) => `${v.rpm.toLocaleString("en-US")} RPM`], ["cdi", "VOR / CDI", "nav", () => cdi(120), () => "Course 120"],
 ];
 const GNAME = { perf: ["Performance", "What the airplane is doing"], ctl: ["Control", "Attitude and power: set these"], nav: ["Navigation", "Where you are relative to a [[fix]]"] };
+// GL2 power-source mode (opts.power): the six-pack only, tagged by what drives each instrument; fail a source and the
+// instruments on it show INOP (gyros visibly tumble/drift) or freeze. Round-gauge C172S: vacuum attitude and heading,
+// electric turn coordinator; PHAK 8. Static blocked: altimeter and VSI freeze, airspeed is wrong (PHAK 8).
+const SRCOF = { asi: "ps", alt: "ps", vsi: "ps", ai: "vac", hi: "vac", tc: "elec" }, SRCN = { ps: "Pitot-static", vac: "Vacuum", elec: "Electrical" };
+const FAIL = { none: ["Three power sources", "All working", "The airplane spreads its instruments across three sources so one failure never takes everything. Tap a source to see what it drives."],
+  vac: ["Vacuum failure", "Attitude and heading lost", "Cover the dead gyros and fly by the turn coordinator, altimeter, airspeed and compass. A vacuum failure is often slow, so cross-check the suction gauge."],
+  elec: ["Electrical failure", "Turn coordinator lost", "Gyro-driven attitude and heading stay, as do the pitot-static instruments. Radios and lights go with the battery."],
+  ps: ["Static blocked", "Altimeter and VSI frozen", "Airspeed is wrong too (it reads low in a descent). Open the alternate static source."] };
+function powerMode(host) {
+  const F = frame(host, { cls: "instp ipx ippow capin", corners: { tl: "Instrument power", tr: "PHAK 8" } }); F.root.insertBefore(F.ctrl, F.stage);
+  const v = { kt: 100, pitch: 0, ft: 4500, fpm: 0 }; const grid = h("div", { class: "ip-grid" }); F.stage.append(grid); const cells = {};
+  for (const [k, name, , fn, rd] of CELLS.slice(0, 6)) { const c = h("div", { class: "ip-cell", "data-s": SRCOF[k] }); const flag = h("div", { class: "ip-flag" }, "");
+    c.append(h("div", { class: "ip-face" }, fn(v)), flag, h("div", { class: "ip-name" }, name), h("div", { class: "ip-read ip-src" }, SRCN[SRCOF[k]])); grid.append(c); cells[k] = c; }
+  let src = null, fail = "none";
+  const paint = () => { for (const k in cells) { const c = cells[k], dead = fail !== "none" && SRCOF[k] === fail; c.classList.toggle("on", !!src && SRCOF[k] === src); c.classList.toggle("off", !!src && SRCOF[k] !== src);
+      c.classList.toggle("dead", dead); c.classList.toggle("frz", dead && fail === "ps"); c.classList.toggle("tumb", dead && (k === "ai" || k === "hi"));
+      c.querySelector(".ip-flag").textContent = dead ? (fail === "ps" ? "FROZEN" : "INOP") : ""; } };
+  const sc = chips(F.ctrl, [["ps", "Pitot-static"], ["vac", "Vacuum"], ["elec", "Electrical"]], null, (k) => { src = k; paint(); if (k) { F.caption(SRCN[k] + " instruments", Object.keys(cells).filter((x) => SRCOF[x] === k).map((x) => CELLS.find((c) => c[0] === x)[1]).join(", ")); F.explain(rich({ ps: "Pitot (ram) and static pressure drive the airspeed indicator; static pressure alone drives the altimeter and VSI.", vac: "An engine-driven vacuum pump spins the attitude and heading gyros. Watch the suction gauge.", elec: "The turn coordinator's gyro is electric, so a vacuum failure leaves you a working rate-of-turn reference." }[k]) + ' <span class="src">PHAK 8</span>'); } else setFail(fail); }, { label: "Power source", toggle: true });
+  function setFail(k) { fail = k; const m = FAIL[k]; paint(); F.caption(m[0], m[1]); F.explain(`${rich(m[2])} <span class="src">PHAK 8</span>`); }
+  chips(F.ctrl, [["none", "All working"], ["vac", "Vacuum failure"], ["elec", "Electrical failure"], ["ps", "Static blocked"]], "none", (k) => { src = null; sc.set(null); setFail(k || "none"); }, { label: "Failure" });
+  F.root.insertBefore(F.root.querySelector(".caption"), F.stage);
+  setFail("none");
+  return { destroy: () => F.destroy() };
+}
 export function mount(host, opts = {}) {
+  if (opts.power) return powerMode(host);
   const F = frame(host, { cls: "instp ipx capin", corners: { tl: "Round gauges", tr: "Example readings" } }); F.root.insertBefore(F.ctrl, F.stage);   // chips on top: nothing below can move them
   let grp = null, sit = "level", v = { ...SIT.level.ctl, ...SIT.level.perf }, tmr = 0;
   const grid = h("div", { class: "ip-grid" }); F.stage.append(grid); const cells = {};

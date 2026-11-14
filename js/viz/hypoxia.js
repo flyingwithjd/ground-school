@@ -5,7 +5,8 @@
 // diluter-demand up to 40,000 ft, pressure-demand above 40,000 ft, systems certified above 18,000 ft need masks, not
 // cannulas; AC 61-107B: continuous-flow needs very careful attention above 25,000 ft; pulse-demand saves 50-85% of the oxygen.
 // AOPA Air Safety Institute hypoxia alert: below 90% SpO2 mental function begins to deteriorate.
-import { slider, chips, row } from "./base.js?v=5436de0cbc";
+import { slider, chips, row, frame } from "./base.js?v=5436de0cbc";
+import { h } from "../core/util.js?v=5436de0cbc";
 import { pxScene, T, L, R, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=5436de0cbc";
 const SPO2 = [[0, 96], [5000, 94], [10000, 90], [15000, 70], [20000, 62]];
 export function spo2(a) { if (a > 20000) return null; for (let i = 1; i < SPO2.length; i++) if (a <= SPO2[i][0]) { const [a0, s0] = SPO2[i - 1], [a1, s1] = SPO2[i]; return Math.round(s0 + ((a - a0) / (a1 - a0)) * (s1 - s0)); } return 62; }
@@ -26,7 +27,34 @@ function info(a) {
   let tuc = null; for (const [h, t] of TUC) if (a >= h) tuc = [h, t];
   return { reg, rec, eff, tuc };
 }
+// GL2 (opts.systems): a simplified instrument-style panel instead of the chart: a pulse oximeter, the cabin altitude with the
+// 91.211 status, and short cards for the rule, the oxygen system and time of useful consciousness.
+function systemsPanel(host) {
+  let a = 8000, sys = "none";
+  const F = frame(host, { cls: "hyp2 capin", corners: { tl: "Cabin oxygen", tr: "91.211 · PHAK 17" } });
+  const ox = h("b", { class: "hy-o2" }), oxs = h("small"), pulse = h("i", { class: "hy-pulse" });
+  const altv = h("b", { class: "hy-alt" }), reg = h("span", { class: "hy-reg" });
+  const dev = h("div", { class: "hy-dev" }, h("span", { class: "hy-k" }, "Pulse oximeter"), h("div", { class: "hy-row" }, ox, pulse), oxs);
+  const altc = h("div", { class: "hy-dev hy-a" }, h("span", { class: "hy-k" }, "Cabin altitude"), altv, reg);
+  const cards = h("div", { class: "hy-cards" });
+  F.stage.append(h("div", { class: "hy-top" }, dev, altc), cards);
+  slider(row(F.ctrl, "Altitude"), { label: "Cabin altitude", min: 0, max: 45000, step: 500, value: a, fmt: (x) => x.toLocaleString() + " ft", oninput: (x) => { a = x; upd(); } });
+  chips(row(F.ctrl, "Oxygen"), Object.entries(SYS).map(([k, v]) => [k, k === "none" ? "None" : v[0]]), sys, (k) => { sys = k || "none"; upd(); }, { label: "Oxygen" });
+  function upd() { const I = info(a), Sy = SYS[sys], lim = Sy[1], over = sys !== "none" && lim && a > lim, o2 = sys === "none" ? spo2(a) : over ? null : 96, low = o2 != null && o2 < 90;
+    ox.textContent = o2 == null ? "--" : o2 + "%"; oxs.textContent = o2 == null ? (sys === "none" ? "SpO2 · breathing air is inadequate" : "SpO2 · past this system's limit") : "SpO2" + (low ? " · below 90%" : ""); dev.classList.toggle("bad", low || o2 == null); pulse.style.animationDuration = low || o2 == null ? ".55s" : ".9s";
+    altv.textContent = a.toLocaleString() + " ft"; const lvl = a > 15000 ? 3 : a > 14000 ? 2 : a > 12500 ? 1 : 0; reg.textContent = ["No oxygen required", "Crew: oxygen after 30 min", "Crew: oxygen at all times", "Oxygen for everyone"][lvl]; altc.dataset.l = lvl;
+    const blocks = [["Rule · 91.211", I.reg], sys !== "none" ? [Sy[0], Sy[2]] : ["Effects · AIM 8-1", I.eff]];
+    if (I.tuc && (sys === "none" || over)) blocks.push(["Useful consciousness", `${I.tuc[1]} at ${I.tuc[0].toLocaleString()} ft`]);
+    cards.replaceChildren(...blocks.map(([k, v]) => h("div", { class: "hy-card" }, h("span", {}, k), h("p", {}, v))));
+    const cap = sys === "none" ? (o2 == null ? ["No oxygen", "Breathing air is totally inadequate at this altitude. Use supplemental oxygen or descend now."] : low ? ["Below 90%", "Mental function starts to suffer below about 90%. Use supplemental oxygen or descend."] : ["Breathing cabin air", "Blood oxygen falls as you climb. Check it with a pulse oximeter."])
+      : over ? ["Past this system's limit", "This system isn't rated for this altitude. Switch to one that is, or descend to where it works."] : ["On oxygen", "Enough supplemental oxygen keeps blood saturation near sea-level values: 96% in the FAA table."];
+    F.caption(cap[0], cap[1]);
+    F.explain(`Oxygen is still about 21% of the air at ${a.toLocaleString()} ft, but its partial pressure drops as you climb, so each breath delivers less. SpO2 breathing air: FAA CAMI table. <span class="src">14 CFR 91.211 · AIM 8-1 · PHAK 7, 17 · FAA CAMI</span>`); }
+  upd();
+  return { destroy() { F.destroy(); } };
+}
 export function mount(host, opts = {}) {
+  if (opts.systems) return systemsPanel(host);
   let a = 8000, sys = "none"; const SY = !!opts.systems;
   const S = pxScene(host, { cls: SY ? "xtall" : "tall", corners: { tl: "Cabin altitude and oxygen", tr: "14 CFR 91.211 · AIM 8-1 · PHAK 17" } }, draw);
   const sp = slider(SY ? row(S.F.ctrl, "Altitude") : S.F.ctrl, { label: "Cabin altitude", min: 0, max: 45000, step: 500, value: a, fmt: (x) => x.toLocaleString() + " ft", oninput: (x) => { a = x; S.redraw(); } });

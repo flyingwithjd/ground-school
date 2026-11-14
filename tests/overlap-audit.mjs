@@ -12,7 +12,11 @@ const check = () => pg.evaluate(() => { const out = [];
   document.querySelectorAll(".viz").forEach((v, vi) => { const boxes = [...v.querySelectorAll(".stage > .corner, .stage > .caption .label, .stage > .caption .big, .stage > .caption .spec")].filter((e) => e.textContent.trim() && e.offsetParent).map((e) => { const r = e.getBoundingClientRect(); return { t: e.textContent.slice(0, 28), l: r.left, r: r.right, t2: r.top, b: r.bottom }; });
     const sr = v.querySelector(".stage").getBoundingClientRect();
     for (const a of boxes) if (a.r > sr.right + 1 || a.l < sr.left - 1) out.push(`viz${vi} "${a.t}" spills out of card`);
-    for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) { const a = boxes[i], c = boxes[j]; if (a.l < c.r - 1 && c.l < a.r - 1 && a.t2 < c.b - 1 && c.t2 < a.b - 1) out.push(`viz${vi} "${a.t}" ⟂ "${c.t}"`); } });
+    for (let i = 0; i < boxes.length; i++) for (let j = i + 1; j < boxes.length; j++) { const a = boxes[i], c = boxes[j]; if (a.l < c.r - 1 && c.l < a.r - 1 && a.t2 < c.b - 1 && c.t2 < a.b - 1) out.push(`viz${vi} "${a.t}" ⟂ "${c.t}"`); }
+    // 3D leader-line tags and part labels never sit on the caption (canvas label vs caption bounding boxes)
+    const capEls = [...v.querySelectorAll(".stage > .caption .label, .stage > .caption .big")].map((e) => e.getBoundingClientRect()).filter((r) => r.width);
+    for (const t of v.querySelectorAll(".t3-tag, .fus-lab")) { if (getComputedStyle(t).opacity === "0") continue; const q = t.getBoundingClientRect(); if (!q.width) continue;
+      for (const r of capEls) if (q.left < r.right - 1 && r.left < q.right - 1 && q.top < r.bottom - 1 && r.top < q.bottom - 1) out.push(`viz${vi} label "${t.textContent}" covers the caption`); } });
   // lesson pager
   const pgs = [...document.querySelectorAll(".secnav .pg")].map((e) => ({ e, r: e.getBoundingClientRect() }));
   for (const { e, r } of pgs) { if (r.right > innerWidth + 1 || r.left < -1) out.push(`pager "${e.textContent}" spills off screen`);
