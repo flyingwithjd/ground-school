@@ -919,3 +919,18 @@ html.locked #gate { display: flex; }
 @media (max-width: 420px) { .hy-o2 { font-size: 28px; } .hy-alt { font-size: 19px; } }
 .viz.elec3d .stage { aspect-ratio: 4/3.2; } .el-g { display: block; width: 100%; max-width: 420px; height: auto; margin: 0 auto 4px; } .t3-tag.bad { border-color: #ef4444; color: #fca5a5; }
 @media (max-width: 600px) { .viz.fuel3d.lim .stage { aspect-ratio: 4/2.45; } .viz.ap3d .stage { aspect-ratio: 4/3.0; } .viz.press3d .stage { aspect-ratio: 4/2.9; } }
+/* forces3d step-by-step caption (gl1-fix13) */
+.viz.forces3d .stage { aspect-ratio: 16 / 10.5; }
+@media (max-width: 700px) { .viz.forces3d .stage { aspect-ratio: 16 / 11.5; } }
+.forces3d .f3-step { padding: 8px 12px 6px; height: 124px; overflow: hidden; box-sizing: border-box; border-bottom: 1px solid #1d1d21; }
+.forces3d .f3-sh { display: flex; align-items: center; justify-content: space-between; gap: 8px; }
+.forces3d .f3-n { font: 600 11px/1 var(--mono, ui-monospace, monospace); letter-spacing: .08em; text-transform: uppercase; color: var(--muted, #9aa0a6); }
+.forces3d .f3-replay { min-width: 0; padding: 6px 14px; font-size: 14px; min-height: 34px; }
+.forces3d .f3-prog { height: 3px; margin: 6px 0 6px; background: #1d1d21; border-radius: 2px; overflow: hidden; }
+.forces3d .f3-prog i { display: block; height: 100%; width: 0; background: var(--acc, #3b82f6); }
+.forces3d .f3-step b { display: block; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; font-size: 16px; line-height: 1.25; color: #F2F1EC; }
+.forces3d .f3-step p { margin: 2px 0 0; font-size: 14px; line-height: 1.35; color: #c5c8cc; height: 2.7em; overflow: hidden; }
+.forces3d .f3-asi em { display: block; margin-top: 3px; font: 600 10px/1 var(--mono, ui-monospace, monospace); font-style: normal; letter-spacing: .06em; text-transform: uppercase; color: #c5c8cc; }
+.forces3d .ctrl-row.off { opacity: .45; }
+.forces3d .f3-pair.dwin .f3-bar:first-child i { background: rgba(242,241,236,.55); }
+.forces3d .f3-pair.dwin .f3-bar:last-child i { background: var(--acc, #3b82f6); }
