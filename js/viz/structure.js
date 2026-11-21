@@ -73,9 +73,14 @@ export function mount(host) {
   const inkMat = new THREE.LineBasicMaterial({ color: INK, transparent: true, opacity: 0.4 });
   const wingInk = new THREE.LineBasicMaterial({ color: INK, transparent: true, opacity: 0.3, clippingPlanes: clipW });
   const HIDE = new Set(["fuselage", "fairing", "engine", "fuel", "propDim", "ailerons"]), GHOST = new Set(["wing", "flaps", "struts"]);
+  // the context airplane's ink edges: every part's segments merged into two LineSegments (solid / ghosted wing), in the root's
+  // frame, so the 172 costs 2 draw calls of ink instead of one per sub-part (keeps Semimonocoque within the draw-call budget)
+  const inkSegs = { solid: [], ghost: [] }, toRoot = new THREE.Matrix4().copy(P.root.matrixWorld).invert(), tv = new THREE.Vector3();
   for (const [name, part] of Object.entries(P.parts)) part.subs.forEach((sb) => {
     sb.obj.traverse((o) => { if (o.isMesh && o.userData.part === name) o.visible = !HIDE.has(name) && !GHOST.has(name); });
-    if (!HIDE.has(name) && sb.segs.length) { const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(sb.segs, 3)); sb.obj.add(new THREE.LineSegments(g, GHOST.has(name) ? wingInk : inkMat)); } });
+    if (!HIDE.has(name) && sb.segs.length) { sb.obj.updateMatrixWorld(true); const m = new THREE.Matrix4().multiplyMatrices(toRoot, sb.obj.matrixWorld), out = inkSegs[GHOST.has(name) ? "ghost" : "solid"];
+      for (let i = 0; i < sb.segs.length; i += 3) { tv.set(sb.segs[i], sb.segs[i + 1], sb.segs[i + 2]).applyMatrix4(m); out.push(tv.x, tv.y, tv.z); } } });
+  for (const [k, a] of Object.entries(inkSegs)) if (a.length) { const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.Float32BufferAttribute(a, 3)); P.root.add(new THREE.LineSegments(g, k === "ghost" ? wingInk : inkMat)); }
   // ---------- fuselage pieces (rebuilt for each type) ----------
   // Performance: every member of one part type (all longerons, all diagonals, ...) is merged into ONE mesh with its own
   // material, so a whole mode draws in a handful of calls and isolating a part is a material colour swap, not a rebuild.
