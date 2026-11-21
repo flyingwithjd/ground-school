@@ -19,6 +19,7 @@ export const DRILLS = {
     note: "Autopilot and other \"if installed\" items are left out." },
   bstart: { name: "Before starting engine", src: "C172S POH 4", steps: ["Preflight inspection: COMPLETE", "Passenger briefing: COMPLETE", "Seats and seat belts: ADJUST and LOCK", "Brakes: TEST and SET", "Circuit breakers: CHECK IN", "Electrical equipment: OFF", "Avionics (BUS 1 and 2): OFF", "Fuel selector: BOTH", "Fuel shutoff valve: ON"], r: ["Preflight inspection: COMPLETE", "Passenger briefing: COMPLETE", "Seats and seat belts: ADJUST and LOCK", "Brakes: TEST and SET", "Circuit breakers: CHECK IN", "Electrical equipment: OFF", "Avionics master: OFF", "Fuel selector: BOTH", "Fuel shutoff valve: ON", "Avionics circuit breakers: CHECK IN"] },
 };
+const CH = 6;   // steps on screen at a time
 const PANELS = [["r", "Round gauges"], ["g", "G1000"]];
 let panel = (() => { try { return localStorage.getItem("sqs.panel") === "g" ? "g" : "r"; } catch (e) { return "r"; } })();
 export function mount(host, opts = {}) {
@@ -28,13 +29,17 @@ export function mount(host, opts = {}) {
   const steps = () => (panel === "g" ? DRILLS[key].steps : DRILLS[key].r);
   function reset() { const D = DRILLS[key]; pool = shuffle(steps().map((s, i) => ({ s, i }))); next = 0; miss = 0; t0 = 0; draw(); F.caption("Tap the steps in order", D.name + (panel === "g" ? " · G1000" : " · round gauges")); }
   function draw(flash) { const D = DRILLS[key], S = steps(); wrap.innerHTML = "";
-    const done = h("ol", { class: "cf-done" }); S.slice(0, next).forEach((s) => { const li = h("li"); li.textContent = s; done.append(li); });
+    // Long checklists come in chunks of CH: only the current chunk's steps are on screen, so the drill fits one phone screen.
+    // Earlier chunks fold into one line; the full list shows at the end.
+    const fin = next >= S.length, c0 = fin ? 0 : Math.floor(next / CH) * CH, c1 = Math.min(S.length, c0 + CH);
+    const done = h("ol", { class: "cf-done", start: c0 + 1 }); S.slice(c0, next).forEach((s) => { const li = h("li"); li.textContent = s; done.append(li); });
+    const prev = c0 > 0 ? h("p", { class: "label cf-prev" }, `✓ Steps 1–${c0} done`) : null;
     const left = h("div", { class: "cf-pool" });
-    pool.filter((o) => o.i >= next).forEach((o) => { const b = h("button", { type: "button", class: "cf-item" + (flash === o.i ? " bad" : "") }); b.textContent = o.s;
+    pool.filter((o) => o.i >= next && o.i < c1).forEach((o) => { const b = h("button", { type: "button", class: "cf-item" + (flash === o.i ? " bad" : "") }); b.textContent = o.s;
       b.addEventListener("click", () => { if (!t0) t0 = performance.now(); if (o.i === next) { next++; draw(); } else { miss++; draw(o.i); } }); left.append(b); });
     const stat = h("p", { class: "label cf-stat" });
     if (next >= S.length) { const sec = t0 ? ((performance.now() - t0) / 1000).toFixed(1) : "0"; stat.textContent = `Complete · ${sec} s · ${miss} wrong tap${miss === 1 ? "" : "s"}`; const again = h("button", { type: "button", class: "btn" }); again.textContent = "Again"; again.onclick = reset; wrap.append(done, stat, again); }
-    else { stat.textContent = `Step ${next + 1} of ${S.length}${miss ? ` · ${miss} wrong` : ""}`; wrap.append(done, stat, left); }
+    else { stat.textContent = `Step ${next + 1} of ${S.length}${miss ? ` · ${miss} wrong` : ""}`; if (prev) wrap.append(prev); wrap.append(done, stat, left); }
     F.explain((panel === "g"
       ? `Items are from the Cessna 172S NAV III (G1000) POH: a MAGNETOS switch, AVIONICS BUS 1 and 2, and a STBY BATT switch for the standby battery.`
       : `Items are from the round-gauge Cessna 172S POH: an ignition switch and one avionics master, no standby battery. Flying a G1000 172S? Switch the panel above.`)

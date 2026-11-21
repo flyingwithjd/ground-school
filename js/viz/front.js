@@ -20,7 +20,7 @@ export function mount(host, opts = {}) {
   const clouds = s("g", {}, g), labels = s("g", {}, g), me = s("g", {}, g), arrows = s("g", {}, g);
   s("line", { x1: 0, y1: 0, x2: 0, y2: -60, stroke: INK, "stroke-width": 3 }, me); s("circle", { cx: 0, cy: -72, r: 10, fill: "none", stroke: INK, "stroke-width": 3 }, me);
   const meT = TT(me, 0, 40, "YOU", { anchor: "middle", size: 14, op: 0.8 });
-  const panel = document.createElement("div"); panel.className = "readout fr-ro"; F.ctrl.append(panel);
+  const panel = document.createElement("div"); panel.className = "fr-cmp"; F.ctrl.append(panel);
   let kind = opts.kind || "cold", pos = "before";
   const cloud = (x, y, w, hh, label) => { const c = s("path", { d: `M${x - w / 2},${y} Q${x - w / 2},${y - hh} ${x - w / 4},${y - hh * 0.8} Q${x},${y - hh * 1.3} ${x + w / 4},${y - hh * 0.8} Q${x + w / 2},${y - hh} ${x + w / 2},${y} Z`, fill: "none", stroke: FAINT2, "stroke-width": 2 }, clouds); if (label) TT(labels, x, y + 26, label, { anchor: "middle", size: 13, op: 0.55 }); return c; };
   function draw(anim) { clouds.innerHTML = ""; labels.innerHTML = ""; arrows.innerHTML = "";
@@ -48,7 +48,9 @@ export function mount(host, opts = {}) {
     s("path", { d: `M${X0 - 40},${GY + 50} L${X0 + 140},${GY + 50}`, stroke: ACC, "stroke-width": 3, "marker-end": "url(#ah)" }, arrows); TT(arrows, X0 + 50, GY + 90, "front moves this way", { anchor: "middle", size: 13, op: 0.7 });
     const mx = pos === "before" ? (kind === "cold" ? 1250 : 1420) : pos === "at" ? X0 + 20 : 300; me.setAttribute("transform", `translate(${mx} ${GY})`);
     if (anim) drawOn(surf, { dur: 1500 });
-    const W = WX[kind][pos]; panel.innerHTML = ROWS.filter(([k]) => W[k] !== "–").map(([k, l]) => `<div><b>${W[k]}</b><span>${l}</span></div>`).join("");
+    // both fronts side by side for the same spot, so the comparison never needs a toggle; the drawn front's column is lit
+    const C = WX.cold[pos], Wm = WX.warm[pos], on = (k2) => (k2 === kind ? ' class="on"' : "");
+    panel.innerHTML = `<table><thead><tr><th></th><th${on("cold")}>Cold front</th><th${on("warm")}>Warm front</th></tr></thead><tbody>${ROWS.filter(([k2]) => C[k2] !== "–" || Wm[k2] !== "–").map(([k2, l]) => `<tr><th>${l}</th><td${on("cold")}>${C[k2]}</td><td${on("warm")}>${Wm[k2]}</td></tr>`).join("")}</tbody></table>`;
     F.caption(`${kind === "cold" ? "Cold" : "Warm"} front · ${pos === "before" ? "ahead of it" : pos === "at" ? "passing overhead" : "after it passes"}`, kind === "cold" ? "Fast, steep, narrow band of violent weather" : "Slow, shallow, wide band of steady weather");
     F.explain(kind === "cold" ? `Cold, dense air plows under the warm air and forces it up fast. Expect a narrow band of showers and thunderstorms right at the front. A fast-moving cold front can bring a squall line along or ahead of it. Behind it the sky clears, but winds are gusty and turbulent. <span class="src">PHAK Ch 12</span>` : `Warm air slides up over the cold air on a gentle slope, so clouds show up hundreds of miles ahead: cirrus, then cirrostratus, altostratus and nimbostratus. Expect low ceilings, poor visibility and steady precipitation over a wide area. In summer, thunderstorms can be embedded. <span class="src">PHAK Ch 12</span>`); }
   chips(F.ctrl, [["cold", "Cold front"], ["warm", "Warm front"]], kind, (v) => { kind = v; draw(true); }, { label: "Front" });

@@ -4,7 +4,7 @@ import { h, s, esc, ease, reduced, clamp } from "../core/util.js?v=ac9b353384";
 export const ACC = "#3B82F6", INK = "#F2F1EC";
 export const FAINT = "rgba(242,241,236,.22)", FAINT2 = "rgba(242,241,236,.4)";
 
-export function frame(host, { cls = "", corners = {}, caption = null, explain = "" } = {}) {
+export function frame(host, { cls = "", corners = {}, caption = null, explain = "", clamp = false } = {}) {
   const root = h("figure", { class: "viz " + cls }); const stage = h("div", { class: "stage" }); root.append(stage);
   for (const k of ["tl", "tr", "bl", "br"]) if (corners[k]) stage.append(h("div", { class: "corner " + k }, corners[k]));
   const cap = h("div", { class: "caption" }); stage.append(cap);
@@ -13,9 +13,13 @@ export function frame(host, { cls = "", corners = {}, caption = null, explain = 
   const api = { root, stage, ctrl, explainEl: ex, cleanup: [],
     // update the caption text in place so the headline underline draws on once per visual, never again on a value or label change
     caption(label, big) { if (!label && !big) { cap.innerHTML = ""; return; } const l = cap.querySelector(".label"), b = cap.querySelector(".big"); if (!!l === !!label && !!b === !!big && (l || b)) { if (l && l.textContent !== label) l.textContent = label; if (b && b.textContent !== big) b.textContent = big; return; } cap.innerHTML = `${label ? `<span class="label">${esc(label)}</span>` : ""}${big ? `<span class="big">${esc(big)}</span>` : ""}`; },
-    explain(html) { ex.innerHTML = html || ""; ex.style.display = html ? "" : "none"; },
+    explain(html) { ex.innerHTML = html || ""; ex.style.display = html ? "" : "none"; if (clamp) fold(); },
     corner(k, text) { let c = stage.querySelector(".corner." + k); if (!c) { c = h("div", { class: "corner " + k }); stage.append(c); } c.textContent = text || ""; },
     on(fn) { api.cleanup.push(fn); }, destroy() { api.cleanup.forEach((f) => { try { f(); } catch (e) {} }); root.remove(); } };
+  // clamp: a long explanation shows four lines and a More button (the full text, sources included, stays in the page)
+  let more = null; function fold() { if (!more) { ex.classList.add("ex-clamp"); more = h("button", { type: "button", class: "ex-more", "aria-expanded": "false" }, "More ▾"); ex.after(more);
+      more.addEventListener("click", () => { const o = ex.classList.toggle("open"); more.textContent = o ? "Less ▴" : "More ▾"; more.setAttribute("aria-expanded", String(o)); }); }
+    requestAnimationFrame(() => { if (ex.classList.contains("open")) return; more.style.display = ex.scrollHeight > ex.clientHeight + 2 ? "" : "none"; }); }
   if (caption) api.caption(caption[0], caption[1]); api.explain(explain);
   if (!ctrl.childNodes.length) queueMicrotask(() => { if (!ctrl.childNodes.length) ctrl.style.display = "none"; });
   const vt = host.closest && host.closest("[data-viz]"); if (vt && LIVE_FIRST.has(vt.dataset.viz)) { root.classList.add("slfirst"); queueMicrotask(() => liveFirst(root, stage, ctrl, cap, ex)); }

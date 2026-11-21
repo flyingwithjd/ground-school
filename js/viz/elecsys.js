@@ -28,7 +28,7 @@ export function mount(host) {
   let panel = "round", fc = "normal", st;
   const fresh = () => ({ bat: true, alt: true, fld: true, avion: true, land: false, pitot: false, nav: true, beacon: true, strobes: false, rpm: false, cleared: false, charge: 1, list: null, step: 0, done: false });
   st = fresh();
-  const F = frame(host, { cls: "elec3d capin", corners: { tl: "Electrical system · 28 V", tr: "POH 3, 7" } });
+  const F = frame(host, { cls: "elec3d capin", clamp: true, corners: { tl: "Electrical system · 28 V", tr: "POH 3, 7" } });
   const S3 = planeStage(F.stage, { view: { tg: [-2.6, 4.8, 0], az: -38, el: 24, d: 50 }, maxFps: 30 }), X = buildX(S3);
   const gsv = svgEl("svg", { class: "el-g", viewBox: "0 0 360 120", role: "img", "aria-label": "Electrical gauges" });
   const S = { F, redraw: () => render() };

@@ -35,12 +35,12 @@ export default {
     { id: "illus", label: "Night illusions · AFH 11 · PHAK 17", title: "When the lights lie",
       body: `<p><strong>False horizon</strong>: ground lights and stars blend together, or a sloping cloud bank or patterns of ground lights suggest a horizon that isn't level. <strong>Autokinesis</strong>: a stationary light you stare at for many seconds appears to move. Both affect vision only, and both can lead to loss of control. Keep scanning, and trust the attitude indicator. <span class="src">AFH 11 · PHAK 17</span></p>
 <p><strong>Approach illusions</strong> push you high or low:</p>`,
-      viz: { type: "approachillusion" },
       body2: `<ul><li><strong>Black hole / featureless terrain</strong> (over water or dark land, only runway lights visible) makes you think you're higher than you are, so you fly <strong>low</strong>. In the worst case you land short.</li>
 <li><strong>Bright runway and approach lights</strong> with little else lit make the runway look closer, so you fly <strong>high</strong>.</li>
 <li><strong>Narrow or upsloping runway</strong> also makes you feel high, so you fly <strong>low</strong>. A wide or downsloping runway does the opposite.</li>
 <li><strong>Roads and trains</strong>: a line of lights can be mistaken for a runway.</li></ul>
-<p><strong>Defenses</strong>: study the airport diagram and Chart Supplement, fly the VASI or PAPI, cross-check the altimeter, and go around whenever your position or altitude relative to the runway is in doubt. <span class="src">AFH 11 · PHAK 17</span></p>`,
+<p><strong>Defenses</strong>: study the airport diagram and Chart Supplement, fly the VASI or PAPI, cross-check the altimeter, and go around whenever your position or altitude relative to the runway is in doubt. <span class="src">AFH 11 · PHAK 17</span></p>
+<div class="btns mt"><a class="btn arrow" href="#/lesson/gl17/opt">Try each approach illusion yourself (GL17)</a></div>`,
       kdr: { k: "False horizon, autokinesis, black hole and other approach illusions.", d: "Name the illusion and the error it causes; use a VASI or PAPI and the altimeter.", r: "Landing short on a black-hole approach.", codes: ["PA.XI.A.K8", "PA.XI.A.R3", "PA.I.H.K1k"] } },
     { id: "equip", label: "Pilot and airplane equipment · AFH 11 · 14 CFR 91.205(c), 91.209", title: "What you carry, what the airplane needs",
       body: `<p><strong>You</strong>: at least one reliable flashlight (white for preflight; red or dim white in the cockpit) with spare batteries; charts for the route and the <em>adjacent</em> charts, because towns show up far away at night; an organized cockpit with everything within reach before you taxi. Set any EFB's brightness low. <span class="src">AFH 11</span></p>

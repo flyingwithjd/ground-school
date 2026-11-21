@@ -7,7 +7,7 @@ const ARM = { front: 37, rear: 73, bagA: 95, bagB: 123, fuel: 48 };
 const NORMAL = [[35, 1500], [35, 1950], [41, 2550], [47.3, 2550], [47.3, 1500]], UTIL = [[35, 1500], [35, 1950], [37.5, 2200], [40.5, 2200], [40.5, 1500]];
 const fwdLimit = (w) => (w <= 1950 ? 35 : 35 + ((w - 1950) / 600) * 6);
 export function mount(host) {
-  const F = frame(host, { cls: "tall capin", corners: { tl: "Weight & balance · C172S envelope", tr: "POH Sec 2, 6" } });
+  const F = frame(host, { cls: "tall capin", clamp: true, corners: { tl: "C172S CG envelope", tr: "POH Sec 2, 6" } });
   const el = svg(F.stage, "0 0 1600 1100"); const g = s("g", {}, el);
   const X0 = 170, X1 = 1540, Y0 = 940, Y1 = 90, C0 = 33, C1 = 49, W0 = 1500, W1 = 2650;
   const X = (c) => X0 + ((c - C0) / (C1 - C0)) * (X1 - X0), Y = (w) => Y0 - ((w - W0) / (W1 - W0)) * (Y0 - Y1);
@@ -24,13 +24,13 @@ export function mount(host) {
   // empty weight inputs
   const emp = h("div", { class: "numrow" });
   const num = (label, v, step) => { const i = h("input", { type: "number", value: v, step, inputmode: "decimal", "aria-label": label }); emp.append(h("label", {}, h("span", { class: "label" }, label), i)); i.addEventListener("input", calc); return i; };
-  const eW = num("Empty weight lb", 1642, 1), eM = num("Empty moment ÷1000", 62.6, 0.1); F.ctrl.append(emp);
+  const eW = num("Empty weight lb", 1642, 1), eM = num("Empty moment ÷1000", 62.6, 0.1);   // placed in the worksheet drawer below
   const V = { front: 340, rear: 310, bagA: 56, bagB: 0, fuel: 35, burn: 0 };
   const S = {};
   const add = (k, label, max, unit = "lb") => (S[k] = slider(F.ctrl, { label, min: 0, max, step: 1, value: V[k], fmt: (v) => `${v} ${unit}`, oninput: (v) => { V[k] = v; if (k === "fuel" && V.burn > v) S.burn.set(v, false), (V.burn = v); calc(); } }));
   add("front", "Pilot + front passenger", 440); add("rear", "Rear seats", 400); add("bagA", "Baggage area A", 120); add("bagB", "Baggage area B", 50); add("fuel", "Fuel (usable)", 53, "gal"); add("burn", "Fuel burned in flight", 53, "gal");
-  const set = readout(F.ctrl, [["w", "takeoff weight"], ["m", "moment ÷1000"], ["cg", "takeoff CG"], ["lcg", "landing CG"]]);
-  const tbl = h("div", { class: "wbtable" }); F.ctrl.append(tbl);
+  const set = readout(F.ctrl, [["w", "takeoff weight"], ["m", "moment ÷1000"], ["cg", "takeoff CG"], ["lcg", "landing CG"]]); F.ctrl.lastElementChild.classList.add("wb4");
+  const wbd = h("details", { class: "wbsheet" }); wbd.append(h("summary", { class: "label" }, "Empty weight and worksheet")); const tbl = h("div", { class: "wbtable" }); wbd.append(emp, tbl); F.ctrl.append(wbd);   // the full worksheet folds away so the envelope and sliders fit one phone screen
   function calc() { const ew = +eW.value || 0, em = (+eM.value || 0) * 1000;
     const rows = [["Empty", ew, ew ? em / ew : 0, em], ["Front seats", V.front, ARM.front], ["Rear seats", V.rear, ARM.rear], ["Baggage A", V.bagA, ARM.bagA], ["Baggage B", V.bagB, ARM.bagB], ["Fuel", V.fuel * 6, ARM.fuel], ["Start, taxi, runup", -8, 0, -400]].map((r) => [r[0], r[1], r[2], r[3] ?? r[1] * r[2]]);
     const ramp = rows.slice(0, 6).reduce((a, r) => a + r[1], 0); const w = rows.reduce((a, r) => a + r[1], 0), m = rows.reduce((a, r) => a + r[3], 0), cg = m / w;

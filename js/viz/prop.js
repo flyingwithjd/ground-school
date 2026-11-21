@@ -48,7 +48,7 @@ function propModel(THREE) { const P = buildPlane(THREE), blades = [], bands = []
   return Object.assign(P, { hub, blades, bands, disc }); }
 export function mount(host) {
   let stn = 2, mode = "fixed", twist = true, v = 0, thr = 1, set = 2400, b75 = betaFixed(0.75 * RAD), rpmCS = 2400;
-  const F = frame(host, { cls: "capin sec3d prop3d", corners: { tl: "Propeller", tr: "PHAK 7 · POH 2" } });
+  const F = frame(host, { cls: "capin sec3d prop3d", clamp: true, corners: { tl: "Propeller", tr: "PHAK 7 · POH 2" } });
   F.root.dataset.live = "1";   // the prop turns slowly while on screen; zero frames offscreen
   const S = planeStage(F.stage, { model: propModel, cg: [PX, PY, 0], orbit: false, maxFps: 30, fov: 24, view: { tg: [PX - 1, PY, 0], az: -42, el: 12, d: 20, fov: 24 } });
   const M3 = S.P; S.highlight(["propeller"]);
@@ -88,7 +88,7 @@ export function mount(host) {
   const r5 = row(F.ctrl, "Station"); chips(r5, [["0", "Hub"], ["1", "Mid"], ["2", "Tip"]], String(stn), (k) => { if (k == null) return; stn = +k; showBand(); redraw(); }, { label: "Blade station" });
   const r2 = row(F.ctrl, "Fly"); const sv = slider(r2, { label: "Airspeed", min: 0, max: 150, value: v, fmt: (x) => x + " KIAS", oninput: (x) => { v = x; pre.set(null); upd(); } });
   const st = slider(r2, { label: "Throttle", min: 0, max: 100, value: thr * 100, fmt: (x) => (x >= 100 ? "Full" : x <= 0 ? "Idle" : x + "%"), oninput: (x) => { thr = x / 100; pre.set(null); upd(); } });
-  const r3 = row(F.ctrl, "Try"); const pre = chips(r3, [["static", "Full-throttle static"], ["climb", "Climb"], ["cruise", "Cruise"], ["dive", "Dive"]], "static", (k) => {
+  const r3 = row(F.ctrl, "Try"); const pre = chips(r3, [["static", "Static"], ["climb", "Climb"], ["cruise", "Cruise"], ["dive", "Dive"]], "static", (k) => {
     if (!k) return; [v, thr] = { static: [0, 1], climb: [74, 1], cruise: [110, 0.85], dive: [145, 1] }[k]; sv.set(v, false); st.set(Math.round(thr * 100), false); upd(); }, { label: "Try", toggle: true });
   const r4 = row(F.ctrl, "Prop control"); const rs = slider(r4, { label: "RPM set", min: 2100, max: 2700, step: 50, value: set, fmt: (x) => x.toLocaleString("en-US") + " RPM", oninput: (x) => { set = x; upd(); } }); r4.classList.add("off"); rs.input.disabled = true;
   // constant speed: the blade angle (at 75% radius) the governor wants so the blade carries a load that matches the power
@@ -116,7 +116,7 @@ export function mount(host) {
     // which grows toward the tip) and forward with the airplane (airspeed, up the page); the air meets it from the opposite
     // direction (relative wind). Angle of attack = blade angle minus the angle of the relative wind. Same scale at every station.
     const r = ST[stn] * RAD, u = (Math.max(rpm, 1) / 60) * 2 * Math.PI * r, va = v * KT, ph = phi(v, rpm, r), be = beta(r), aoa = be - ph, bad = aoa > 15 || aoa < 0, col = bad ? COL.red : ACC;
-    const hv = Math.min(110, pw * 0.3), k = Math.min((pw * 0.56) / u, va > 1 ? hv / va : 9), c = Math.min(pw * 0.34, 170), le = [x0 + pw * 0.62, top + 40 + hv + 14];   // each station fills the panel; the angles are true
+    const hv = Math.min(wide ? 110 : 84, pw * 0.3), k = Math.min((pw * 0.56) / u, va > 1 ? hv / va : 9), c = Math.min(pw * 0.34, 170), le = [x0 + pw * 0.62, top + 40 + hv + 14];   // each station fills the panel; the angles are true
     const cb = Math.cos(be * D), sb = Math.sin(be * D), f2 = (n) => n.toFixed(1), rot = (el, x, y, a) => el.setAttribute("transform", `rotate(${f2(a)} ${f2(x)} ${f2(y)})`);
     T(g, x0, top + 8, ["Near the hub", "Mid-blade", "Near the tip"][stn], { size: 13, weight: 600 });
     T(g, x0, top + 25, `blade angle ${Math.round(be)}°`, { size: 11.5, fill: GRAY });
@@ -171,7 +171,7 @@ export function mount(host) {
     if (wide) { const gx0 = W - pad - gcw, gxc = gx0 + gcw / 2; L(g, gx0, top + 4, gx0, top + sH, { stroke: "rgba(242,241,236,.07)", w: 1 });
       if (cs) { const r = 56, y1 = top + r + 2; tach(gxc, y1, r); mp(gxc, y1 + 2 * r + 16, r); Hh = y1 + 3 * r + 34; note(gxc, Hh - 8, "middle"); Hh = Math.max(Hh, top + sH + 10); }
       else { const r = Math.min(64, gcw / 2 - 8), y1 = top + 8 + r; tach(gxc, y1, r); note(gxc, y1 + r + 26, "middle"); Hh = Math.max(top + sH + 10, y1 + r + 40); } }
-    else { const iy0 = top + sH + 18, r = 56, gy = iy0 + r + 6; L(g, pad, iy0 - 4, W - pad, iy0 - 4, { stroke: "rgba(242,241,236,.08)", w: 1 });
+    else { const iy0 = top + sH + 14, r = 56, gy = iy0 + r + 6; L(g, pad, iy0 - 4, W - pad, iy0 - 4, { stroke: "rgba(242,241,236,.08)", w: 1 });
       if (cs) { tach(pad + r + 2, gy, r); mp(W - pad - r - 2, gy, r); Hh = gy + r + 32; note(W / 2, Hh - 10, "middle"); }
       else { tach(pad + r + 2, gy, r); const tx = pad + 2 * r + 20; note(tx, gy - 4, "start"); ["fixed pitch: RPM follows", "throttle and airspeed"].forEach((s2, j) => T(g, tx, gy + 14 + j * 15, s2, { size: 11, fill: GRAY })); Hh = gy + r + 12; } }
     let cap;
