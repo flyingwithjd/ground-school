@@ -139,7 +139,9 @@ export function systems(S, F, { cowl, animatePose, setPoseNow }) {
     // flight controls: anchors on each surface's trailing edge (left side, nearest the rear-quarter camera)
     T("Aileron", CTL.ail, -20, -34, "ctl"), T("Flap", CTL.flap, -14, -40, "ctl"), T("Elevator", CTL.elev, -20, 30, "ctl"), T("Rudder", CTL.rud, 22, -30, "ctl"), T("Trim tab", CTL.trim, 26, 26, "ctl")];
   LBL.forEach((l) => (l.t.on = false));
-  let live = null, raf = 0; const loop = () => { raf = 0;
+  // label/glow loop: 30 fps at most, and only while the stage is on screen (an IntersectionObserver restarts it)
+  let live = null, raf = 0, onScreen = true, lastT = 0; const io = new IntersectionObserver((es) => { onScreen = es[0].isIntersecting; if (onScreen && live && !raf) raf = requestAnimationFrame(loop); }); io.observe(F.stage);
+  const loop = (ts) => { raf = 0; if (live && !onScreen) return; if (live && ts && ts - lastT < 32) { raf = requestAnimationFrame(loop); return; } lastT = ts || 0;
     const on = live && live.includes("elec"), t = performance.now() / 1000;
     glows.land.set(LDG, on ? 1 : 0); beam.set(LDG, on ? 1 : 0); glows.navL.set(TIPL, on ? 0.95 : 0); glows.navR.set(TIPR, on ? 0.95 : 0); glows.navT.set(TAIL, on ? 0.8 : 0);
     glows.beacon.set(BCN, on ? lightPulse(t, "beacon") : 0); const fl = on ? lightPulse(t, "strobe") : 0; glows.strobesL.set(STBL, fl); glows.strobesR.set(STBR, fl);
@@ -170,5 +172,5 @@ export function systems(S, F, { cowl, animatePose, setPoseNow }) {
     if (k === "brk") subChips.set("wheel"); F.caption(name, big); F.explain(`${rich(text)} <span class="src">${src}</span>`); };
   chips(F.ctrl, Object.keys(SYS).map((k) => [k, SYS[k][0]]), null, pick, { label: "System", toggle: true }); F.ctrl.append(sub); sub.hidden = true;
   pick(null);
-  return () => { live = null; cancelAnimationFrame(raf); };
+  return () => { live = null; cancelAnimationFrame(raf); io.disconnect(); };
 }
