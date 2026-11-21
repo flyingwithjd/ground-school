@@ -1,6 +1,6 @@
 // Position lights at night (AFH 11, 14 CFR 91.113): turn the other airplane and see which lights face you.
-import { slider } from "./base.js?v=a658135e5c";
-import { pxScene, T, L, C, planeTop, ACC, INK, GRAY, DIM } from "./kit.js?v=a658135e5c";
+import { slider } from "./base.js?v=437330da39";
+import { pxScene, T, L, C, planeTop, ACC, INK, GRAY, DIM } from "./kit.js?v=437330da39";
 const RED = "#E5484D", GRN = "#30A46C";
 export function mount(host) {
   let hdg = 270;

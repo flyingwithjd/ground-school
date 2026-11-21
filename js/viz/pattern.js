@@ -2,9 +2,9 @@
 // on upwind, level at pattern altitude on downwind, descending from abeam the approach end to a touch-and-go. The leg it is
 // on (or the leg you pick) is drawn in the accent; drop lines to the ground track show the height. Schematic: the airplane
 // is enlarged and distances are not to scale.
-import { frame, chips, row } from "./base.js?v=a658135e5c";
-import { planeStage } from "./planestage.js?v=a658135e5c";
-import { reduced } from "../core/util.js?v=a658135e5c";
+import { frame, chips, row } from "./base.js?v=437330da39";
+import { planeStage } from "./planestage.js?v=437330da39";
+import { reduced } from "../core/util.js?v=437330da39";
 import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
