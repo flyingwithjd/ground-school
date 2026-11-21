@@ -950,3 +950,5 @@ html.locked #gate { display: flex; }
   section.sec.lead > .label { display: none; }
   section.sec.lead > h2 + div .viz:first-child { margin-top: 14px; }
 }
+
+.viz.rowv .stage{aspect-ratio:1000/850}
