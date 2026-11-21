@@ -14,7 +14,8 @@ export default {
 <p class="note">Currency is the legal minimum, not proficiency. Examiners like to ask you to separate the two (ACS "night currency versus proficiency").</p>`,
       kdr: { k: "The three definitions of night; 61.57(b) currency; night training requirements.", d: "Say which definition a given rule uses and whether you are current to carry passengers.", r: "Confusing currency with proficiency.", codes: ["PA.I.A.K1", "PA.XI.A.R5"] } },
     { id: "vision", label: "Night vision · AFH 11 · PHAK 17", title: "Look beside it, not at it",
-      body: `<p>The retina has two kinds of receptors: <span class="src">AFH 11 · PHAK 17</span></p>
+      body: `<p>This lesson starts with how your eyes work in the dark. The legal meanings of night, for logging, passengers and lights, come a few pages later in "Three clocks for one sunset".</p>
+<p>The retina has two kinds of receptors: <span class="src">AFH 11 · PHAK 17</span></p>
 <ul><li><strong>Cones</strong> are packed in the center (the fovea is all cones). They give color, detail and day vision.</li>
 <li><strong>Rods</strong> are mostly in the periphery. They are far more sensitive to dim light, but they give no color and little detail.</li></ul>
 <p>That gives three kinds of vision. <strong>Photopic</strong> (day) uses cones. <strong>Mesopic</strong> (dawn, dusk, full moon) uses both, and the PHAK calls it the most dangerous period for viewing. <strong>Scotopic</strong> (night) uses rods only. <span class="src">PHAK 17 · AFH 11</span></p>

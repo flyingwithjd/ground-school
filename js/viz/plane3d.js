@@ -59,13 +59,21 @@ export function mount(host, opts = {}) {
   function cowl(show, wire = false) { (S.inkLines.cowling || []).forEach((l) => (l.visible = show || wire)); S.P.parts.cowling.subs.forEach((sb) => sb.obj.traverse((o) => o.isMesh && !o.isLineSegments2 && (o.visible = show && !wire))); S.kick(); }
   // Every part you can tap on the model has its own button (MAP targets = the Parts row + Fuselage / Wings / Landing gear).
   // Both button rows act as one set: exactly one button (or none, for parts without a button) is lit, matching the view.
-  const markChip = (key) => groups.forEach((g) => g.set(key));
-  const INTRO = ["Five major components", "Tap a part", "Drag to orbit. Tap the airplane or a button to isolate a part. Tap the same button again, or empty space, to clear it."];
+  // Five major components first; a component's own parts appear in the second row only once it (or one of its parts) is picked.
+  const SUBS = { wing: ["ailerons", "flaps", "struts", "fuel"], empennage: ["hstab", "elevator", "trimtab", "fin", "rudder"], powerplant: ["engine", "cowling", "propeller"] };
+  const PARENT = {}; for (const [k, v] of Object.entries(SUBS)) v.forEach((c) => (PARENT[c] = k));
+  let subHint = null;
+  function showSubs(major) { const g = groups[1]; if (!g) return; const list = SUBS[major] || []; g.el.querySelectorAll(".chip").forEach((b) => (b.style.display = list.includes(b.dataset.v) ? "" : "none"));
+    if (subHint) subHint.textContent = !major ? "Pick a component to see its parts" : list.length ? "" : "Tap another component to see its parts"; if (subHint) subHint.style.display = subHint.textContent ? "" : "none"; }
+  const markChip = (key) => { const major = key ? PARENT[key] || key : null; if (groups[0]) groups[0].set(major); if (groups[1]) groups[1].set(PARENT[key] ? key : null); showSubs(major); };
+  const INTRO = ["Five major components", "Tap a part", "Drag to orbit. Tap a component, on the airplane or below, to light it up; its own parts then appear in the second row. Tap the same button again, or empty space, to clear it."];
   function reset() { cur = null; markChip(null); cowl(true); S.highlight([]); S.setView("iso"); animatePose({}); F.caption(INTRO[0], INTRO[1]); F.explain(INTRO[2]); }
   function select(key) { const P = PARTS[key]; if (!P) return; cur = key; markChip(key); cowl(!P.hideCowl && !P.cowlWire, P.cowlWire); S.highlight(P.hl); S.setView(P.view); animatePose(P.pose || {}); F.caption(P.group, P.name); F.explain(P.text); }
   if (mode === "explore") {
     groups.push(chips(F.ctrl, [["fuselage", "Fuselage"], ["wing", "Wings"], ["empennage", "Empennage"], ["gear", "Landing gear"], ["powerplant", "Powerplant"]], null, (k) => (k ? select(k) : reset()), { label: "Major components", toggle: true }));
-    groups.push(chips(F.ctrl, [["ailerons", "Ailerons"], ["flaps", "Flaps"], ["struts", "Lift struts"], ["fuel", "Fuel tanks"], ["hstab", "Horizontal stabilizer"], ["elevator", "Elevator"], ["trimtab", "Trim tab"], ["fin", "Vertical stabilizer"], ["rudder", "Rudder"], ["engine", "Engine"], ["cowling", "Cowling"], ["propeller", "Propeller"]], null, (k) => (k ? select(k) : reset()), { label: "Parts", toggle: true }));
+    const r2 = h("div", { class: "p3subs" }); F.ctrl.append(r2); groups.push(chips(r2, [["ailerons", "Ailerons"], ["flaps", "Flaps"], ["struts", "Lift struts"], ["fuel", "Fuel tanks"], ["hstab", "Horizontal stabilizer"], ["elevator", "Elevator"], ["trimtab", "Trim tab"], ["fin", "Vertical stabilizer"], ["rudder", "Rudder"], ["engine", "Engine"], ["cowling", "Cowling"], ["propeller", "Propeller"]], null, (k) => (k ? select(k) : cur && PARENT[cur] ? select(PARENT[cur]) : reset()), { label: "Parts", toggle: true }));
+    subHint = h("span", { class: "label p3hint" }); r2.prepend(subHint);
+    markChip(null);   // the parts row sits under the components row, so the component buttons never move when it changes
     F.caption(INTRO[0], INTRO[1]); F.explain(INTRO[2]);
   } else if (mode === "systems") {
     const stop = systems(S, F, { cowl, animatePose, setPoseNow: (p) => { S.animate(null); curPose = { ...p }; S.pose(curPose); } }); F.on(stop);

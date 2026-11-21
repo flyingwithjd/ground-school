@@ -7,7 +7,8 @@ export default {
 <p>"VFR flight not recommended" is advice, not a prohibition, but the PHAK says to weigh it carefully. For a student pilot, your solo endorsement limits and your CFI come first. <span class="src">PHAK 13; 14 CFR 61.87</span></p>`,
       kdr: { k: "Standard, abbreviated and outlook briefings and their order.", d: "Call for a standard briefing and take notes in the briefing order.", r: "Skipping a briefing because the sky looks fine.", codes: ["PA.I.C.K1", "PA.I.C.K2"] } },
     { id: "metar", label: "METAR · PHAK 13", title: "A sentence in code",
-      body: `<p>A [[METAR]] is an observation of current surface weather. Read it left to right: type, station, date and time (UTC), modifier, wind (true, knots), visibility (statute miles), weather, sky (hundreds of feet AGL), temperature/dew point (°C), altimeter and remarks. Tap each group. <span class="src">PHAK 13</span></p>`,
+      body: `<p>A [[METAR]] is an observation of current surface weather. Read it left to right: type, station, date and time (UTC), modifier, wind (true, knots), visibility (statute miles), weather, sky (hundreds of feet AGL), temperature/dew point (°C), altimeter and remarks. Tap each group. <span class="src">PHAK 13</span></p>
+<p>The METAR is one of several weather products; "Your weather sources", later in this lesson, shows where to get each one.</p>`,
       viz: { type: "metar", opts: { kind: "metar", kinds: ["metar", "metar2"] } },
       body2: `<p>Automated stations can't see clouds above 12,000 ft, so CLR from an automated station means "nothing detected below 12,000," not a clear sky. <span class="src">PHAK 13</span></p>`,
       kdr: { k: "Every METAR group; ceilings; automated-station limits.", d: "Decode a METAR aloud and say whether it's VFR.", r: "Reading wind as magnetic or heights as MSL.", codes: ["PA.I.C.K2a", "PA.I.C.R2b"] } },
