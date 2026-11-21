@@ -18,12 +18,12 @@ function plane(g, x, y, rot, on, side) { return s("path", { d: side ? SIDE : TOP
 function arrow(g, d, on) { return s("path", { d, fill: "none", stroke: on ? ACC : INK, "stroke-width": 3, opacity: on ? 0.9 : 0.55, "marker-end": on ? "url(#ah)" : "url(#ahw)" }, g); }
 function dashed(g, d) { const p = s("path", { d, fill: "none", stroke: INK, "stroke-width": 3.5, "stroke-dasharray": "14 12", opacity: 0.85, "marker-end": "url(#ahw)" }, g); drawOn(p, { dur: 1400 }); return p; }
 function cross(g, x, y) { s("path", { d: `M${x - 16},${y - 16} L${x + 16},${y + 16} M${x + 16},${y - 16} L${x - 16},${y + 16}`, stroke: INK, "stroke-width": 3, opacity: 0.35 }, g); }
-const lab = (g, x, y, t, on, anchor = "middle") => T(g, x, y, t, { anchor, size: 34, op: on ? 1 : 0.8, fill: on ? ACC : INK });
+const lab = (g, x, y, t, on, anchor = "middle") => T(g, x, y, t, { anchor, size: 32, op: on ? 1 : 0.8, fill: on ? ACC : INK });
 const SCENES = {
   conv(g) { // A flies north, B flies west from A's right: B has it; A turns right and passes behind B
     cross(g, 330, 300); arrow(g, "M330,640 L330,500", false); arrow(g, "M700,300 L520,300", true);
     plane(g, 330, 700, -90, false); plane(g, 780, 300, 180, true); dashed(g, "M330,610 C330,470 520,430 620,420");
-    lab(g, 780, 210, "Has the right-of-way", true); lab(g, 330, 800, "Gives way: turns right", false); },
+    lab(g, 960, 168, "Has the right-of-way", true, "end"); lab(g, 445, 712, "Gives way: turns right", false, "start"); },
   head(g) { // nose to nose: both alter course to the right
     cross(g, 500, 400); arrow(g, "M240,400 L360,400", false); arrow(g, "M760,400 L640,400", false);
     plane(g, 160, 400, 0, false); plane(g, 840, 400, 180, false);

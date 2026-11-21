@@ -10,7 +10,7 @@ import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
 const LEGS = {
   dep: ["Upwind / departure", "Climb straight ahead", "After takeoff, continue straight ahead until beyond the departure end of the runway. Climb at VY (74 KIAS in the 172S, POH) unless a different speed is called for."],
-  xw: ["Crosswind", "Within 300 ft of pattern altitude", "Do not turn crosswind until beyond the departure end and within 300 feet below traffic pattern altitude. Level off at pattern altitude and turn downwind. <span class=\"src\">AC 90-66C 11.7</span>"],
+  xw: ["Crosswind", "Turn near pattern altitude", "Do not turn crosswind until beyond the departure end and within 300 feet below traffic pattern altitude. Level off at pattern altitude and turn downwind. <span class=\"src\">AC 90-66C 11.7</span>"],
   dw: ["Downwind", "Pattern altitude", "Parallel to the runway, opposite the landing direction, at traffic pattern altitude: usually 1,000 ft AGL for propeller airplanes unless the Chart Supplement publishes another. Hold it until at least abeam the approach end. <span class=\"src\">AC 90-66C App A, 11.4</span>"],
   base: ["Base", "Descending", "Turn base about 45° relative bearing from the approach end of the runway. Keep descending and managing energy toward a stabilized final. <span class=\"src\">AC 90-66C 11.4</span>"],
   final: ["Final", "Aligned with the centerline", "Complete the turn to final at least ¼ mile from the runway. Stay aligned with the extended centerline to the landing. <span class=\"src\">AIM 4-3-3 (via AC 90-66C App A)</span>"],
@@ -50,7 +50,7 @@ function build(def, side) { let pts = def.pts.map((p) => [p[0], p[1], p[2] * sid
   for (let r = 0; r < 3; r++) S.forEach((o, i) => { const a = S[Math.max(0, i - 1)], b = S[Math.min(N - 1, i + 1)]; o.bank = (a.bank + o.bank * 2 + b.bank) / 4; });
   return { S, len: acc, loop }; }
 export function mount(host, opts = {}) {
-  const F = frame(host, { cls: "capin", corners: { tl: "Not to scale" } });
+  const F = frame(host, { cls: "capin pt3", corners: { tl: "Not to scale" } });
   const still = reduced();
   const S = planeStage(F.stage, { view: { tg: [75, 8, -62], az: 100, el: 52, d: 470 }, orbit: false, maxFps: 30 }); const T = S.THREE;
   // enlarge the airplane about its CG; it is then moved along the path by its pivot
@@ -97,7 +97,7 @@ export function mount(host, opts = {}) {
   const view = () => { const v = VIEWS[mode]; return { tg: [v[0], 8, side * v[1]], az: side < 0 ? 100 : -100, el: 52, d: v[2] }; };
   const SPEED = 30;   // schematic units per second: one circuit in about 25 s
   function frameAt(now) { const r = S.renderer.getDrawingBufferSize(new T.Vector2()); if (r.x !== res.x || r.y !== res.y) { res.copy(r); mats.forEach((m) => m.resolution.copy(res)); }
-    const dist = still ? P.len * 0.45 : ((now - t0) / 1000) * SPEED; let s = P.loop ? dist % P.len : dist % (P.len + 45);
+    const dist = still ? stillS() : ((now - t0) / 1000) * SPEED; let s = P.loop ? dist % P.len : dist % (P.len + 45);
     if (!P.loop && s > P.len) s = P.len;   // pause at the end of an entry demo, then start over
     const S0 = P.S; let lo = 0, hi = S0.length - 1; while (hi - lo > 1) { const m = (lo + hi) >> 1; if (S0[m].s <= s) lo = m; else hi = m; }
     const a = S0[lo], b = S0[hi], t = Math.min(1, Math.max(0, (s - a.s) / Math.max(1e-6, b.s - a.s)));
@@ -105,6 +105,7 @@ export function mount(host, opts = {}) {
     S.pivot.position.set(p[0], p[1] + S.CG.y * K, p[2]); S.setAttitude({ yaw: a.yaw + dy * t, bank: a.bank + (b.bank - a.bank) * t, pitch: a.pitch + (b.pitch - a.pitch) * t });
     if (a.tag !== curTag) { curTag = a.tag; if (pick === "live") { setAccent(); if (mode === "circuit") say(curTag); } }
     drawTags(); return !still; }
+  function stillS() { const d = P.S.filter((o) => o.tag === "dw"); return d.length ? d[Math.floor(d.length / 2)].s : P.len * 0.45; }
   function say(k) { const L = LEGS[k] || ENTRY[k]; if (!L) return; F.caption(L[0], L[1]); F.explain(L[2]); }
   // controls: direction, then legs (legs page) or entries (entries page)
   const r1 = row(F.ctrl, "Pattern"); chips(r1, [["-1", "Left traffic"], ["1", "Right traffic"]], String(side), (v) => { side = +v; rebuild(); S.setView(view(), 900); intro(); }, { label: "Pattern direction" });
