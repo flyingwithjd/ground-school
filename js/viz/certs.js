@@ -2,9 +2,10 @@
 // A = standard airworthiness certificate (FAA Form 8100-2, white) or special (FAA Form 8130-7, pink), R = certificate of
 // aircraft registration (AC Form 8050-3), O = operating limitations, W = weight and balance; the ghosted fifth tile is the
 // radio station license, needed only outside the US. Tap a field to light it in blue and read what it means.
+// A shows BOTH airworthiness certificates at once (white standard and pink special), side by side, as compact mock-ups;
+// the stage height is set from the width to fit them exactly, and the other papers reuse that same height.
 // Sources: PHAK Ch 9 (Fig 9-8, 9-9); 14 CFR 21.175, 21.181, 47.31(c), 47.40, 47.41, 91.9, 91.203.
 import { pxScene, T, R, L, hit, INK, GRAY, DIM, ACC, ACCF } from "./kit.js?v=098eade7ef";
-import { chips } from "./base.js?v=098eade7ef";
 import { s } from "../core/util.js?v=098eade7ef";
 const PINK = "#F2A7C3", PINKF = "rgba(242,167,195,.13)", WHITEF = "rgba(242,241,236,.07)";
 const wrapT = (str, n) => { const out = []; let line = ""; for (const w of String(str).split(" ")) { if ((line + " " + w).trim().length > n) { out.push(line.trim()); line = w; } else line += " " + w; } if (line.trim()) out.push(line.trim()); return out; };
@@ -14,6 +15,13 @@ const TILES = [
   { k: "X", letter: "R", name: "Radio station license", ghost: true },
 ];
 // Each document: title lines, then fields [id, label, value, what it means, source].
+// compact rows for the side-by-side airworthiness cards: field id -> [short label, short value]
+const SHORT = {
+  std: { reg: ["1 REGISTRATION", "N0SQK (sample)"], mm: ["2 MAKE / MODEL", "Cessna 172S"], sn: ["3 SERIAL NO.", "172S00000"], cat: ["4 CATEGORY", "Normal / Utility"],
+    basis: ["5 BASIS", "Meets type design"], terms: ["6 TERMS", "No expiration date"], disp: ["DISPLAY", "At cabin entrance"] },
+  spc: { reg: ["A REGISTRATION", "N0SQK (sample)"], cat: ["B CATEGORY", "Experimental, LSA…"], lim: ["C OPER. LIMITS", "Issued with it"],
+    ferry: ["FERRY PERMIT", "Time-limited"], disp: ["DISPLAY", "At cabin entrance"] },
+};
 const DOCS = {
   std: { tint: WHITEF, edge: INK, head: ["UNITED STATES OF AMERICA", "DEPT OF TRANSPORTATION · FAA"], title: "STANDARD AIRWORTHINESS CERTIFICATE",
     fields: [
@@ -60,44 +68,53 @@ const DOCS = {
     ] },
 };
 export function mount(host) {
-  let tile = "A", kind = "std", sel = null;
-  const docKey = () => (tile === "A" ? kind : tile === "R" ? "reg" : tile === "O" ? "ops" : tile === "W" ? "wb" : "radio");
-  const sc = pxScene(host, { cls: "xtall certs", corners: { tl: "Papers on board · AROW", tr: "Sample" } }, draw);
-  const kc = chips(sc.F.ctrl, [["std", "Standard · white"], ["spc", "Special · pink"]], kind, (v) => { kind = v; sel = null; sc.redraw(); }, { label: "Airworthiness certificate type" });
-  function draw(g, W, H, top) {
-    const ph = W < 520, M = ph ? 10 : 18, tw = Math.min(W - 2 * M, 640), x0 = (W - tw) / 2;
-    // AROW strip
-    const n = TILES.length, gap = ph ? 6 : 10, tl = (tw - gap * (n - 1)) / n, th = ph ? 46 : 52;
+  let tile = "A", sel = null;   // sel: "std:reg" style key (doc:field)
+  const docKey = () => (tile === "R" ? "reg" : tile === "O" ? "ops" : tile === "W" ? "wb" : "radio");
+  const sc = pxScene(host, { cls: "certs", corners: { tl: "AROW papers", tr: "Sample" } }, draw);
+  // layout metrics shared by the height calculation and the drawing
+  const M = (W) => { const ph = W < 520, m = ph ? 10 : 18, tw = Math.min(W - 2 * m, 680); return { ph, m, tw, x0: (W - tw) / 2, th: ph ? 44 : 50, rowH: ph ? 31 : 36, headH: ph ? 46 : 52 }; };
+  const needH = (W, top) => { const k = M(W); return Math.round(top + k.th + 24 + k.headH + 7 * k.rowH + 12 + 8); };
+  let lastW = 0;
+  const fit = () => { const W = sc.F.stage.clientWidth; if (!W || W === lastW) return; lastW = W; const c = sc.F.stage.querySelector(".corner.tl"); const top = Math.max(30, c ? c.offsetTop + c.offsetHeight : 0) + 12; sc.F.stage.style.height = needH(W, top) + "px"; };
+  const ro = new ResizeObserver(fit); ro.observe(sc.F.stage); fit();
+  function field(card, D, dk, f, x, y, w, h, compact, k) { const [id, lab, val, mean, src] = f, key = dk + ":" + id, on = sel === key, gg = s("g", {}, card);
+    const r = R(gg, x - 4, y + 1, w + 8, h - 2, { stroke: on ? ACC : "rgba(242,241,236,.0)", sw: on ? 2 : 1, fill: on ? ACCF : "rgba(0,0,0,0.001)", rx: 5 });
+    const cpl = Math.floor(w / 6.9), sh = compact && SHORT[dk] && SHORT[dk][id];
+    const l1 = sh ? sh[0] : wrapT(lab, cpl)[0], v1 = sh ? (val.length * 7.2 <= w ? val : sh[1]) : (wrapT(val, Math.floor(w / 7.4))[0]);
+    T(gg, x, y + 5, l1, { size: 11, fill: on ? ACC : GRAY, base: "hanging" }); T(gg, x, y + (k.ph ? 17 : 19), v1, { size: k.ph ? 12 : 13, fill: INK, weight: 600, base: "hanging", mono: false });
+    L(gg, x, y + h, x + w, y + h, { stroke: D.edge, w: 0.6, op: 0.22 });
+    hit(gg, r, lab + ": " + val, () => { sel = key; sc.F.caption((dk === "std" ? "White · " : dk === "spc" ? "Pink · " : "") + lab.replace(/^[0-9A-C]\s+/, "").toLowerCase().replace(/^\w/, (c) => c.toUpperCase()), val); sc.F.explain(`${mean} <span class="src">${src}</span>`); sc.redraw(); }); }
+  function card(g, dk, x, y, w, h, k, compact, title, sub) { const D = DOCS[dk], cg = s("g", {}, g);
+    R(cg, x, y, w, h, { stroke: D.edge, sw: 1.4, fill: D.tint, rx: 6, dash: D.ghost ? "5 4" : null }); R(cg, x + 3, y + 3, w - 6, h - 6, { stroke: D.edge, sw: 0.6, rx: 4, op: 0.45 });
+    const wm = T(cg, x + w / 2, y + h / 2, "SAMPLE", { size: k.ph && compact ? 34 : 56, anchor: "middle", base: "middle", weight: 700, fill: D.edge, op: 0.06, mono: false }); wm.setAttribute("transform", `rotate(-24 ${x + w / 2} ${y + h / 2})`);
+    T(cg, x + w / 2, y + 10, title, { size: 13, anchor: "middle", weight: 700, base: "hanging", ls: 0.6, fill: dk === "spc" ? PINK : INK });
+    T(cg, x + w / 2, y + 27, sub, { size: 11, anchor: "middle", fill: GRAY, base: "hanging" });
+    const ix = x + 10, iw = w - 20; let cy = y + k.headH - 4; L(cg, ix, cy, ix + iw, cy, { stroke: D.edge, w: 0.8, op: 0.5 });
+    const rows = compact ? k.rowH : Math.min(64, (y + h - 8 - cy) / D.fields.length);
+    D.fields.forEach((f) => { field(cg, D, dk, f, ix, cy, iw, rows, compact, k); cy += rows; });
+    return { cy, ix, iw, cg, D }; }
+  function draw(g, W, H, top) { const k = M(W), { x0, tw, th } = k;
+    const n = TILES.length, gap = k.ph ? 6 : 10, tl = (tw - gap * (n - 1)) / n;
     TILES.forEach((t, i) => { const x = x0 + i * (tl + gap), on = tile === t.k, gg = s("g", {}, g);
       const r = R(gg, x, top, tl, th, { stroke: on ? ACC : t.ghost ? DIM : GRAY, sw: on ? 2 : 1.2, fill: on ? ACCF : "rgba(10,10,11,.6)", rx: 8, dash: t.ghost ? "4 4" : null });
-      T(gg, x + tl / 2, top + th / 2 + 1, t.letter || t.k, { size: ph ? 22 : 26, anchor: "middle", base: "middle", weight: 600, fill: on ? INK : t.ghost ? DIM : INK, mono: false });
+      T(gg, x + tl / 2, top + th / 2 + 1, t.letter || t.k, { size: k.ph ? 22 : 26, anchor: "middle", base: "middle", weight: 600, fill: on ? INK : t.ghost ? DIM : INK, mono: false });
       if (t.ghost) L(gg, x + 8, top + th - 8, x + tl - 8, top + 8, { stroke: DIM, w: 1.2 });
-      hit(gg, r, t.name + (t.ghost ? " (flights outside the US only)" : ""), () => { tile = t.k; sel = null; kc.enable(tile === "A" ? ["std", "spc"] : []); sc.redraw(); }); });
-    const D = DOCS[docKey()], cur = TILES.find((t) => t.k === tile);
-    let y = top + th + 10;
-    T(g, x0, y + 6, (cur.ghost ? "Not on board for US flights · " : "") + cur.name.toUpperCase(), { size: 11, fill: cur.ghost ? DIM : GRAY, base: "middle" });
-    y += 18;
-    // the document card
-    const dh = H - y - 10, card = s("g", {}, g); R(card, x0, y, tw, dh, { stroke: D.edge, sw: 1.4, fill: D.tint, rx: 6, dash: D.ghost ? "5 4" : null, op: D.ghost ? 0.9 : 1 });
-    R(card, x0 + 4, y + 4, tw - 8, dh - 8, { stroke: D.edge, sw: 0.6, rx: 4, op: 0.45 });
-    const wm = T(card, x0 + tw / 2, y + dh / 2, "SAMPLE", { size: ph ? 54 : 72, anchor: "middle", base: "middle", weight: 700, fill: D.edge, op: 0.06, mono: false });
-    wm.setAttribute("transform", `rotate(-24 ${x0 + tw / 2} ${y + dh / 2})`);
-    let cy = y + 16; const ix = x0 + 14, iw = tw - 28, cpl = Math.floor(iw / 6.9);
-    D.head.forEach((t) => { T(card, x0 + tw / 2, cy, t, { size: 11, anchor: "middle", fill: GRAY, base: "hanging" }); cy += 14; });
-    const tl2 = wrapT(D.title, Math.floor(iw / 8.7)); tl2.forEach((t) => { T(card, x0 + tw / 2, cy + 2, t, { size: 13, anchor: "middle", weight: 700, base: "hanging", ls: 0.8 }); cy += 17; });
-    cy += 6; L(card, ix, cy, ix + iw, cy, { stroke: D.edge, w: 0.8, op: 0.5 }); cy += 6;
-    // fields share the remaining height
-    const left = y + dh - 10 - cy, fh = Math.min(64, left / D.fields.length);
-    D.fields.forEach(([id, lab, val, mean, src]) => { const on = sel === id, gg = s("g", {}, card), fy = cy;
-      const r = R(gg, ix - 4, fy + 2, iw + 8, fh - 4, { stroke: on ? ACC : "rgba(242,241,236,.0)", sw: on ? 2 : 1, fill: on ? ACCF : "rgba(0,0,0,0.001)", rx: 5 });
-      const ll = wrapT(lab, cpl); const vl = wrapT(val, Math.floor(iw / 7.6));
-      let ty = fy + 8; ll.slice(0, 2).forEach((t) => { T(gg, ix, ty, t, { size: 11, fill: on ? ACC : GRAY, base: "hanging" }); ty += 13; });
-      vl.slice(0, fh > 50 ? 2 : 1).forEach((t) => { T(gg, ix, ty + 1, t, { size: 13, fill: INK, weight: 600, base: "hanging", mono: false }); ty += 16; });
-      if (fy + fh < y + dh - 12) L(gg, ix, fy + fh, ix + iw, fy + fh, { stroke: D.edge, w: 0.6, op: 0.22 });
-      hit(gg, r, lab + ": " + val, () => { sel = id; sc.F.caption(lab.replace(/^[0-9A-C]\s+/, "").toLowerCase().replace(/^\w/, (c) => c.toUpperCase()), val); sc.F.explain(`${mean} <span class="src">${src}</span>`); sc.redraw(); });
-      cy += fh; });
-    if (!sel) { sc.F.caption(cur.name, tile === "A" ? (kind === "std" ? "White · standard" : "Pink · special") : tile === "R" ? "Expires after 7 years" : tile === "O" ? "AFM/POH, markings, placards" : tile === "W" ? "Current empty weight and CG" : "Outside the US only");
-      sc.F.explain(tile === "X" ? "AROW lists what must be on board for a flight in the US. The radio station license only matters for international flights. <span class=\"src\">14 CFR 91.9, 91.203 · PHAK Ch 9</span>" : "Tap a field on the document to see what it means. The letters on top are the AROW papers that must be on board; this is a generic sample, not a real certificate. <span class=\"src\">14 CFR 91.9, 91.203 · PHAK Ch 9</span>"); }
+      hit(gg, r, t.name + (t.ghost ? " (flights outside the US only)" : ""), () => { tile = t.k; sel = null; sc.redraw(); }); });
+    const cur = TILES.find((t) => t.k === tile); let y = top + th + 8;
+    T(g, x0, y + 7, tile === "A" ? (k.ph ? "AIRWORTHINESS · WHITE OR PINK" : "AIRWORTHINESS CERTIFICATE · WHITE (STANDARD) OR PINK (SPECIAL)") : (cur.ghost ? "Not on board for US flights · " : "") + cur.name.toUpperCase(), { size: 11, fill: cur.ghost ? DIM : GRAY, base: "middle" });
+    y += 16; const ch = H - y - 8;
+    if (tile === "A") { const cgap = k.ph ? 8 : 14, cw = (tw - cgap) / 2;
+      card(g, "std", x0, y, cw, ch, k, true, "STANDARD", k.ph ? "White · 8100-2" : "White · FAA Form 8100-2");
+      const p = card(g, "spc", x0 + cw + cgap, y, cw, ch, k, true, "SPECIAL", k.ph ? "Pink · 8130-7" : "Pink · FAA Form 8130-7");
+      // the pink card has fewer fields: the room left says what pink covers
+      const lines = wrapT("Experimental, light-sport, restricted, ferry permits and more (tap B).", Math.floor(p.iw / (k.ph ? 5.6 : 6.2)));
+      const room = y + ch - 10 - p.cy, nl = Math.min(lines.length, Math.floor((room - 4) / 13));
+      lines.slice(0, nl).forEach((t, i) => T(p.cg, p.ix, p.cy + 8 + i * 13, nl < lines.length && i === nl - 1 ? t.replace(/\W*$/, "…") : t, { size: 11, fill: GRAY, base: "hanging", mono: false }));
+    } else { const dk = docKey(), D = DOCS[dk]; card(g, dk, x0, y, tw, ch, k, false, D.title.length * 8 > tw - 20 ? D.title.replace("CERTIFICATE OF ", "") : D.title, D.head.join(" · ").length * 6.9 < tw - 20 ? D.head.join(" · ") : D.head[D.head.length - 1]); }
+    if (!sel) { sc.F.caption(cur.name, tile === "A" ? "White = standard · pink = special" : tile === "R" ? "Expires after 7 years" : tile === "O" ? "AFM/POH, markings, placards" : tile === "W" ? "Current empty weight and CG" : "Outside the US only");
+      sc.F.explain(tile === "X" ? "AROW lists what must be on board for a flight in the US. The radio station license only matters for international flights. <span class=\"src\">14 CFR 91.9, 91.203 · PHAK Ch 9</span>"
+        : tile === "A" ? "Every airplane carries one airworthiness certificate: <strong>white</strong> (standard) for normal, utility, acrobatic, commuter and transport category aircraft, or <strong>pink</strong> (special) for the others. Tap any field to see what it means. Generic samples, not real certificates. <span class=\"src\">14 CFR 21.175, 91.203 · PHAK Ch 3, 9</span>"
+        : "Tap a field on the document to see what it means. The letters on top are the AROW papers that must be on board; this is a generic sample, not a real certificate. <span class=\"src\">14 CFR 91.9, 91.203 · PHAK Ch 9</span>"); }
   }
-  return { destroy() { sc.F.destroy(); } };
+  return { destroy() { ro.disconnect(); sc.F.destroy(); } };
 }

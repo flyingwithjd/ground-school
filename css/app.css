@@ -934,3 +934,6 @@ html.locked #gate { display: flex; }
 .forces3d .ctrl-row.off { opacity: .45; }
 .forces3d .f3-pair.dwin .f3-bar:first-child i { background: rgba(242,241,236,.55); }
 .forces3d .f3-pair.dwin .f3-bar:last-child i { background: var(--acc, #3b82f6); }
+/* certs: the stage height is set in JS from the width (both certificates fit with no empty space) */
+.viz.px.certs .stage, .viz.px.xtall.certs .stage { aspect-ratio: auto; }
+@media (max-width: 700px) { .viz.px.certs .stage, .viz.px.xtall.certs .stage { aspect-ratio: auto; } }
