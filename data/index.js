@@ -11,7 +11,7 @@ import c1 from "./lessons/c/gl1.js?v=296c20dfbe"; import c2 from "./lessons/c/gl
 import airport from "./modules/airport.js?v=296c20dfbe"; import wind from "./modules/wind.js?v=296c20dfbe"; import radio from "./modules/radio.js?v=296c20dfbe"; import regs from "./modules/regs.js?v=296c20dfbe";
 import emerg from "./modules/emerg.js?v=296c20dfbe"; import adm from "./modules/adm.js?v=296c20dfbe"; import flows from "./modules/flows.js?v=296c20dfbe"; import mnemo from "./modules/mnemo.js?v=296c20dfbe"; import vspeeds from "./modules/vspeeds.js?v=296c20dfbe";
 // Questions written from the retired oral items, and the page (section) every question comes from.
-import oralmc from "./lessons/oralmc.js?v=296c20dfbe"; import fill from "./lessons/fill.js?v=296c20dfbe"; import QSEC from "./qsec.js?v=296c20dfbe";
+import oralmc from "./lessons/oralmc.js?v=296c20dfbe"; import fill from "./lessons/fill.js?v=296c20dfbe"; import QSEC from "./qsec.js?v=296c20dfbe"; import RETIRED_MAP from "./retired.js?v=296c20dfbe";
 const SUPP = { gl1: x1, gl2: x2, gl3: x3, gl4: x4, gl5: x5, gl6: x6, gl7: x7, gl8: x8 };
 for (const [id, X] of Object.entries(SUPP)) { const L = { gl1, gl2, gl3, gl4, gl5, gl6, gl7, gl8 }[id];
   if (L.__merged) continue; L.__merged = true;   // idempotent even if this module is ever evaluated twice
@@ -28,6 +28,9 @@ for (const L of ALL) if (oralmc[L.id] && !L.__omerged) { L.__omerged = true; L.q
 for (const L of ALL) if (fill[L.id] && !L.__fmerged) { L.__fmerged = true; L.questions = [...(L.questions || []), ...fill[L.id]]; }
 // Oral (say-it-out-loud) items were retired: confidence on every answer now carries that signal. Old answers to them stay
 // in saved progress, harmlessly ignored.
+// Retired near-duplicates (data/retired.js) are dropped here; their ids stay reserved in the source files.
+export const RETIRED = new Set(Object.keys(RETIRED_MAP));
+for (const L of ALL) if (!L.__rmerged) { L.__rmerged = true; L.questions = (L.questions || []).filter((q) => !RETIRED.has(q.id)); }
 export const LESSONS = {}; export const QUESTIONS = {}; export const TOPICS = {};
 for (const L of ALL) {
   if (LESSONS[L.id]) console.error("duplicate lesson", L.id); LESSONS[L.id] = L;

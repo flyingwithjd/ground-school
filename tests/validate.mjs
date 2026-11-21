@@ -32,7 +32,12 @@ const pos = (lid) => { const k = ORDER.indexOf(lid); return k >= 0 ? k : ORDER.i
 let nSec = 0; for (const q of Object.values(QUESTIONS)) { const k = secKey(q); if (!k) { console.log("NO SECTION", q.id); bad++; continue; }
   const [lid, sid] = k.split("/"); if (!LESSONS[lid] || !(await pages(lid)).has(sid)) { console.log("BAD SECTION", q.id, k); bad++; continue; }
   if (lid !== q.lesson && !(pos(lid) <= pos(q.lesson))) { console.log("SECTION LATER THAN LESSON", q.id, k); bad++; continue; } nSec++; }
-const QS = (await import("../data/qsec.js")).default; for (const id of Object.keys(QS)) if (!QUESTIONS[id]) { console.log("STALE qsec.js ENTRY", id); bad++; }
+const { RETIRED } = await import("../data/index.js"); const RMAP = (await import("../data/retired.js")).default;
+const QS = (await import("../data/qsec.js")).default; for (const id of Object.keys(QS)) if (!QUESTIONS[id] && !RETIRED.has(id)) { console.log("STALE qsec.js ENTRY", id); bad++; }
+
+// Retired ids stay reserved: each must still exist in a source file and name a live question that carries its point.
+{ const src = fs.readdirSync("data/lessons", { recursive: true }).filter((f) => f.endsWith(".js")).map((f) => "data/lessons/" + f).concat(fs.readdirSync("data/modules").map((f) => "data/modules/" + f)).map((f) => fs.readFileSync(f, "utf8")).join("\n");
+  for (const [id, keep] of Object.entries(RMAP)) { if (!src.includes(`"${id}"`)) { console.log("RETIRED ID NOT IN SOURCE", id); bad++; } if (!QUESTIONS[keep]) { console.log("RETIRED POINTS AT MISSING", id, keep); bad++; } if (QUESTIONS[id]) { console.log("RETIRED STILL LIVE", id); bad++; } } }
 console.log("section tags", nSec, "of", Object.keys(QUESTIONS).length);
 // The page index (Course search, Now page) must match the lesson text.
 { const { execFileSync } = await import("child_process"); try { execFileSync("node", [new URL("../tools/build-pageindex.mjs", import.meta.url).pathname, "--check"], { stdio: "pipe" }); console.log("page index up to date"); } catch (e) { console.log("PAGE INDEX OUT OF DATE (run node tools/build-pageindex.mjs)"); bad++; } }
