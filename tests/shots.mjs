@@ -6,10 +6,10 @@ const b = await chromium.launch({ executablePath: "/usr/bin/google-chrome", args
 const storageState = fs.existsSync("/tmp/seeded-state.json") ? "/tmp/seeded-state.json" : undefined;
 const shots = [
   ["ipad-portrait-1024x1366_home.png", 1024, 1366, "#/"],
-  ["ipad-portrait-1024x1366_lesson-forces.png", 1024, 1366, "#/lesson/gl3/0", { viz: 1 }],
-  ["ipad-landscape-1366x1024_metar-decoder.png", 1366, 1024, "#/lesson/gl8/1", { viz: 1, tap: 6 }],
+  ["ipad-portrait-1024x1366_lesson-forces.png", 1024, 1366, "#/lesson/gl3/forces", { viz: 1 }],
+  ["ipad-landscape-1366x1024_metar-decoder.png", 1366, 1024, "#/lesson/gl8/metar", { viz: 1, tap: 6 }],
   ["ipad-landscape-1366x1024_course.png", 1366, 1024, "#/course"],
-  ["phone-390x844_cold-front.png", 390, 844, "#/lesson/gl7/5", { viz: 1 }],
+  ["phone-390x844_cold-front.png", 390, 844, "#/lesson/gl7/front", { viz: 1 }],
   ["phone-390x844_quiz.png", 390, 844, "#/practice/gl4", { quiz: 1 }],
   ["phone-390x844_home.png", 390, 844, "#/"],
   ["desktop-1440x900_3d-airplane.png", 1440, 900, "#/lesson/gl1/0", { viz: 1, wait: 3500 }],

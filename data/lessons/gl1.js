@@ -1,7 +1,7 @@
 // GL1 · Introduction to the Airplane
 export default {
   id: "gl1", code: "GL1", stage: 1, kind: "ground", title: "Introduction to the Airplane", short: "Components, construction, lift, instruments, preflight and ground operations",
-  intro: "Before you can fly an airplane you have to be able to name every part of it, know what each part does, and know where the rules come from.",
+  intro: "Meet the airplane: what each part does, how it flies, and how you check it before you go.",
   refs: ["PHAK Ch 1, 3; Glossary", "AFH Ch 2", "C172S POH Sec 1, 2, 7", "14 CFR 61", "ACS PA.I.A/B/G; PA.II.A/C/D/F"],
   topics: { "gl1.parts": "Major components", "gl1.build": "Construction types", "gl1.c172": "The Cessna 172S", "gl1.axes": "Axes of flight", "gl1.cert": "How training and certification work" },
   questions: [

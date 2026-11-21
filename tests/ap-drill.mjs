@@ -9,7 +9,7 @@ const pg = await ctx.newPage();
 const errs = []; pg.on("pageerror", (e) => errs.push(e.message));
 await pg.addInitScript(() => { try { localStorage.setItem("sqs.access", "1"); } catch (e) {} });
 const cdp = await ctx.newCDPSession(pg); await cdp.send("Network.setCacheDisabled", { cacheDisabled: true });
-await pg.goto(BASE + "#/lesson/gl2/21", { waitUntil: "domcontentloaded" });
+await pg.goto(BASE + "#/lesson/gl2/ap", { waitUntil: "domcontentloaded" });
 await pg.waitForTimeout(1800);
 await pg.evaluate(() => { const v = document.querySelector("[data-viz='ap3d']"); const tb = document.querySelector(".top"); if (v) window.scrollTo(0, v.getBoundingClientRect().top + scrollY - (tb ? tb.getBoundingClientRect().height : 8)); });
 await pg.waitForTimeout(400);

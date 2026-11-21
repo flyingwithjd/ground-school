@@ -10,7 +10,7 @@ for (const [w, hh] of [[1440, 900], [390, 844]]) {
   const ctx = await b.newContext({ viewport: { width: w, height: hh }, deviceScaleFactor: w < 700 ? 2 : 1, isMobile: w < 700, hasTouch: w < 700 }); const pg = await ctx.newPage();
   await pg.addInitScript(() => { try { localStorage.setItem("sqs.access", "1"); } catch (e) {} });
   const errs = []; pg.on("pageerror", (e) => errs.push(e.message)); pg.on("console", (m) => m.type() === "error" && errs.push(m.text()));
-  await pg.goto(BASE + "#/lesson/gl1/2"); await pg.waitForTimeout(2500);
+  await pg.goto(BASE + "#/lesson/gl1/build"); await pg.waitForTimeout(2500);
   await pg.evaluate(() => { const v = document.querySelector('[data-viz="structure"] .viz'); window.scrollTo(0, v.getBoundingClientRect().top + scrollY - 90); }); await pg.waitForTimeout(1500);
   const viz = pg.locator('[data-viz="structure"] .viz');
   const shot = async (name) => { await pg.evaluate(() => document.querySelectorAll("body *").forEach((e) => { const p = getComputedStyle(e).position; if ((p === "fixed" || p === "sticky") && !e.closest(".viz")) e.style.visibility = "hidden"; }));

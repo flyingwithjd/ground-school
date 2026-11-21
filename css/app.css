@@ -941,3 +941,12 @@ html.locked #gate { display: flex; }
 .units-inc > summary { cursor: pointer; list-style: none; }
 .units-inc > summary::-webkit-details-marker { display: none; }
 .units-inc[hidden] { display: none; }
+/* phones: a tighter lesson opening so the first page's lead visual (GL1: the 3D airplane) starts on the first screen */
+@media (max-width: 600px) {
+  .hero:not(.compact) .label { margin-bottom: 10px; }
+  .hero:not(.compact) > p { font-size: 17px; margin-top: 12px; }
+  .hero + nav.steps, nav.steps { margin-top: 18px; }
+  .pagelist { margin-top: 6px; }
+  section.sec.lead > .label { display: none; }
+  section.sec.lead > h2 + div .viz:first-child { margin-top: 14px; }
+}

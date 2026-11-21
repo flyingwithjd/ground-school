@@ -35,7 +35,7 @@ for (const [w, hh] of ALLW.filter(([w]) => !WANT.length || WANT.includes(w))) {
   }
   // GL1 §2 fuselage: the in-stage "Show a dent" button (Monocoque only) never covers the airplane or a label, and stays put when toggled
   if (w !== 1024) for (const _ of [0]) {
-    await pg.goto("about:blank"); await pg.goto(BASE + "#/lesson/gl1/2"); await pg.waitForTimeout(2200);
+    await pg.goto("about:blank"); await pg.goto(BASE + "#/lesson/gl1/build"); await pg.waitForTimeout(2200);
     const fv = pg.locator('[data-viz="structure"] .viz'); await fv.evaluate((v) => window.scrollTo(0, v.getBoundingClientRect().top + scrollY - 90)); await pg.waitForTimeout(500);
     const dchk = async (what, wantText) => { checks++; const r = await fv.evaluate((v) => { const st = v.querySelector(".stage"), sr = st.getBoundingClientRect(), b = st.querySelector(".fus-dent");
         if (!b || b.hidden || !b.offsetParent) return { vis: false }; const br = b.getBoundingClientRect(), [ml, mt, mr, mb] = (st.__mbox ? st.__mbox() : [0, 0, 0, 9999]);

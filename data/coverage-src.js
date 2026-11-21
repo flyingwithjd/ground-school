@@ -4,7 +4,7 @@
 // Status: "good" = taught in at least one section and tested by 3+ questions; "thin" = taught but fewer than 3 questions; "missing" = not found.
 export const COVERAGE = {
   gl1: { refs: "PHAK 1, 3 · AFH 2 · POH 1 · ACS PA.I.G, PA.II", units: ["gl1", "fw1"], items: [
-    ["Aircraft design, certification and airworthiness", "airworth|type certificate|certificated", ["design", "papers"]],
+    ["Aircraft design, certification and airworthiness", "airworth|type certificate|certificated", ["papers"]],
     ["Lift and basic aerodynamics", "\\blift\\b", ["aero"]],
     ["Major components", "fuselage|empennage|major components?", ["parts"]],
     ["Fuselage", "fuselage|monocoque", ["parts", "build"]],

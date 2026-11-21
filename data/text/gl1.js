@@ -10,8 +10,8 @@ export default {
       <p><strong>[[Landing gear]].</strong> The principal support on the ground. A [[nosewheel]] design is <strong>[[tricycle gear|Tricycle gear]]</strong>; a [[tailwheel|Conventional gear]] design is <strong>[[conventional gear|Conventional gear]]</strong>. Gear can be fixed or [[retractable|Retractable gear]], and airplanes can also use [[floats]] for water or skis for snow. On a nosewheel airplane the CG is ahead of the main wheels, so it tends to track straight; on a tailwheel airplane the CG is behind the mains, so a swerve tends to grow into a [[ground loop]]. <span class="src">PHAK 3, 7</span></p>
       <p><strong>[[Powerplant|Powerplant]].</strong> The engine and the propeller. In a piston trainer, two [[magnetos]] fire the spark plugs independently of the [[electrical system|Electrical system]]. The engine turns the propeller and also drives the [[electrical system|Electrical system]] and, in many airplanes, a [[vacuum|Vacuum system]] source for some instruments. A [[firewall]] separates the engine compartment from the cabin. <span class="src">PHAK 3</span></p>
       <div class="why"><span class="label">Why it matters</span><p>Every later lesson, every checklist line and every radio call assumes you can find these parts instantly. During preflight you will be checking each one for damage, and the examiner will ask you what each does.</p></div>
-      <p>Tap any part of the airplane below, or pick one from the list.</p>`,
-      viz: [{ type: "plane3d", opts: { mode: "explore" } }, { type: "gear3d", after: "p:nth-of-type(6)" }],
+      <p>Tap any part of the airplane above, or pick one from the list.</p>`,
+      viz: { type: "plane3d", before: true, opts: { mode: "explore" } },
       kdr: { k: "Name the five major components and the movable surfaces on each.", d: "Point to and name each part during a walkaround.", r: "A part you cannot name is a part you will not inspect properly.", codes: "PA.I.G.K1a, PA.II.A.K3a" } },
     { id: "build", label: "Construction · PHAK 3", title: "Truss, shell, or both",
       body: `<p>Older airplanes used an open <strong>[[truss structure]]</strong>: tubes of wood, steel or aluminum called <strong>[[longerons|longerons]]</strong>, welded or braced into a rigid framework. It is strong but hard to streamline, so fabric or skin is stretched over [[formers|Former]] to give shape. <span class="src">PHAK 3</span></p>
@@ -39,7 +39,7 @@ export default {
       <tr><td>Size</td><td>Span 36 ft 1 in; length 27 ft 2 in; wheelbase 65 in</td></tr></table></div>
       <p class="src">C172S POH Sec 1, 2, 7 (Information Manual)</p>
       <div class="note">Many 172S airplanes have the Garmin [[G1000]] glass flight deck instead of the conventional "six-pack" instruments. The [[airframe|Airframe]], engine and limitations above are the same family, but instrument and electrical details differ. Learn the version you fly.</div>
-      <p>The next page looks inside the engine at what happens in each cylinder.</p>`,
+      <p>Later in this lesson you'll look inside the engine at what happens in each cylinder.</p>`,
       viz: { type: "plane3d", opts: { mode: "tour" } },
       kdr: { k: "State the engine, fuel, oil and flap facts for your trainer.", d: "Find each item on the airplane: oil dipstick, fuel caps and drains, flap lever and indicator.", r: "Wrong fuel grade or low oil are preflight catches, not in-flight discoveries.", codes: "PA.I.G.K1c, PA.I.G.K1e" } },
     { id: "engine", label: "Inside the engine · PHAK 7", title: "Smooth burn, not a bang",

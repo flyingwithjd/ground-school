@@ -8,7 +8,7 @@ const b = await chromium.launch({ executablePath: "/usr/bin/google-chrome", args
 const ctx = await b.newContext({ viewport: { width: 390, height: 844 }, hasTouch: true, isMobile: true }); const pg = await ctx.newPage();
 const errs = []; pg.on("pageerror", (e) => errs.push(e.message));
 await pg.addInitScript(() => { try { localStorage.setItem("sqs.access", "1"); } catch (e) {} });
-await pg.goto(BASE + (process.env.ROUTE || "#/lesson/gl1/7"), { waitUntil: "domcontentloaded" }); await pg.waitForTimeout(1800);
+await pg.goto(BASE + (process.env.ROUTE || "#/lesson/gl1/aero"), { waitUntil: "domcontentloaded" }); await pg.waitForTimeout(1800);
 await pg.evaluate(() => { const v = document.querySelector("[data-viz='forces3d']"); const tb = document.querySelector(".top"); window.scrollTo(0, v.getBoundingClientRect().top + scrollY - (tb ? tb.getBoundingClientRect().height : 8)); });
 const click = (t) => pg.evaluate((t) => [...document.querySelectorAll("[data-viz=forces3d] button")].find((x) => x.textContent.trim() === t).click(), t);
 const read = () => pg.evaluate(() => { const d = document.querySelector("figure.forces3d").dataset; return { V: +d.v, T: +d.thrust, D: +d.drag, L: +d.lift, P: +d.pitch, ph: +d.phase, busy: d.busy, step: document.querySelector(".f3-step b").textContent }; });

@@ -54,7 +54,7 @@ async function run(label, route, { behindChip = "CG behind mains", sizes = [[390
   }
 }
 
-await run("GL1 parts", "#/lesson/gl1/0", { behindChip: "CG behind mains" });
+// GL1 parts no longer carries the gear demo (Nov 2026 reorder: it lives on GL2 Airframe systems only)
 await run("GL2 types", "#/lesson/gl2/airframe", { behindChip: "Tailwheel", sizes: [[390, 844]] });
 await b.close();
 console.log(bad ? `${bad} problem(s)` : "gear swerve: all good");
