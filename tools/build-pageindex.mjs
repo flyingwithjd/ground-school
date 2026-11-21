@@ -5,13 +5,13 @@ import fs from "fs";
 globalThis.window ||= { addEventListener() {} }; globalThis.localStorage ||= { getItem() { return null; }, setItem() {} };
 const R = new URL("..", import.meta.url).pathname;
 const ow = console.warn; console.warn = () => {}; const D = await import(R + "data/index.js"); console.warn = ow;
-const { mergeSections } = await import(R + "js/views/merge-sections.js");
+const { mergeSections } = await import(R + "js/views/merge-sections.js"); const { PAGE_ORDER } = await import(R + "data/order.js");
 const G = (await import(R + "data/glossary.js")).GLOSSARY;
 export async function buildIndex() {
   const ids = [...D.ORDER.filter((id) => D.LESSONS[id]), ...Object.keys(D.LESSONS).filter((id) => !D.ORDER.includes(id))];
   const lessons = {}; const text = [];
   for (const id of ids) { const L = D.LESSONS[id]; const m = await import(R + `data/text/${id}.js`); const xf = R + `data/text/x/${id}.js`; const x = L.textx && fs.existsSync(xf) ? await import(xf) : null;
-    const ss = mergeSections(m.default.sections || [], x ? x.default.sections || [] : []);
+    const ss = mergeSections(m.default.sections || [], x ? x.default.sections || [] : [], PAGE_ORDER[id]);
     lessons[id] = ss.map((s) => [s.id, String(s.label || "").replace(/\s+/g, " ").trim(), String(s.title || "").replace(/<[^>]+>/g, "").replace(/\s+/g, " ").trim()]);
     ss.forEach((s) => text.push([id + "/" + s.id, [s.title, s.body, s.body2, s.kdr && [s.kdr.k, s.kdr.d, s.kdr.r].join(" ")].join(" ").replace(/<[^>]+>/g, " ").replace(/\[\[([^\]|]+)(?:\|([^\]]+))?\]\]/g, (_, a, b) => a + " " + (b || "")).toLowerCase()])); }
   const terms = {}; const rx = (k) => new RegExp("(^|[^a-z0-9])" + k.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + "(s|es)?([^a-z0-9]|$)");

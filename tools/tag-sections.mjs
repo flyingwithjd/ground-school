@@ -8,7 +8,7 @@ import fs from "fs";
 globalThis.window ||= { addEventListener() {} }; globalThis.localStorage ||= { getItem() { return null; }, setItem() {} };
 const R = new URL("..", import.meta.url).pathname;
 const D = await import(R + "data/index.js");
-const { mergeSections } = await import(R + "js/views/merge-sections.js");
+const { mergeSections } = await import(R + "js/views/merge-sections.js"); const { PAGE_ORDER } = await import(R + "data/order.js");
 const REVIEW = new Set(["gl6", "gl12", "gl18", "gl19", "fl7"]);   // stage-check prep lessons: their questions review earlier lessons
 // reviewed by hand: the topic's own page is right even though the words point elsewhere
 const KEEP = new Set(["gl1c-07", "gl3-03", "em1-03", "gl5c-19", "gl1x-25"]);
@@ -18,7 +18,7 @@ const secText = (s) => [s.title, s.label, s.body, s.body2, s.kdr && [s.kdr.k, s.
 const qText = (q) => [q.q, (q.c || []).join(" "), q.c && q.a != null ? (q.c[q.a] + " ").repeat(2) : "", q.why].join(" ");
 export async function lessonSections(id) { const L = D.LESSONS[id];
   const m = await import(R + `data/text/${id}.js`); const xf = R + `data/text/x/${id}.js`; const x = L.textx && fs.existsSync(xf) ? await import(xf) : null;
-  return mergeSections(m.default.sections || [], x ? x.default.sections || [] : []); }
+  return mergeSections(m.default.sections || [], x ? x.default.sections || [] : [], PAGE_ORDER[id]); }
 const SECS = {}; for (const id of Object.keys(D.LESSONS)) SECS[id] = await lessonSections(id);
 // document frequencies over every page in the course
 const pages = []; for (const [lid, ss] of Object.entries(SECS)) ss.forEach((s, i) => pages.push({ lid, sid: s.id, i, tf: count(tok(secText(s))) }));

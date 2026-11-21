@@ -1,20 +1,21 @@
-import { h, esc, pct } from "../core/util.js?v=7b96b5d687";
-import { S, save, lessonState } from "../core/store.js?v=7b96b5d687";
-import { LESSONS, lessonItems } from "../../data/index.js?v=7b96b5d687";
-import { lessonStats, onlyReached, nextLesson } from "../core/progress.js?v=7b96b5d687";
-import { plan, pick, wrapPool, pageIds, pageStats, pageBlind, cpState, cpMark, finish } from "../core/flow.js?v=7b96b5d687";
-import { get } from "../core/srs.js?v=7b96b5d687";
-import { rich, autoTerms } from "../core/rich.js?v=7b96b5d687";
-import { mountViz, destroyAll } from "../viz/index.js?v=7b96b5d687";
-import { practiceSet, allLabel, session } from "./quiz.js?v=7b96b5d687";
-import { mergeSections } from "./merge-sections.js?v=7b96b5d687";
+import { h, esc, pct } from "../core/util.js?v=fd8c244ed1";
+import { S, save, lessonState } from "../core/store.js?v=fd8c244ed1";
+import { LESSONS, lessonItems } from "../../data/index.js?v=fd8c244ed1";
+import { lessonStats, onlyReached, nextLesson } from "../core/progress.js?v=fd8c244ed1";
+import { plan, pick, wrapPool, pageIds, pageStats, pageBlind, cpState, cpMark, finish } from "../core/flow.js?v=fd8c244ed1";
+import { get } from "../core/srs.js?v=fd8c244ed1";
+import { rich, autoTerms } from "../core/rich.js?v=fd8c244ed1";
+import { mountViz, destroyAll } from "../viz/index.js?v=fd8c244ed1";
+import { practiceSet, allLabel, session } from "./quiz.js?v=fd8c244ed1";
+import { mergeSections } from "./merge-sections.js?v=fd8c244ed1";
+import { PAGE_ORDER } from "../../data/order.js?v=fd8c244ed1";
 export { mergeSections };
 const KIND = { ground: "Ground lesson", flight: "Flight lesson briefing", module: "Module unit" };
 // Lesson text is code-split: question banks load up front (the review engine needs them); prose loads when the lesson opens.
 // Supplement sections (data/text/x/<id>.js) slot in after the section named by `at` ("^" = first), else at the end.
 export function loadLesson(id) { const L0 = LESSONS[id]; if (!L0) return Promise.reject(new Error("Lesson not found."));
-  return Promise.all([import(`../../data/text/${id}.js?v=7b96b5d687`), L0.textx ? import(`../../data/text/x/${id}.js?v=7b96b5d687`) : null])
-    .then(([m, x]) => ({ ...L0, ...m.default, sections: mergeSections(m.default.sections || [], x ? x.default.sections || [] : []) })); }
+  return Promise.all([import(`../../data/text/${id}.js?v=fd8c244ed1`), L0.textx ? import(`../../data/text/x/${id}.js?v=fd8c244ed1`) : null])
+    .then(([m, x]) => ({ ...L0, ...m.default, sections: mergeSections(m.default.sections || [], x ? x.default.sections || [] : [], PAGE_ORDER[id]) })); }
 // One page of lesson prose with its visuals, Know/Do/Risk card and ACS codes (also used by the Review blind spots lesson).
 export function renderPage(sec, S0, terms = autoTerms) {
   sec.innerHTML = `<span class="label">${esc(S0.label)}</span><h2>${esc(S0.title)}</h2>`;
@@ -56,7 +57,8 @@ function build(p, L, id, secIdx) {
   // the V-speeds lesson defines these terms in place, so it skips the dotted underlines
   const terms = id === "vs1" ? () => {} : autoTerms;
   terms(top.querySelector("p")); p.append(top);
-  if (L.includes) { const inc = h("div", { class: "mt" }); inc.innerHTML = `<div class="list-head mt2"><span class="label">This lesson includes these units</span><span class="label">Readiness</span></div>${L.includes.map((u) => { const U = LESSONS[u]; const s = lessonStats(u); return `<a class="row" href="#/lesson/${u}"><span class="code">${U.code}</span><span><div class="t">${esc(U.title)}</div><div class="s">${esc(U.short || "")}</div></span><span><div class="meter"><i style="width:${Math.round(s.readiness * 100)}%"></i></div></span></a>`; }).join("")}`; p.append(inc); }
+  // Included units: a collapsed list on the first page and the wrap-up only, so it never pushes every page's content down.
+  let inc = null; if (L.includes) { inc = h("details", { class: "mt units-inc" }); inc.innerHTML = `<summary class="list-head mt2"><span class="label">This lesson includes ${L.includes.length} units ▾</span><span class="label">Readiness</span></summary>${L.includes.map((u) => { const U = LESSONS[u]; const s = lessonStats(u); return `<a class="row" href="#/lesson/${u}"><span class="code">${U.code}</span><span><div class="t">${esc(U.title)}</div><div class="s">${esc(U.short || "")}</div></span><span><div class="meter"><i style="width:${Math.round(s.readiness * 100)}%"></i></div></span></a>`; }).join("")}`; p.append(inc); }
   const stepBar = h("nav", { class: "steps", "aria-label": "Lesson steps" }); p.append(stepBar);
   // Every page with its readiness, so the weak parts of a lesson are easy to spot and open.
   const plist = h("details", { class: "pagelist" }); plist.innerHTML = `<summary><span class="label">Pages and readiness</span><span class="label pl-now"></span></summary><div class="plist"></div>`; p.append(plist);
@@ -87,7 +89,7 @@ function build(p, L, id, secIdx) {
     else if (s.kind === "prep") { briefing(sec); terms(sec); }
     else if (s.kind === "cp") checkpoint(sec, s);
     else wrapUp(sec);
-    mark(); top.classList.toggle("compact", cur > 0);
+    mark(); top.classList.toggle("compact", cur > 0); if (inc) inc.hidden = !(cur === 0 || s.kind === "wrap");
     // Pager: two equal cells, a mono PREVIOUS / NEXT label over a title that wraps to 2 lines, so long titles never collide.
     const nav = h("nav", { class: "secnav", "aria-label": "Lesson sections" });
     const cell = (cls, label, title) => { const b = h("button", { class: "pg " + cls, type: "button" }); b.append(h("span", { class: "pg-l" }, label), h("span", { class: "pg-t" }, title)); if (title) b.title = title; return b; };
