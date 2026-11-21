@@ -5,6 +5,7 @@ import { h, reduced } from "../core/util.js?v=098eade7ef";
 import { mount as taxiWind } from "./taxiwind.js?v=098eade7ef";
 import { mount as walkaround } from "./walkaround.js?v=098eade7ef";
 import { systems } from "./systems3d.js?v=098eade7ef";
+import { tags3d } from "./tags3d.js?v=098eade7ef";
 // Pose sign conventions (model): ail>0 rolls right, elev<0 = trailing edge up (nose up), rud>0 = right rudder, steer>0 = nose wheel left.
 const PARTS = {
   fuselage: { name: "Fuselage", group: "Major component", hl: ["fuselage", "fairing"], view: "iso", text: "The central body. Carries crew, passengers and cargo, and joins the wings and tail. Semimonocoque aluminum on the 172." },
@@ -69,16 +70,18 @@ export function mount(host, opts = {}) {
   } else if (mode === "systems") {
     const stop = systems(S, F, { cowl, animatePose, setPoseNow: (p) => { S.animate(null); curPose = { ...p }; S.pose(curPose); } }); F.on(stop);
   } else {
-    const prev = h("button", { class: "btn ghost", type: "button" }, "←"), next = h("button", { class: "btn pri arrow", type: "button" }, "Next");
-    const dots = chips(F.ctrl, TOUR.map((t, i) => [String(i), t.big]), "0", (v) => show(+v), { label: "Tour stops" }); F.ctrl.append(h("div", { class: "btns" }, prev, next));
-    prev.onclick = () => show((ti + TOUR.length - 1) % TOUR.length); next.onclick = () => show((ti + 1) % TOUR.length);
-    function show(i) { ti = i; dots.set(String(i)); const T = TOUR[i]; cowl(!T.hideCowl); S.highlight(T.hl); S.setView(T.view); F.caption(T.label, T.big); F.explain("");
-      const t0 = performance.now(); curPose = {};
-      if (T.spin) S.animate((now) => S.pose({ prop: ((now - t0) / 1000) * 0.9 }));
-      else if (T.flapCycle) S.animate((now) => { const t = ((now - t0) / 1000) % 8; const st = [0, 10, 20, 30, 30, 0]; const k = Math.min(Math.floor(t / 1.4), 5); const f = st[k] + ((st[Math.min(k + 1, 5)] - st[k]) * ease(Math.min(1, (t - k * 1.4) / 0.9))) ; S.pose({ flap: f }); F.corner("tr", `Flaps ${Math.round(st[Math.min(k + 1, 5)] === st[k] ? st[k] : f)}°`); });
-      else if (T.steerCycle) S.animate((now) => S.pose({ steer: Math.sin((now - t0) / 900) * 10 }));
-      else { S.animate(null); S.pose({}); F.corner("tr", SPEC); } }
-    show(0);
+    // "tour": the 172's key facts all at once, as labels on one view (gl1-fix13: replaces a 7-stop click-through tour that
+    // repeated the spec table on the same page). Static scene: no frames while idle.
+    const TG = tags3d(F.stage), SPECS = [["High wing · struts", [-1.6, 7.25, -12.5], -24, -34], ["180 hp engine", [5.2, 5.0, -1.0], 14, -40], ["76 in prop", [7.25, 7.4, 0], 22, -22],
+      ["Electric flaps", [-3.75, 6.7, -5.8], -36, 30], ["56 gal in wings", [-0.4, 7.0, 7.5], 28, -28], ["Tricycle gear", [5.7, 0.45, 0], 22, 26]];
+    const L3 = SPECS.map(([t, at, dx, dy]) => ({ t: TG.add(t, { dx, dy }), at }));
+    S.highlight([]); S.setView({ tg: [-3.4, 4.4, 0], az: -38, el: 20, d: 46 }, 1);
+    // each label goes outward from the airplane's middle, so they fan out around it instead of stacking
+    const place = () => { const qs = L3.map((l) => S.project(l.at)), c = S.project([-3.4, 4.4, 0]);
+      L3.forEach((l, i) => { const vx = qs[i].x - c.x, vy = qs[i].y - c.y, n = Math.hypot(vx, vy) || 1; l.t.dx = (vx / n) * 26 + (vx < 0 ? -6 : 6); l.t.dy = (vy / n) * 30 + (vy < 0 ? -8 : 8); });
+      TG.place(L3.map((l, i) => ({ t: l.t, q: qs[i] })), 34); };
+    S.animate(() => { place(); return false; }, { idle: true });
+    F.caption("Four seats · high wing", "Cessna 172S"); F.explain("The 172S's key facts on one view; the table below has the details. Drag to orbit.");
   }
   return { destroy() { S.destroy(); F.destroy(); } };
 }
