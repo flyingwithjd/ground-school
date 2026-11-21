@@ -17,8 +17,8 @@ export function frame(host, { cls = "", corners = {}, caption = null, explain = 
     corner(k, text) { let c = stage.querySelector(".corner." + k); if (!c) { c = h("div", { class: "corner " + k }); stage.append(c); } c.textContent = text || ""; },
     on(fn) { api.cleanup.push(fn); }, destroy() { api.cleanup.forEach((f) => { try { f(); } catch (e) {} }); root.remove(); } };
   // clamp: a long explanation shows four lines and a More button (the full text, sources included, stays in the page)
-  let more = null; function fold() { if (!more) { ex.classList.add("ex-clamp"); more = h("button", { type: "button", class: "ex-more", "aria-expanded": "false" }, "More ▾"); ex.after(more);
-      more.addEventListener("click", () => { const o = ex.classList.toggle("open"); more.textContent = o ? "Less ▴" : "More ▾"; more.setAttribute("aria-expanded", String(o)); }); }
+  let more = null; function fold() { if (!more) { ex.classList.add("ex-clamp"); more = h("button", { type: "button", class: "ex-more", "aria-expanded": "false" }, "Full explanation ▾"); ex.before(more);   // above the text, so it never moves when the text opens
+      more.addEventListener("click", () => { const o = ex.classList.toggle("open"); more.textContent = o ? "Shorter ▴" : "Full explanation ▾"; more.setAttribute("aria-expanded", String(o)); }); }
     requestAnimationFrame(() => { if (ex.classList.contains("open")) return; more.style.display = ex.scrollHeight > ex.clientHeight + 2 ? "" : "none"; }); }
   if (caption) api.caption(caption[0], caption[1]); api.explain(explain);
   if (!ctrl.childNodes.length) queueMicrotask(() => { if (!ctrl.childNodes.length) ctrl.style.display = "none"; });
@@ -33,7 +33,7 @@ function liveFirst(root, stage, ctrl, cap, ex) {
   const items = [...ctrl.children].filter((c) => c.classList.contains("slider") || (c.classList.contains("ctrl-row") && c.querySelector(".slider")));
   let live = null; if (items.length) { live = h("div", { class: "ctrl ctrl-live" }); items.forEach((c) => live.append(c)); stage.after(live); }
   if (!ctrl.children.length) ctrl.style.display = "none"; else (live || stage).after(ctrl);   // chips next, before any strip, chart or readout under the stage
-  if (root.classList.contains("capin")) root.insertBefore(cap, ex);
+  if (root.classList.contains("capin")) { const m = ex.previousElementSibling; root.insertBefore(cap, m && m.classList.contains("ex-more") ? m : ex); }
 }
 // A control row that always takes its own full line in the controls bar, with a small mono label in front.
 // Groups placed in separate rows never end up side by side, whatever the selection.

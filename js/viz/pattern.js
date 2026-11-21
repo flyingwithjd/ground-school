@@ -102,9 +102,10 @@ export function mount(host, opts = {}) {
   ["dep", "xw", "dw", "base", "final"].forEach((k) => mkTag(k, NAME[k])); mkTag("wind", "Wind 090°").classList.add("wind");
   let tagPos = {};
   function placeTags() { const z = side, has = (k) => P.S.some((o) => o.tag === k);
-    tagPos = { dw: [RWL / 2, PA, z * (OFF + 16)], xw: [XX - 8, PA * 0.9, z * OFF * 0.5, "in"], base: [BX + 8, 40, z * OFF * 0.5, "in"], final: [BX * 0.5, 0, -z * 34], dep: [(RWL + XX) / 2 + 6, 0, -z * 34], wind: [RWL / 2, 0, -z * 60] };
+    tagPos = { dw: [RWL / 2, PA, z * (OFF + 26)], xw: [XX - 8, PA * 0.9, z * OFF * 0.5, "in"], base: [BX + 8, 40, z * OFF * 0.5, "in"], final: [BX * 0.5, 0, -z * 34], dep: [(RWL + XX) / 2 + 6, 0, -z * 34], wind: [RWL / 2, 0, -z * 60] };
     if (mode !== "circuit") for (const k of ["dep", "xw", "dw", "base", "final"]) if (!has(k)) delete tagPos[k];
-    if (mode === "out") tagPos.dep = [XX + 50, PA, z * 26]; }
+    if (mode === "out") tagPos.dep = [XX + 50, PA, z * 26];
+    if (mode === "e45" || mode === "mid") tagPos.dw = [RWL * 0.2, PA, z * (OFF + 26)]; }   // keep the label off the entry line, which joins at midfield
   function drawTags() { tagEls.forEach((e) => { const p3 = tagPos[e.dataset.k]; if (!p3) { e.style.display = "none"; return; } const q = S.project(p3, false); e.style.display = ""; e.style.left = Math.round(q.x) + "px"; e.style.top = Math.round(q.y) + "px";
       // "in" tags sit just inside the rectangle beside their leg: the label grows toward the pattern's middle, never across the line
       if (p3[3] === "in") { const c = S.project([(BX + XX) / 2, PA, side * OFF * 0.5], false); e.style.transform = q.x > c.x ? "translate(-100%,-50%)" : "translate(0,-50%)"; } }); }

@@ -962,7 +962,7 @@ html.locked #gate { display: flex; }
 @media (max-width: 600px) { .numrow { flex-wrap: nowrap; gap: 10px; } .numrow label { flex: 1 1 0; min-width: 0; justify-content: flex-end; } .numrow input { width: 100%; } }
 /* long explanations under a visual can fold to four lines (frame option clamp) */
 .viz .explain.ex-clamp:not(.open) { max-height: 6.6em; overflow: hidden; -webkit-mask-image: linear-gradient(#000 60%, transparent); mask-image: linear-gradient(#000 60%, transparent); }
-.viz .ex-more { margin: -14px clamp(16px, 2.6vw, 26px) 18px; background: none; border: 0; padding: 6px 0; color: var(--acc, #3b82f6); font: 500 11px/1.4 var(--mono); letter-spacing: .14em; text-transform: uppercase; cursor: pointer; }
+.viz .ex-more { margin: 0 clamp(16px, 2.6vw, 26px) 4px; background: none; border: 0; padding: 6px 0; color: var(--acc, #3b82f6); font: 500 11px/1.4 var(--mono); letter-spacing: .14em; text-transform: uppercase; cursor: pointer; }
 .viz .readout.wb4 { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 8px 10px; width: 100%; } .viz .readout.wb4 b { font-size: 17px; white-space: nowrap; } .viz .readout.wb4 span { letter-spacing: .08em; font-size: 9.5px; }
 .wbsheet .numrow { margin: 4px 0 14px; }
 .viz.chairfly .cf-prev { margin: 22px 0 0; color: var(--acc, #3b82f6); }
