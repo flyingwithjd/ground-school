@@ -1,6 +1,6 @@
 // Shared building blocks for every visualization: frame, corner labels, caption, sliders, chips,
 // and the signature "point of light" line draw (a bright head with a glowing tail lays the line down).
-import { h, s, esc, ease, reduced, clamp } from "../core/util.js?v=fcedebb251";
+import { h, s, esc, ease, reduced, clamp } from "../core/util.js?v=296c20dfbe";
 export const ACC = "#3B82F6", INK = "#F2F1EC";
 export const FAINT = "rgba(242,241,236,.22)", FAINT2 = "rgba(242,241,236,.4)";
 
@@ -28,7 +28,7 @@ export function frame(host, { cls = "", corners = {}, caption = null, explain = 
 // Play-while-you-watch layout (GL2 systems visuals): the live sliders sit directly under the stage so the visual and every
 // slider fit on one phone screen; then the option chips (compact, wrapping rows), then any strip, chart or readout drawn
 // under the stage, and the headline last. Runs once after mount, when the controls exist; nothing moves afterwards.
-export const LIVE_FIRST = new Set(["aoa", "flaptypes", "prop", "mixture", "carbice", "combustion", "magcheck", "starter", "vg", "fuellim", "fuel3d", "elecsys", "enginegauges", "icing", "icing3d", "hypoxia", "koel", "pressurization", "press3d", "cabinheat", "heat3d", "autopilot", "ap3d", "gear", "gear3d", "certs"]);
+export const LIVE_FIRST = new Set(["aoa", "stability", "flaptypes", "prop", "mixture", "carbice", "combustion", "magcheck", "starter", "vg", "fuellim", "fuel3d", "elecsys", "enginegauges", "icing", "icing3d", "hypoxia", "koel", "pressurization", "press3d", "cabinheat", "heat3d", "autopilot", "ap3d", "gear", "gear3d", "certs"]);
 function liveFirst(root, stage, ctrl, cap, ex) {
   const items = [...ctrl.children].filter((c) => c.classList.contains("slider") || (c.classList.contains("ctrl-row") && c.querySelector(".slider")));
   let live = null; if (items.length) { live = h("div", { class: "ctrl ctrl-live" }); items.forEach((c) => live.append(c)); stage.after(live); }

@@ -5,7 +5,7 @@
 import { createRequire } from "module"; const { chromium } = createRequire("/workspace/pgs-build/")("playwright-core");
 const BASE = process.env.BASE || "http://localhost:8765/index.html";
 const ALL = { catlim: "vg", ignition: "magcheck", fuellim: "fuel3d", induct: "carbice", elec: "elecsys", oilcool: "enginegauges", mixture: "mixture", prop: "prop", secctl: "flaptypes", icing: "icing3d", oxygen: "hypoxia", koel: "koel", press: "press3d", heat: "heat3d", ap: "ap3d", airframe: "gear3d", starting: "starter" };
-Object.assign(ALL, { "gl3/lift": "aoa", "fl3/slow": "aoa", "gl10/overview": "airspace", "gl7/front": "front", "gl4/legs": "pattern", "gl4/entry": "pattern", "ap7/entry": "pattern" });
+Object.assign(ALL, { "gl3/stab": "stability", "gl3/lift": "aoa", "fl3/slow": "aoa", "gl10/overview": "airspace", "gl7/front": "front", "gl4/legs": "pattern", "gl4/entry": "pattern", "ap7/entry": "pattern" });
 // GL1 papers visuals are addressed as lesson/section
 Object.assign(ALL, { "gl1/papers": "certs", "gl1/papers:airworthy": "airworthy", "gl1/cert": "pilotpath", "gl1/walk": "plane3d", "gl1/aero:forces3d": "forces3d", "gl1/insts:instpanel": "instpanel", "gl1/subs": "plane3d", "gl1/engine:combustion": "combustion", "gl1/c172": "plane3d", "gl1/ground:mnemo": "mnemo", "gl2/fuel:fuel3d": "fuel3d", "gl2/gyro:instpanel": "instpanel" });
 const want = process.argv.slice(2).length ? process.argv.slice(2) : Object.keys(ALL);
