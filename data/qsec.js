@@ -1280,7 +1280,7 @@ export default {
 "gl19-13":"gl14/gps",
 "gl19-14":"gl17/alc",
 "gl19-15":"gl16/att",
-"gl19-16":"gl4/legs",
+"gl19-16":"gl11/priv",
 "gl19-17":"gl17/med",
 "gl19-18":"gl15/def",
 "ap1-01":"num",

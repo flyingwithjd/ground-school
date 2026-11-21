@@ -4,7 +4,7 @@
 export const PAGE_ORDER = {
   // GL1 (Nov 2026): how the airplane works and flies first, then the systems and engine, then preflight and ground ops,
   // and the paperwork (records and certificates, merged) and the path to the certificate last.
-  gl1: ["parts", "c172", "axes", "aero", "subs", "engine", "build", "insts", "walk", "ground", "wind", "runup", "papers", "cert"],
+  gl1: ["parts", "c172", "axes", "aero", "subs", "engine", "build", "insts", "walk", "ground", "wind", "runup", "papers", "poh", "cert", "certs"],
   // GL2 in blocks: controls | engine | fuel | electrical | instruments | airframe and cabin | beyond the trainer | paperwork last
   gl2: ["primary", "secondary", "secctl", "engine", "ignition", "starting", "induct", "mixture", "combust", "oilcool", "prop", "fuel", "fuellim", "refuel", "elec", "pitot", "gyro", "airframe", "heat", "icing", "ap", "oxygen", "press", "other", "limits", "catlim", "koel"],
   // GL3 opens with the forces visual; climbs follow drag; the standard atmosphere bridges to GL5 density altitude
@@ -16,7 +16,7 @@ export const PAGE_ORDER = {
   // GL8 opens with the METAR decoder
   gl8: ["metar", "taf", "fb", "sources", "brief", "adv", "pirep", "obs", "charts", "atcwx"],
   // GL11 opens with the pilot's responsibilities; the rule book and course pages follow
-  gl11: ["pic", "inop", "maint", "ad", "ntsb", "system", "course", "presolo"],
+  gl11: ["pic", "inop", "maint", "ad", "ntsb", "asrs", "system", "course", "presolo", "priv", "current"],
   // GL15: how your eyes work first, the legal definitions after
   gl15: ["vision", "illus", "poslights", "apt", "def", "equip", "prep", "ground", "climb", "land", "emerg"],
   // GL17: the body first, the medical certificate rules last

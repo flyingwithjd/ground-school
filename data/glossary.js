@@ -509,5 +509,12 @@ export const GLOSSARY = {
   "Vortex generator": { def: "Small vanes on the wing (or tail) that stir energetic air into the boundary layer so the airflow stays attached longer.", src: "PHAK Ch 5 · AFH Ch 2" },
   "T-tail": { def: "A tail with the horizontal stabilizer mounted on top of the vertical fin, above most of the wing's downwash and propeller slipstream.", src: "PHAK Ch 6" },
   "Hand propping": { def: "Starting an engine by swinging the propeller by hand. It is dangerous: do it only per the POH, with trained people, the brakes set or chocks in place, and a competent person at the controls.", src: "AFH Ch 2" }
+  "MOSAIC": { def: "Modernization of Special Airworthiness Certification: the FAA rule (published July 2025, effective October 22, 2025) that moved the aircraft limits for sport pilots into 14 CFR 61.316 and widened the aircraft they may fly.", src: "PHAK Addendum (MOSAIC, Oct 2025)" },
+  "ASRS": { def: "Aviation Safety Reporting System: NASA's confidential, voluntary safety reporting program for the FAA. A timely report can waive the penalty for an inadvertent violation.", src: "14 CFR 91.25 · AC 00-46F" },
+  "Compensation or hire": { def: "Any payment or other benefit for flying, not only money. A private pilot may not fly for compensation or hire except as 61.113 allows.", src: "14 CFR 61.113 · FAA legal interpretations" },
+  "Pro rata share": { def: "An equal share. Splitting costs, a private pilot must pay at least the total divided by the number of people on board.", src: "14 CFR 61.113(c)" },
+  "Flight review": { def: "At least 1 hour of ground and 1 hour of flight training with an authorized instructor, needed every 24 calendar months to act as pilot in command.", src: "14 CFR 61.56" },
+  "LAHSO": { def: "Land and hold short operations: a clearance to land and stop before an intersecting runway, taxiway or other point. The pilot in command may decline; student pilots should not take part.", src: "AIM 4-3-11" },
+  "Available Landing Distance": { def: "ALD: the runway length from the threshold to the hold-short point in a LAHSO clearance, published in the Chart Supplement.", src: "AIM 4-3-11" },
 };
 export default GLOSSARY;
