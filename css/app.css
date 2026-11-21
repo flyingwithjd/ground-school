@@ -651,6 +651,8 @@ html.locked #gate { display: flex; }
 @media (max-width:700px){.viz.fr3d .stage{aspect-ratio:4/4.3}}
 .viz.as3d .stage{aspect-ratio:16/10}
 @media (max-width:700px){.viz.as3d .stage{aspect-ratio:4/4.2}}
+.viz.aoa3d .stage{aspect-ratio:16/8.6}
+@media (max-width:700px){.viz.aoa3d .stage{aspect-ratio:4/3.1}}
 @media (max-width:560px){.fr3-tag{font-size:10px!important;letter-spacing:.07em!important;padding:3px 5px!important}.fr3-tag.big{font-size:11px!important;letter-spacing:.1em!important}}
 .viz .stage svg.lab3d{position:absolute;inset:0;pointer-events:none;z-index:2}
 .viz.carb3d .stage{aspect-ratio:16/9}
@@ -667,6 +669,7 @@ html.locked #gate { display: flex; }
 .viz.slfirst > .ctrl-live .ctrl-row{flex-wrap:wrap;gap:6px 18px}
 .viz.slfirst > .ctrl-live .ctrl-row > .ctrl-lab{display:none}
 .viz.slfirst > .ctrl-live .slider{flex:1 1 260px;min-width:0;gap:10px;grid-template-columns:96px minmax(0,1fr) 78px}
+.viz.slfirst > .ctrl-live > .slider{flex:0 0 auto}
 .viz.slfirst > .ctrl-live .slider label{white-space:normal;line-height:1.2}
 .viz.slfirst > .ctrl-live .slider input{min-height:28px}
 .viz.slfirst > .ctrl:not(.ctrl-live){padding-top:12px;padding-bottom:12px;gap:8px}
