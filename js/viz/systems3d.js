@@ -18,7 +18,7 @@ import { buildPitot } from "./pitot3d.js?v=098eade7ef";
 import { rich } from "../core/rich.js?v=098eade7ef";
 import { h } from "../core/util.js?v=098eade7ef";
 const ACC = 0x3b82f6, XM = -1.22, WZ = -4.1;
-export function systems(S, F, { cowl, animatePose }) {
+export function systems(S, F, { cowl, animatePose, setPoseNow }) {
   const THREE = S.THREE, G = S.cueGroup, groups = { elec: new THREE.Group(), brk: new THREE.Group(), brkLine: new THREE.Group(), pedals: new THREE.Group() };
   Object.values(groups).forEach((g) => { g.visible = false; G.add(g); });
   const fill = new THREE.MeshBasicMaterial({ color: 0x0c2c6e, transparent: true, opacity: 0.85, depthTest: false, depthWrite: false });
@@ -129,12 +129,15 @@ export function systems(S, F, { cowl, animatePose }) {
   const P = groups.pedals; [-0.85, -0.4].forEach((z) => { solid(new THREE.BoxGeometry(0.08, 0.5, 0.26), [3.1, 3.8, z], P, [0, 0, 0.35]); solid(new THREE.CylinderGeometry(0.07, 0.07, 0.4, 10), [3.2, 3.35, z], P, [0, 0, 0.5]); });
   wire([[3.05, 3.45, -0.62], [3.2, 3.35, -0.85]], P, 2); wire([[3.05, 3.45, -0.62], [3.2, 3.35, -0.4]], P, 2);
   // ---- labels ----
+  const CTL = { ail: [-2.9, 7.0, -13.4], flap: [-3.7, 6.75, -5.7], elev: [-17.6, 4.62, -3.6], rud: [-18.85, 6.6, 0], trim: [-17.55, 4.62, 1.75] };
   const TG = tags3d(F.stage); const T = (txt, at, dx, dy, grp, cls = "", tight = false) => ({ t: TG.add(txt, { dx, dy, cls: (tight ? "tight " : "") + cls, tight }), at, grp });
   const LBL = [T("Battery", BAT, -26, 46, "elec"), T("Alternator", ALT, 24, -46, "elec"), T("Starter", STR, 30, 34, "elec"), T("Master + breakers", BUS, -56, 22, "elec"),
     T("Landing/taxi lts", LDG, 44, -16, "elec", "", true), T("Nav · red", TIPL, 14, 10, "elec", "nav-l", true), T("Nav · green", TIPR, -16, -16, "elec", "nav-r", true), T("Nav · white", TAIL, 12, 12, "elec", "nav-w", true),
     T("Beacon", BCN, 10, -16, "elec", "", true), T("Strobe", STBL, 14, 22, "elec", "strobe", true), T("Strobe", STBR, -16, 16, "elec", "strobe", true), T("Pitot tube", PIT, 36, 52, "elec"),
     T("Disc", DISCW, 40, 40, "brk"), T("Caliper", CAL, -40, -40, "brk"), T("Pads", PADW, -60, 34, "brk"), T("Brake line", BLP, 40, -30, "brk"), T("Brake line", [1.6, 3.2, -0.65], -20, -40, "pedals"),
-    T("Toe brakes", [3.1, 3.95, -0.6], -30, -46, "pedals"), T("Master cylinders", [3.2, 3.35, -0.6], 30, 44, "pedals")];
+    T("Toe brakes", [3.1, 3.95, -0.6], -30, -46, "pedals"), T("Master cylinders", [3.2, 3.35, -0.6], 30, 44, "pedals"),
+    // flight controls: anchors on each surface's trailing edge (left side, nearest the rear-quarter camera)
+    T("Aileron", CTL.ail, -20, -34, "ctl"), T("Flap", CTL.flap, -14, -40, "ctl"), T("Elevator", CTL.elev, -20, 30, "ctl"), T("Rudder", CTL.rud, 22, -30, "ctl"), T("Trim tab", CTL.trim, 26, 26, "ctl")];
   LBL.forEach((l) => (l.t.on = false));
   let live = null, raf = 0; const loop = () => { raf = 0;
     const on = live && live.includes("elec"), t = performance.now() / 1000;
@@ -142,18 +145,28 @@ export function systems(S, F, { cowl, animatePose }) {
     glows.beacon.set(BCN, on ? lightPulse(t, "beacon") : 0); const fl = on ? lightPulse(t, "strobe") : 0; glows.strobesL.set(STBL, fl); glows.strobesR.set(STBR, fl);
     TG.place(LBL.filter((l) => l.t.on).map((l) => ({ t: l.t, q: S.project(l.at), qs: (l.ats || []).map((p) => S.project(p)) })), live && live.includes("brk") ? 62 : 34);
     LBL.filter((l) => !l.t.on).forEach((l) => TG.place([{ t: l.t, q: null }])); if (live) raf = requestAnimationFrame(loop); };
-  const show = (keys) => { hideModelWheel(keys.includes("brk")); Object.entries(groups).forEach(([k, g]) => (g.visible = keys.includes(k))); LBL.forEach((l) => (l.t.on = keys.includes(l.grp))); live = keys.length ? keys : null; S.setFlow(!!(live && live.includes("elec"))); if (live && !raf) raf = requestAnimationFrame(loop); if (!live) loop(); S.kick(); };
-  const VIEW = { elec: { tg: [-3.5, 4.8, 0], az: -38, el: 24, d: 52 }, brk: { tg: [XM - 0.08, 0.72, WZ + 0.25], az: 145, el: -8, d: 2.75 }, pedals: { tg: [2.6, 3.55, -0.62], az: -58, el: 22, d: 6.5 } };
+  const show = (keys) => { hideModelWheel(keys.includes("brk")); Object.entries(groups).forEach(([k, g]) => (g.visible = keys.includes(k))); LBL.forEach((l) => (l.t.on = keys.includes(l.grp))); live = keys.length ? keys : null; const cs = !!(live && live.includes("ctl")); S.setFlow(!!(live && (live.includes("elec") || cs)), cs ? ctlFlow : null); if (live && !raf) raf = requestAnimationFrame(loop); if (!live) loop(); S.kick(); };
+  // Flight controls: each surface in turn deflects and returns, smoothly, over and over while on screen (setFlow keeps the
+  // loop alive; off-screen it stops). Ailerons move opposite each other; elevator up and down; rudder left and right;
+  // flaps down and back up. The caption names the surface that is moving and the axis it works.
+  const CYC = [["ail", "Ailerons · roll", 22], ["elev", "Elevator · pitch", 20], ["rud", "Rudder · yaw", 22], ["flap", "Flaps · extra lift", 30]], SEG = 2600;
+  let ctlPose = {}, ctlI = -1, ctlT0 = 0;
+  const ctlFlow = (now) => { if (!ctlT0) ctlT0 = now; const t = (now - ctlT0) % (SEG * CYC.length), i = Math.floor(t / SEG), u = (t - i * SEG) / SEG, [key, cap, amt] = CYC[i];
+    const v = key === "flap" ? amt * (1 - Math.cos(u * 2 * Math.PI)) / 2 : amt * Math.sin(u * 2 * Math.PI);
+    ctlPose = { ail: 0, elev: 0, rud: 0, flap: 0, trim: 0, [key]: v }; setPoseNow(ctlPose);
+    if (i !== ctlI) { ctlI = i; F.caption("Flight controls", cap); S.highlight([{ ail: "ailerons", elev: "elevator", rud: "rudder", flap: "flaps" }[key]].concat(key === "elev" ? ["trimtab"] : [])); LBL.forEach((l) => l.grp === "ctl" && l.t.el.classList.toggle("on", l.t.el.textContent.startsWith({ ail: "Aileron", elev: "Elevator", rud: "Rudder", flap: "Flap" }[key]))); } };
+  const VIEW = { ctl: { tg: [-5.6, 5.4, -2.6], az: -150, el: 22, d: 47 }, elec: { tg: [-3.5, 4.8, 0], az: -38, el: 24, d: 52 }, brk: { tg: [XM - 0.08, 0.72, WZ + 0.25], az: 145, el: -8, d: 2.75 }, pedals: { tg: [2.6, 3.55, -0.62], az: -58, el: 22, d: 6.5 } };
   const SYS = {
     air: ["Airframe", "The basic structure", ["fuselage", "fairing", "wing", "fin", "hstab", "struts"], "iso", {}, "Fuselage, wings, struts and tail: built to carry the air loads plus the weight of fuel, crew and payload.", "PHAK 3"],
     elec: ["Electrical system", "28-volt DC", [], VIEW.elec, {}, "The engine-driven alternator and the battery feed the buses through the MASTER switch (ALT and BAT halves); circuit breakers protect each circuit out to the starter, avionics and lights. [[Position lights|Nav lights]] are red on the left wingtip, green on the right and white on the tail. The [[Beacon|beacon]] on top of the fin flashes red; white [[Strobe lights|strobes]] flash at each wingtip. The landing and taxi lights sit in the left wing leading edge. A heated pitot tube hangs under the left wing, just outboard of the strut. Seen x-ray through the cowling and skin; wire routes are schematic.", "C172S POH 7 · PHAK 7 · 14 CFR 91.209"],
-    ctl: ["Flight controls", "Ailerons, elevator, rudder, flaps, trim", ["ailerons", "elevator", "rudder", "flaps", "trimtab"], "iso", { ail: 18, elev: -16, rud: 16, flap: 20, trim: 8 }, "The surfaces that change the airplane's attitude, worked from the yoke, pedals, flap switch and trim wheel. Shown deflected for clarity.", "PHAK 3"],
+    ctl: ["Flight controls", "Ailerons · roll", ["ailerons", "elevator", "rudder", "flaps", "trimtab"], VIEW.ctl, null, "The surfaces that change the airplane's attitude, seen from behind so you can watch each one move in turn. The [[ailerons]] move opposite each other to [[roll]] the airplane (yoke turned); the [[elevator]] moves up and down for [[pitch]] (yoke pushed or pulled); the [[rudder]] swings left and right for [[yaw]] (pedals). The [[flaps]] move down together for more lift at low speed, and the [[trim tab]] on the elevator holds a pitch attitude for you.", "PHAK 3, 6"],
     brk: ["Brakes", "Disc brakes on the main wheels", [], VIEW.brk, {}, "Each main wheel has a single hydraulic disc brake on its inboard side; the nose wheel has none. Press the top of a rudder pedal (toe brake) and its master cylinder pushes fluid down the brake line to squeeze the disc. On the walkaround: no leaks, line secure, disc and pads not worn.", "C172S POH 7 · AFH 2"],
   };
   const sub = h("div", { class: "sys-sub" }); const subChips = chips(sub, [["wheel", "Main wheel"], ["pedals", "Rudder pedals"]], "wheel", (v) => { const p = v === "pedals"; S.setInkOpacity(p ? 0.16 : 0.38); S.setView(p ? VIEW.pedals : VIEW.brk); show(p ? ["brkLine", "pedals"] : ["brk", "brkLine"]); F.caption("Brakes", p ? "Toe brakes and master cylinders" : "Disc brakes on the main wheels"); }, { label: "Brake view" });
   const pick = (k) => { sub.hidden = k !== "brk"; S.setInkOpacity(0.5);
-    if (!k) { cowl(true); S.highlight([]); S.setView("iso"); animatePose({}); show([]); F.caption("Four subcomponents", "Pick a system"); F.explain("Each chip lights only that system's parts. Drag to orbit."); return; }
-    const [name, big, hl, view, pose, text, src] = SYS[k]; cowl(k !== "elec", k === "elec"); S.highlight(hl); S.setView(view); animatePose(pose); show(k === "elec" ? ["elec"] : k === "brk" ? ["brk", "brkLine"] : []);
+    if (!k) { cowl(true); S.highlight([]); S.setView("iso"); setPoseNow(ctlPose); ctlPose = {}; animatePose({}); show([]); F.caption("Four subcomponents", "Pick a system"); F.explain("Each chip lights only that system's parts. Drag to orbit."); return; }
+    const [name, big, hl, view, pose, text, src] = SYS[k]; cowl(k !== "elec", k === "elec"); S.highlight(hl); S.setView(view); ctlI = -1; ctlT0 = 0;
+    if (pose) { setPoseNow(ctlPose); ctlPose = {}; animatePose(pose); } show(k === "elec" ? ["elec"] : k === "brk" ? ["brk", "brkLine"] : k === "ctl" ? ["ctl"] : []);
     if (k === "brk") subChips.set("wheel"); F.caption(name, big); F.explain(`${rich(text)} <span class="src">${src}</span>`); };
   chips(F.ctrl, Object.keys(SYS).map((k) => [k, SYS[k][0]]), null, pick, { label: "System", toggle: true }); F.ctrl.append(sub); sub.hidden = true;
   pick(null);

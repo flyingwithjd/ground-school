@@ -45,7 +45,7 @@ export function mount(host, opts = {}) {
   const F = frame(host, { cls: "capin p3cap", corners: { tl: "Cessna 172S", tr: SPEC } });   // caption under the stage, so it never covers the model on a phone
   let cur = null, anim = null, ti = 0; const groups = [];
   // Tap a part on the model to select it; tap empty space to clear back to the default view.
-  const S = planeStage(F.stage, { view: "iso", onPick: mode === "explore" ? (p) => (p && MAP[p] ? select(MAP[p]) : !p && cur && reset()) : null });
+  const S = planeStage(F.stage, { view: "iso", maxFps: mode === "systems" ? 30 : 64, onPick: mode === "explore" ? (p) => (p && MAP[p] ? select(MAP[p]) : !p && cur && reset()) : null });
   // Corner labels (type top-left, dimensions top-right) live in a band above the canvas, never over the model.
   let bandW = 0, bandB = 0;   // the band only grows at a given width (a shorter tour label must not resize the canvas)
   const band = () => { const sr = F.stage.getBoundingClientRect(); if (!sr.height) return; let b = 0; F.stage.querySelectorAll(".corner.tl, .corner.tr").forEach((c) => { if (c.textContent.trim()) b = Math.max(b, c.getBoundingClientRect().bottom - sr.top); }); if (sr.width !== bandW) { bandW = sr.width; bandB = 0; } bandB = Math.max(bandB, b ? b + 8 : 0); S.setTopBand(bandB); };
@@ -67,7 +67,7 @@ export function mount(host, opts = {}) {
     groups.push(chips(F.ctrl, [["ailerons", "Ailerons"], ["flaps", "Flaps"], ["struts", "Lift struts"], ["fuel", "Fuel tanks"], ["hstab", "Horizontal stabilizer"], ["elevator", "Elevator"], ["trimtab", "Trim tab"], ["fin", "Vertical stabilizer"], ["rudder", "Rudder"], ["engine", "Engine"], ["cowling", "Cowling"], ["propeller", "Propeller"]], null, (k) => (k ? select(k) : reset()), { label: "Parts", toggle: true }));
     F.caption(INTRO[0], INTRO[1]); F.explain(INTRO[2]);
   } else if (mode === "systems") {
-    const stop = systems(S, F, { cowl, animatePose }); F.on(stop);
+    const stop = systems(S, F, { cowl, animatePose, setPoseNow: (p) => { S.animate(null); curPose = { ...p }; S.pose(curPose); } }); F.on(stop);
   } else {
     const prev = h("button", { class: "btn ghost", type: "button" }, "←"), next = h("button", { class: "btn pri arrow", type: "button" }, "Next");
     const dots = chips(F.ctrl, TOUR.map((t, i) => [String(i), t.big]), "0", (v) => show(+v), { label: "Tour stops" }); F.ctrl.append(h("div", { class: "btns" }, prev, next));
