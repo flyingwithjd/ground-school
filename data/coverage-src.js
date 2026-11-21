@@ -75,7 +75,7 @@ export const COVERAGE = {
     ["Stall speed performance charts", "stall speed|stall-speed"], ["Preflight action (91.103)", "91\\.103|preflight action"] ] },
   gl6: { refs: "Stage 1 check", units: ["gl6"], check: true, items: [
     ["Stage 1 written check: 80% to pass, every miss reviewed", "."], ["Stage 1 oral review", "."] ] },
-  gl7: { refs: "PHAK 12 · Aviation Weather Handbook (FAA-H-8083-28) · ACS PA.I.C", units: ["gl7"], items: [
+  gl7: { refs: "PHAK 12 · Aviation Weather Handbook (FAA-H-8083-28B) · ACS PA.I.C", units: ["gl7"], items: [
     ["Composition of the atmosphere", "nitrogen|oxygen|78"], ["Atmospheric circulation", "circulation|convection|uneven heating"], ["Atmospheric pressure", "pressure"],
     ["Coriolis force", "coriolis"], ["Measurement of atmospheric pressure", "barometer|inches of mercury|in\\. ?hg|millibar|hectopascal|station pressure"],
     ["Altitude and atmospheric pressure", "pressure (drops|decreases|falls)|1 inch|1,000 ft"], ["Altitude and flight", "density altitude|performance"],
@@ -85,7 +85,7 @@ export const COVERAGE = {
     ["Saturation", "saturat"], ["Dew and frost", "\\bdew\\b|frost"], ["Fog", "\\bfog"], ["Clouds", "cloud"], ["Ceiling", "ceiling"], ["Visibility", "visibility"],
     ["Precipitation", "precipitation|rain|snow|freezing"], ["Air masses", "air mass"], ["Fronts", "front"], ["Warm front", "warm front|warm air slides"], ["Cold front", "cold front"],
     ["Stationary front", "stationary front|stationary\\b.{0,40}front"], ["Occluded front", "occlu"], ["Thunderstorms", "thunderstorm"] ] },
-  gl8: { refs: "PHAK 13 · FAA-H-8083-28 · AIM 7 · ACS PA.I.C", units: ["gl8"], items: [
+  gl8: { refs: "PHAK 13 · FAA-H-8083-28B · AIM 7 · ACS PA.I.C", units: ["gl8"], items: [
     ["Surface aviation weather observations", "metar|asos|awos"], ["Upper air observations", "radiosonde|upper air|balloon"], ["Radar observations", "radar"],
     ["Satellite", "satellite"], ["Flight Service Stations", "flight service|\\bfss\\b|1800wxbrief|1-800-wx-brief"], ["Telephone Information Briefing Service (largely discontinued)", "tibs|telephone information briefing"],
     ["Weather briefings", "briefing"], ["Standard briefing", "standard briefing"], ["Abbreviated briefing", "abbreviated"], ["Outlook briefing", "outlook"],

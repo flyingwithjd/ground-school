@@ -3,7 +3,7 @@ const Q = (id, t, q, c, why, src) => ({ id, t, q, c, a: 0, why, src });
 export default {
   id: "gl7", code: "GL7", stage: 2, kind: "ground", title: "Weather Theory", short: "Pressure and wind, stability, moisture and fog, clouds, fronts and thunderstorms",
   intro: "Weather is heat and moisture moving around a spinning planet. Learn why it happens and the reports in GL8 start to read like a story.",
-  refs: ["PHAK Ch 12", "AWH (FAA-H-8083-28)", "ACS PA.I.C"],
+  refs: ["PHAK Ch 12", "AWH (FAA-H-8083-28B)", "ACS PA.I.C"],
   topics: { "gl7.press": "Pressure and wind", "gl7.stab": "Lapse rates and stability", "gl7.moist": "Moisture, dew point and fog", "gl7.cloud": "Clouds, ceiling and precipitation", "gl7.front": "Air masses and fronts", "gl7.ts": "Thunderstorms and icing" },
   questions: [
     Q("gl7-01", "gl7.press", "In the Northern Hemisphere, the Coriolis force deflects moving air:", ["To the right", "To the left", "Straight up", "Not at all"], "Coriolis deflects air to the right in the Northern Hemisphere. It is greatest at the poles, zero at the equator, and larger for faster-moving air.", "PHAK Ch 12"),

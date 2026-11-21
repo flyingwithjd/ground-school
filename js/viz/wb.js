@@ -1,26 +1,26 @@
 // Weight & balance calculator that plots on the C172S CG envelope (limits from POH Sec 2; arms from POH Sec 6).
 // Defaults reproduce the POH sample loading problem's empty weight. Always use YOUR airplane's actual empty weight and moment.
-import { frame, slider, chips, readout, svg, ACC, FAINT, FAINT2 } from "./base.js?v=007dcd4f24";
-import { s, h } from "../core/util.js?v=007dcd4f24";
-import { T } from "./shapes.js?v=007dcd4f24";
+import { frame, slider, chips, readout, svg, ACC, FAINT, FAINT2 } from "./base.js?v=1e426d64e6";
+import { s, h } from "../core/util.js?v=1e426d64e6";
+import { T } from "./shapes.js?v=1e426d64e6";
 const ARM = { front: 37, rear: 73, bagA: 95, bagB: 123, fuel: 48 };
 const NORMAL = [[35, 1500], [35, 1950], [41, 2550], [47.3, 2550], [47.3, 1500]], UTIL = [[35, 1500], [35, 1950], [37.5, 2200], [40.5, 2200], [40.5, 1500]];
 const fwdLimit = (w) => (w <= 1950 ? 35 : 35 + ((w - 1950) / 600) * 6);
 export function mount(host) {
-  const F = frame(host, { cls: "tall capin", clamp: true, corners: { tl: "C172S CG envelope", tr: "POH Sec 2, 6" } });
-  const el = svg(F.stage, "0 0 1600 1100"); const g = s("g", {}, el);
-  const X0 = 170, X1 = 1540, Y0 = 940, Y1 = 90, C0 = 33, C1 = 49, W0 = 1500, W1 = 2650;
+  const F = frame(host, { cls: "tall capin", clamp: true });   // no corner labels: the chart title row carries the axis name
+  const el = svg(F.stage, "0 0 800 600"); const g = s("g", {}, el);   // compact viewBox so labels stay ~11 px on a 390 px phone
+  const X0 = 146, X1 = 782, Y0 = 500, Y1 = 64, C0 = 33, C1 = 49, W0 = 1500, W1 = 2650;
   const X = (c) => X0 + ((c - C0) / (C1 - C0)) * (X1 - X0), Y = (w) => Y0 - ((w - W0) / (W1 - W0)) * (Y0 - Y1);
   s("path", { d: `M${X0},${Y1} L${X0},${Y0} L${X1},${Y0}`, fill: "none", stroke: FAINT2, "stroke-width": 1.5 }, g);
-  for (let c = 34; c <= 48; c += 2) { s("line", { x1: X(c), y1: Y0, x2: X(c), y2: Y0 + 10, stroke: FAINT2 }, g); T(g, X(c), Y0 + 38, c, { anchor: "middle", size: 18, op: 0.5 }); }
-  for (let w = 1600; w <= 2600; w += 200) { s("line", { x1: X0 - 10, y1: Y(w), x2: X0, y2: Y(w), stroke: FAINT2 }, g); T(g, X0 - 18, Y(w) + 6, w.toLocaleString(), { anchor: "end", size: 18, op: 0.5 }); }
-  T(g, X1, Y0 + 76, "CG · inches aft of datum", { anchor: "end", size: 16, op: 0.5 }); T(g, X0, Y1 - 30, "weight · lb", { size: 16, op: 0.5 });
+  for (let c = 34; c <= 48; c += 2) { s("line", { x1: X(c), y1: Y0, x2: X(c), y2: Y0 + 10, stroke: FAINT2 }, g); T(g, X(c), Y0 + 36, c, { anchor: "middle", size: 26, op: 0.65 }); }
+  for (let w = 1600; w <= 2600; w += 200) { s("line", { x1: X0 - 10, y1: Y(w), x2: X0, y2: Y(w), stroke: FAINT2 }, g); T(g, X0 - 14, Y(w) + 9, w.toLocaleString(), { anchor: "end", size: 26, op: 0.65 }); }
+  T(g, X1, Y0 + 82, "CG · inches aft of datum", { anchor: "end", size: 24, op: 0.6 }); T(g, 18, Y1 - 28, "C172S CG envelope · weight lb", { size: 24, op: 0.6 });
   const poly = (P, attrs) => s("path", { d: "M" + P.map(([c, w]) => `${X(c).toFixed(1)},${Y(w).toFixed(1)}`).join(" L"), fill: "none", ...attrs }, g);
   const envN = poly(NORMAL, { stroke: "#F2F1EC", "stroke-width": 2.5, opacity: 0.8 }); const envU = poly(UTIL, { stroke: FAINT2, "stroke-width": 1.5, "stroke-dasharray": "8 8" });
-  T(g, X(44.2), Y(2550) + 34, "normal category · 2,550 lb max", { anchor: "middle", size: 15, op: 0.6 }); T(g, X(37.8), Y(2200) - 14, "utility", { anchor: "middle", size: 14, op: 0.45 });
+  T(g, X(44.15), Y(2550) + 34, "normal · 2,550 lb max", { anchor: "middle", size: 22, op: 0.65 }); T(g, X(38.9), Y(2200) + 30, "utility", { anchor: "middle", size: 22, op: 0.55 });
   const path = s("line", { stroke: ACC, "stroke-width": 2.5, "stroke-dasharray": "6 6", opacity: 0.8 }, g);
-  const pTO = s("circle", { r: 11, fill: ACC, filter: "url(#gw)" }, g), pL = s("circle", { r: 9, fill: "none", stroke: ACC, "stroke-width": 3 }, g);
-  const tTO = T(g, 0, 0, "takeoff", { size: 15, op: 0.9, fill: ACC }), tL = T(g, 0, 0, "landing", { size: 15, op: 0.7, fill: ACC });
+  const pTO = s("circle", { r: 9, fill: ACC, filter: "url(#gw)" }, g), pL = s("circle", { r: 8, fill: "none", stroke: ACC, "stroke-width": 3 }, g);
+  const tTO = T(g, 0, 0, "takeoff", { size: 22, op: 0.95, fill: ACC }), tL = T(g, 0, 0, "landing", { size: 22, op: 0.8, fill: ACC });
   // empty weight inputs
   const emp = h("div", { class: "numrow" });
   const num = (label, v, step) => { const i = h("input", { type: "number", value: v, step, inputmode: "decimal", "aria-label": label }); emp.append(h("label", {}, h("span", { class: "label" }, label), i)); i.addEventListener("input", calc); return i; };
@@ -39,7 +39,9 @@ export function mount(host) {
     set("w", `${Math.round(w).toLocaleString()} lb`); set("m", (m / 1000).toFixed(1)); set("cg", `${cg.toFixed(1)} in`); set("lcg", `${lcg.toFixed(1)} in`);
     const pos = (c, ww) => [Math.min(X1, Math.max(X0, X(c))), Math.min(Y0, Math.max(Y1, Y(ww)))];
     const [x1, y1] = pos(cg, w), [x2, y2] = pos(lcg, lw); pTO.setAttribute("cx", x1); pTO.setAttribute("cy", y1); pL.setAttribute("cx", x2); pL.setAttribute("cy", y2); pL.style.display = V.burn ? "" : "none"; tL.style.display = V.burn ? "" : "none";
-    path.setAttribute("x1", x1); path.setAttribute("y1", y1); path.setAttribute("x2", x2); path.setAttribute("y2", y2); tTO.setAttribute("x", x1 + 18); tTO.setAttribute("y", y1 - 12); tL.setAttribute("x", x2 + 18); tL.setAttribute("y", y2 + 24);
+    path.setAttribute("x1", x1); path.setAttribute("y1", y1); path.setAttribute("x2", x2); path.setAttribute("y2", y2); // labels sit beside their dots, flipping left near the right edge and below the dot near the top so nothing is clipped
+    const lab = (t, x, y, dy) => { const left = x > X1 - 130; t.setAttribute("text-anchor", left ? "end" : "start"); t.setAttribute("x", x + (left ? -16 : 16)); t.setAttribute("y", Math.max(Y1 + 26, y + dy)); };
+    lab(tTO, x1, y1, -12); lab(tL, x2, y2, 30);
     const issues = []; if (ramp > 2558) issues.push(`over the 2,558 lb maximum ramp weight`); if (w > 2550) issues.push(`over the 2,550 lb maximum takeoff weight by ${Math.round(w - 2550)} lb`);
     if (V.bagA + V.bagB > 120) issues.push("combined baggage over 120 lb"); if (cg < fwdLimit(w)) issues.push("CG forward of the limit"); if (cg > 47.3) issues.push("CG aft of the 47.3 in limit");
     if (lw && (lcg < fwdLimit(lw) || lcg > 47.3)) issues.push("landing CG outside the envelope");
