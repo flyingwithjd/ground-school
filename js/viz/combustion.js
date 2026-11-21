@@ -95,8 +95,9 @@ export function mount(host) {
   const F = frame(host, { cls: "capin sec3d cyl3d", corners: { tl: "Combustion", tr: "PHAK 7" } });
   const S = planeStage(F.stage, { model: cylModel, cg: [5, 0, 0], orbit: false, maxFps: 30, fov: 22, view: { tg: [5.5, 0, 0], az: 74, el: 16, d: 60, fov: 22 } });
   const M3 = S.P; S.renderer.localClippingEnabled = true;
-  // camera: slightly from the front and above the cut; for detonation and preignition it glides square onto the cut so the chamber reads flat, framed to the whole cylinder, valve springs, plugs and crank
-  const VZ = { az: 76, el: 14, fov: 22 }, FIT = [[-8.6, 0, 0], [-8.6, -1.6, 0], [0.35, BR + 2.85, 0], [0.35, -BR - 2.85, 0], [XC + 4.2, 0, -0.7], [XC, 4.2, -0.7], [XC, -4.2, -0.7], [BAR, BR + 1.3, 0], [BAR, -BR - 1.3, 0], [0, 0, -BR - 1.6]];
+  // camera: one fixed view for every case (slightly from the front and above the cut), framed to the whole cylinder, valve
+  // springs, plugs and crank. Switching Normal / Detonation / Preignition never moves, rescales or reframes it.
+  const VZ = { az: 80, el: 11, fov: 22 }, FIT = [[-8.6, 0, 0], [-8.6, -1.6, 0], [0.35, BR + 2.85, 0], [0.35, -BR - 2.85, 0], [XC + 4.2, 0, -0.7], [XC, 4.2, -0.7], [XC, -4.2, -0.7], [BAR, BR + 1.3, 0], [BAR, -BR - 1.3, 0], [0, 0, -BR - 1.6]];
   const band = (dur = 1) => { const sr = F.stage.getBoundingClientRect(); if (!sr.height) return; let b = 0; F.stage.querySelectorAll(".corner").forEach((c) => { if (c.textContent.trim()) b = Math.max(b, c.getBoundingClientRect().bottom - sr.top); }); S.setTopBand(b ? b + 4 : 0);
     const Hh = Math.max(1, sr.height - (+F.stage.dataset.band || 0)); S.setView(fitView(THREE, FIT, VZ, sr.width / Hh, 0.84, 0.86), typeof dur === "number" ? dur : 1); lab.dirty = performance.now() + (typeof dur === "number" && dur > 1 ? dur + 200 : 400); S.kick(); };
   const bro = new ResizeObserver(() => band()); bro.observe(F.stage); F.on(() => bro.disconnect());
@@ -110,7 +111,7 @@ export function mount(host) {
   // strip under the stage: the cylinder-pressure trace
   const strip = h("div", { class: "vstrip" }); F.stage.after(strip); const sv = s("svg", { class: "full", role: "img" }, strip); let sg = s("g", {}, sv);
   const sro = new ResizeObserver(() => redraw()); sro.observe(strip); F.on(() => sro.disconnect());
-  const r0 = row(F.ctrl, "Burn"); const kc = chips(r0, [["normal", "Normal"], ["det", "Detonation"], ["pre", "Preignition"]], kind, (v) => { kind = v || "normal"; kc.set(kind); fixed = false; VZ.az = kind === "normal" ? 76 : 84; VZ.el = kind === "normal" ? 14 : 6; band(1400); run(); }, { label: "Burn" });
+  const r0 = row(F.ctrl, "Burn"); const kc = chips(r0, [["normal", "Normal"], ["det", "Detonation"], ["pre", "Preignition"]], kind, (v) => { kind = v || "normal"; kc.set(kind); fixed = false; run(); }, { label: "Burn" });
   const r1 = row(F.ctrl, "Respond"); const fg = h("div", { class: "chips", role: "group", "aria-label": "Respond" }); r1.append(fg);
   const fb = h("button", { class: "chip", type: "button" }, "–"), rb = h("button", { class: "chip", type: "button" }, "Run a cycle"); fg.append(fb, rb);
   fb.addEventListener("click", () => { if (kind !== "normal") { fixed = !fixed; run(); } }); rb.addEventListener("click", run);
