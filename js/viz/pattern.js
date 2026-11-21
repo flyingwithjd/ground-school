@@ -2,9 +2,9 @@
 // on upwind, level at pattern altitude on downwind, descending from abeam the approach end to a touch-and-go. The leg it is
 // on (or the leg you pick) is drawn in the accent; drop lines to the ground track show the height. Schematic: the airplane
 // is enlarged and distances are not to scale.
-import { frame, chips, row } from "./base.js?v=437330da39";
-import { planeStage } from "./planestage.js?v=437330da39";
-import { reduced } from "../core/util.js?v=437330da39";
+import { frame, chips, row } from "./base.js?v=ac9b353384";
+import { planeStage } from "./planestage.js?v=ac9b353384";
+import { reduced } from "../core/util.js?v=ac9b353384";
 import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
@@ -89,7 +89,7 @@ export function mount(host, opts = {}) {
   const tagEls = []; const mkTag = (k, text) => { const e = document.createElement("div"); e.className = "pt3-tag"; e.dataset.k = k; e.style.cssText = TAG; e.textContent = text; e.setAttribute("aria-hidden", "true"); F.stage.append(e); tagEls.push(e); return e; };
   ["dep", "xw", "dw", "base", "final"].forEach((k) => mkTag(k, NAME[k])); mkTag("rw9", "9"); mkTag("rw27", "27"); mkTag("wind", "Wind 090°");
   let tagPos = {};
-  function placeTags() { tagPos = {}; const S0 = P.S; for (const k of ["dep", "xw", "dw", "base", "final"]) { const ii = S0.filter((o) => o.tag === k); if (!ii.length) continue; const o = ii[Math.floor(ii.length / 2)].p; tagPos[k] = [o[0], o[1] + 7, o[2]]; }
+  function placeTags() { tagPos = {}; const S0 = P.S; for (const k of ["dep", "xw", "dw", "base", "final"]) { const ii = S0.filter((o) => o.tag === k); if (!ii.length) continue; const o = ii[Math.floor(ii.length * (k === "final" ? 0.12 : 0.5))].p; tagPos[k] = [o[0], o[1] + 7, o[2]]; }
     tagPos.rw9 = [4, 0, -side * 28]; tagPos.rw27 = [RWL - 4, 0, -side * 28]; tagPos.wind = [RWL - 30, 0, -side * 64]; }
   function drawTags() { tagEls.forEach((e) => { const p3 = tagPos[e.dataset.k]; if (!p3) { e.style.display = "none"; return; } const q = S.project(p3, false); e.style.display = ""; e.style.left = Math.round(q.x) + "px"; e.style.top = Math.round(q.y) + "px"; }); }
   // camera: look at the middle of the pattern from the runway side

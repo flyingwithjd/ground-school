@@ -1,13 +1,13 @@
 // "Review blind spots": one flow that rereads the exact pages behind your open blind spots, then asks only those blind
 // spots. The 12-hour rule holds: a blind spot is asked only once its wait is over; the pages can be reread any time.
-import { h, esc, fmtDue } from "../core/util.js?v=437330da39";
-import { get } from "../core/srs.js?v=437330da39";
-import { LESSONS, QUESTIONS, ORDER, secKey } from "../../data/index.js?v=437330da39";
-import { blindList } from "../core/progress.js?v=437330da39";
-import { pagesOf } from "../core/flow.js?v=437330da39";
-import { destroyAll } from "../viz/index.js?v=437330da39";
-import { loadLesson, renderPage } from "./lesson.js?v=437330da39";
-import { session } from "./quiz.js?v=437330da39";
+import { h, esc, fmtDue } from "../core/util.js?v=ac9b353384";
+import { get } from "../core/srs.js?v=ac9b353384";
+import { LESSONS, QUESTIONS, ORDER, secKey } from "../../data/index.js?v=ac9b353384";
+import { blindList } from "../core/progress.js?v=ac9b353384";
+import { pagesOf } from "../core/flow.js?v=ac9b353384";
+import { destroyAll } from "../viz/index.js?v=ac9b353384";
+import { loadLesson, renderPage } from "./lesson.js?v=ac9b353384";
+import { session } from "./quiz.js?v=ac9b353384";
 const MAXP = 6;
 const lpos = (lid) => { const k = ORDER.indexOf(lid); if (k >= 0) return k * 100; const P = ORDER.find((o) => (LESSONS[o].includes || []).includes(lid)); return P ? ORDER.indexOf(P) * 100 + 50 : 9e4; };
 // Pages behind open blind spots, Certain misses first (up to 6 pages a sitting), shown in course order.

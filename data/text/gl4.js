@@ -8,7 +8,7 @@ export default {
       kdr: { k: "Names and purposes of the pattern legs; pattern altitude.", d: "Fly a rectangular pattern at the correct altitude with wind correction.", r: "Low, tight or descending patterns raise collision and stall-spin risk.", codes: ["PA.III.B.K2"] } },
     { id: "entry", label: "Entering and leaving · AC 90-66C", title: "Enter level, at 45°",
       body: `<p>Figure out the runway in use and the pattern direction while still well clear, then get down to pattern altitude <em>before</em> you arrive. Descending into the pattern can put you on top of someone already in it. <span class="src">AC 90-66C 11.2–11.3</span></p>
-<p>The standard entry is a 45° angle to the downwind, abeam the midpoint of the runway. Pick an entry below to see it, along with the alternatives.</p>`,
+<p>The standard entry is a 45° angle to the downwind, abeam the midpoint of the runway. Pick an entry above to see it, along with the alternatives.</p>`,
       viz: { type: "pattern", opts: { entries: true } },
       kdr: { k: "Standard and alternate entries; departure procedures.", d: "Arrive at pattern altitude and enter on the 45°.", r: "Straight-in and descending entries conflict with pattern traffic.", codes: ["PA.III.B.K2", "PA.III.B.R1"] } },
     { id: "dir", label: "Pattern direction · 14 CFR 91.126", title: "Left turns unless marked",
