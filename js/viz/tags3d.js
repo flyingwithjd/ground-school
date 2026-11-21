@@ -1,7 +1,7 @@
 // Leader-line labels for planeStage visuals: each tag sits at a screen offset from its 3D anchor, joined by a thin leader
 // line with a dot on the anchor. Tags are kept inside the stage and pushed apart so they never overlap each other or the
 // caption band. tight: keep the tag close to its glow (short or no leader) and try nearby slots instead of sliding far.
-import { h, s } from "../core/util.js?v=098eade7ef";
+import { h, s } from "../core/util.js?v=7b96b5d687";
 export function tags3d(stage) {
   const svg = s("svg", { class: "t3-lines", "aria-hidden": "true" }); stage.append(svg);
   const list = [];
