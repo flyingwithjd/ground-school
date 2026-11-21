@@ -2,10 +2,10 @@
 // Tap a station: the camera glides there and lights only that area. Each station has a few findings; for each, decide
 // Ground it or All clear, then see why (AFH Ch 2). A ring on the model marks where the finding is. Orbit on the canvas only.
 // Sources: FAA-H-8083-3C AFH Ch 2 (preflight assessment); C172S POH Sec 4 (oil 5 qt minimum, 8 qt capacity).
-import { frame, chips } from "./base.js?v=f95c6a1467";
-import { planeStage } from "./planestage.js?v=f95c6a1467";
-import { rich } from "../core/rich.js?v=f95c6a1467";
-import { h } from "../core/util.js?v=f95c6a1467";
+import { frame, chips } from "./base.js?v=22b6b8096a";
+import { planeStage } from "./planestage.js?v=22b6b8096a";
+import { rich } from "../core/rich.js?v=22b6b8096a";
+import { h } from "../core/util.js?v=22b6b8096a";
 const A = "AFH 2";
 export const STATIONS = [
   { k: "cabin", t: "Cabin", view: "cabin", hl: ["fuselage"], check: "Papers aboard, [[control lock]] out, switches off, fuel selector in every position including OFF, belts, seats locked in their rails, windows, instruments.",

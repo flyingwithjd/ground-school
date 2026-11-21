@@ -1,8 +1,8 @@
 // Runway numbering on a compass rose (AIM 4-3-6, AIM 2-3-3). Turn the runway; read both numbers;
 // add parallels to see L/C/R swap ends; then quiz yourself on which way a runway points.
-import { frame, chips, slider, svg, drawOn, ACC, FAINT, FAINT2, INK } from "./base.js?v=f95c6a1467";
-import { s, h, shuffle } from "../core/util.js?v=f95c6a1467";
-import { T } from "./shapes.js?v=f95c6a1467";
+import { frame, chips, slider, svg, drawOn, ACC, FAINT, FAINT2, INK } from "./base.js?v=22b6b8096a";
+import { s, h, shuffle } from "../core/util.js?v=22b6b8096a";
+import { T } from "./shapes.js?v=22b6b8096a";
 const CX = 1060, CY = 440, R = 330, D2R = Math.PI / 180;
 const pt = (a, r) => [CX + r * Math.sin(a * D2R), CY - r * Math.cos(a * D2R)];
 export const rwyNum = (hdg) => { let n = Math.round(((hdg % 360) + 360) % 360 / 10); if (n === 0) n = 36; return n; };
