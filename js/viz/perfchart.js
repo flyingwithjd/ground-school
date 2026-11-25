@@ -11,7 +11,7 @@ const fV = (d, v) => (v >= 0 ? d * (1 - (0.1 * v) / 9) : d * (1 + (0.1 * -v) / 2
 const halo = (e) => { e.setAttribute("stroke", "#0a0a0a"); e.setAttribute("stroke-width", 4); e.setAttribute("paint-order", "stroke"); return e; };
 export function mount(host) {
   let oat = 25, pa = 4000, w = 2400, v = 10;
-  const S = pxScene(host, { corners: { tl: "Takeoff distance · sample chart", tr: "PHAK 11" } }, draw);
+  const S = pxScene(host, { cls: "toc", corners: { tl: "Takeoff distance · sample chart", tr: "PHAK 11" } }, draw);
   slider(row(S.F.ctrl), { label: "Temperature", min: -20, max: 40, step: 5, value: oat, fmt: (x) => `${x} °C`, oninput: (x) => { oat = x; S.redraw(); } });
   slider(row(S.F.ctrl), { label: "Pressure alt", min: 0, max: 8000, step: 1000, value: pa, fmt: (x) => `${x.toLocaleString()} ft`, oninput: (x) => { pa = x; S.redraw(); } });
   slider(row(S.F.ctrl), { label: "Weight", min: 1900, max: 2550, step: 50, value: w, fmt: (x) => `${x.toLocaleString()} lb`, oninput: (x) => { w = x; S.redraw(); } });

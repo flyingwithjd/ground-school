@@ -39,7 +39,7 @@ export function mount(host) {
     if (h > 300) { const dd = Math.abs(diff) < 0.05 ? "same temp" : (diff < 0 ? Math.abs(diff).toFixed(1) + "° warmer" : diff.toFixed(1) + "° colder"); T(g, px + (diff < 0 ? 18 : -18), py - 14, dd, { size: 11, fill: ACC, anchor: diff < 0 ? "start" : "end", weight: 600 }); }
     T(g, x1 - 4, y0 - 8, tc < 2 ? "pushed up…" : tc < 6 ? "let go" : "", { size: 11, fill: GRAY, anchor: "end" });
     const big = st === "unstable" ? "Unstable: it keeps rising" : st === "stable" ? "Stable: it sinks back" : "Neutral: it stays put";
-    S.F.caption(`${env < 0 ? `Air warms ${-env} °C/1,000 ft (inversion)` : `Air cools ${env} °C/1,000 ft`} · parcel ${gp} °C`, big);
+    S.F.caption(`Air ${env < 0 ? "warms " + -env : "cools " + env} °C/1,000 ft · parcel ${gp} °C`, big);
     S.F.explain(`A rising parcel expands and cools: 3 °C per 1,000 ft while dry, more slowly (1.1–2.8 °C) once saturated, because condensing water releases heat. If the air around it cools faster than the parcel, the parcel stays warmer and lighter and keeps rising: <strong>unstable</strong>, with cumulus, showers and bumps. If the air cools more slowly, or warms with height (an <strong>inversion</strong>), the parcel ends up colder and sinks back: <strong>stable</strong>, with stratus, haze and smooth air. <span class="src">PHAK 12</span>`);
   }
   return { destroy() { S.F.destroy(); } };
