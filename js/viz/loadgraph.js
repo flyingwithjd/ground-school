@@ -29,11 +29,11 @@ export function mount(host) {
       T(g, x0, y1 - 6, "LOAD lb", { size: 11, fill: GRAY }); T(g, x1, y0 + 30, "MOMENT ÷ 1000", { size: 11, fill: GRAY, anchor: "end" });
       ST.forEach(([k, lab, arm, max], i) => { const mm = Math.min(MX, (MY * arm) / 1000), ww = (mm * 1000) / arm;
         L(g, X(0), Y(0), X(mm), Y(ww), { stroke: INK, w: 1.4 });
-        // station name along the top end of its line, staggered so names never collide
-        const short = ph ? ["FRONT", "REAR", "FUEL", "BAG"][i] : ["PILOT + FRONT", "REAR SEATS", "FUEL", "BAGGAGE"][i];
-        const ex = X(mm), ey = Y(ww); T(g, Math.min(ex + 4, x1 + 36), ey + (ey < y1 + 6 ? 12 : 4), short, { size: 11, fill: GRAY, anchor: ey < y1 + 6 ? "end" : "start" });
+        // short station name just above the top end of its line (the ends are far enough apart not to collide)
+        const short = ["FRONT", "FUEL", "REAR", "BAG"][["front", "fuel", "rear", "bag"].indexOf(k)], ex = X(mm), ey = Y(ww);
+        T(g, ex, ey - 6, short, { size: 11, fill: GRAY, anchor: ex > x1 - 20 ? "end" : "middle" });
         if (lb[k] > 0) { const px = X(mom[k]), py = Y(lb[k]); L(g, x0, py, px, py, { stroke: ACC, w: 1.2, dash: "3 3" }); L(g, px, py, px, y0, { stroke: ACC, w: 1.2, dash: "3 3" }); C(g, px, py, 3.5, { fill: ACC }); } });
-      if (ph) T(g, x0, H - 12, `Read each load across to its line, then down: e.g. front ${lb.front} lb → ${mom.front.toFixed(1)}`, { size: 11, fill: GRAY }); }
+      if (ph) T(g, x0, H - 12, "Across to the line, down to the moment", { size: 11, fill: GRAY }); }
     // ---- moment envelope: weight up, moment/1000 across
     if (showE) { const x0 = ph ? 52 : 52 + pw + gap + 30, y0 = H - bot - 22, y1 = top + 14, x1 = x0 + pw, M0 = 50, M1 = 125, W0 = 1500, W1 = 2600;
       const X = (m) => x0 + ((m - M0) / (M1 - M0)) * (x1 - x0), Y = (w) => y0 - ((w - W0) / (W1 - W0)) * (y0 - y1);
@@ -47,7 +47,7 @@ export function mount(host) {
       L(g, x0, py, px, py, { stroke: ok ? ACC : INK, w: 1.2, dash: "3 3" }); L(g, px, py, px, y0, { stroke: ok ? ACC : INK, w: 1.2, dash: "3 3" });
       C(g, px, py, 6, { fill: ok ? ACC : "#000", stroke: ok ? ACC : INK, sw: 2 }); if (!ok) { L(g, px - 4, py - 4, px + 4, py + 4, { stroke: INK, w: 2 }); L(g, px - 4, py + 4, px + 4, py - 4, { stroke: INK, w: 2 }); }
       if (ph) T(g, x0, H - 12, `${tw.toLocaleString()} lb at ${tm.toFixed(1)}: ${ok ? "inside, OK to fly" : "outside the envelope"}`, { size: 11, fill: ok ? ACC : INK }); }
-    if (!ph) T(g, 52, H - 12, `Empty ${EW} lb / ${EM} + front ${mom.front.toFixed(1)} + rear ${mom.rear.toFixed(1)} + fuel ${mom.fuel.toFixed(1)} + bag ${mom.bag.toFixed(1)} = ${tw.toLocaleString()} lb, moment ${tm.toFixed(1)}`, { size: 11, fill: GRAY });
+    if (!ph) T(g, 52, H - 12, `MOMENTS: empty ${EM} + ${mom.front.toFixed(1)} + ${mom.rear.toFixed(1)} + ${mom.fuel.toFixed(1)} + ${mom.bag.toFixed(1)} = ${tm.toFixed(1)}`, { size: 11, fill: GRAY });
     S.F.caption(`${tw.toLocaleString()} lb · moment ${tm.toFixed(1)} · CG ${cg.toFixed(1)} in`, tw > MAXW ? "Over max weight" : ok ? "Inside the envelope" : "CG out of limits");
     S.F.explain(`Read each load across to its station line and down to its moment (÷ 1000). Add them to the empty airplane's ${EW} lb and ${EM}, then plot total weight against total moment: inside the envelope is within limits. Fuel is 6 lb per gallon. This is a sample airplane; use your airplane's POH and its actual empty weight and moment. <span class="src">PHAK 10 · FAA-H-8083-1B</span>`);
   }
