@@ -1,7 +1,7 @@
 // The four forces: tap a force to read it; change thrust or pitch and watch the balance (qualitative).
-import { frame, chips, svg, drawOn } from "./base.js?v=bcb0f9d34d";
-import { s } from "../core/util.js?v=bcb0f9d34d";
-import { sidePlane, T, arrow, setArrow, accentize } from "./shapes.js?v=bcb0f9d34d";
+import { frame, chips, svg, drawOn } from "./base.js?v=b692f64f03";
+import { s } from "../core/util.js?v=b692f64f03";
+import { sidePlane, T, arrow, setArrow, accentize } from "./shapes.js?v=b692f64f03";
 export const INFO = {
   lift: ["Lift", "Acts perpendicular to the relative wind, through the center of lift. Produced mostly by the wing."],
   weight: ["Weight", "Always acts straight down toward the center of the earth, through the CG, whatever the attitude."],

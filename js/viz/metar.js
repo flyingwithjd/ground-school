@@ -1,7 +1,7 @@
 // METAR / TAF / FB decoder (PHAK Ch 13). Tap any group to decode it. Strings are the PHAK's published
 // examples, shown as EXAMPLES only: never current weather and never for flight planning.
-import { frame, chips } from "./base.js?v=bcb0f9d34d";
-import { h, esc } from "../core/util.js?v=bcb0f9d34d";
+import { frame, chips } from "./base.js?v=b692f64f03";
+import { h, esc } from "../core/util.js?v=b692f64f03";
 const EX = {
   metar: { src: "PHAK Ch 13 (METAR example)", text: "METAR KGGG 161753Z AUTO 14021G26KT 3/4SM +TSRA BR BKN008 OVC012CB 18/17 A2970 RMK PRESFR" },
   metar2: { src: "PHAK Fig 12-25 (St. Louis report along a warm front; groups put in standard order)", text: "METAR KSTL 1950Z 21018KT 1SM -RA OVC010 18/18 A2960" },
