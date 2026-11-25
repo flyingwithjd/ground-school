@@ -43,9 +43,10 @@ const check = () => pg.evaluate(() => { const out = [];
 let bad = 0; const seen = new Set();
 for (const r of routes) { await pg.goto("about:blank"); await pg.goto((process.env.BASE || "http://localhost:8765/index.html") + r); await pg.waitForTimeout(900);
   let ov = await check();
-  if (await pg.locator(".viz .chip", { hasText: /^Ailerons$/ }).count()) { const chipsL = pg.locator(".viz").filter({ has: pg.locator(".chip", { hasText: /^Ailerons$/ }) }).first().locator(".chip");
+  if (await pg.locator(".viz .chip", { hasText: /^Ailerons$/ }).count()) { const chipsL = pg.locator(".viz").filter({ has: pg.locator(".chip", { hasText: /^Ailerons$/ }) }).first().locator(".chip:visible");   // hidden chip rows (other modes) are skipped
     for (let i = 0; i < await chipsL.count(); i++) { const c = chipsL.nth(i); const name = await c.textContent(); await c.click(); await pg.waitForTimeout(250);
-      const on = await pg.evaluate(() => [...document.querySelectorAll(".viz .chip")].filter((c) => c.closest(".viz").textContent.includes("Ailerons") && (c.classList.contains("on") || c.getAttribute("aria-pressed") === "true")).map((c) => c.textContent));
+      // the explorer has a group row (Powerplant, ...) and a part row: exactly one chip is active in the row that was tapped
+      const on = await c.evaluate((el) => [...el.parentElement.querySelectorAll(".chip")].filter((x) => x.offsetParent && (x.classList.contains("on") || x.getAttribute("aria-pressed") === "true")).map((x) => x.textContent));
       if (on.length !== 1 || on[0] !== name) ov.push(`after tapping ${name}, active = ${JSON.stringify(on)}`); ov.push(...(await check()).map((x) => `[${name}] ` + x)); } }
   if (await pg.locator(".viz.fus").count()) { const fv = pg.locator(".viz.fus").first();
     for (const [nm, re] of [["Monocoque", /^Monocoque$/], ["Show a dent", /^Show a dent$/], ["Semimonocoque", /^Semimonocoque$/], ["Truss", /^Truss$/]]) { await fv.locator(".chip", { hasText: re }).click(); await pg.waitForTimeout(250); ov.push(...(await check()).map((x) => `[${nm}] ` + x)); } }
