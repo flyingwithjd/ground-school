@@ -1,6 +1,6 @@
 // Every abbreviation in lesson prose must be tappable: either it has a glossary entry that autoTerms (js/core/rich.js)
 // wraps automatically, it is wrapped by hand with [[...]], or it is on the allowlist below with a reason.
-// Part 2 renders the "Records first" page and checks its terms open a popover that stays on screen.
+// Part 2 renders the "Records and certificates" page and checks its terms open a popover that stays on screen.
 import { readdirSync } from "fs";
 const { PLAIN, G } = await import("../js/core/rich.js");
 // Letters that should NOT open a definition, with why.
@@ -14,8 +14,8 @@ const ALLOW = {
   // names, identifiers and examples, not jargon
   C172S: "model name", SP: "model name", "IO-360": "engine model", "IO-360-L2A": "engine model", G1000: "avionics model", GFC: "autopilot model (GFC 700)", KAP: "autopilot model (KAP 140)", III: "product name / roman numeral", FL600: "flight level example, defined in place", LAX: "airport identifier", KOEL: "airport identifier", N123AB: "example N-number", VIP: "plain English", JO: "FAA order prefix", "VR1207": "route number", "IR206": "route number", VP: "waypoint prefix, defined in place",
   "WX-BRIEF": "phone number", "AK-BRIEF": "phone number", WX: "phone number", AK: "phone number", BRIEF: "phone number",
-  TREE: "radio pronunciation", FIFE: "radio pronunciation", NIN: "radio pronunciation", TIBS: "discontinued service, defined in place", EFAS: "discontinued service, defined in place", CAMI: "named in place", MSDS: "named in place", CLR: "METAR code, defined in place", US: "plain English", "FAA-S-ACS-6C": "document number", "FAA-H-8083-2A": "document number",
-  GL3: "lesson code", GL5: "lesson code", GL7: "lesson code", GL11: "lesson code", GL13: "lesson code", GL14: "lesson code", GL17: "lesson code", FL1: "lesson code", FL6: "lesson code",
+  TREE: "radio pronunciation", FIFE: "radio pronunciation", NIN: "radio pronunciation", TIBS: "discontinued service, defined in place", EFAS: "discontinued service, defined in place", CAMI: "named in place", MSDS: "named in place", CLR: "METAR code, defined in place", US: "plain English", "FAA-S-ACS-6C": "document number", "FAA-H-8083-2A": "document number", ATOMATOFLAMES: "mnemonic, spelled out item by item in place", "JET-A": "placard text quoted (jet fuel is tapped in the same paragraph)", APRON: "sign text quoted",
+  GL1: "lesson code", GL2: "lesson code", GL3: "lesson code", GL5: "lesson code", GL7: "lesson code", GL11: "lesson code", GL13: "lesson code", GL14: "lesson code", GL17: "lesson code", FL1: "lesson code", FL6: "lesson code",
 };
 const D = new URL("../data/text/", import.meta.url).pathname;
 const files = [...readdirSync(D).filter((f) => f.endsWith(".js")).map((f) => D + f), ...readdirSync(D + "x").map((f) => D + "x/" + f)];
@@ -36,7 +36,7 @@ if (process.argv.includes("--static")) process.exit(bad ? 1 : 0);
 // which stays inside the viewport, never covers its own term, and the buttons don't break the line layout. 1440, 744 and 390.
 const { createRequire } = await import("module"); const { chromium } = createRequire("/workspace/pgs-build/")("playwright-core");
 const BASE = process.env.BASE || "http://localhost:8765/index.html", shotDir = process.argv[2] && !process.argv[2].startsWith("--") ? process.argv[2] : null;
-const NEED = { "Records first": ["airworthy", "pilot in command", "annual inspection", "calendar month", "100-hour inspection", "transponder", "elt", "ad", "inoperative equipment", "airworthiness certificate", "registration certificate", "operating limitations", "afm", "poh", "placard", "weight and balance", "compass correction card", "data plate", "cfr", "afh"],
+const NEED = { "Records and certificates": ["airworthy", "pilot in command", "annual inspection", "calendar month", "100-hour inspection", "transponder", "elt", "ad", "inoperative equipment", "airworthiness certificate", "registration certificate", "afm", "poh", "placard", "compass correction card", "data plate", "cfr", "afh"],
   "What you're looking for": ["poh", "vsi", "crazing", "spars", "100ll", "fuel sump", "strut", "shimmy damper", "cowling", "cfi"] };
 const b = await chromium.launch({ executablePath: "/usr/bin/google-chrome", args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
 const ok = (c, m) => { if (!c) { bad++; console.log("   FAIL", m); } };
@@ -44,9 +44,9 @@ for (const [w, hh] of [[1440, 900], [744, 1133], [390, 844]]) {
   const ctx = await b.newContext({ viewport: { width: w, height: hh }, isMobile: w < 700, hasTouch: w < 1100 }); const pg = await ctx.newPage();
   await pg.addInitScript(() => { try { localStorage.setItem("sqs.access", "1"); } catch (e) {} });
   const errs = []; pg.on("pageerror", (e) => errs.push(e.message)); pg.on("console", (m) => (m.type() === "error" || /glossary missing/.test(m.text())) && errs.push(m.text()));
-  await pg.goto(BASE + "#/lesson/gl1/0"); await pg.waitForSelector(".steps button"); await pg.waitForTimeout(800);
   for (const [title, need] of Object.entries(NEED)) {
-  await pg.locator(title === "Records first" ? ".steps button[aria-label^='Preflight assessment']" : ".steps button[aria-label^='Visual preflight']").first().click(); await pg.waitForTimeout(900);
+  // each GL1 page has its own route since the Nov 2026 reorder
+  await pg.goto(BASE + "#/lesson/gl1/" + (title === "Records and certificates" ? "papers" : "walk")); await pg.waitForSelector("h2"); await pg.waitForTimeout(900);
   const sec = pg.locator("h2", { hasText: title }).locator("xpath=ancestor::*[.//p][1]");
   ok(await sec.count(), `${w}: ${title} section not found`);
   const terms = await sec.evaluate((s) => [...s.querySelectorAll(".gl")].map((x) => x.dataset.term));

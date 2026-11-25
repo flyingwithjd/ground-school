@@ -20,7 +20,7 @@ const SUB = { SO: "vs0", S0: "vs0", "S1": "vs1", S: "vs", FE: "vfe", NO: "vno", 
 // Every other abbreviation that has its own glossary entry (key = the letters) is tapped the same way.
 // Ambiguous letters (VR, VMC, TC, NAV, IR, DC, ID, switch and TAF codes) stay out; tests/acronyms.mjs keeps this list honest.
 export const ABBR = ["FAA", "CFR", "FAR", "AIM", "PHAK", "AFH", "AC", "VFR", "IFR", "MVFR", "LIFR", "IMC", "ATC", "CFI", "PIC", "NTSB", "ICAO", "NOAA", "UTC", "CONUS", "SM", "NM", "RPM", "GPH", "OAT", "CHT", "EGT", "ISA", "IAS", "CAS", "TAS", "GS", "WCA", "ETA", "ETE", "CG", "AOA", "ASI", "VSI", "IVSI", "PFD", "MFD", "EFB", "ADM", "SRM", "CRM", "CFIT", "TUC", "DCS", "CO", "AME", "PAVE", "CARE", "TEAM", "DECIDE", "ABCDE", "ANDS", "AV1ATE", "ARROW", "SAFETY", "ELT", "AD", "SAIB", "MEL", "TCDS", "TSO", "NOTAM", "TFR", "SFRA", "MOA", "MTR", "CFA", "NSA", "GPS", "RNAV", "RAIM", "VOR", "VORTAC", "NDB", "DME", "ILS", "CDI", "OBS", "ADS-B", "UAT", "TIS-B", "FIS-B", "IDENT", "ATIS", "ASOS", "AWOS", "FSS", "MULTICOM", "GFA", "CVA", "MEF", "TAC", "WAC", "MAYDAY", "PAN-PAN", "TH", "MH", "CH", "MC", "CC", "E6B", "VOT", "SOP", "PSI",
-  "VASI", "PAPI", "REIL", "CTAF", "UNICOM", "METAR", "TAF", "PIREP", "AIRMET", "SIGMET", "G-AIRMET", "TRSA", "AHRS", "IMSAFE", "NEXRAD", "ATCRBS"];
+  "VASI", "PAPI", "REIL", "CTAF", "UNICOM", "METAR", "TAF", "PIREP", "AIRMET", "SIGMET", "G-AIRMET", "TRSA", "AHRS", "IMSAFE", "NEXRAD", "ATCRBS", "LAHSO", "ALD", "NASA", "ASRS", "WINGS", "ATP"];
 for (const a of ABBR) PLAIN[a] = a.toLowerCase();
 export { PLAIN };
 // A token: not glued to a word or hyphen in front; an optional plural "s"; not followed by a letter/digit or a hyphenated code (IO-360).
