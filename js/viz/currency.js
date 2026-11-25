@@ -7,7 +7,7 @@ const DAY = 864e5, fmtD = (d) => `${MO[d.getMonth()]} ${d.getDate()}, ${d.getFul
 export function mount(host) {
   const today = new Date(); today.setHours(12, 0, 0, 0);
   let mode = "fr", fr = 20, ld = 40, mv = 20;
-  const S = pxScene(host, { corners: { tl: "Are you current today?", tr: "Today " + fmtD(today) } }, draw);
+  const S = pxScene(host, { corners: { tl: "Current today?", tr: "Today " + fmtD(today) } }, draw);
   chips(S.F.ctrl, [["fr", "Flight review"], ["pax", "Passengers"], ["addr", "New address"]], mode, (v) => { mode = v; show(); S.redraw(); }, { label: "Rule" });
   const sl = {
     fr: slider(S.F.ctrl, { label: "Last review", min: 0, max: 30, step: 1, value: fr, fmt: (v) => v + " months ago", oninput: (v) => { fr = v; S.redraw(); } }),
@@ -31,18 +31,18 @@ export function mount(host) {
       a0 = new Date(+today - 125 * DAY); a1 = new Date(+today + 95 * DAY);
       const ok = today <= end;
       rows = [{ lab: "CARRY PASSENGERS BY DAY", src: "61.57(a)", s: ls, e: end, on: ok, a: "3RD-LAST LANDING", b: "THRU " + fmtD(end).toUpperCase() }];
-      head = ok ? "Current: you may carry passengers" : "Not current: fly 3 takeoffs and landings first"; big = ok ? `${Math.round((end - today) / DAY)} days left` : "No passengers today";
+      head = ok ? "Current: you may carry passengers" : "Not current for passengers"; big = ok ? `${Math.round((end - today) / DAY)} days left` : "No passengers today";
       ex = `To carry anyone you need <b>3 takeoffs and 3 landings in the preceding 90 days</b>, as sole manipulator, in the same category and class. Touch-and-goes count in a nosewheel airplane; a tailwheel airplane needs full stops. At night (1 hour after sunset to 1 hour before sunrise) the 3 must be full stops made in that period. To get current again, fly them with no passengers, or with an instructor. <span class="src">14 CFR 61.57(a)–(b)</span>`;
     } else {
       const mvd = new Date(+today - mv * DAY), end = new Date(+mvd + 30 * DAY);
       a0 = new Date(+today - 62 * DAY); a1 = new Date(+today + 32 * DAY);
       const ok = today <= end;
       rows = [{ lab: "TOLD THE FAA", src: "61.60", s: mvd, e: a1, on: true, a: "MOVED", b: "" },
-        { lab: "HAVEN'T TOLD THE FAA", src: "61.60", s: mvd, e: end, on: ok, a: "MOVED", b: "DAY 30 · " + fmtD(end).toUpperCase() }];
-      head = ok ? "Notify the FAA within 30 days" : "Grounded until you notify the FAA"; big = ok ? `${Math.round((end - today) / DAY)} days to tell the FAA` : "Can't use your certificate";
+        { lab: "HAVEN'T TOLD THE FAA", src: "61.60", s: mvd, e: end, on: ok, a: "MOVED", b: "DAY 30", one: true }];
+      head = ok ? "Notify the FAA within 30 days" : "Grounded until you notify the FAA"; big = ok ? `Tell the FAA by ${fmtD(end)}` : "Can't use your certificate";
       ex = `After a change of permanent mailing address, you may not use your pilot certificate after 30 days unless you've notified the FAA Airman Certification Branch. The rule says in writing; the FAA also takes it online. <span class="src">14 CFR 61.60</span>`;
     }
-    const X = (d) => x0 + ((d - a0) / (a1 - a0)) * (x1 - x0), y0 = top + 8, rh = ph ? 118 : 132, bh = ph ? 28 : 38, xt = X(today);
+    const X = (d) => x0 + ((d - a0) / (a1 - a0)) * (x1 - x0), y0 = top + 8, rh = mode === "addr" ? (ph ? 92 : 104) : ph ? 118 : 132, bh = ph ? 28 : 38, xt = X(today);
     rows.forEach((r, i) => { const y = y0 + i * rh, by = y + 34, xs = Math.max(x0, X(r.s)), xe = Math.min(x1, X(r.e));
       T(g, x0, y + 4, r.lab, { size: 11, fill: r.on ? INK : GRAY }); T(g, x1, y + 4, r.src, { size: 11, fill: GRAY, anchor: "end" });
       // today marker above the bar
@@ -50,10 +50,11 @@ export function mount(host) {
       R(g, x0, by, x1 - x0, bh, { fill: "rgba(242,241,236,.05)", rx: 3 });
       R(g, xs, by, Math.max(2, xe - xs), bh, { fill: r.on ? ACC : ACCM, rx: 3 });
       if (r.e < a1 && xe < x1 - 4) R(g, xe, by, x1 - xe, bh, { stroke: DIM, sw: 1, dash: "3 3", rx: 3 });
-      if (r.e < a1) L(g, xe, by - 4, xe, by + bh + 26, { stroke: INK, w: 1.5 });
+      if (r.e < a1) L(g, xe, by - 4, xe, by + bh + (r.one ? 8 : 26), { stroke: INK, w: 1.5 });
       L(g, xt, y + 26, xt, by + bh + 4, { stroke: INK, w: 2.5 });
       T(g, xs, by + bh + 18, r.a, { size: 11, fill: GRAY, anchor: xs > W * 0.6 ? "end" : "start" });
-      if (r.b) T(g, xe, by + bh + 40, r.b, { size: ph ? 11 : 12, fill: r.on ? INK : GRAY, weight: 600, anchor: xe > W * 0.5 ? "end" : "start" });
+      if (r.b && r.one) T(g, xe < x1 - 60 ? xe + 6 : xe - 6, by + bh + 18, r.b, { size: 11, fill: r.on ? INK : GRAY, weight: 700, anchor: xe < x1 - 60 ? "start" : "end" });
+      else if (r.b) T(g, xe, by + bh + 40, r.b, { size: ph ? 11 : 12, fill: r.on ? INK : GRAY, weight: 600, anchor: xe > W * 0.5 ? "end" : "start" });
     });
     // axis: years (flight review) or 30-day steps
     const ya = y0 + rows.length * rh - 6; L(g, x0, ya, x1, ya, { stroke: DIM, w: 1 });

@@ -18,7 +18,7 @@ export function mount(host) {
     gates.forEach(([lab, ok], i) => { const x = x0 + 20 + sp * i + sp / 2 - sp / 2 + sp / 2;
       C(g, x, cy, ph ? 15 : 18, { stroke: ok ? ACC : INK, sw: 2, fill: ok ? ACCF : "#111113" });
       if (ok) P(g, `M${x - 6},${cy} l4,5 l8,-10`, { stroke: ACC, w: 2.4 }); else { P(g, `M${x - 6},${cy - 6} l12,12 M${x + 6},${cy - 6} l-12,12`, { stroke: INK, w: 2.2 }); }
-      lab.forEach((t, k) => T(g, x, cy + (ph ? 34 : 40) + k * 15, t, { size: 11, anchor: "middle", fill: ok ? INK : GRAY, ls: 0 }));
+      lab.forEach((t, k) => T(g, x, cy + (ph ? 34 : 40) + k * 15, t, { size: 11, anchor: "middle", fill: ok ? INK : GRAY, mono: false, weight: 600 }));
       T(g, x, cy - (ph ? 24 : 28), String(i + 1), { size: 11, anchor: "middle", fill: GRAY });
     });
     // end node
