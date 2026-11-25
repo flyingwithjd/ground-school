@@ -13,5 +13,10 @@ export default {
 <p>Pick a situation below.</p>`,
       viz: { type: "wake", opts: { mode: "land" } },
       kdr: { k: "Wake turbulence avoidance.", d: "Plan a path that stays above a larger airplane's wake.", r: "Wake encounters close to the ground.", codes: ["PA.II.F.R3", "PA.III.B.R3"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Two made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "wx3" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Wind shear and wake decisions.", d: "Recognize a microburst and avoid wake.", r: "Low-altitude wind shear and wake encounters.", codes: ["PA.III.B.R3", "PA.VII.A.R4"] } },
   ],
 };

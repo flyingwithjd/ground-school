@@ -16,5 +16,10 @@ export default {
 <p>The five, with the thought that gives each away and its antidote. Anti-authority, "Don't tell me": Follow the rules. They are usually right. Impulsivity, "Do it quickly": Not so fast. Think first. Invulnerability, "It won't happen to me": It could happen to me. Macho, "I can do it": Taking chances is foolish. Resignation, "What's the use?": I'm not helpless. I can make a difference. <span class="src">PHAK Ch 2, Fig 2-4</span></p>`,
       viz: { type: "attitude", opts: {} },
       kdr: { k: "Hazardous attitudes.", d: "Identify and counter hazardous attitudes.", r: "Hazardous attitudes.", codes: ["PA.I.H.K4", "PA.I.H.R2"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Two made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "ad1" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Hazardous attitudes and PAVE in practice.", d: "Name the attitude and reduce stacked risks.", r: "Small risks that add up.", codes: ["PA.I.H.R2", "PA.I.D.R1", "PA.I.D.R4"] } },
   ],
 };

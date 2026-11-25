@@ -18,5 +18,10 @@ export default {
     { id: "alt", label: "Minimum altitudes · 14 CFR 91.119", title: "Always leave room to glide",
       body: `<p>Anywhere: high enough to make an emergency landing without undue hazard if the engine quits. Over congested areas: 1,000 ft above the highest obstacle within 2,000 ft. Elsewhere: 500 ft above the surface; over open water or sparsely populated areas, no closer than 500 ft to any person, vessel, vehicle or structure. Takeoff and landing are excepted. <span class="src">14 CFR 91.119</span></p>`,
       kdr: { k: "Minimum safe altitudes.", d: "Plan altitudes that leave a place to land.", r: "Low-altitude maneuvering.", codes: ["PA.IX.B.R1", "PA.IX.B.R5"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Two made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "rg3" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Equipment and fuel decisions.", d: "Apply 91.151, 91.207 and 91.413.", r: "Low fuel and overdue checks.", codes: ["PA.I.D.R6", "PA.VI.A.R3", "PA.II.B.R2", "PA.II.A.R2"] } },
   ],
 };

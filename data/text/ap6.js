@@ -11,5 +11,10 @@ export default {
 <p>The full table: steady green is cleared for takeoff on the ground and cleared to land in the air. Flashing green is cleared to taxi on the ground and return for landing in the air. Steady red is stop on the ground; in the air it means give way to other aircraft and keep circling. Flashing red on the ground means taxi clear of the runway in use; in the air it means the airport is unsafe, do not land. Acknowledge by moving the ailerons or rudder in daylight, or by blinking the landing or navigation lights at night. <span class="src">AIM 4-3-13, TBL 4-3-1</span></p>`,
       viz: { type: "lightgun", opts: { where: "air" } },
       kdr: { k: "Light gun signals; lost communication.", d: "Respond to light signals.", r: "Communication failure in the pattern.", codes: ["PA.III.A.K3", "PA.III.A.K5"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Two made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "ap6" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Light signals and airport indicators in practice.", d: "Respond to light-gun signals and pattern indicators.", r: "Runway incursions without a radio.", codes: ["PA.III.A.R1", "PA.II.D.R4", "PA.III.B.R1"] } },
   ],
 };

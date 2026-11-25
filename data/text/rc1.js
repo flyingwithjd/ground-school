@@ -18,5 +18,10 @@ export default {
       body: `<p>Troubleshoot first: volume, squelch, frequency, audio panel, headset plug and circuit breakers. If only the receiver has failed, stay outside or above the Class D airspace until you know the traffic, tell the tower your type, position, altitude and intent to land, and call about 3 to 5 miles out. Then watch the tower for light signals. <span class="src">AIM 4-2-13, 4-3-13</span></p>`,
       viz: { type: "lightgun", opts: { where: "air" } },
       kdr: { k: "Lost communication procedures and light signals.", d: "Respond to light signals.", r: "Loss of communication near an airport.", codes: ["PA.III.A.K5", "PA.III.A.K3", "PA.III.A.K6"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Two made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "rc1" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Radio decisions: lost communications and unclear instructions.", d: "Squawk 7600, read light signals, and never guess.", r: "Miscommunication.", codes: ["PA.III.A.R1", "PA.III.A.R2", "PA.III.A.R4"] } },
   ],
 };

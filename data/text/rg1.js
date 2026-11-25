@@ -14,5 +14,10 @@ export default {
       viz: { type: "mnemo", opts: { set: "limits" } },
       body2: `<p>On a solo cross-country, carry your logbook and your student pilot certificate. The FAA, the NTSB and law enforcement may ask to see them. <span class="src">14 CFR 61.51(i)</span></p>`,
       kdr: { k: "Student privileges and limitations.", d: "Plan flights that stay within your limits.", r: "Flying outside your endorsed limits.", codes: ["PA.I.A.K2", "PA.I.A.K4", "PA.I.A.R1"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Two made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "rg1" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Student pilot rule decisions.", d: "Apply 61.87 and 61.89 to your next solo.", r: "Solo outside your limits.", codes: ["PA.II.A.R4", "PA.I.D.R1", "PA.I.D.R3", "PA.I.C.R1"] } },
   ],
 };

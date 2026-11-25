@@ -1,8 +1,8 @@
 // Attitude indicator (PHAK 8; FAA-H-8083-15B Instrument Flying Handbook ch 4–6). drawAI() is shared with other visuals.
 // Modes: "ai" (GL13) pitch and bank sliders with the bank scale read out; "unusual" (FL11) nose-high and nose-low unusual
 // attitudes with the recovery steps in order. Sky blue and ground brown are kept: the color is the information. Static scene.
-import { slider, chips, row } from "./base.js?v=0ffd46bda8";
-import { pxScene, T, L, C, P, ACC, INK, GRAY } from "./kit.js?v=0ffd46bda8";
+import { slider, chips, row } from "./base.js?v=680d64f417";
+import { pxScene, T, L, C, P, ACC, INK, GRAY } from "./kit.js?v=680d64f417";
 const D = Math.PI / 180;
 let uid = 0;
 export function drawAI(g, cx, cy, r, pitch, bank) {

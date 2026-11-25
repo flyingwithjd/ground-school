@@ -18,6 +18,11 @@ export default {
       body: `<p>At 1,800 RPM, check each magneto alone. A small drop is normal because one set of plugs is doing the work. Too big a drop, or too big a difference between the two, means an ignition problem. No drop at all can mean a magneto is not grounding, which is dangerous if someone moves the propeller. <span class="src">POH 4</span></p>
 <p>Also check the engine and electrical indications, flight controls free and correct, trim set for takeoff, and brief the departure, including what you will do if the engine fails. Review takeoff performance. <span class="src">ACS PA.II.F</span> <span class="dim">Confirm with your CFI and your aircraft's POH.</span></p>`,
       kdr: { k: "Reasons for each runup item; detecting malfunctions.", d: "Complete the before-takeoff checklist.", r: "Accepting a marginal runup result.", codes: ["PA.II.F.K1a", "PA.II.F.K1b", "PA.II.F.S1"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Two made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "fl1" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Ground-operation decisions: a failed run-up and taxiing in wind.", d: "Apply run-up limits and wind-correct taxi control positions.", r: "Departing with a known defect; upsets while taxiing.", codes: ["PA.II.B.R2", "PA.II.A.R2", "PA.II.D.R1", "PA.II.A.R3"] } },
   ],
   prep: {
     expect: ["Your instructor will walk the preflight with you, then let you lead it.", "You will start the engine, taxi and do the runup with coaching.", "You may fly the airplane for part of the flight to feel the controls."],

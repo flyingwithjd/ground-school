@@ -1,7 +1,7 @@
 // Hypoxia vs hyperventilation (PHAK FAA-H-8083-25C ch 17): their symptoms overlap, so the situation decides what to do
 // first. Drawn as two overlapping boxes (a square Venn). Static scene.
-import { chips, row } from "./base.js?v=0ffd46bda8";
-import { pxScene, T, R, ACC, INK, GRAY, ACCF } from "./kit.js?v=0ffd46bda8";
+import { chips, row } from "./base.js?v=680d64f417";
+import { pxScene, T, R, ACC, INK, GRAY, ACCF } from "./kit.js?v=680d64f417";
 const COL = [["Hypoxia only", ["blue lips, nails", "headache", "euphoria", "slow reactions", "drowsy"]],
   ["Both", ["lightheaded", "tingling", "vision dims", "can pass out"]],
   ["Hyperventilation", ["fast breathing", "hot and cold", "muscle spasms"]]];

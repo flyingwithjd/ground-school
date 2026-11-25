@@ -15,6 +15,11 @@ export default {
       body: `<p>Once you are climbing, move to the side of the runway if needed to see and avoid departing traffic. The AFH suggests a shallow turn to the upwind side. Hold VY +10/−5 knots to a safe altitude, keep wind-drift correction, make your radio call and rejoin the pattern. <span class="src">ACS PA.IV.N.S6–S8; AFH 8</span></p>
 <p>Low go-arounds happen in ground effect. The airplane feels like it is floating on a cushion, but that performance is borrowed and repaid as you climb. <span class="src">AFH 9</span></p>`,
       kdr: { k: "Wind and density altitude on climb performance.", d: "Maneuver to the side; hold VY.", r: "Collision hazards; low-altitude stall.", codes: ["PA.IV.N.K2", "PA.IV.N.S6", "PA.IV.N.S7", "PA.IV.N.R5"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Two made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "fl4" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Go-around decisions: traffic on the runway and a bounced landing.", d: "Decide early, offset, and retract flaps in stages.", r: "Delayed go-arounds.", codes: ["PA.IV.N.R1", "PA.IV.N.R4", "PA.IV.N.R2", "PA.IV.N.R3"] } },
   ],
   prep: {
     expect: ["Go-arounds at altitude first, then in the pattern from short final.", "Your instructor may call \"Go around\" at any point on final.", "Radio calls after each go-around at a non-towered field."],

@@ -32,6 +32,11 @@ export default {
       viz: { type: "fieldprof", opts: { phase: "to", tech: "soft" } },
       body2: `<p>On a <strong>soft-field landing</strong>, touch down as slowly as possible, often with a little power through the flare. Keep the nose wheel off the ground as long as you can, then keep it light, and keep the airplane moving. Avoid hard braking. <span class="src">AFH 9 · ACS PA.IV.D</span></p>`,
       kdr: { k: "Ground effect; soft-surface technique.", d: "Lift off at the lowest speed and accelerate in ground effect; land at minimum speed.", r: "Climbing out of ground effect too early; bogging down.", codes: ["PA.IV.C.K1", "PA.IV.C.S8", "PA.IV.D.S9", "PA.IV.C.R1"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Three made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "fl8" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Takeoff and landing decisions: gusty crosswinds, unstable approaches and obstacles.", d: "Apply crosswind limits, a stabilized-approach gate and Vx/Vy.", r: "Unstable approaches and crosswinds beyond your limits.", codes: ["PA.IV.B.R1", "PA.IV.B.R2", "PA.IV.M.R9", "PA.IV.N.R1", "PA.IV.F.R1", "PA.IV.F.R5"] } },
   ],
   prep: {
     expect: ["Normal takeoffs and landings in the pattern, many times each flight.", "Crosswind practice when the wind allows.", "Short-field and soft-field demonstrations, then your own tries."],

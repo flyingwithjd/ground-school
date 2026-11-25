@@ -23,6 +23,11 @@ export default {
       viz: { type: "turn180" },
       body2: `<p>Hold altitude: don't climb into more cloud or descend toward terrain. Tell ATC you're a VFR pilot in IMC and ask for help. Better still, turn around early, while you can still see. <span class="src">AFH 18 · AIM 6-2</span></p>`,
       kdr: { k: "Procedures to regain VMC after inadvertent IMC.", d: "Fly a level 180° turn by instruments and roll out on the reciprocal heading.", r: "Spatial disorientation; loss of control.", codes: ["PA.VIII.E.K3", "PA.VIII.A.R1", "PA.VIII.A.R2"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Two made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "fl11" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Instrument decisions: losing the horizon and fixation.", d: "Fly the instruments, turn back, and ask for help.", r: "Spatial disorientation and fixation.", codes: ["PA.VIII.A.R1", "PA.VIII.A.R2", "PA.VIII.A.R5", "PA.VIII.A.R6"] } },
   ],
   prep: {
     expect: ["Flying under a view-limiting device while your CFI watches outside.", "Straight-and-level first, then climbs, descents and turns to headings.", "Unusual attitudes: your CFI sets one up while your eyes are closed, then hands you the controls."],

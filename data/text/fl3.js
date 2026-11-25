@@ -16,6 +16,11 @@ export default {
       body: `<p>A spin needs a stall and yaw. Keep the ball centered near the stall and a spin cannot develop. The dangerous case is a skidding turn near the ground, such as adding inside rudder to tighten an overshot turn to final while pulling back. <span class="src">AFH 5</span></p>
 <p>172S POH recovery: throttle idle and ailerons neutral; full rudder opposite the rotation; just after the rudder reaches the stop, wheel briskly forward far enough to break the stall; hold until rotation stops; neutralize rudder and recover smoothly from the dive. <span class="src">POH 4</span> Intentional spins are approved only in the utility category. <span class="dim">Confirm with your CFI and your aircraft's POH.</span></p>`,
       kdr: { k: "Spin causes, phases and recovery.", d: "Explain spin recovery for your airplane.", r: "Cross-controlled flight at low altitude.", codes: ["PA.VII.D.K1", "PA.VII.D.K2", "PA.VII.D.K3"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Two made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "fl3" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Stall decisions: an unexpected stall warning and a wing drop.", d: "Reduce angle of attack first; practice at a safe altitude.", r: "Inadvertent stalls from distraction.", codes: ["PA.VII.A.R1", "PA.VII.C.R3", "PA.VII.B.R4", "PA.VII.B.R5"] } },
   ],
   prep: {
     expect: ["Clearing turns, then slow flight with turns, climbs and descents.", "Power-off stalls from an approach configuration; power-on stalls from a climb.", "Your instructor will set the standard: impending or full stall."],

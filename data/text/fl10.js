@@ -26,6 +26,11 @@ export default {
       body2: `<p>The AFH's general recovery, unless your airplane's POH says otherwise: <strong>power</strong> to idle, <strong>ailerons</strong> neutral, full <strong>rudder</strong> opposite the rotation, then brisk forward <strong>elevator</strong> to break the stall. When the rotation stops, neutralize the rudder and ease out of the dive. <span class="src">AFH 5</span></p>
 <p>Private pilot applicants need spin <em>awareness</em>, not spin training. Many trainers prohibit intentional spins, or allow them only in the utility category at limited weight and CG. Check your airplane's POH limitations and placards. <span class="src">ACS PA.VII.D · 14 CFR 91.9</span></p>`,
       kdr: { k: "Spin causes and phases; spin recovery.", d: "Explain spin entry, phases and the recovery steps.", r: "Inadvertent spin at low altitude; loss of control.", codes: ["PA.VII.D.K1", "PA.VII.D.K2", "PA.VII.D.K3", "PA.VII.D.R1"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Two made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "fl10" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Spin and accelerated stall decisions.", d: "Recover with PARE and by unloading.", r: "Loss of control in a steep turn or stall.", codes: ["PA.VII.D.R1", "PA.VII.D.R3", "PA.VII.C.R5", "PA.V.A.R1"] } },
   ],
   prep: {
     expect: ["Clearing turns, then power-off and power-on stalls, straight and in shallow turns.", "Your CFI may demonstrate an accelerated, cross-control or trim stall.", "Recoveries until they're automatic."],
