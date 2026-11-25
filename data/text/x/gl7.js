@@ -3,7 +3,9 @@ export default {
   sections: [
     { id: "circ", at: "^", label: "Circulation and pressure · PHAK 12", title: "Why the air moves at all",
       body: `<p>The sun heats the equator more than the poles. Warm air rises and cool air sinks to replace it: that's <strong>atmospheric circulation</strong>. The Earth's rotation breaks the flow into <strong>three cells</strong> in each hemisphere, at roughly 0–30°, 30–60° and 60–90° latitude. That gives the northeasterly trade winds near the equator and the <strong>prevailing westerlies</strong> over the contiguous United States. <span class="src">PHAK 12</span></p>
-<p>Within about <strong>2,000 ft</strong> of the ground, friction slows the wind and changes its direction, so the surface wind differs from the wind a few thousand feet up. <span class="src">PHAK 12</span></p>
+<p>Within about <strong>2,000 ft</strong> of the ground, friction slows the wind and changes its direction, so the surface wind differs from the wind a few thousand feet up. <span class="src">PHAK 12</span></p>`,
+      viz: { type: "circulation" },
+      body2: `
 <p><strong>Measuring pressure.</strong> An aneroid barometer, the same cell that drives your altimeter, measures pressure. Standard sea-level pressure is 29.92 "Hg = 1,013.2 mb; 1 "Hg is about 34 mb. Stations convert their reading to sea level by adding about 1 "Hg per 1,000 ft of elevation, so a station at 5,000 ft reading 24.92 reports 29.92. Rising pressure usually means fair weather is coming; falling pressure, worse weather. <span class="src">PHAK 12</span></p>`,
       kdr: { k: "Explain global circulation, friction near the surface and how pressure is reported.", d: "Read a pressure trend and expect wind changes as you climb out of the friction layer.", r: "Planning on the surface wind for a climb or cruise altitude.", codes: ["PA.I.C.K3a", "PA.I.C.K3b", "PA.I.C.K3c"] } },
     { id: "local", at: "press", label: "Local winds and turbulence · PHAK 12", title: "Terrain and sun stir the air",
