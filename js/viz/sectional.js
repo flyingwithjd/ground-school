@@ -66,7 +66,7 @@ export function mount(host) {
       lines.forEach((s2, i) => { const yy = b + (ph && o.phDy != null ? o.phDy : o.dy || 0) + i * 13; if (yy > top + 6 && yy < H - bot + 2) halo(T(G, left, yy, s2, { size: 11, fill: S_(key) ? INK : col, weight: i ? 500 : 700 })); }); };
     if (on(32, 28, 20)) { apt(32, 28, BLU, { star: true, key: "twr" }); block(32, 28, ["RIVERTON (X21)", "CT – 119.2★ⓒ", "1043 L 55 122.95"], BLU, "twr", { anchor: "end", dx: 14, dy: 22, center: true }); }
     if (on(78, 14, 20)) { apt(78, 14, MAG, { key: "ntw" }); block(78, 14, ["CEDAR FLAT (X34)", "1240 L 32 122.8ⓒ"], MAG, "ntw", { dx: 14, dy: -2 }); }
-    if (on(90, 27, 20)) { apt(90, 27, MAG, { rw: false, ticks: false, key: "soft" }); block(90, 27, ["HILLTOP (X47)", "1610 – 22 122.9ⓒ"], MAG, "soft", { anchor: "end", dx: 18, dy: 18, phDy: -20 }); }
+    if (on(90, 27, 20)) { apt(90, 27, MAG, { rw: false, ticks: false, key: "soft" }); block(90, 27, ["HILLTOP (X47)", "1610 – 22 122.9ⓒ"], MAG, "soft", { anchor: "end", dx: 18, dy: -20 }); }
     // VORTAC with its compass rose and box
     if (on(62, 38, 60)) { const [a, b] = m(62, 38), rr = Math.max(26, 8 * k), hi = S_("vor"), col = hi ? INK : BLU;
       C(G, a, b, rr, { stroke: col, sw: hi ? 1.8 : 1.1 }); const vr = 6 * Math.PI / 180;   // rose aligned to magnetic north (6°E variation)
