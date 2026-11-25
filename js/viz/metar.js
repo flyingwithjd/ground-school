@@ -7,7 +7,23 @@ const EX = {
   metar2: { src: "PHAK Fig 12-25 (St. Louis report along a warm front; groups put in standard order)", text: "METAR KSTL 1950Z 21018KT 1SM -RA OVC010 18/18 A2960" },
   taf: { src: "PHAK Ch 13 (TAF example)", text: "TAF KPIR 111130Z 1112/1212 TEMPO 1112/1114 5SM BR FM1500 16015G25KT P6SM SCT040 BKN250 FM120000 14012KT P6SM BKN080 OVC150 PROB30 1200/1204 3SM TSRA BKN030CB FM120400 1408KT P6SM SCT040 OVC080 TEMPO 1204/1208 3SM TSRA OVC030CB" },
   fb: { src: "PHAK Fig 13-9 and its explanation (AMA and DEN groups, plus the PHAK's two coding examples)", text: "FB AMA 6000 2714 DEN 9000 2321-04 9900 731960" },
+  pirep: { src: "Made-up PIREP in the standard format · AIM 7-1-18 · AWH", made: true, text: "ABC UA /OV ABC090020 /TM 1645 /FL065 /TP C172 /SK BKN035-TOP055 /WX FV05SM HZ /TA 08 /WV 270025 /TB LGT-MOD 040-060 /IC NEG /RM SMOOTH ABV 070" },
 };
+const PR = {
+  UA: ["Type", "UA is a routine pilot report. UUA is an urgent one: tornado, funnel cloud, severe turbulence or icing, hail, low-level wind shear, volcanic ash."],
+  "/OV": ["Location", "Where it happened, from a navaid: ABC090020 means 20 NM on the 090° radial from the ABC VOR. It can also be an airport or a route between two points."],
+  "/TM": ["Time", "When it happened, in UTC (Zulu): 16:45 Z."],
+  "/FL": ["Altitude", "Altitude in hundreds of feet MSL: 065 is 6,500 ft. UNKN if unknown, DURD or DURC during descent or climb."],
+  "/TP": ["Aircraft type", "The reporting aircraft. Turbulence and icing reports mean most from a type like yours: light chop in a jet can be moderate in a small airplane."],
+  "/SK": ["Sky cover", "Bases and tops in hundreds of feet MSL: broken clouds based at 3,500 ft with tops at 5,500 ft."],
+  "/WX": ["Weather", "Flight visibility 5 SM in haze. FV is flight visibility, as the pilot saw it, not a surface report."],
+  "/TA": ["Temperature", "Outside air temperature in °C: 8 °C. M means minus."],
+  "/WV": ["Wind", "Wind at the reported altitude: from 270° at 25 kt. The AIM's PIREP table gives the direction in degrees magnetic, unlike METAR and winds-aloft winds, which are true."],
+  "/TB": ["Turbulence", "Light to moderate turbulence between 4,000 and 6,000 ft MSL. Intensity: LGT, MOD, SEV, EXTRM; CHOP or CAT when reported."],
+  "/IC": ["Icing", "NEG means no icing. Otherwise intensity (TRACE, LGT, MOD, SEV), type (RIME, CLR, MX) and altitudes."],
+  "/RM": ["Remarks", "Anything else useful, in plain words: smooth above 7,000 ft."],
+};
+function tokenizePirep(t) { // station, then UA, then the slash groups return t.split(/ (?=\/)/).map((x) => x.trim()); }
 const WX = { MI: "shallow", BC: "patches", DR: "low drifting", BL: "blowing", SH: "showers", TS: "thunderstorm", FZ: "freezing", PR: "partial",
   DZ: "drizzle", RA: "rain", SN: "snow", SG: "snow grains", IC: "ice crystals", PL: "ice pellets", GR: "hail", GS: "small hail or snow pellets",
   BR: "mist", FG: "fog", FU: "smoke", DU: "dust", SA: "sand", HZ: "haze", PY: "spray", VA: "volcanic ash",
@@ -17,6 +33,7 @@ const ft = (n) => (+n * 100).toLocaleString("en-US") + " ft AGL";
 const hr = (s) => s.slice(0, 2) + ":" + s.slice(2, 4) + " UTC";
 function decode(tok, i, all, kind) {
   let m;
+  if (kind === "pirep") { if (i === 0) return ["Station", "The nearest weather reporting location to what was seen (ABC is made up)."]; const k = (tok.match(/^\/[A-Z]{2}|^UU?A$/) || [""])[0]; return PR[k] || ["Group", "Not decoded here. See AIM 7-1-18."]; }
   if (kind === "fb") {
     if (tok === "FB") return ["Product", "Winds and temperatures aloft forecast"];
     if (/^[A-Z]{3}$/.test(tok)) return ["Station", `${tok === "AMA" ? "Amarillo (elevation 3,605 ft, so the lowest reported level is 6,000 ft)" : tok === "DEN" ? "Denver (elevation 5,431 ft, so the lowest reported level is 9,000 ft)" : tok}. No winds are forecast within 1,500 ft of station elevation and no temperatures within 2,500 ft.`];
@@ -64,17 +81,18 @@ function decode(tok, i, all, kind) {
     return ["Weather", `${tok === "+FC" ? "Tornado or waterspout" : (inten + txt).replace(/^./, (c) => c.toUpperCase())}.${parts.includes("TS") ? " Thunderstorm: avoid." : ""}`]; } }
   return ["Group", "Not decoded here. Look it up in the PHAK Ch 13 or the AWH."];
 }
-function tokenize(t) { const a = t.split(/\s+/), out = []; for (let i = 0; i < a.length; i++) { if (/^\d$/.test(a[i]) && /^\d\/\dSM$/.test(a[i + 1] || "")) { out.push(a[i] + " " + a[i + 1]); i++; } else out.push(a[i]); } return out; }
+function tokenize(t) { if (/^[A-Z]{3} UU?A /.test(t)) { const [st, ty, ...r] = t.split(" "); return [st, ty, ...tokenizePirep(r.join(" "))]; }
+  const a = t.split(/\s+/), out = []; for (let i = 0; i < a.length; i++) { if (/^\d$/.test(a[i]) && /^\d\/\dSM$/.test(a[i + 1] || "")) { out.push(a[i] + " " + a[i + 1]); i++; } else out.push(a[i]); } return out; }
 export function mount(host, opts = {}) {
   const F = frame(host, { cls: "metar capin ctrl-top" }); F.root.insertBefore(F.ctrl, F.stage); // picker on top so switching never moves it
   const wrap = h("div", { class: "mt-wrap" }); F.stage.prepend(wrap);
-  const tag = h("div", { class: "mt-tag" }, "Example from the FAA handbook · not current weather · do not use for flight");
+  const tag = h("div", { class: "mt-tag" });
   const line = h("div", { class: "mt-line", role: "group", "aria-label": "report groups" }); const det = h("div", { class: "mt-det", "aria-live": "polite" });
   const prog = h("div", { class: "mt-prog" }); wrap.append(tag, line, prog, det);
   let kind = opts.kind || "metar", seen = new Set();
   const keys = opts.kinds || ["metar", "metar2", "taf", "fb"];
-  const names = { metar: "METAR", metar2: "METAR 2", taf: "TAF", fb: "Winds aloft (FB)" };
-  function render() { const ex = EX[kind], toks = tokenize(ex.text), k = kind.startsWith("metar") ? "metar" : kind; seen = new Set(); line.innerHTML = "";
+  const names = { metar: "METAR", metar2: "METAR 2", taf: "TAF", fb: "Winds aloft (FB)", pirep: "PIREP" };
+  function render() { const ex = EX[kind], toks = tokenize(ex.text), k = kind.startsWith("metar") ? "metar" : kind; seen = new Set(); line.innerHTML = ""; tag.textContent = `${ex.made ? "Made-up example" : "Example from the FAA handbook"} · not current weather · do not use for flight`;
     toks.forEach((t, i) => { const b = h("button", { class: "mt-tok", type: "button" }, t); b.addEventListener("click", () => pick(i, b)); line.append(b); });
     const pick = (i, b) => { line.querySelectorAll(".mt-tok").forEach((x) => x.classList.remove("on")); b.classList.add("on"); seen.add(i); b.classList.add("seen");
       const [lab, txt] = decode(toks[i], i, toks, k); det.innerHTML = `<span class="label">${esc(lab)}</span><h4>${esc(toks[i])}</h4><p>${esc(txt)}</p>`;
