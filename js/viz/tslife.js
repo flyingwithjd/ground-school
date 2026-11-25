@@ -1,8 +1,8 @@
 // Thunderstorm life cycle, side view (PHAK 12, Fig 12-28): cumulus (updrafts), mature (updrafts and downdrafts, rain or
 // hail, the most violent stage), dissipating (downdrafts). Updrafts are blue, downdrafts white. Loops through the stages
 // on its own, or tap a stage to hold it. Continuous animation, on screen only, 30 fps cap.
-import { chips, row, loop } from "./base.js?v=124d9a2f12";
-import { pxScene, T, L, C, P, ACC, INK, GRAY, BODY } from "./kit.js?v=124d9a2f12";
+import { chips, row, loop } from "./base.js?v=c153ca6f67";
+import { pxScene, T, L, C, P, ACC, INK, GRAY, BODY } from "./kit.js?v=c153ca6f67";
 const ST = {
   cu: ["Cumulus stage", "Updrafts build the cloud", "Warm, moist, unstable air rises in continuous updrafts and the cloud towers upward. There's little or no rain yet, because the updrafts hold the drops aloft."],
   ma: ["Mature stage", "Rain or hail and downdrafts: the most violent", "Drops grow too heavy to hold up and rain or hail falls, dragging air down with it. Updrafts and downdrafts now sit side by side: severe turbulence, lightning, and a gust front where the downdraft spreads out along the ground. This is the most violent stage."],

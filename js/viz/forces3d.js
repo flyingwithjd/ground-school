@@ -12,11 +12,11 @@
 // Thrust acts along the propeller shaft (turns with the airplane); lift is perpendicular and drag parallel to the flight
 // path; weight is always straight down. The camera is a near-side view so arrow lengths read true. Grey 'before'
 // arrows beside the solid ones keep the steady-cruise length. Arrows show direction and relative change, not scale.
-import { frame, chips, row } from "./base.js?v=124d9a2f12";
-import { h, reduced } from "../core/util.js?v=124d9a2f12";
-import { planeStage } from "./planestage.js?v=124d9a2f12";
-import { tags3d } from "./tags3d.js?v=124d9a2f12";
-import { INFO } from "./forces.js?v=124d9a2f12";
+import { frame, chips, row } from "./base.js?v=c153ca6f67";
+import { h, reduced } from "../core/util.js?v=c153ca6f67";
+import { planeStage } from "./planestage.js?v=c153ca6f67";
+import { tags3d } from "./tags3d.js?v=c153ca6f67";
+import { INFO } from "./forces.js?v=c153ca6f67";
 const CG = [-1.2, 4.6, 0], D2R = Math.PI / 180, ACC = 0x3b82f6, GHOST = 0xA8ADB4, V0 = 105;
 // anchor on the airframe (model ft), base length, ghost offset (world ft), tag offset dx, dy
 // Drag is drawn aft from the wing's trailing edge, through the clear air above the tailcone, so the long side view fits a phone.

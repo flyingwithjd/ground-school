@@ -2,8 +2,8 @@
 // sits under the speed or fuel burn on the outer scale; then every outer number lines up with its inner partner.
 // Two modes: time from distance and groundspeed, and fuel from time and fuel burn (plus the 91.151 day reserve).
 // Static scene: redraws only on input or resize.
-import { slider, chips, row } from "./base.js?v=124d9a2f12";
-import { pxScene, T, C, L, P, wrapT, ACC, INK, GRAY, DIM, BODY } from "./kit.js?v=124d9a2f12";
+import { slider, chips, row } from "./base.js?v=c153ca6f67";
+import { pxScene, T, C, L, P, wrapT, ACC, INK, GRAY, DIM, BODY } from "./kit.js?v=c153ca6f67";
 const LAB = [10, 12, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90];
 const frac = (v) => { const l = Math.log10(v); return l - Math.floor(l); };
 const digits = (v) => { let d = v; while (d >= 100) d /= 10; while (d < 10) d *= 10; return d; };
