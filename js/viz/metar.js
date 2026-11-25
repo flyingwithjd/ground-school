@@ -23,7 +23,8 @@ const PR = {
   "/IC": ["Icing", "NEG means no icing. Otherwise intensity (TRACE, LGT, MOD, SEV), type (RIME, CLR, MX) and altitudes."],
   "/RM": ["Remarks", "Anything else useful, in plain words: smooth above 7,000 ft."],
 };
-function tokenizePirep(t) { // station, then UA, then the slash groups return t.split(/ (?=\/)/).map((x) => x.trim()); }
+// PIREP: station, then UA or UUA, then the slash groups
+function tokenizePirep(t) { return t.split(/ (?=\/)/).map((x) => x.trim()); }
 const WX = { MI: "shallow", BC: "patches", DR: "low drifting", BL: "blowing", SH: "showers", TS: "thunderstorm", FZ: "freezing", PR: "partial",
   DZ: "drizzle", RA: "rain", SN: "snow", SG: "snow grains", IC: "ice crystals", PL: "ice pellets", GR: "hail", GS: "small hail or snow pellets",
   BR: "mist", FG: "fog", FU: "smoke", DU: "dust", SA: "sand", HZ: "haze", PY: "spray", VA: "volcanic ash",
