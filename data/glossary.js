@@ -516,5 +516,9 @@ export const GLOSSARY = {
   "Flight review": { def: "At least 1 hour of ground and 1 hour of flight training with an authorized instructor, needed every 24 calendar months to act as pilot in command.", src: "14 CFR 61.56" },
   "LAHSO": { def: "Land and hold short operations: a clearance to land and stop before an intersecting runway, taxiway or other point. The pilot in command may decline; student pilots should not take part.", src: "AIM 4-3-11" },
   "Available Landing Distance": { def: "ALD: the runway length from the threshold to the hold-short point in a LAHSO clearance, published in the Chart Supplement.", src: "AIM 4-3-11" },
+  "ALD": { def: "Available Landing Distance: in a LAHSO clearance, the runway length from the threshold to the hold-short point. Published in the Chart Supplement; the controller gives it on request.", src: "AIM 4-3-11" },
+  "ATP": { def: "Airline transport pilot: the highest pilot certificate, required for airline captains and first officers. At least 23 years old (21 for a restricted ATP) and 1,500 hours for airplanes.", src: "14 CFR 61.153, 61.159, 61.160" },
+  "NASA": { def: "National Aeronautics and Space Administration. For pilots, it runs the Aviation Safety Reporting System (ASRS) for the FAA as a neutral third party.", src: "AC 00-46F" },
+  "WINGS": { def: "The FAA WINGS Pilot Proficiency Program: phases of ground and flight training with an instructor. Completing a phase counts in place of a flight review.", src: "14 CFR 61.56(e) · AC 61-91" },
 };
 export default GLOSSARY;
