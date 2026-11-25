@@ -2,8 +2,8 @@
 // shows which group decided it. VFR: ceiling above 3,000 ft and visibility above 5 SM. MVFR: ceiling 1,000–3,000 ft
 // and/or visibility 3–5 SM. IFR: ceiling 500 to below 1,000 ft and/or visibility 1 to below 3 SM. LIFR: ceiling below
 // 500 ft and/or visibility below 1 SM. The worse of the two decides. Controls sit on top so nothing below moves them.
-import { frame, chips, row } from "./base.js?v=d39252cec8";
-import { h, esc } from "../core/util.js?v=d39252cec8";
+import { frame, chips, row } from "./base.js?v=6bcaa8bbf8";
+import { h, esc } from "../core/util.js?v=6bcaa8bbf8";
 const CATS = ["VFR", "MVFR", "IFR", "LIFR"];
 const VIS = [["1/4SM", 0.25], ["1/2SM", 0.5], ["3/4SM", 0.75], ["1SM", 1], ["1 1/2SM", 1.5], ["2SM", 2], ["3SM", 3], ["4SM", 4], ["5SM", 5], ["6SM", 6], ["10SM", 10]];
 const IDS = ["KXQA", "KXRB", "KXTC", "KXVD", "KXWE"];

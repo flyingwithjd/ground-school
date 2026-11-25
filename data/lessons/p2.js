@@ -4,7 +4,7 @@
 const Q = (id, t, sec, q, c, why, src) => ({ id, t, sec, q, c, a: 0, why, src });
 export default {
   topics: {
-    gl14: { "gl14.calc": "Time, speed, distance and fuel" },
+    gl14: { "gl14.calc": "Time, speed, distance and fuel", "gl14.xc": "Planning a cross-country" },
     gl5: { "gl5.wbgraph": "Loading graph and moment envelope", "gl5.tochart": "Graphical takeoff chart" },
     gl8: { "gl8.fbcalc": "Winds aloft to groundspeed", "gl8.catgame": "Flight categories", "gl8.gfa": "Graphical Forecasts for Aviation", "gl8.outlook": "Convective outlooks" },
     gl10: { "gl10.chart": "Airspace on the sectional chart" },
@@ -81,6 +81,10 @@ export default {
       Q("gl14p-17", "gl14.plan", "plan", "On a nav log, wind correction is applied to the true course to give the", ["True heading", "Magnetic course", "Compass heading", "Groundspeed"], "TC ± WCA = TH. Variation then gives magnetic heading, and deviation compass heading.", "PHAK 16"),
       Q("gl14p-18", "gl14.plan", "plan", "You planned 14 minutes for a 24 NM leg but cross the checkpoint after 18 minutes. Your actual groundspeed is about", ["80 knots", "103 knots", "96 knots", "70 knots"], "24 NM in 18 minutes (0.3 h) is 80 knots, slower than planned, so the wind is stronger or more of a headwind than forecast. Update the times and fuel ahead.", "PHAK 16"),
       Q("gl14p-19", "gl14.plan", "plan", "Where does the deviation for the compass heading column come from?", ["The compass card in your airplane", "The isogonic lines on the sectional", "The winds aloft forecast for the route", "The airport entry in the Chart Supplement"], "Deviation is the compass's own error in that airplane, printed on its correction card. Variation comes from the chart's isogonic lines.", "PHAK 16"),
+      Q("gl14p-20", "gl14.xc", "xc", "Your magnetic course is 080° and you'll cruise more than 3,000 ft AGL. Which VFR cruising altitude fits?", ["5,500 ft MSL", "4,000 ft MSL", "6,500 ft MSL", "6,000 ft MSL"], "Magnetic course 0–179° takes odd thousands plus 500 ft (14 CFR 91.159), so 3,500, 5,500, 7,500 and so on.", "14 CFR 91.159"),
+      Q("gl14p-21", "gl14.xc", "xc", "Field elevation 2,400 ft, altimeter 29.82. The pressure altitude is", ["2,500 ft", "2,300 ft", "2,400 ft", "3,400 ft"], "Pressure altitude = elevation + (29.92 − altimeter) × 1,000 = 2,400 + 100 = 2,500 ft.", "PHAK 4"),
+      Q("gl14p-22", "gl14.xc", "xc", "Which item does 14 CFR 91.103 specifically require you to know before a flight not in the vicinity of an airport?", ["Alternatives if the flight can't be completed", "The names of all en route controllers", "The latest sectional's print date", "Each passenger's weight to the pound"], "For IFR flights and flights not in the vicinity of an airport, 91.103 requires weather reports and forecasts, fuel requirements, alternatives available if the planned flight can't be completed, and known traffic delays.", "14 CFR 91.103"),
+      Q("gl14p-23", "gl14.xc", "xc", "Your new ETA is 10 minutes before a TAF's FM group forecasting thunderstorms at the destination. The best plan is to", ["Delay or replan the trip", "Go and land quickly", "Go and use datalink to pick a gap", "Go and hold until the storms pass"], "Forecast timing is approximate and storms bring gusts, shear and lightning ahead of the cells. Ten minutes is no margin. Datalink weather is for strategic avoidance, not threading cells.", "AIM 7-1 · PHAK 2"),
     ],
   },
 };

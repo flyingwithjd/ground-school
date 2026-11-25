@@ -1,9 +1,9 @@
 // Traffic pattern in ink 3D (AC 90-66C, AIM 4-3-3): the C172 model flies a rectangle with round turns around runway 9 on a loop,
 // climbing on upwind, level at pattern altitude on downwind, descending from abeam the approach end to a touch-and-go. The
 // leg it is on (or the leg you pick) is drawn in the accent, the rest of the track in dim ink; corner drop lines show height.
-import { frame, chips, row } from "./base.js?v=d39252cec8";
-import { planeStage } from "./planestage.js?v=d39252cec8";
-import { reduced } from "../core/util.js?v=d39252cec8";
+import { frame, chips, row } from "./base.js?v=6bcaa8bbf8";
+import { planeStage } from "./planestage.js?v=6bcaa8bbf8";
+import { reduced } from "../core/util.js?v=6bcaa8bbf8";
 import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";

@@ -1049,3 +1049,20 @@ html.locked #gate { display: flex; }
 .viz.px.cvo .stage { aspect-ratio: 16 / 9.8; }
 @media (max-width: 700px) { .viz.px.cvo .stage { aspect-ratio: 4 / 2.6; } }
 @media (max-width: 700px) { .viz.px.gfa .caption .label, .viz.px.cvo .caption .label { display: block; min-height: 2lh; } }
+.xcp-wrap { gap: 12px; }
+.xcp-t { font: 600 18px/1.3 var(--sans, Inter, system-ui, sans-serif); margin: 0; }
+.xcp-mapbox svg { display: block; width: 100%; max-width: 520px; height: auto; }
+.xcp-data { font: 500 13px/1.55 var(--mono); white-space: pre-wrap; overflow-wrap: anywhere; margin: 0; padding: 10px 12px; border: 1px solid var(--line); border-radius: 10px; background: #0d0d0f; }
+.xcp-ans { flex-wrap: wrap; }
+.xcp .chip.wrong { border-style: dashed; text-decoration: line-through; opacity: .85; }
+.viz.xcp .stage { aspect-ratio: auto; min-height: 0; display: block; }
+.xcp-mapbox svg { max-width: 420px; }
+@media (max-width: 700px) { .xcp-wrap { padding: 14px; } .xcp-data { font-size: 12px; } }
+.xcp-ans .chip:disabled { opacity: 1; cursor: default; }
+.xcp-ans .chip:disabled:not(.on):not(.wrong) { opacity: .45; }
+.viz.xcp > .ctrl .chip { min-width: 40px; padding-left: 0; padding-right: 0; justify-content: center; }
+@media (max-width: 700px) { .viz.xcp > .ctrl .chips { gap: 6px; } .viz.xcp > .ctrl .chip { min-width: 38px; } }
+/* hold the data box and question to fixed heights so the answer buttons sit at the same place on every step */
+.xcp-data { min-height: calc(5 * 1.55em + 22px); }
+.xcp .wg-q { min-height: 2lh; }
+@media (max-width: 700px) { .xcp-data { min-height: calc(8 * 1.55em + 22px); } }
