@@ -1,6 +1,6 @@
 // Gyroscope properties (PHAK 8): rigidity in space and precession (a force acts 90° later in the direction of rotation).
-import { slider, chips } from "./base.js?v=b692f64f03";
-import { pxScene, T, L, P, C, R, hit, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=b692f64f03";
+import { slider, chips } from "./base.js?v=bce0e1cd0c";
+import { pxScene, T, L, P, C, R, hit, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=bce0e1cd0c";
 export function mount(host) {
   let mode = "pre", push = 0, bank = 20;
   const S = pxScene(host, { corners: { tl: "Gyroscope", tr: "PHAK 8" } }, draw);

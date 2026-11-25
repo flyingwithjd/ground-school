@@ -6,11 +6,11 @@
 // the dashed white arrow is the direction of travel. Retractable gear cycles up and down on its own while on screen.
 // Sources: PHAK Ch 3 (landing gear: tricycle, conventional / tailwheel; floats, skis); PHAK 7 (retractable gear); AFH Ch 14
 // (tailwheel airplanes: CG behind the main wheels, ground loops). The 172 shape is kept for both CG cases so only the CG changes.
-import { frame, chips } from "./base.js?v=b692f64f03";
-import { planeStage } from "./planestage.js?v=b692f64f03";
-import { rich } from "../core/rich.js?v=b692f64f03";
-import { h, reduced } from "../core/util.js?v=b692f64f03";
-import { tags3d } from "./tags3d.js?v=b692f64f03";
+import { frame, chips } from "./base.js?v=bce0e1cd0c";
+import { planeStage } from "./planestage.js?v=bce0e1cd0c";
+import { rich } from "../core/rich.js?v=bce0e1cd0c";
+import { h, reduced } from "../core/util.js?v=bce0e1cd0c";
+import { tags3d } from "./tags3d.js?v=bce0e1cd0c";
 const XM = -1.22, XN = 4.2, YEL = 0xffd23f, D = Math.PI / 180;
 const CASE = {
   ahead: { x: 0.4, chip: "CG ahead of mains", cap: ["Nosewheel (tricycle) gear", "CG ahead of the main wheels"],
