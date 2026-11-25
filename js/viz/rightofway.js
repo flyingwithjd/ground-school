@@ -1,8 +1,8 @@
 // Right-of-way (14 CFR 91.113), seen from above (landing: from the side). Pick a situation: the aircraft with the right-of-way is
 // drawn in the accent, the one that gives way in ink with its new course dashed; a faint X marks where the two paths would meet.
-import { frame, chips, svg, drawOn, ACC } from "./base.js?v=6e081c439c";
-import { s } from "../core/util.js?v=6e081c439c";
-import { T } from "./shapes.js?v=6e081c439c";
+import { frame, chips, svg, drawOn, ACC } from "./base.js?v=4e8c88b40f";
+import { s } from "../core/util.js?v=4e8c88b40f";
+import { T } from "./shapes.js?v=4e8c88b40f";
 const INK = "#F2F1EC";
 const CASES = {
   conv: { cap: ["Converging", "The one on the right has it"], t: "Same category, about the same altitude, converging (not head-on): the aircraft to the other's right has the right-of-way. The other gives way and does not pass over, under or ahead unless well clear. <span class=\"src\">91.113(b), (d)</span>", a: [700, 640, -45], b: [1180, 420, -135], who: "b", give: "M700,640 Q760,560 860,600" },

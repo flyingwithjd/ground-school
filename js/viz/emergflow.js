@@ -1,7 +1,7 @@
 // Emergency flows: pick a scenario, choose the first action, then step through the rest. Content mirrors the lesson text (AFH 11/18, C172S POH 3).
-import { htmlScene } from "./kit.js?v=6e081c439c";
-import { chips } from "./base.js?v=6e081c439c";
-import { h, shuffle } from "../core/util.js?v=6e081c439c";
+import { htmlScene } from "./kit.js?v=4e8c88b40f";
+import { chips } from "./base.js?v=4e8c88b40f";
+import { h, shuffle } from "../core/util.js?v=4e8c88b40f";
 // scenario: [chip label, cue, first-step options (first is right), why, [steps...], source]
 const SETS = {
   fire: [
