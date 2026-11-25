@@ -11,7 +11,7 @@ const catOf = (ceil, vis) => { const c = ceil == null ? 1e9 : ceil; const cc = c
 let seed = (Date.now() % 100000) + 7; const R = () => ((seed = (seed * 16807) % 2147483647) / 2147483647); const pick = (a) => a[Math.floor(R() * a.length)];
 // one weather "state": wind, visibility (+weather), sky. Aims at a category but the truth is always computed from the groups.
 function state(target) {
-  const vi = { 0: [9, 10], 1: [6, 7, 8, 9, 10], 2: [3, 4, 5, 9, 10], 3: [0, 1, 2, 9] }[target];
+  const vi = { 0: [9, 10], 1: [6, 7, 8, 9, 10], 2: [3, 4, 5, 9, 10], 3: [0, 1, 2, 6, 7] }[target];
   const [vs, vis] = VIS[pick(vi)];
   const ceilBy = { 0: [40, 50, 70, 120, null], 1: [10, 15, 20, 25, 30, 45], 2: [5, 6, 8, 9, 30], 3: [1, 2, 3, 4, 20] }[target];
   let ceil = pick(ceilBy); const vc = catOf(null, vis).vc; if (vc < target && (ceil == null || catOf(ceil * 100, 10).cc < target)) ceil = { 1: 20, 2: 7, 3: 3 }[target];

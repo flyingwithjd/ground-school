@@ -14,7 +14,7 @@ const IT = {
   iso: ["Isobars", "Lines of equal pressure, every 4 mb", "Each line joins points of equal sea-level pressure, drawn every 4 mb (…1000, 1004, 1008…). The closer together they are, the steeper the pressure change and the stronger the wind."],
   trof: ["Trough", "Dashed line: a stretched-out low", "An elongated area of relatively low pressure. Air converges and rises along it, so it often brings clouds and showers, even without a front."],
   chance: ["Chance of precipitation", "Pale shading: a chance (25 to under 55%)", "On a prog chart, light green shading (pale here) marks where precipitation has a chance (25 to under 55%) of occurring at the valid time."],
-  likely: ["Precipitation likely", "Solid shading: likely (55% or more)", "Dark green shading (solid here) marks where precipitation is likely (55% or more) at the valid time. Symbols inside show the type, such as rain or thunderstorms."],
+  likely: ["Precipitation likely", "Solid shading: likely (55% or more)", "Dark green shading (solid here) marks where precipitation is likely (55% or more) at the valid time.."],
 };
 export function mount(host) {
   let mode = "sfc", sel = "cold";
