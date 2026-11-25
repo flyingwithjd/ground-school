@@ -1,8 +1,8 @@
 // Land and hold short (AIM 4-3-11): plan view of a runway with a crossing runway. Set the landing distance your POH gives
 // for today and who's flying; see whether it fits the Available Landing Distance (ALD) to the hold-short point.
 // Schematic, not to scale; the 2,800 ft ALD is an example (real ALDs are in the Chart Supplement). Static scene.
-import { slider, chips } from "./base.js?v=41a7119e32";
-import { pxScene, T, L, R, P, planeTop, wrapT, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=41a7119e32";
+import { slider, chips } from "./base.js?v=d39252cec8";
+import { pxScene, T, L, R, P, planeTop, wrapT, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=d39252cec8";
 const ALD = 2800, RWY = 6000;
 export function mount(host) {
   let dist = 1900, who = "pvt";

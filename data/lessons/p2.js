@@ -6,7 +6,7 @@ export default {
   topics: {
     gl14: { "gl14.calc": "Time, speed, distance and fuel" },
     gl5: { "gl5.wbgraph": "Loading graph and moment envelope", "gl5.tochart": "Graphical takeoff chart" },
-    gl8: { "gl8.fbcalc": "Winds aloft to groundspeed", "gl8.catgame": "Flight categories" },
+    gl8: { "gl8.fbcalc": "Winds aloft to groundspeed", "gl8.catgame": "Flight categories", "gl8.gfa": "Graphical Forecasts for Aviation", "gl8.outlook": "Convective outlooks" },
     gl10: { "gl10.chart": "Airspace on the sectional chart" },
   },
   questions: {
@@ -46,6 +46,10 @@ export default {
       Q("gl8p-10", "gl8.catgame", "catgame", "A ceiling of 400 ft with 3 SM visibility is", ["LIFR", "IFR", "MVFR", "VFR"], "Below 500 ft is LIFR, whatever the visibility.", "AIM 7-1"),
       Q("gl8p-11", "gl8.charts", "charts", "On a surface analysis chart, a red line with semicircles marks", ["A warm front", "A cold front", "An occluded front", "A trough"], "Warm fronts are red with semicircles on the side toward which the front is moving. Cold fronts are blue with triangles; occluded fronts are purple with both.", "AWH 25 · PHAK 12"),
       Q("gl8p-12", "gl8.charts", "charts", "On a surface analysis, isobars are packed close together around a low. That means", ["Strong winds", "Light and variable winds", "Fair weather under sinking air", "Low humidity"], "Isobars are drawn every 4 mb. Close spacing means a steep pressure gradient and strong wind.", "AWH 25 · PHAK 12"),
+      Q("gl8p-13", "gl8.gfa", "gfa", "On the GFA Clouds layer, cloud bases and tops are shown in", ["Hundreds of feet MSL", "Hundreds of feet AGL", "Thousands of feet AGL", "Flight levels only"], "The GFA gives cloud heights in feet above mean sea level, unlike METARs and TAFs, which use AGL.", "aviationweather.gov GFA · AWH 27.4"),
+      Q("gl8p-14", "gl8.gfa", "gfa", "How far ahead do the GFA forecasts reach?", ["18 hours", "6 hours", "48 hours", "72 hours"], "The GFA time slider runs from 18 hours in the past to 18 hours ahead.", "aviationweather.gov GFA · AWH 28"),
+      Q("gl8p-15", "gl8.outlook", "outlook", "Which convective outlook category is the lowest?", ["TSTM, general thunderstorms", "MRGL, marginal risk", "SLGT, slight risk", "ENH, enhanced risk"], "TSTM marks a 10% or greater chance of thunderstorms that aren't expected to be severe. Then come 1 MRGL, 2 SLGT, 3 ENH, 4 MDT and 5 HIGH.", "AWH 27 · spc.noaa.gov"),
+      Q("gl8p-16", "gl8.outlook", "outlook", "Your route crosses a TSTM area on the convective outlook. That means", ["Storms are possible; plan to avoid them", "No storms will form", "Severe storms are certain", "Only IFR pilots are affected"], "TSTM storms aren't forecast to be severe, but any thunderstorm can bring lightning, turbulence, gusts and hail. Plan a route and time that stays well clear.", "AWH 27 · AIM 7-1"),
     ],
     gl10: [
       // GL10 chart: how each airspace class is drawn on a sectional (Chart User's Guide; AIM 3-2)

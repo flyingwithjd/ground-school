@@ -1044,3 +1044,8 @@ html.locked #gate { display: flex; }
 .wg-rep b.acc { color: var(--acc); font-weight: 700; }
 .wg-q { font-weight: 600; }
 .wxg .chip.wrong { border-style: dashed; text-decoration: line-through; opacity: .85; }
+.viz.px.gfa .stage { aspect-ratio: 16 / 10.4; }
+@media (max-width: 700px) { .viz.px.gfa .stage { aspect-ratio: 4 / 2.85; } }
+.viz.px.cvo .stage { aspect-ratio: 16 / 9.8; }
+@media (max-width: 700px) { .viz.px.cvo .stage { aspect-ratio: 4 / 2.6; } }
+@media (max-width: 700px) { .viz.px.gfa .caption .label, .viz.px.cvo .caption .label { display: block; min-height: 2lh; } }
