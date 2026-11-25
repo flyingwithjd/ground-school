@@ -1,9 +1,9 @@
 // Flight controls on their hinges. Drag the drawn yoke (turn = roll, pull/push = pitch) and press the rudder pedals (yaw);
 // the 3D airplane moves its surfaces and responds gently about each axis. Secondary mode: trim and flaps.
-import { frame, chips, slider } from "./base.js?v=0f2c4d5d6f";
-import { planeStage } from "./planestage.js?v=0f2c4d5d6f";
-import { trimFlaps } from "./trimflaps.js?v=0f2c4d5d6f";
-import { h, s, clamp, reduced } from "../core/util.js?v=0f2c4d5d6f";
+import { frame, chips, slider } from "./base.js?v=179674840b";
+import { planeStage } from "./planestage.js?v=179674840b";
+import { trimFlaps } from "./trimflaps.js?v=179674840b";
+import { h, s, clamp, reduced } from "../core/util.js?v=179674840b";
 // model signs: ail>0 = roll right; elev<0 = trailing edge up (nose up); rud>0 = right rudder; trim>0 = tab TE down (nose-up trim); steer>0 = nosewheel left
 // Shared drag-and-spring behaviour for the drawn cockpit controls: drag moves them, release springs them back to neutral.
 function springy(box, { get, set, fromDown, fromMove, keys }) {

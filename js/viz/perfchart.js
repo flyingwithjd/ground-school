@@ -1,8 +1,8 @@
 // FAA-style graphical takeoff chart, redrawn in ink with made-up numbers (PHAK 11 explains reading these charts):
 // temperature and pressure altitude → reference line → weight guide lines → reference line → wind guide lines → distance.
 // A sample chart for practice only; it isn't from any airplane's POH. Static scene: redraws only on input or resize.
-import { slider, row } from "./base.js?v=0f2c4d5d6f";
-import { pxScene, T, L, C, P, ACC, INK, GRAY, DIM } from "./kit.js?v=0f2c4d5d6f";
+import { slider, row } from "./base.js?v=179674840b";
+import { pxScene, T, L, C, P, ACC, INK, GRAY, DIM } from "./kit.js?v=179674840b";
 const REFW = 2550, D0 = 0, D1 = 5500;
 const da = (pa, oat) => pa + 118.8 * (oat - (15 - (2 * pa) / 1000));
 const fA = (pa, oat) => 1050 * Math.exp(da(pa, oat) / 9500);                 // over a 50 ft obstacle, at the reference weight, calm

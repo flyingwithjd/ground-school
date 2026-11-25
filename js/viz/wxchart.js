@@ -1,8 +1,8 @@
 // Surface analysis and prog chart reader (AWH 25.2, 27.9; PHAK 12): a made-up chart with highs, lows, isobars every 4 mb,
 // cold, warm, occluded and stationary fronts, a trough, and on the prog chart, precipitation shading. Tap a symbol to read it.
 // Front colors are kept because the color is the information; the symbol you pick is drawn bold and labeled. Static scene.
-import { chips, row } from "./base.js?v=0f2c4d5d6f";
-import { pxScene, T, L, C, P, hit, INK, GRAY } from "./kit.js?v=0f2c4d5d6f";
+import { chips, row } from "./base.js?v=179674840b";
+import { pxScene, T, L, C, P, hit, INK, GRAY } from "./kit.js?v=179674840b";
 const CB = "#60A5FA", WR = "#F87171", OC = "#C084FC", TR = "#D6A35C", GR = "rgba(74,222,128,";
 const IT = {
   cold: ["Cold front", "Blue, triangles point the way it moves", "Cold, dense air pushes under the warm air like a wedge. Expect a narrow band of cumuliform clouds, showers or thunderstorms and gusty, turbulent wind along it. After it passes: a wind shift, falling temperature and dew point, rising pressure and good visibility."],

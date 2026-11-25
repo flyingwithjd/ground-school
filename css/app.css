@@ -1074,3 +1074,7 @@ html.locked #gate { display: flex; }
 .viz.px.spinv .stage { aspect-ratio: 16 / 9; }
 @media (max-width: 700px) { .viz.px.spinv .stage { aspect-ratio: 4 / 3.6; } }
 @media (max-width: 700px) { .viz.px.sturn .caption .label, .viz.px.fprof .caption .label, .viz.px.spinv .caption .label { display: block; min-height: 2lh; } }
+.viz.px.attind .stage { aspect-ratio: 16 / 8; }
+@media (max-width: 700px) { .viz.px.attind .stage { aspect-ratio: 4 / 3.4; } }
+.viz.px.t180 .stage { aspect-ratio: 16 / 8.4; }
+@media (max-width: 700px) { .viz.px.t180 .stage { aspect-ratio: 4 / 3.6; } .viz.px.t180 .caption .label, .viz.px.attind .caption .label { display: block; min-height: 2lh; } }

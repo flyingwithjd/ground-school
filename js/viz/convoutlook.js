@@ -1,8 +1,8 @@
 // Convective outlook reader (AWH 27; Storm Prediction Center): a made-up Day 1 categorical outlook with nested risk areas,
 // TSTM through HIGH, in the SPC colors (color is the information). Pick a category to outline it and read what it means;
 // a route A to B reports the highest risk it crosses. Static scene: draws only on change.
-import { chips, row } from "./base.js?v=0f2c4d5d6f";
-import { pxScene, T, L, C, P, R, hit, INK, GRAY } from "./kit.js?v=0f2c4d5d6f";
+import { chips, row } from "./base.js?v=179674840b";
+import { pxScene, T, L, C, P, R, hit, INK, GRAY } from "./kit.js?v=179674840b";
 const K = [
   ["tstm", "T", "TSTM", "General thunderstorms", "#C1E9C1", 34, "10% or greater chance of thunderstorms, not expected to be severe. Still lightning, gusts, turbulence, heavy rain and possible hail: no place for a light airplane."],
   ["mrgl", "1", "MRGL", "Marginal risk", "#66A366", 25, "Severe storms possible, but isolated, short-lived or barely severe."],

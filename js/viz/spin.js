@@ -1,8 +1,8 @@
 // Spin phases (AFH FAA-H-8083-3C ch 5; ACS PA.VII.D): a side view of the flight path through entry, incipient spin,
 // developed spin and recovery, not to scale. The phase you pick is drawn blue and its key points are listed below.
 // Recovery steps are the AFH's general ones; your airplane's POH procedure comes first. Static scene.
-import { chips, row } from "./base.js?v=0f2c4d5d6f";
-import { pxScene, T, L, P, ACC, INK, GRAY } from "./kit.js?v=0f2c4d5d6f";
+import { chips, row } from "./base.js?v=179674840b";
+import { pxScene, T, L, P, ACC, INK, GRAY } from "./kit.js?v=179674840b";
 const PH = {
   entry: ["Entry", "Stalled and yawing", "A spin needs two things: a stalled wing and yaw. Uncoordinated rudder at the stall (a skid, or a slip near the ground) lets one wing stall more deeply. That wing drops and the airplane starts to rotate. Recovering from the stall at the first cue, with coordinated controls, prevents the spin."],
   inc: ["Incipient", "The first turns", "From the stall to a steady spin: about the first two turns in a small airplane. Rotation and the flight path aren't settled yet. Recovery now is quickest and takes the least altitude."],

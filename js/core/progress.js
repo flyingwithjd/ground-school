@@ -1,7 +1,7 @@
 // Mastery, readiness and blind-spot analytics, all derived from per-item SRS state.
-import { get, recall, level, isDue, recentAcc, readyW, blindIds, DAY } from "./srs.js?v=0f2c4d5d6f";
-import { LESSONS, QUESTIONS, TOPICS, ORDER, item, lessonItems, secKey } from "../../data/index.js?v=0f2c4d5d6f";
-import { S, migrate } from "./store.js?v=0f2c4d5d6f";
+import { get, recall, level, isDue, recentAcc, readyW, blindIds, DAY } from "./srs.js?v=179674840b";
+import { LESSONS, QUESTIONS, TOPICS, ORDER, item, lessonItems, secKey } from "../../data/index.js?v=179674840b";
+import { S, migrate } from "./store.js?v=179674840b";
 export const allIds = () => Object.keys(QUESTIONS);
 // ---------- Pages reached: a learner is only ever asked about a page they have opened ----------
 // A page is reached once it is opened in its lesson (lessons[id].read, kept since the first version) or, for progress saved

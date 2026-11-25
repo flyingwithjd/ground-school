@@ -4,7 +4,7 @@
 export const STAGES = [
   { id: "s1", n: 1, title: "Stage 1", sub: "The airplane, aerodynamics, airports, weight and performance", ground: ["gl1", "gl2", "gl3", "gl4", "gl5", "gl6"], flight: ["fl1", "fl2", "fl3", "fl4", "fl5", "fl6", "fl7"] },
   { id: "s2", n: 2, title: "Stage 2", sub: "Weather, emergencies, airspace and the rules. Ends with the pre-solo written and first solo.", ground: ["gl7", "gl8", "gl9", "gl10", "gl11", "gl12"], flight: ["fl8", "fl9", "fl10"] },
-  { id: "s3", n: 3, title: "Stage 3", sub: "Instruments, navigation, night, decision making and aeromedical factors", ground: ["gl13", "gl14", "gl15", "gl16", "gl17", "gl18"], flight: [] },
+  { id: "s3", n: 3, title: "Stage 3", sub: "Instruments, navigation, night, decision making and aeromedical factors", ground: ["gl13", "gl14", "gl15", "gl16", "gl17", "gl18"], flight: ["fl11"] },
   { id: "s4", n: 4, title: "Stage 4", sub: "End-of-course review and exam", ground: ["gl19"], flight: [] },
 ];
 export const MODULES = [
@@ -39,5 +39,5 @@ export const SUBJECTS = [
   { id: "airport", title: "Airport/Radio", lessons: ["gl4", "ap1", "ap2", "ap3", "ap4", "ap5", "ap6", "ap7", "rc1", "gl15"] },
   { id: "emerg", title: "Emergencies", lessons: ["gl9", "em1", "em2"] },
   { id: "human", title: "Pilot & safety", lessons: ["gl16", "ad1", "ad2", "gl17", "gl15", "mn1"] },
-  { id: "flight", title: "Flight lessons", lessons: ["fl1", "fl2", "fl3", "fl4", "fl5", "fl6", "fl7", "fl8", "fl9", "fl10", "fw1"] },
+  { id: "flight", title: "Flight lessons", lessons: ["fl1", "fl2", "fl3", "fl4", "fl5", "fl6", "fl7", "fl8", "fl9", "fl10", "fl11", "fw1"] },
 ];
