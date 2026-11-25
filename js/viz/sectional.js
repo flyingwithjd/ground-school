@@ -1,8 +1,8 @@
 // A fictional sectional chart snippet (FAA Aeronautical Chart User's Guide; PHAK 16): tap a symbol to read it.
 // Chart colors are kept on purpose (blue = towered, magenta = nontowered), because that color is the information.
 // Scale toggle: sectional 1:500,000 or terminal area chart 1:250,000 (twice the size). Static scene.
-import { chips, row } from "./base.js?v=2e5623b5fa";
-import { pxScene, T, L, C, P, R, hit, ACC, INK, GRAY, DIM } from "./kit.js?v=2e5623b5fa";
+import { chips, row } from "./base.js?v=0a2a439800";
+import { pxScene, T, L, C, P, R, hit, ACC, INK, GRAY, DIM } from "./kit.js?v=0a2a439800";
 const MAG = "#D946EF", BLU = "#60A5FA";
 // [key, short name, caption, explanation]
 const IT = {

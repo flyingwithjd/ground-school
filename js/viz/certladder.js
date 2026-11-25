@@ -1,6 +1,6 @@
 // Pilot certificates as a staircase (14 CFR 61.5; PHAK 1 and its MOSAIC addendum): tap a step to see its age, minimum
 // flight time, passengers and pay. Static scene: it redraws only on a tap or a resize.
-import { pxScene, T, L, hit, block, wrapT, ACC, INK, GRAY, DIM } from "./kit.js?v=2e5623b5fa";
+import { pxScene, T, L, hit, block, wrapT, ACC, INK, GRAY, DIM } from "./kit.js?v=0a2a439800";
 const C = [
   { k: "STUDENT", name: "Student pilot", age: "16", time: "None to start", pax: "None", pay: "No", lim: "Solo only, with your instructor's endorsements.", src: "14 CFR 61.83, 61.89" },
   { k: "SPORT", name: "Sport pilot", age: "17", time: "20 h", pax: "1", pay: "No (share costs, pay at least half)", lim: "Day, up to 10,000 ft MSL or 2,000 ft AGL. Airplanes with up to 4 seats and VS1 no more than 59 kt CAS (MOSAIC). A driver's license can stand in for a medical.", src: "14 CFR 61.313, 61.315, 61.316 · PHAK MOSAIC addendum" },
