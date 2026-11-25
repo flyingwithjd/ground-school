@@ -1040,3 +1040,6 @@ html.locked #gate { display: flex; }
 @media (max-width: 700px) { .viz.px.toc .caption .label, .viz.px.parcel .caption .label { display: block; min-height: 2lh; } }
 .viz.px.wxc .stage { aspect-ratio: 16 / 9.8; }
 @media (max-width: 700px) { .viz.px.wxc .stage { aspect-ratio: 4 / 3.4; } }
+.wg-rep { font: 500 16px/1.6 var(--mono); word-spacing: .15em; min-height: 3.2em; overflow-wrap: anywhere; }
+.wg-rep b.acc { color: var(--acc); font-weight: 700; }
+.wg-q { font-weight: 600; }
