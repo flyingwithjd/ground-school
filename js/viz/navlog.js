@@ -1,8 +1,8 @@
 // A one-page navigation log for a fictional three-leg trip (PHAK 16): pick a leg and a wind; the heading chain
 // (TC ± WCA = TH, ± variation = MH, ± deviation = CH) and the leg's groundspeed, time and fuel update, with trip totals.
 // Static scene: redraws only on input or resize.
-import { slider, chips, row } from "./base.js?v=c153ca6f67";
-import { pxScene, T, L, C, P, R, ACC, INK, GRAY, DIM, ACCF, BODY } from "./kit.js?v=c153ca6f67";
+import { slider, chips, row } from "./base.js?v=41a7119e32";
+import { pxScene, T, L, C, P, R, ACC, INK, GRAY, DIM, ACCF, BODY } from "./kit.js?v=41a7119e32";
 const TAS = 110, GPH = 8.5, VAR = 6;                     // variation 6°E: subtract
 const LEGS = [["Riverton", "Bridge", 62, 18], ["Bridge", "Lake", 95, 26], ["Lake", "Cedar Flat", 40, 21]];
 const DEV = (mh) => (mh < 90 ? 2 : mh < 180 ? 0 : mh < 270 ? -2 : 1);   // the airplane's compass card (made up)

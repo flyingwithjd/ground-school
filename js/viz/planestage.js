@@ -5,8 +5,8 @@ import { OrbitControls } from "three/addons/controls/OrbitControls.js";
 import { LineSegments2 } from "three/addons/lines/LineSegments2.js";
 import { LineSegmentsGeometry } from "three/addons/lines/LineSegmentsGeometry.js";
 import { LineMaterial } from "three/addons/lines/LineMaterial.js";
-import { buildPlane } from "./c172-model.js?v=c153ca6f67";
-import { reduced, clamp } from "../core/util.js?v=c153ca6f67";
+import { buildPlane } from "./c172-model.js?v=41a7119e32";
+import { reduced, clamp } from "../core/util.js?v=41a7119e32";
 const ACC = 0x3b82f6, INK = 0xf2f1ec, BG = 0x0a0a0b, D = Math.PI / 180;
 const s5 = (t) => { t = clamp(t, 0, 1); return t * t * t * (t * (t * 6 - 15) + 10); };
 export const VIEWS = {
