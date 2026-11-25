@@ -5,8 +5,17 @@ const Q = (id, t, sec, q, c, why, src) => ({ id, t, sec, q, c, a: 0, why, src })
 export default {
   topics: {
     gl14: { "gl14.calc": "Time, speed, distance and fuel" },
+    gl5: { "gl5.wbgraph": "Loading graph and moment envelope" },
   },
   questions: {
+    gl5: [
+      // GL5 wbgraph: loading graph and CG moment envelope (PHAK 10; FAA-H-8083-1B)
+      Q("gl5p-01", "gl5.wbgraph", "wbgraph", "On a loading graph, the baggage line leans further toward the moment axis than the front-seat line because", ["Baggage sits farther aft, so each pound adds more moment", "Baggage is limited to a lighter maximum weight", "The front seats move fore and aft on rails", "Fuel burns off in flight and changes the CG"], "Moment = weight × arm. A longer arm gives more moment per pound, so that station's line tilts further toward the moment scale.", "PHAK 10"),
+      Q("gl5p-02", "gl5.wbgraph", "wbgraph", "Empty airplane 1,642 lb, moment ÷ 1000 of 62.6. Add a 340 lb front-seat load (arm 37 in) and 40 gallons of fuel (arm 48 in). The total moment ÷ 1000 is", ["86.7", "74.2", "98.2", "80.9"], "Front seats: 340 × 37 = 12.6. Fuel: 40 gal × 6 lb = 240 lb × 48 = 11.5. 62.6 + 12.6 + 11.5 = 86.7.", "PHAK 10"),
+      Q("gl5p-03", "gl5.wbgraph", "wbgraph", "The total weight is 2,222 lb and the total moment ÷ 1000 is 86.7. The CG is about", ["39.0 in aft of datum", "41.2 in aft of datum", "38.1 in aft of datum", "25.6 in aft of datum"], "CG = total moment ÷ total weight = 86,700 ÷ 2,222 ≈ 39.0 in.", "PHAK 10"),
+      Q("gl5p-04", "gl5.wbgraph", "wbgraph", "On the CG moment envelope, your point sits to the right of the outline at an allowed weight. The CG is", ["Aft of the limit", "Forward of the limit", "Within limits, since the weight is allowed", "Exactly on the datum"], "At a given weight, more moment means the CG is farther aft. To the right of the envelope is aft of the aft limit.", "PHAK 10"),
+      Q("gl5p-05", "gl5.wbgraph", "wbgraph", "To enter 30 gallons of fuel on a loading graph scaled in pounds, you read the fuel line at", ["180 lb", "30 lb", "225 lb", "150 lb"], "Gasoline weighs 6 lb per gallon: 30 × 6 = 180 lb. (225 lb would be oil at 7.5 lb per gallon.)", "PHAK 10"),
+    ],
     gl14: [
       Q("gl14p-01", "gl14.calc", "calc", "How long will 135 NM take at a groundspeed of 90 knots?", ["1 hour 30 minutes", "1 hour 15 minutes", "1 hour 45 minutes", "2 hours 5 minutes"], "Time = distance ÷ groundspeed: 135 ÷ 90 = 1.5 hours, which is 1 hour 30 minutes.", "PHAK 16"),
       Q("gl14p-02", "gl14.calc", "calc", "You pass two checkpoints 24 NM apart in 16 minutes. Your groundspeed is", ["90 knots", "96 knots", "80 knots", "150 knots"], "Groundspeed = distance ÷ time: 16 minutes is 16/60 of an hour, and 24 ÷ (16/60) = 90 knots.", "PHAK 16"),

@@ -1020,3 +1020,7 @@ html.locked #gate { display: flex; }
 /* GL14 nav log: a little taller than 16:9 on wide screens so the trip line fits under the heading chain */
 .viz.px.nlog .stage { aspect-ratio: 16 / 9.4; }
 @media (max-width: 700px) { .viz.px.nlog .stage { aspect-ratio: 4 / 3.6; } }
+/* GL5 loading graph: both charts side by side on wide screens; one at a time (chip) on a phone */
+.viz.px.wbg .stage { aspect-ratio: 16 / 10; }
+@media (max-width: 700px) { .viz.px.wbg .stage { aspect-ratio: 4 / 3.6; } }
+@media (min-width: 640px) { .viz .phone-only { display: none; } }

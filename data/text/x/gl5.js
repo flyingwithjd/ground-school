@@ -1,6 +1,14 @@
 // GL5 supplement text: climb performance and V-speeds, cruise/range/endurance, stall speed chart, runway factors (PHAK 11; C172S POH Sec 4, 5).
 export default {
   sections: [
+    { id: "wbgraph", at: "calc", label: "Loading graph and envelope · PHAK 10 · FAA-H-8083-1B", title: "Read it off the graphs",
+      body: `<p>Many POHs, and the FAA knowledge test, skip the arithmetic and use two graphs instead. <span class="src">PHAK 10 · FAA-H-8083-1B</span></p>
+<ul><li><strong>Loading graph</strong>: one line per station (front seats, rear seats, fuel, baggage). Find the load on the left, go across to that station's line, then straight down to read its <strong>moment ÷ 1000</strong>. A station farther aft has a longer arm, so its line leans further toward the moment axis.</li>
+<li><strong>Add it up</strong>: the empty airplane's weight and moment come from its weight and balance record. Add every load's weight and moment to them. Fuel goes in as pounds, 6 per gallon.</li>
+<li><strong>Center-of-gravity moment envelope</strong>: plot total weight against total moment. Inside the outline, the weight and CG are within limits; to the right at the same weight is too far aft, to the left too far forward.</li></ul>`,
+      viz: { type: "loadgraph" },
+      body2: `<p>Check landing too: burn off the trip fuel and plot the point again. The graphs are only as good as your pencil, so read carefully and cross-check with the formula: CG = total moment ÷ total weight. Use your airplane's own POH and its actual empty weight, never a sample's. <span class="src">PHAK 10</span></p>`,
+      kdr: { k: "Loading graph; CG moment envelope; moment index (moment ÷ 1000).", d: "Determine weight and CG with the loading graph and envelope.", r: "Misreading a graph line or forgetting to convert fuel to pounds.", codes: ["PA.I.F.K2f", "PA.I.F.R5"] } },
     { id: "speeds", at: "da", label: "Performance speeds · PHAK 11", title: "Vx, Vy and the ceiling",
       body: `<p><strong>V<sub>X</sub></strong>, best angle of climb, gives the most altitude in a given <strong>distance</strong>, so use it to clear obstacles. <strong>V<sub>Y</sub></strong>, best rate of climb, gives the most altitude in a given <strong>time</strong>. As altitude rises, V<sub>X</sub> normally increases slightly and V<sub>Y</sub> decreases slightly. <span class="src">PHAK 11</span></p>
 <p>In the 172S at 2,550 lb: <strong>V<sub>X</sub> 62 KIAS</strong> at sea level (67 at 10,000 ft); <strong>V<sub>Y</sub> 74 KIAS</strong> at sea level (72 at 10,000 ft). A normal climb is 75–85 KIAS. <span class="src">POH 4</span></p>
