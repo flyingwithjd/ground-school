@@ -1079,7 +1079,7 @@ html.locked #gate { display: flex; }
 .viz.px.t180 .stage { aspect-ratio: 16 / 8.4; }
 @media (max-width: 700px) { .viz.px.t180 .stage { aspect-ratio: 4 / 3.6; } .viz.px.t180 .caption .label, .viz.px.attind .caption .label { display: block; min-height: 2lh; } }
 .viz.px.sdis .stage { aspect-ratio: 16 / 6; } .viz.px.hvx .stage { aspect-ratio: 16 / 5.4; min-height: 230px; } .viz.px.vsil .stage { aspect-ratio: 16 / 6; } .viz.px.tcoord .stage { aspect-ratio: 16 / 6.5; }
-@media (max-width: 700px) { .viz.px.sdis .stage { aspect-ratio: 4 / 3.2; } .viz.px.hvx .stage { aspect-ratio: 4 / 3.6; } .viz.px.vsil .stage { aspect-ratio: 4 / 2.9; } .viz.px.tcoord .stage { aspect-ratio: 4 / 3.4; }
+@media (max-width: 700px) { .viz.px.sdis .stage { aspect-ratio: 4 / 3.2; } .viz.px.hvx .stage { aspect-ratio: auto; height: 330px; } .viz.px.vsil .stage { aspect-ratio: 4 / 2.9; } .viz.px.tcoord .stage { aspect-ratio: 4 / 3.4; }
   .viz.px.sdis .caption .label, .viz.px.hvx .caption .label, .viz.px.vsil .caption .label, .viz.px.tcoord .caption .label { display: block; min-height: 2lh; } }
 .viz.scen .hv-body { gap: 10px; padding: 14px 14px 16px; }
 .viz.scen .sc-set, .viz.scen .sc-q { margin: 0; font-size: 16px; line-height: 1.5; } .viz.scen .sc-q { font-weight: 700; } .viz.scen .sc-prev { margin: 0; color: var(--ink2); font-size: 14px; }
