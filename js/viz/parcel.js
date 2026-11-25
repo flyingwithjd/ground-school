@@ -4,6 +4,7 @@
 import { slider, chips, row, loop } from "./base.js?v=124d9a2f12";
 import { pxScene, T, L, C, P, R, ACC, INK, GRAY } from "./kit.js?v=124d9a2f12";
 const T0 = 20, HMAX = 10000, HPUSH = 3000, CYC = 7;
+const halo = (e) => { e.setAttribute("stroke", "#0a0a0a"); e.setAttribute("stroke-width", 4); e.setAttribute("paint-order", "stroke"); return e; };
 export function mount(host) {
   let env = 3.5, sat = false, t0 = performance.now(), now = t0, last = 0;
   const S = pxScene(host, { cls: "parcel", corners: { tl: "Lift a parcel of air", tr: "PHAK 12" } }, draw);
@@ -37,7 +38,7 @@ export function mount(host) {
     L(g, X(te(h)), py, px, py, { stroke: "rgba(242,241,236,.5)", w: 1, dash: "2 3" });
     C(g, px, py, ph ? 11 : 14, { fill: "rgba(59,130,246,.25)", stroke: ACC, sw: 2 });
     if (h > 300) { const dd = Math.abs(diff) < 0.05 ? "same temp" : (diff < 0 ? Math.abs(diff).toFixed(1) + "° warmer" : diff.toFixed(1) + "° colder"); T(g, px + (diff < 0 ? 18 : -18), py - 14, dd, { size: 11, fill: ACC, anchor: diff < 0 ? "start" : "end", weight: 600 }); }
-    T(g, x1 - 4, y0 - 8, tc < 2 ? "pushed up…" : tc < 6 ? "let go" : "", { size: 11, fill: GRAY, anchor: "end" });
+    halo(T(g, x1 - 4, y0 - 8, tc < 2 ? "pushed up…" : tc < 6 ? "let go" : "", { size: 11, fill: GRAY, anchor: "end" }));
     const big = st === "unstable" ? "Unstable: it keeps rising" : st === "stable" ? "Stable: it sinks back" : "Neutral: it stays put";
     S.F.caption(`Air ${env < 0 ? "warms " + -env : "cools " + env} °C/1,000 ft · parcel ${gp} °C`, big);
     S.F.explain(`A rising parcel expands and cools: 3 °C per 1,000 ft while dry, more slowly (1.1–2.8 °C) once saturated, because condensing water releases heat. If the air around it cools faster than the parcel, the parcel stays warmer and lighter and keeps rising: <strong>unstable</strong>, with cumulus, showers and bumps. If the air cools more slowly, or warms with height (an <strong>inversion</strong>), the parcel ends up colder and sinks back: <strong>stable</strong>, with stratus, haze and smooth air. <span class="src">PHAK 12</span>`);
