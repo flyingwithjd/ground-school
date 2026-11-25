@@ -1,8 +1,8 @@
 // Stability (PHAK 12): give a parcel of air a push up to 3,000 ft, then let go. It cools at its adiabatic rate (3 °C per
 // 1,000 ft dry, about 1.5 °C saturated); the air around it cools at the environmental lapse rate you set. Warmer than its
 // surroundings, it keeps rising (unstable); colder, it sinks back (stable). Continuous loop, on screen only, 30 fps cap.
-import { slider, chips, row, loop } from "./base.js?v=27c70f9d2b";
-import { pxScene, T, L, C, P, R, ACC, INK, GRAY } from "./kit.js?v=27c70f9d2b";
+import { slider, chips, row, loop } from "./base.js?v=4d40905da2";
+import { pxScene, T, L, C, P, R, ACC, INK, GRAY } from "./kit.js?v=4d40905da2";
 const T0 = 20, HMAX = 10000, HPUSH = 3000, CYC = 7;
 const halo = (e) => { e.setAttribute("stroke", "#0a0a0a"); e.setAttribute("stroke-width", 4); e.setAttribute("paint-order", "stroke"); return e; };
 export function mount(host) {

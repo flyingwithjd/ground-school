@@ -9,13 +9,13 @@
 // Preignition is ignition before the normally timed spark, from residual hot spots: a carbon deposit on a spark plug, a
 // cracked spark plug insulator or other cylinder damage; it causes power loss and high temperatures. The two can occur
 // together, and one can cause the other. Spark timing, flame speeds and the pressure curves are illustrative.
-import { frame, chips, row } from "./base.js?v=27c70f9d2b";
-import { planeStage } from "./planestage.js?v=27c70f9d2b";
-import { modelKit, fitView } from "./section-models.js?v=27c70f9d2b";
-import { h, s, reduced } from "../core/util.js?v=27c70f9d2b";
+import { frame, chips, row } from "./base.js?v=4d40905da2";
+import { planeStage } from "./planestage.js?v=4d40905da2";
+import { modelKit, fitView } from "./section-models.js?v=4d40905da2";
+import { h, s, reduced } from "../core/util.js?v=4d40905da2";
 import * as THREE from "three";
-import { T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=27c70f9d2b";
-import { anim, COL } from "./dial.js?v=27c70f9d2b";
+import { T, L, P, C, R, INK, GRAY, DIM, ACC } from "./kit.js?v=4d40905da2";
+import { anim, COL } from "./dial.js?v=4d40905da2";
 const A0 = -90, A1 = 90, SPARK = -20, KNOCK = 14, HOT = -55;
 // cylinder pressure (0-1 scale) at crank angle a (deg after top dead center) for each case
 export function press(kind, a) {

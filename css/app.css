@@ -1094,3 +1094,10 @@ html.locked #gate { display: flex; }
 .t5-sod-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
 .t5-sod-row b { display: block; font-size: 17px; } .t5-sod-row small { display: block; color: var(--ink2); font-size: 14px; margin-top: 2px; }
 .viz.scen .ctrl:empty { display: none; } .sod-viz { margin-top: 8px; }
+.viz.px.oatchk .stage { aspect-ratio: 16 / 6.5; } .viz.px.alc .stage, .viz.px.dive .stage { aspect-ratio: 16 / 4.5; min-height: 190px; } .viz.px.ear .stage { aspect-ratio: 16 / 7; } .viz.px.stress .stage { aspect-ratio: 16 / 6; } .viz.px.scanb .stage { aspect-ratio: 16 / 5; min-height: 200px; }
+@media (max-width: 700px) { .viz.px.oatchk .stage { aspect-ratio: auto; height: 330px; } .viz.px.ear .stage { aspect-ratio: 4 / 3.4; } .viz.px.stress .stage { aspect-ratio: 4 / 3; }
+  .viz.px.oatchk .caption .label, .viz.px.alc .caption .label, .viz.px.dive .caption .label, .viz.px.ear .caption .label, .viz.px.stress .caption .label, .viz.px.scanb .caption .label { display: block; min-height: 2lh; } }
+.viz.fcard .hv-body { gap: 8px; padding: 14px; } .viz.fcard .fc-h { font: 800 20px/1.2 var(--sans); margin: 0; }
+.viz.fcard .fc-cols { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin-top: 8px; } .viz.fcard .fc-col ul { margin: 6px 0 0; padding-left: 1.1em; } .viz.fcard .fc-col li { margin: 4px 0; font-size: 15px; line-height: 1.4; }
+.viz.fcard .fc-col.go .hv-tag { color: var(--acc); } .viz.fcard .fc-note { margin: 10px 0 0; color: var(--ink2); font-size: 15px; line-height: 1.5; }
+@media (max-width: 520px) { .viz.fcard .fc-cols { grid-template-columns: 1fr; gap: 8px; } }

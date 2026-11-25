@@ -2,8 +2,8 @@
 // Each option is [text, grade, why, next?]: grade "best" | "ok" | "poor"; next is the step index to go to (default: the
 // following step; -1 ends). The best option is written first; the card shuffles the order on screen.
 // acs: ACS FAA-S-ACS-6C risk-management (R) elements the scenario practices. src: the FAA references behind the answers.
-import { SCEN3 } from "./scenarios3.js?v=27c70f9d2b";
-import { SCEN2 } from "./scenarios2.js?v=27c70f9d2b";
+import { SCEN3 } from "./scenarios3.js?v=4d40905da2";
+import { SCEN2 } from "./scenarios2.js?v=4d40905da2";
 export const SCEN = {
   gl4: [
     { id: "hold", t: "Traffic on final", acs: ["PA.III.B.R1", "PA.IV.A.R7"], src: "AIM 4-1-9 · AC 90-66C · AFH 7",

@@ -1,10 +1,10 @@
 // Scenario cards (review plan item 3): made-up situations at generic airports, two decisions each, every choice graded and
 // explained, tagged with the ACS risk-management elements it practices. Data: data/scenarios.js. HTML scene, no animation.
-import { htmlScene } from "./kit.js?v=27c70f9d2b";
-import { chips } from "./base.js?v=27c70f9d2b";
-import { h } from "../core/util.js?v=27c70f9d2b";
-import { autoTerms } from "../core/rich.js?v=27c70f9d2b";
-import { SCEN } from "../../data/scenarios.js?v=27c70f9d2b";
+import { htmlScene } from "./kit.js?v=4d40905da2";
+import { chips } from "./base.js?v=4d40905da2";
+import { h } from "../core/util.js?v=4d40905da2";
+import { autoTerms } from "../core/rich.js?v=4d40905da2";
+import { SCEN } from "../../data/scenarios.js?v=4d40905da2";
 const GR = { best: ["Best choice", "go"], ok: ["Workable, not best", "ok"], poor: ["Risky", "no"] };
 // stable shuffle per scenario step, so the best answer isn't always first
 const order = (seed, n) => { let x = 0; for (const c of seed) x = (x * 31 + c.charCodeAt(0)) >>> 0; const a = [...Array(n).keys()]; for (let i = n - 1; i > 0; i--) { x = (x * 1103515245 + 12345) >>> 0; const j = x % (i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };

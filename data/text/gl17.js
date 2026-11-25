@@ -23,6 +23,7 @@ export default {
 <li>while using any drug that affects the faculties in any way contrary to safety</li>
 <li>with a blood or breath alcohol concentration of <strong>0.04</strong> or more.</li></ul>
 <p>8 hours is a legal minimum, not a safe number. The AIM recommends <strong>12 to 24 hours</strong> between "bottle and throttle", depending on how much you drank. <span class="src">AIM 8-1-1</span></p>`,
+      viz: { type: "alcohol" },
       body2: `<p><strong>How alcohol hurts you in the air</strong> <span class="src">PHAK 17</span></p>
 <ul><li>The body needs about <strong>3 hours</strong> to clear the alcohol in one mixed drink or one beer, and considerable amounts can stay in the body for <strong>over 16 hours</strong>. A hangover still means you're under the influence.</li>
 <li>Alcohol causes <strong>histotoxic hypoxia</strong>: the cells can't use oxygen properly. One ounce of alcohol can equal about <strong>2,000 ft</strong> of extra physiological altitude, and with altitude, two drinks may feel like three or four.</li></ul>
@@ -59,6 +60,7 @@ export default {
 <ul><li><strong>Climbing</strong>: the expanding middle-ear air usually escapes on its own.</li>
 <li><strong>Descending</strong>: the higher outside pressure pushes the eardrum inward, and the partial vacuum tends to hold the tube shut. That's harder to fix and more painful.</li></ul>
 <p>To clear: swallow, yawn or tense your throat muscles. If that fails, close your mouth, pinch your nose and blow gently (the <strong>Valsalva maneuver</strong>). <span class="src">AIM 8-1-2 · PHAK 17</span></p>`,
+      viz: { type: "earblock" },
       body2: `<p>A <strong>sinus block</strong> occurs most often during <strong>descent</strong>. It can cause excruciating pain above the eyebrows or in the cheeks (sometimes felt as a toothache). <span class="src">AIM 8-1-2</span></p>
 <p>A cold, ear infection, sore throat or allergy can make equalizing impossible. The safe answer is not to fly with one. Nose drops or sprays may help with minor congestion, but ask an AME before using any medication. <span class="src">PHAK 17 · AIM 8-1-2</span></p>`,
       kdr: { k: "Middle ear and sinus problems.", d: "Prevent and clear an ear block.", r: "Flying with a cold.", codes: ["PA.I.H.K1c"] } },
@@ -90,6 +92,7 @@ export default {
 
     { id: "mot", label: "Motion sickness and carbon monoxide · PHAK 17", title: "Queasy or poisoned?",
       body: `<p><strong>Motion sickness</strong> comes from conflicting messages between the inner ear, eyes and body. Symptoms: general discomfort, nausea, dizziness, paleness, sweating and vomiting. Open the fresh-air vents, look outside at a fixed point, and avoid unnecessary head movement. It usually goes away within the first few lessons, so tell your instructor if you're prone to it. Medications like Dramamine help passengers but are <strong>not recommended for pilots</strong> because they cause drowsiness. <span class="src">PHAK 17</span></p>`,
+      viz: { type: "factcard", opts: { set: "mot" } },
       body2: `<p><strong>Carbon monoxide</strong> is colorless and odorless. It attaches to hemoglobin about <strong>200 times</strong> more easily than oxygen (hypemic hypoxia), and the body needs up to <strong>48 hours</strong> to get rid of it. Heater and defrost vents can carry it into the cabin from a leaking exhaust (as with a muffler-shroud heater). Symptoms: headache, blurred vision, dizziness, drowsiness, loss of muscle power. <span class="src">PHAK 17</span></p>
 <p>If you smell exhaust or feel any of these: <strong>heater off, fresh-air vents and windows open, oxygen if available</strong>, and land. Carry a CO detector, since dangerous levels can exist without any smell. <span class="src">PHAK 17</span></p>
 <p><strong>Chemicals.</strong> Preflight means handling fuel, oil and sometimes hydraulic fluid. Know the first aid on each product's Safety Data Sheet (the PHAK calls it the MSDS). In general: flush eyes with clean water (fuel: at least 15 minutes, then medical attention right away), remove contaminated clothing and wash skin with mild soap and water, and move to fresh air if you breathe fumes. Seek medical attention if symptoms or irritation persist, and immediately if fuel or oil is swallowed. <span class="src">PHAK 17</span></p>`,
@@ -101,6 +104,7 @@ export default {
 <ul><li><strong>Acute fatigue</strong> is short-term (exertion, excitement, lack of sleep) and is cured by rest and about 8 hours of sound sleep. <strong>Skill fatigue</strong> is a special kind: timing gets sloppy and attention narrows to the center while you neglect the periphery.</li>
 <li><strong>Chronic fatigue</strong> lasts long, usually has psychological roots, and isn't fixed by diet and sleep alone. It needs a physician.</li></ul>
 <p>If you're suffering from acute fatigue, stay on the ground. <span class="src">PHAK 17</span></p>`,
+      viz: { type: "stresscurve" },
       kdr: { k: "Acute and chronic stress and fatigue.", d: "Recognize fatigue in yourself and ground yourself.", r: "Late-day flights; get-there-itis.", codes: ["PA.I.H.K1g", "PA.I.H.K1h"] } },
 
     { id: "dehyd", label: "Dehydration, heat, cold and nutrition · PHAK 17 · FAA Aeromedical Advisory", title: "Water, food and temperature",
@@ -109,6 +113,7 @@ export default {
 <li>Most people only feel thirst at about a <strong>1.5-quart deficit</strong> (2% of body weight), which is already too late.</li>
 <li><strong>Heatstroke</strong> is the body's failure to control its temperature, and sometimes the first sign is collapse. Carry water and drink at intervals on long flights, about <strong>1 quart per hour</strong> in severe heat or <strong>1 pint per hour</strong> in moderate heat.</li></ul>
 <p><span class="src">PHAK 17</span></p>`,
+      viz: { type: "factcard", opts: { set: "dehyd" } },
       body2: `<p><strong>Nutrition.</strong> Missing or postponing meals can cause low blood sugar: distraction, broken habit patterns and a short attention span. <span class="src">PHAK 17</span></p>
 <p><strong>Hypothermia</strong> is a core body temperature that's too low. At first you only shiver, but as it falls you can be impaired while still feeling alert. Act early, even with a precautionary landing. Cabin heat helps but brings CO risk. Dress for the outside temperature and carry season-appropriate survival gear, since you may have to wait outside after a forced landing. <span class="src">FAA Aeromedical Advisory, FAA Safety Briefing</span></p>`,
       kdr: { k: "Dehydration, heatstroke, nutrition and hypothermia.", d: "Plan water, food and clothing for the flight.", r: "Summer heat; winter forced landing.", codes: ["PA.I.H.K1i", "PA.I.H.K1j"] } },
@@ -120,6 +125,7 @@ export default {
 <li><strong>Empty-field myopia</strong>: above clouds or in haze, with nothing to focus on, your eyes relax to 10–30 ft, so you look without seeing. Focus on distant objects or lights.</li>
 <li>Day, dusk and night vision (photopic, mesopic and scotopic) are in the Night Operations lesson.</li></ul>
 <p><span class="src">PHAK 17</span></p>`,
+      viz: { type: "scanblock" },
       body2: `<p><strong>Collision clues</strong>: a target with <strong>no relative motion</strong> that just grows larger is on a collision course. Clean the windshield, and remember most midair collisions happen in good weather, near airports and VORs. <span class="src">AIM 8-1-8</span></p>
 <p><strong>Glare</strong>: sunglasses should pass about 15% of light (absorb at least 85%), with neutral color. <span class="src">AIM 8-1-6</span></p>`,
       kdr: { k: "Vision in flight, blind spot, empty-field myopia, scanning.", d: "Scan effectively and recognize a collision course.", r: "Heads-down time; haze; window posts.", codes: ["PA.I.H.K1k", "PA.I.H.R3"] } },
@@ -130,6 +136,7 @@ export default {
 <ul><li>up to <strong>8,000 ft</strong> MSL: at least <strong>12 hours</strong> after a dive that didn't need a controlled ascent (non-decompression-stop), and at least <strong>24 hours</strong> after one that did</li>
 <li>above <strong>8,000 ft</strong>: at least <strong>24 hours</strong> after any dive.</li></ul>
 <p>These are actual flight altitudes, not cabin altitudes. Symptoms can appear even after you land. If DCS occurs in flight: 100% oxygen if available, emergency descent and land as soon as possible, and get medical evaluation even if the symptoms go away. <span class="src">PHAK 17</span></p>`,
+      viz: { type: "divewait" },
       kdr: { k: "Dissolved nitrogen after scuba diving.", d: "Plan a flight after a dive.", r: "Flying home the same day as a dive trip.", codes: ["PA.I.H.K1l"] } },
     { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
       body: `<p>Three made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,

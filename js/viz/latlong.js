@@ -1,6 +1,6 @@
 // Time zones and UTC (PHAK 16): the earth turns 15° an hour; convert local clock time to Zulu.
-import { slider, chips } from "./base.js?v=27c70f9d2b";
-import { pxScene, T, L, R, ACC, INK, GRAY, DIM, ACCF, ACCM, fmtTime } from "./kit.js?v=27c70f9d2b";
+import { slider, chips } from "./base.js?v=4d40905da2";
+import { pxScene, T, L, R, ACC, INK, GRAY, DIM, ACCF, ACCM, fmtTime } from "./kit.js?v=4d40905da2";
 const Z = [["E", "Eastern", 5, 75], ["C", "Central", 6, 90], ["M", "Mountain", 7, 105], ["P", "Pacific", 8, 120]];
 export function mount(host) {
   let zi = 2, dst = false, t = 14 * 60;

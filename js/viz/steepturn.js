@@ -2,8 +2,8 @@
 // turn. Lift tilts with the wings; its vertical part must still equal weight, so total lift (load factor) grows as
 // 1/cos(bank) and the stall speed by √(load factor). Turn rate and radius are shown for 100 knots true airspeed.
 // Static scene: draws only on change.
-import { slider, row } from "./base.js?v=27c70f9d2b";
-import { pxScene, T, L, C, P, R, ACC, INK, GRAY } from "./kit.js?v=27c70f9d2b";
+import { slider, row } from "./base.js?v=4d40905da2";
+import { pxScene, T, L, C, P, R, ACC, INK, GRAY } from "./kit.js?v=4d40905da2";
 const D = Math.PI / 180;
 export function mount(host) {
   let bank = 45;

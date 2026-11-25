@@ -3,8 +3,8 @@
 // are added to the empty airplane's, and the total weight and moment are plotted on the envelope.
 // A sample airplane only (172-like arms and envelope); always use your airplane's POH and its actual empty weight.
 // Static scene: redraws only on input or resize.
-import { slider, chips, row } from "./base.js?v=27c70f9d2b";
-import { pxScene, T, L, C, P, R, ACC, INK, GRAY, DIM } from "./kit.js?v=27c70f9d2b";
+import { slider, chips, row } from "./base.js?v=4d40905da2";
+import { pxScene, T, L, C, P, R, ACC, INK, GRAY, DIM } from "./kit.js?v=4d40905da2";
 const EW = 1642, EM = 62.6, MAXW = 2550;
 const ST = [["front", "Pilot + front seat", 37, 400], ["rear", "Rear seats", 73, 400], ["fuel", "Fuel", 48, 318], ["bag", "Baggage", 95, 120]];
 const ENV = [[35, 1500], [35, 1950], [41, 2550], [47.3, 2550], [47.3, 1500]];                 // CG in, weight lb
