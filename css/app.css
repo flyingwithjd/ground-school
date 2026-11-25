@@ -996,3 +996,24 @@ html.locked #gate { display: flex; }
 /* short pixel scenes (P1c rules visuals): less empty stage under a compact drawing */
 .viz.px.short .stage { aspect-ratio: 16 / 8; }
 @media (max-width: 700px) { .viz.px.short .stage { aspect-ratio: 4 / 3; } }
+/* P1d: first-visit plan card, plan line on Now, Today's 5 card with a quiet 7-day streak */
+.hero-start .start-first { margin: 18px 0 0; color: var(--ink2); font-size: 16px; }
+.plan-card { margin-bottom: clamp(32px, 5vw, 56px); display: flex; flex-direction: column; gap: 14px; max-width: min(100%, 48rem); }
+.plan-card > p { margin: 0; font-size: 16px; }
+.plan-row { display: flex; flex-direction: column; gap: 8px; }
+.plan-row .chips { display: flex; flex-wrap: wrap; gap: 6px; }
+.plan-date { max-width: 220px; color-scheme: dark; }
+.plan-saved { margin: 0; min-height: 1.4em; font-size: 14px; color: var(--ink2); }
+.plan-line { margin: 10px 0 0; color: var(--ink2); font-size: 15px; }
+.plan-line a { color: var(--acc); margin-left: 6px; }
+.today-card { margin-top: 18px; }
+.today-card h2 { margin: 10px 0 0; font-size: clamp(22px, 3.2vw, 28px); line-height: 1.2; }
+.today-card p { color: var(--ink2); margin: 8px 0 0; font-size: 16px; }
+.t5-head { display: flex; justify-content: space-between; align-items: baseline; gap: 12px; }
+.t5-streak { color: var(--acc); }
+.t5-week { display: flex; gap: 10px; margin-top: 16px; }
+.t5-day { display: flex; flex-direction: column; align-items: center; gap: 6px; }
+.t5-day i { width: 14px; height: 14px; border-radius: 50%; border: 1.5px solid var(--line2); display: block; }
+.t5-day.on i { background: var(--acc); border-color: var(--acc); }
+.t5-day.now i { box-shadow: 0 0 0 3px rgba(59,130,246,.25); }
+.t5-day b { font: 500 11px/1 var(--mono); color: var(--ink2); letter-spacing: .08em; }

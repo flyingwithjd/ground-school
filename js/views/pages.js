@@ -8,6 +8,7 @@ import { session, practiceSet } from "./quiz.js?v=bcb0f9d34d";
 import { nextStep, pagesOf, pageIndex, pageIds, pageStats } from "../core/flow.js?v=bcb0f9d34d";
 import { blindPages, blindLesson } from "./blindlesson.js?v=bcb0f9d34d";
 import { G, rich } from "../core/rich.js?v=bcb0f9d34d";
+import { T5 } from "../core/today.js?v=bcb0f9d34d";
 const page = (host) => { const p = h("div", { class: "page" }); host.append(p); return p; };
 const meter = (x, big) => `<div class="meter${big ? " big" : ""}"><i style="width:${Math.round(x * 100)}%"></i></div>`;
 const stageLessons = (s) => [...s.ground, ...s.flight].flatMap((id) => [id, ...((LESSONS[id] && LESSONS[id].includes) || [])]);
@@ -25,11 +26,11 @@ export function home(host) {
     const go = started ? ns0.href : `#/lesson/${ORDER.find((id) => LESSONS[id])}/0`;
     p.innerHTML = `<section class="hero hero-start"><span class="label">Private pilot ground school</span><h1>Learn it. Squawk it.</h1>
   <p>Short lessons, visuals you can play with, and questions that come back right before you would forget them.</p>
-  <div class="btns start-btns"><a class="btn pri arrow" id="begin" href="${go}">${started ? (ns0.kind === "cp" ? `Quick check · ${esc(SL.code)}` : `Continue ${esc(SL.code)}`) : "Begin"}</a><a class="btn ghost" href="#/course">Browse the course</a></div></section>
+  <div class="btns start-btns"><a class="btn pri arrow" id="begin" href="${go}">${started ? (ns0.kind === "cp" ? `Quick check · ${esc(SL.code)}` : `Continue ${esc(SL.code)}`) : "Begin"}</a><a class="btn ghost" href="#/course">Browse the course</a></div>${started ? "" : `<p class="start-first">First up: the airplane itself. Tap a control and watch it move.</p>`}</section>
   <section class="start-about"><span class="label">How it works</span><p>Squawk School is built on the FAA handbooks, the Airman Certification Standards and 14 CFR. Read a lesson, try the visuals, then answer. Every question is scheduled for review and the ones you are losing come back, so one right answer never counts as knowing it. Your review queue and weakest areas show up here once you have answered a few questions.</p></section>`;
-    p.insertAdjacentHTML("beforeend", foot()); return;
+    p.append(planCard(true)); p.insertAdjacentHTML("beforeend", foot()); return;
   }
-  p.innerHTML = `<section class="hero now-hero"><span class="label">${esc(CS.title)} · ${esc(CS.sub)}</span><h1>What to work on now</h1></section>`;
+  p.innerHTML = `<section class="hero now-hero"><span class="label">${esc(CS.title)} · ${esc(CS.sub)}</span><h1>What to work on now</h1>${planLine()}</section>`;
   // 1. One clear next step: the quick check you reached, the lesson you are in, or the next lesson.
   const ns = nextStep(); const NL = ns.lid && LESSONS[ns.lid];
   const nx = h("section", { class: "nextstep", id: "next-step" });
@@ -39,6 +40,7 @@ export function home(host) {
     const btn = ns.kind === "cp" ? "Start the quick check" : ns.kind === "continue" ? "Continue" : ns.nRead ? "Continue" : "Begin";
     nx.innerHTML = `<span class="label">${esc(lab)}</span><h2>${esc(NL.title)}</h2><p>${esc(sub)}</p>${ns.nPages ? `<div class="ns-prog"><span class="label">${ns.nRead} of ${ns.nPages} pages</span>${meter(ns.nRead / ns.nPages)}</div>` : ""}<div class="btns mt"><a class="btn pri arrow" id="next-go" href="${ns.href}">${btn}</a>${ns.kind === "cp" ? `<a class="btn ghost" href="#/lesson/${NL.id}">Keep reading</a>` : ""}</div>`; }
   p.append(nx);
+  const t5 = todayCard(); if (t5) p.append(t5);
   // 2. Review blind spots (only when there are some), 3. due reviews.
   const open = blindList(); const ready = blindList({ ready: true }); const cells = [];
   const openSet = new Set(open); const dueOther = due.filter((id) => !openSet.has(id));   // ready blind spots are counted on their own card
@@ -54,6 +56,42 @@ export function home(host) {
   <p class="dim mt" style="font-size:15px">Readiness counts each question by your latest answer: Certain and correct counts fully, Fairly sure counts half, and a guess, a miss or an unseen question counts zero. <a href="#/coverage">Syllabus checklist</a></p>`;
   p.insertAdjacentHTML("beforeend", foot());
 }
+// ---- P1d: the optional study plan (first visit and Settings) and Today's 5 ----
+const GOALS = [["test", "Pass the knowledge test"], ["ride", "Get ready for the checkride"], ["curious", "Just curious"]], MINS = [5, 15, 30];
+const fmtDay = (iso) => { const [y, m, d] = iso.split("-").map(Number); return new Date(y, m - 1, d).toLocaleDateString(undefined, { month: "short", day: "numeric", year: "numeric" }); };
+function planLine() { const P = T5.plan; if (!P || (!P.goal && !P.mins && !P.test)) return "";
+  const g = GOALS.find((x) => x[0] === P.goal), dt = T5.daysToTest(), bits = [g && g[1], P.mins && `${P.mins} min a day`, dt != null && (dt >= 0 ? `test in ${dt} day${dt === 1 ? "" : "s"}` : `test date ${fmtDay(P.test)} has passed`)].filter(Boolean);
+  return `<p class="plan-line">${esc(bits.join(" · "))} <a href="#/settings">Change</a></p>`; }
+function planCard(first) { const P = T5.plan || {}; const c = h("section", { class: "card plan-card", id: "plan-card" });
+  c.innerHTML = `<span class="label">${first ? "Make it yours · optional" : "Your plan"}</span><p class="dim">${first ? "Tell Squawk School what you're after. It stays on this device, and you can skip it." : "Shown on Now. Stays on this device."}</p>`;
+  const mk = (lab, opts, cur, key) => { const r = h("div", { class: "plan-row" }, h("span", { class: "label" }, lab)); const ch = h("div", { class: "chips" });
+    opts.forEach(([v, t]) => { const b = h("button", { class: "chip" + (String(cur) === String(v) ? " on" : ""), type: "button", "aria-pressed": String(String(cur) === String(v)) }, t);
+      b.onclick = () => { const on = !b.classList.contains("on"); ch.querySelectorAll(".chip").forEach((x) => { x.classList.remove("on"); x.setAttribute("aria-pressed", "false"); }); if (on) { b.classList.add("on"); b.setAttribute("aria-pressed", "true"); } T5.setPlan({ [key]: on ? v : null }); saved(); }; ch.append(b); });
+    r.append(ch); c.append(r); };
+  mk("Goal", GOALS, P.goal, "goal"); mk("Time a day", MINS.map((m) => [m, `${m} min`]), P.mins, "mins");
+  const d = h("input", { type: "date", class: "hv-sel plan-date", "aria-label": "Knowledge test date (optional)", value: P.test || "" });
+  d.onchange = () => { T5.setPlan({ test: d.value || null }); saved(); };
+  c.append(h("div", { class: "plan-row" }, h("span", { class: "label" }, "Test date, if you have one"), d));
+  const ok = h("p", { class: "plan-saved", "aria-live": "polite" }); c.append(ok);
+  function saved() { ok.textContent = "Saved on this device."; }
+  return c; }
+// Up to 5 questions for today: blind spots that are ready, then due reviews, then new questions from pages you've read.
+function todayQueue() { const ready = blindList({ ready: true }), due = dueIds(), pool = onlyReached(allCourseIds());
+  const fresh = pool.filter((id) => !get(id) || !get(id).n);
+  return [...new Set([...ready, ...due, ...shuffle(fresh)])].slice(0, T5.GOAL); }
+function todayCard() { const q = todayQueue(), n = T5.count(), done = T5.done();
+  if (!q.length && !done) return null;
+  const c = h("section", { class: "card today-card", id: "today-card" });
+  const dots = T5.off ? "" : `<div class="t5-week" aria-label="Last 7 days">${T5.week().map((d) => `<span class="t5-day${d.done ? " on" : ""}${d.today ? " now" : ""}" title="${d.key}"><i></i><b>${d.label}</b></span>`).join("")}</div>`;
+  const sk = T5.off ? 0 : T5.streak();
+  c.innerHTML = `<div class="t5-head"><span class="label">Today's 5</span>${sk > 1 ? `<span class="label t5-streak">${sk} days in a row</span>` : ""}</div>
+  <h2>${done ? "Done for today" : n ? `${Math.min(n, T5.GOAL)} of ${T5.GOAL} answered` : "Five questions, about 3 minutes"}</h2>
+  <p>${done ? "Nice work. Anything more today is a bonus; the schedule keeps track either way." : "Blind spots and due reviews first, then new questions from pages you've read."}</p>${dots}
+  <div class="btns mt">${q.length ? `<a class="btn ${done ? "ghost" : "pri"} arrow" id="today-go" href="#/today">${done ? "Five more" : n ? "Keep going" : "Start Today's 5"}</a>` : ""}</div>`;
+  return c; }
+export function today(host) { const q = todayQueue();
+  if (!q.length) { const p = page(host); p.innerHTML = `<section class="hero"><span class="label">Today's 5</span><h1>Nothing to ask yet</h1><p>Read a lesson page first. Today's 5 only asks about pages you've opened.</p><div class="btns mt"><a class="btn pri arrow" href="#/">Back to Now</a></div></section>`; return; }
+  return runSession(host, { queue: q, mode: "learn", title: "Today's 5", label: "Today's 5", onAnswer: () => T5.answered(), onExit: () => (location.hash = "#/") }); }
 const lessonWeak = (id) => { const ids = lessonItems(id); const st = stats(ids); return st.blind > 0 || (st.seen >= 3 && st.readiness < 0.5); };
 const lessonStarted = (id) => ((S().lessons[id] || {}).read || []).length > 0;
 function row(L) { const st = lessonStats(L.id); const done = lessonDone(L.id); const started = lessonStarted(L.id);
@@ -160,6 +198,9 @@ export function glossary(host, focus) { const p = page(host); const keys = Objec
   if (focus) { const row = list.querySelector(`#g-${CSS.escape(slug(focus.toLowerCase()))}`); if (row) { row.classList.add("hit"); setTimeout(() => row.scrollIntoView({ block: "start", behavior: matchMedia("(prefers-reduced-motion: reduce)").matches ? "auto" : "smooth" }), 60); } } }
 export function settings(host) { const p = page(host); const st = S();
   p.innerHTML = `<section class="hero"><span class="label">Progress and settings</span><h1>Your data, your device</h1><p>Nothing leaves this browser. No account, no server. Clearing site data erases progress, so export a backup now and then.</p></section>`;
+  const tc = h("div", { class: "card" }); tc.innerHTML = `<span class="label">Today's 5 streak</span><p class="dim mt" style="font-size:16px">The dots for the last 7 days on Now. One missed day a week doesn't break a streak.</p>`;
+  const tch = h("div", { class: "chips mt", id: "streak-opt" }); [["on", "Show"], ["off", "Hide"]].forEach(([v, t]) => { const b = h("button", { class: "chip" + ((T5.off ? "off" : "on") === v ? " on" : ""), type: "button" }, t); b.onclick = () => { T5.setOff(v === "off"); tch.querySelectorAll(".chip").forEach((x) => x.classList.toggle("on", x === b)); }; tch.append(b); }); tc.append(tch);
+  p.append(planCard(false), tc);
   const c2 = h("div", { class: "card" }); c2.innerHTML = `<span class="label">New questions per session</span><p class="dim mt" style="font-size:16px">How many never-seen questions a practice session adds after due reviews.</p>`;
   const ch2 = h("div", { class: "chips mt" }); [6, 12, 20].forEach((n) => { const b = h("button", { class: "chip" + (st.settings.newPerSession === n ? " on" : ""), type: "button" }, String(n)); b.onclick = () => { st.settings.newPerSession = n; save(); ch2.querySelectorAll(".chip").forEach((x) => x.classList.toggle("on", x === b)); }; ch2.append(b); }); c2.append(ch2);
   const c3 = h("div", { class: "card" }); c3.innerHTML = `<span class="label">Backup</span><p class="dim mt" style="font-size:16px">${Object.keys(st.items).length} items with history. Started ${new Date(st.created).toLocaleDateString()}.</p>`;
