@@ -33,13 +33,12 @@ export function mount(host) {
       const lp = blob(70, 30, 20, 9, 0.2), dp = blob(48, 40, 11, 4.5, -1.1);
       const e1 = P(g, pathD(lp) + " Z", { fill: GR + (on("chance") ? ".2)" : ".1)"), stroke: on("chance") ? INK : GR + ".6)", w: 1.2, dash: "4 3" }); taps.push(["chance", e1]);
       const e2 = P(g, pathD(dp) + " Z", { fill: GR + (on("likely") ? ".7)" : ".5)"), stroke: on("likely") ? INK : "none", w: 1.2 }); taps.push(["likely", e2]);
-      for (const [x, y] of [[46, 41], [50, 38]]) { const [a, b] = m(x, y); T(g, a, b + 4, "•", { size: 14, fill: "#052e16", anchor: "middle", mono: false }); }
     }
     // isobars around the low (996 center) and the high (1028 center)
     const ring = (cx, cy, r, sq) => { const pts = []; for (let i = 0; i <= 40; i++) { const a = (i / 40) * 2 * Math.PI; pts.push([cx + Math.cos(a) * r * (1 + 0.1 * Math.sin(2 * a + sq)), cy + Math.sin(a) * r * 0.8]); } return pts; };
     const isoCol = on("iso") ? INK : "rgba(242,241,236,.35)", isoW = on("iso") ? 1.6 : 1;
     [[1000, 7], [1004, 13], [1008, 19]].forEach(([p, r], i) => { const pts = ring(50, 22, r, 0.6); const e = P(g, pathD(pts), { stroke: isoCol, w: isoW }); taps.push(["iso", e]); if (!ph || i === 1) { const [a, b] = m(50 - r * 0.2, 22 - r * 0.8); halo(T(g, a, b + 4, String(p), { size: 11, fill: on("iso") ? INK : GRAY, anchor: "middle" })); } });
-    [[1024, 7], [1020, 13]].forEach(([p, r], i) => { const pts = ring(14, 24, r, 2); const e = P(g, pathD(pts, ms), { stroke: isoCol, w: isoW }); taps.push(["iso", e]); if (!ph || i === 0) { const [a, b] = ms(14, 24 - r * 0.8); halo(T(g, a, b + 4, String(p), { size: 11, fill: on("iso") ? INK : GRAY, anchor: "middle" })); } });
+    [[1024, 7], [1020, 13]].forEach(([p, r], i) => { const pts = ring(14, 24, r, 2); const e = P(g, pathD(pts, ms), { stroke: isoCol, w: isoW }); taps.push(["iso", e]); if (!ph || i === 1) { const [a, b] = ms(14, 24 - r * 0.8); halo(T(g, a, b + 4, String(p), { size: 11, fill: on("iso") ? INK : GRAY, anchor: "middle" })); } });
     // fronts with their symbols
     const front = (pts, kinds, side, key, f = m) => {   // kinds: "tri" | "semi" | "alt"; side: +1 / -1 (left/right of travel along pts)
       const sp = pts.map((p) => f(...p)); const col = key === "cold" ? CB : key === "warm" ? WR : key === "occl" ? OC : null, sw = on(key) ? 4 : 2.6;
@@ -64,8 +63,8 @@ export function mount(host) {
     const ctr = (x, y, ch, pr, key, col, f) => { const [a, b] = f(x, y); halo(T(g, a, b + 10, ch, { size: 28, weight: 800, anchor: "middle", fill: on(key) ? INK : col, mono: false })); halo(T(g, a, b + 26, pr, { size: 11, weight: 600, anchor: "middle", fill: on(key) ? INK : GRAY })); const d = C(g, a, b + 4, 20, { fill: "rgba(0,0,0,0)" }); d.style.pointerEvents = "all"; taps.push([key, d]); };
     ctr(14, 24, "H", "1028", "hi", CB, ms); ctr(50, 22, "L", "996", "lo", WR, m);
     // label for the picked symbol, near it
-    const LAB = { cold: [44, 50, ms], warm: [80, 36, m], occl: [54, 26, m], stat: [80, 7, ms], trof: [84, 52, ms], iso: [50, 41, m], chance: [74, 22, m], likely: [40, 44, m] };
-    if (LAB[sel]) { const [x, y, f] = LAB[sel], [a, b] = (f === ms ? ms : m)(x, y); const txt = IT[sel][0].toLowerCase(); const anc = a > W * 0.6 ? "end" : "start"; halo(T(g, a + (anc === "end" ? -12 : 12), b + (sel === "stat" ? 16 : -10), txt, { size: 11, weight: 700, fill: INK, anchor: anc })); }
+    const LAB = { cold: [44, 50, ms], warm: [80, 36, m], occl: [54, 26, m], stat: [90, 7, ms], trof: [84, 52, ms], iso: [50, 41, m], chance: [82, 27, m], likely: [34, 47, m] };
+    if (LAB[sel]) { const [x, y, f] = LAB[sel], [a, b] = (f === ms ? ms : m)(x, y); const txt = { cold: "cold front", warm: "warm front", occl: "occluded", stat: "stationary", trof: "trough", iso: "isobar", chance: "chance", likely: "likely", hi: "", lo: "" }[sel]; const tw = txt.length * 6.9, anc = a + 12 + tw < W - 4 ? "start" : "end"; halo(T(g, a + (anc === "end" ? -12 : 12), b + (sel === "stat" ? 16 : -10), txt, { size: 11, weight: 700, fill: INK, anchor: anc })); }
     for (const [key, e] of taps) hit(g, e, IT[key][0], () => { sel = key; S.redraw(); });
     halo(T(g, 8, top + 14, mode === "prog" ? (ph ? "forecast +12 h" : "forecast, valid in 12 h: fronts moved east") : (ph ? "observed" : "observed now"), { size: 11, fill: GRAY }));
     const it = IT[sel]; S.F.caption(it[1], it[0]);
