@@ -982,3 +982,14 @@ html.locked #gate { display: flex; }
 .fr-cmp thead th { font: 500 10px/1.4 var(--mono); letter-spacing: .14em; text-transform: uppercase; }
 .fr-cmp tbody th { font: 500 9.5px/1.5 var(--mono); letter-spacing: .1em; text-transform: uppercase; width: 27%; }
 .fr-cmp .on { color: var(--ink); } .fr-cmp thead th.on { color: var(--acc, #3b82f6); }
+/* four-stroke cycle (engine4): upright 3D cylinder; Play + crank on one line; fixed-height stroke sentence so nothing below moves */
+.viz.eng4 .stage{aspect-ratio:6/5}
+@media (max-width:700px){.viz.eng4 .stage{aspect-ratio:1/1.02}}
+.viz.eng4 .e4-play{flex:0 0 auto;min-width:104px;justify-content:center;font-variant-numeric:tabular-nums}
+.viz.slfirst.eng4 > .ctrl-live .ctrl-row{flex-wrap:nowrap;gap:12px}
+.viz.slfirst.eng4 > .ctrl-live .slider{flex:1 1 auto;grid-template-columns:auto minmax(0,1fr) 46px}
+.viz.slfirst.eng4 > .ctrl-live .slider output{min-width:0}
+.viz.eng4 .chips .chip{padding:0 13px}
+@media (max-width:600px){.viz.eng4 .ctrl-row > .ctrl-lab{display:none}.viz.eng4 .chips{gap:6px;flex-wrap:nowrap}.viz.eng4 .chips .chip{padding:0 10px;font-size:13.5px}}
+.viz.eng4 .caption .e4-say{pointer-events:auto;margin:10px 0 0;min-height:calc(3 * 1.5em);font-size:16.5px;line-height:1.5;color:var(--ink2);max-width:60ch}
+@media (max-width:600px){.viz.eng4 .caption .e4-say{min-height:calc(4 * 1.5em);font-size:16px}}

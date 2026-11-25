@@ -45,7 +45,8 @@ const edges = (g, ang = 30) => Array.from(new THREE.EdgesGeometry(g, ang).attrib
 const half = (prof, segs = 32) => { const g = new THREE.LatheGeometry(prof.map(([r, x]) => new THREE.Vector2(r, x)), segs, Math.PI / 2, Math.PI); g.rotateZ(-Math.PI / 2); return g; };   // lathe about x, z <= 0
 const cutFace = (pts, depth = 0.04) => { const sh = new THREE.Shape(pts.map(([x, y]) => new THREE.Vector2(x, y))); const g = new THREE.ExtrudeGeometry(sh, { depth, bevelEnabled: false }); g.translate(0, 0, -depth); return g; };
 const PLUGS = [{ x: 0.35, y: 1, tip: [0.35, BR - 0.35, 0] }, { x: 0.35, y: -1, tip: [0.35, -BR + 0.35, 0] }];
-function cylModel() { const K = modelKit(THREE), root = K.root, cutMat = new THREE.MeshBasicMaterial({ color: 0x1a1b20, side: THREE.DoubleSide });
+export const CYL = { BR, CR, ROD, PIN, XC, DOME, BAR, domeX, PLUGS };   // shared with the four-stroke visual (engine4.js)
+export function cylModel(_T, { swap = false } = {}) { const K = modelKit(THREE), root = K.root, cutMat = new THREE.MeshBasicMaterial({ color: 0x1a1b20, side: THREE.DoubleSide });
   const addCut = (name, parent, pts) => { const g = cutFace(pts); const o = K.add(name, parent, null, edges(g, 20)); o.add(new THREE.Mesh(g, cutMat)); return o; };
   // barrel: bore surface (back half) and its cut walls with cooling fins
   K.add("barrel", root, half([[BR, 0], [BR, BAR]]), []);
@@ -63,9 +64,9 @@ function cylModel() { const K = modelKit(THREE), root = K.root, cutMat = new THR
   const valves = [1, -1].map((sg) => { const g = new THREE.Group(); root.add(g); const vy = sg * 1.15;
     const disc = new THREE.CylinderGeometry(0.85, 0.55, 0.22, 24, 1, false, 0, Math.PI); disc.rotateY(Math.PI / 2); disc.rotateZ(Math.PI / 2); disc.translate(domeX(vy) - 0.02, vy, 0);
     const stem = new THREE.CylinderGeometry(0.11, 0.11, 3.6, 10, 1, false, 0, Math.PI); stem.rotateZ(Math.PI / 2); stem.translate(domeX(vy) - 1.85, vy, 0);
-    K.add(sg > 0 ? "intake" : "exhaust", g, disc, edges(disc)); K.add(sg > 0 ? "intake" : "exhaust", g, stem, []);
+    const vn = (sg > 0) !== swap ? "intake" : "exhaust"; K.add(vn, g, disc, edges(disc)); K.add(vn, g, stem, []);
     const coil = []; for (let i = 0; i < 64; i++) { const a0 = i * 0.5, a1 = (i + 1) * 0.5, x0 = -2.9 - i * 0.019, x1 = -2.9 - (i + 1) * 0.019; coil.push(x0, vy + 0.42 * Math.cos(a0), Math.min(0, 0.42 * Math.sin(a0)), x1, vy + 0.42 * Math.cos(a1), Math.min(0, 0.42 * Math.sin(a1))); }
-    K.add(sg > 0 ? "intake" : "exhaust", g, null, coil); return g; });
+    K.add(vn, g, null, coil); g.userData.vy = vy; return g; });
   // spark plugs: radial through the head near the chamber, top and bottom; white insulator, electrode into the chamber
   const plugs = PLUGS.map((pl) => { const g = new THREE.Group(); root.add(g); const sg = pl.y;
     const body = new THREE.CylinderGeometry(0.42, 0.42, 1.0, 6, 1, false, 0, Math.PI); body.rotateY(-Math.PI / 2); body.translate(pl.x, sg * (BR + 1.1), 0);
@@ -93,7 +94,7 @@ let uid = 0;
 export function mount(host) {
   let kind = "normal", fixed = false, a = A1;
   const F = frame(host, { cls: "capin sec3d cyl3d", corners: { tl: "Combustion", tr: "PHAK 7" } });
-  const S = planeStage(F.stage, { model: cylModel, cg: [5, 0, 0], orbit: false, maxFps: 30, fov: 22, view: { tg: [5.5, 0, 0], az: 74, el: 16, d: 60, fov: 22 } });
+  const S = planeStage(F.stage, { model: () => cylModel(), cg: [5, 0, 0], orbit: false, maxFps: 30, fov: 22, view: { tg: [5.5, 0, 0], az: 74, el: 16, d: 60, fov: 22 } });
   const M3 = S.P; S.renderer.localClippingEnabled = true;
   // camera: one fixed view for every case (slightly from the front and above the cut), framed to the whole cylinder, valve
   // springs, plugs and crank. Switching Normal / Detonation / Preignition never moves, rescales or reframes it.
