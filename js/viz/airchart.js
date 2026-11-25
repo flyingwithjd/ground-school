@@ -3,8 +3,8 @@
 // with a magenta vignette (Class E from 700 ft AGL), and Class G underneath. Chart colors are kept because the color is
 // the information; the class you pick is drawn bold and the others fade. Its link opens the 3D wedding cake on the
 // overview page with the same class lit. Static scene: draws only on change.
-import { chips, row } from "./base.js?v=4e8c88b40f";
-import { pxScene, T, L, C, P, hit, INK, GRAY } from "./kit.js?v=4e8c88b40f";
+import { chips, row } from "./base.js?v=124d9a2f12";
+import { pxScene, T, L, C, P, hit, INK, GRAY } from "./kit.js?v=124d9a2f12";
 const MAG = "#D946EF", BLU = "#60A5FA";
 const IT = {
   B: ["Class B", "Solid blue: shelves 100/SFC, 100/30, 100/60", `<strong>Solid blue lines</strong> outline each Class B shelf. The numbers are ceiling over floor in hundreds of feet MSL: <strong>100/SFC</strong> is surface to 10,000 ft, <strong>100/30</strong> is 3,000 to 10,000 ft. Under a shelf you're outside it. You need an ATC clearance to enter, and student pilots need an endorsement. The thin magenta circle is the <strong>30 NM Mode C veil</strong>: inside it, a transponder with altitude reporting and ADS-B Out are required.`, "AIM 3-2-3 · 14 CFR 91.131, 91.215"],
