@@ -5,8 +5,8 @@
 // A shows BOTH airworthiness certificates at once (white standard and pink special), side by side, as compact mock-ups;
 // the stage height is set from the width to fit them exactly, and the other papers reuse that same height.
 // Sources: PHAK Ch 9 (Fig 9-8, 9-9); 14 CFR 21.175, 21.181, 47.31(c), 47.40, 47.41, 91.9, 91.203.
-import { pxScene, T, R, L, hit, INK, GRAY, DIM, ACC, ACCF } from "./kit.js?v=0e1a30e374";
-import { s } from "../core/util.js?v=0e1a30e374";
+import { pxScene, T, R, L, hit, INK, GRAY, DIM, ACC, ACCF } from "./kit.js?v=2e5623b5fa";
+import { s } from "../core/util.js?v=2e5623b5fa";
 const PINK = "#F2A7C3", PINKF = "rgba(242,167,195,.13)", WHITEF = "rgba(242,241,236,.07)";
 const wrapT = (str, n) => { const out = []; let line = ""; for (const w of String(str).split(" ")) { if ((line + " " + w).trim().length > n) { out.push(line.trim()); line = w; } else line += " " + w; } if (line.trim()) out.push(line.trim()); return out; };
 const TILES = [
