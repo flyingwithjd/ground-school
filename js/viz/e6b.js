@@ -2,8 +2,8 @@
 // sits under the speed or fuel burn on the outer scale; then every outer number lines up with its inner partner.
 // Two modes: time from distance and groundspeed, and fuel from time and fuel burn (plus the 91.151 day reserve).
 // Static scene: redraws only on input or resize.
-import { slider, chips, row } from "./base.js?v=bce0e1cd0c";
-import { pxScene, T, C, L, P, wrapT, ACC, INK, GRAY, DIM, BODY } from "./kit.js?v=bce0e1cd0c";
+import { slider, chips, row } from "./base.js?v=0e1a30e374";
+import { pxScene, T, C, L, P, wrapT, ACC, INK, GRAY, DIM, BODY } from "./kit.js?v=0e1a30e374";
 const LAB = [10, 12, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90];
 const frac = (v) => { const l = Math.log10(v); return l - Math.floor(l); };
 const digits = (v) => { let d = v; while (d >= 100) d /= 10; while (d < 10) d *= 10; return d; };
@@ -54,7 +54,7 @@ export function mount(host) {
     const line = (s, o = {}) => { for (const t of wrapT(s, o.n || n)) { T(g, x0, y, t, { size: o.size || 12, fill: o.fill || GRAY, weight: o.w || 500, mono: o.mono !== false }); y += (o.lh || 17); } };
     line(fuel ? "TIME × FUEL BURN" : "DISTANCE ÷ GROUNDSPEED", { size: 11, fill: GRAY });
     line(fuel ? `${mins} min × ${gph.toFixed(1)} gal/h` : `${dist} NM ÷ ${gs} kt`, { fill: INK, size: ph ? 12 : 13 });
-    y += 6; line(fuel ? `= ${ans.toFixed(1)} gal` : `= ${hm(ans)}`, { fill: ACC, size: ph ? 16 : 22, w: 700, lh: ph ? 22 : 30 });
+    y += ph ? 9 : 14; line(fuel ? `= ${ans.toFixed(1)} gal` : `= ${hm(ans)}`, { fill: ACC, size: ph ? 16 : 22, w: 700, lh: ph ? 22 : 30 });
     if (fuel) { const res = Math.round(gph * 5) / 10, tot = Math.round(ans * 10) / 10 + res; line(`+ day reserve, 30 min: ${res.toFixed(1)} gal`, { size: 12 }); line(`= ${tot.toFixed(1)} gal minimum`, { fill: INK, size: 12, w: 600 }); }
     else line(`${(ans / 60).toFixed(2)} h`, { size: 12 });
     y += ph ? 4 : 10; line(fuel ? "OUTER: GALLONS · INNER: MINUTES" : "OUTER: NM · INNER: MINUTES", { size: 11, fill: GRAY, lh: 16 });

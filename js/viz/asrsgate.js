@@ -1,7 +1,7 @@
 // The ASRS penalty waiver as four gates (AC 00-46F para 12; 14 CFR 91.25): set each condition and see whether the FAA
 // waives the civil penalty or certificate suspension. Static scene.
-import { chips, slider, row } from "./base.js?v=bce0e1cd0c";
-import { pxScene, T, L, C, P, wrapT, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=bce0e1cd0c";
+import { chips, slider, row } from "./base.js?v=0e1a30e374";
+import { pxScene, T, L, C, P, wrapT, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=0e1a30e374";
 export function mount(host) {
   let inad = true, clean = true, prior = true, days = 3;
   const S = pxScene(host, { cls: "short", corners: { tl: "NASA ASRS · waiver", tr: "All four must pass" } }, draw);
