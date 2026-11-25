@@ -11,7 +11,7 @@ import c1 from "./lessons/c/gl1.js?v=bce0e1cd0c"; import c2 from "./lessons/c/gl
 import airport from "./modules/airport.js?v=bce0e1cd0c"; import wind from "./modules/wind.js?v=bce0e1cd0c"; import radio from "./modules/radio.js?v=bce0e1cd0c"; import regs from "./modules/regs.js?v=bce0e1cd0c";
 import emerg from "./modules/emerg.js?v=bce0e1cd0c"; import adm from "./modules/adm.js?v=bce0e1cd0c"; import flows from "./modules/flows.js?v=bce0e1cd0c"; import mnemo from "./modules/mnemo.js?v=bce0e1cd0c"; import vspeeds from "./modules/vspeeds.js?v=bce0e1cd0c";
 // Questions written from the retired oral items, and the page (section) every question comes from.
-import oralmc from "./lessons/oralmc.js?v=bce0e1cd0c"; import fill from "./lessons/fill.js?v=bce0e1cd0c"; import QSEC from "./qsec.js?v=bce0e1cd0c"; import RETIRED_MAP from "./retired.js?v=bce0e1cd0c"; import RULES from "./lessons/rules.js?v=bce0e1cd0c";
+import oralmc from "./lessons/oralmc.js?v=bce0e1cd0c"; import fill from "./lessons/fill.js?v=bce0e1cd0c"; import QSEC from "./qsec.js?v=bce0e1cd0c"; import RETIRED_MAP from "./retired.js?v=bce0e1cd0c"; import RULES from "./lessons/rules.js?v=bce0e1cd0c"; import P2 from "./lessons/p2.js?v=bce0e1cd0c";
 const SUPP = { gl1: x1, gl2: x2, gl3: x3, gl4: x4, gl5: x5, gl6: x6, gl7: x7, gl8: x8 };
 for (const [id, X] of Object.entries(SUPP)) { const L = { gl1, gl2, gl3, gl4, gl5, gl6, gl7, gl8 }[id];
   if (L.__merged) continue; L.__merged = true;   // idempotent even if this module is ever evaluated twice
@@ -28,6 +28,8 @@ for (const L of ALL) if (oralmc[L.id] && !L.__omerged) { L.__omerged = true; L.q
 for (const L of ALL) if (fill[L.id] && !L.__fmerged) { L.__fmerged = true; L.questions = [...(L.questions || []), ...fill[L.id]]; }
 // P1c rules batch (data/lessons/rules.js): new pages' topics and questions.
 for (const L of ALL) if (RULES.questions[L.id] && !L.__pmerged) { L.__pmerged = true; L.topics = { ...(L.topics || {}), ...(RULES.topics[L.id] || {}) }; L.questions = [...(L.questions || []), ...RULES.questions[L.id]]; }
+// Phase 2 batches (data/lessons/p2.js): new pages' topics and questions.
+for (const L of ALL) if (P2.questions[L.id] && !L.__p2merged) { L.__p2merged = true; L.topics = { ...(L.topics || {}), ...(P2.topics[L.id] || {}) }; L.questions = [...(L.questions || []), ...P2.questions[L.id]]; }
 // Oral (say-it-out-loud) items were retired: confidence on every answer now carries that signal. Old answers to them stay
 // in saved progress, harmlessly ignored.
 // Retired near-duplicates (data/retired.js) are dropped here; their ids stay reserved in the source files.
