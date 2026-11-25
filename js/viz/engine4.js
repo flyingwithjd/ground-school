@@ -48,7 +48,7 @@ export function mount(host) {
   function labels(cx, pin) { const Wd = F.stage.clientWidth, Hd = F.stage.clientHeight, ph = Wd < 520; lab.setAttribute("viewBox", `0 0 ${Wd} ${Hd}`); lg.remove(); lg = s("g", {}, lab);
     const tag = (part, at, str, side, fill = GRAY) => { const q = S.project(part), a = S.project(at), x = Math.max(6, Math.min(Wd - 6, a.x));
       L(lg, side < 0 ? x + 4 : x - 4, a.y - 4, q.x, q.y, { stroke: DIM, w: 1 }); T(lg, x, a.y, str, { size: 11, anchor: side < 0 ? "end" : "start", fill }); };
-    const k = Math.floor(ang / 180), on = (n) => STROKES[k].focus.includes(n);
+    const on = (n) => curFocus.includes(n);
     tag([-3.5, VY.in - 0.42, 0], [-3.5, -BR - 1.0, 0], ph ? "intake" : "intake valve", -1, on("intake") ? INK : GRAY);
     tag([-3.5, VY.ex + 0.42, 0], [-3.5, BR + 1.0, 0], ph ? "exhaust" : "exhaust valve", 1, on("exhaust") ? INK : GRAY);
     tag([0.35, BR + 2.75, 0], [-0.6, BR + 3.4, 0], "spark plug", 1, on("plug1") ? INK : GRAY);
@@ -63,9 +63,9 @@ export function mount(host) {
   const pts = new THREE.Points(geo, pmat); pts.renderOrder = 5; pts.frustumCulled = false; S.cueGroup.add(pts);
   const HOME = Array.from({ length: N }, (_, i) => [(0.5 + 0.7548776662 * i) % 1, ((0.5 + 0.5698402910 * i) % 1) * 2 - 1, Math.random() * 6.28]);
   const BLUE = [0.33, 0.58, 1], AMB = [1, 0.7, 0.32], GRY = [0.42, 0.42, 0.4];
-  const spark = [1, -1].map(() => S.cueLine(2, { width: 5, opacity: 0, color: 0xdbe8ff }));
+  const spark = [1, -1].flatMap(() => [0, 1, 2].map(() => S.cueLine(2, { width: 3, opacity: 0, color: 0xeef4ff })));
   const flowIn = S.cueLine(3, { width: 1.6, opacity: 0, color: 0x3b82f6, dash: [0.22, 0.26] }), flowEx = S.cueLine(3, { width: 1.6, opacity: 0, color: 0xf2f1ec, dash: [0.22, 0.26] });
-  let ang = reduced() ? 90 : 0, playing = !reduced(), last = 0, kPrev = -1, tNow = 0;
+  let ang = reduced() ? 90 : 0, playing = !reduced(), last = 0, kPrev = -1, fPrev = null, tNow = 0, curFocus = [];
   function home(i, cx, t) { const [u, v, ph] = HOME[i], y = v * (BR - 0.32), xr = domeX(y) + 0.14, xc = cx - 0.14, wob = t ? 0.05 * Math.sin(t * 3 + ph) : 0; return [xr + u * (xc - xr) + wob, y + wob, 0.06]; }
   function scene() { const th = ang * D, cx = crownX(ang), k = Math.floor(ang / 180) % 4, t = (ang % 180) / 180;
     // piston, rod, crank (same linkage as the combustion visual: the rod joins the wrist pin to the crank pin)
@@ -76,7 +76,8 @@ export function mount(host) {
     vIn.position.x = li; vEx.position.x = le;
     const pIn = port(VY.in, li), pEx = port(VY.ex, le); flowIn.set(pIn); flowEx.set(pEx); flowIn.opacity = li > 0.05 ? 0.75 : 0; flowEx.opacity = le > 0.05 ? 0.45 : 0;
     // spark: both plugs, a short bright arc at the tips just before the top of compression
-    const sp = ang >= SPARK && ang < SPARK + 14; spark.forEach((l, j) => { const tp = plugTip(j ? -1 : 1), sg = j ? -1 : 1; l.opacity = sp ? 1 : 0; l.set([tp, [tp[0] + 0.18, tp[1] - sg * 0.2, 0.08]]); });
+    const sp = ang >= SPARK && ang < SPARK + 14, sk = sp ? 0.25 + 0.75 * Math.sin(((ang - SPARK) / 14) * Math.PI) : 0;
+    spark.forEach((l, j) => { const sg = j < 3 ? 1 : -1, tp = plugTip(sg), off = ((j % 3) - 1) * 0.7, r = 0.6 * sk; l.opacity = sp ? 1 : 0; l.set([[tp[0], tp[1], 0.08], [tp[0] + r * Math.sin(off), tp[1] - sg * r * Math.cos(off), 0.08]]); });
     for (let i = 0; i < N; i++) { let p = home(i, cx, k === 2 ? tNow : 0), c = BLUE, vis = true; const e = 0.08 + (0.8 * i) / N;
       if (k === 0) { const G = pIn[2]; if (t < e - 0.14) vis = false; else if (t < e) p = along(pIn, (t - (e - 0.14)) / 0.14); else { const q = s5((t - e) / 0.14); p = G.map((g, j) => g + (p[j] - g) * q); } }
       if (ang >= SPARK && ang < 540) { const tp = plugTip(p[1] >= 0 ? 1 : -1), d = Math.hypot(p[0] - tp[0], p[1] - tp[1]), aIg = SPARK + 4 + d * 9;
@@ -84,7 +85,8 @@ export function mount(host) {
       if (k === 3) { c = GRY; const G = pEx[2]; if (t >= e + 0.24) vis = false; else if (t >= e + 0.1) p = along([...pEx].reverse(), (t - e - 0.1) / 0.14); else if (t >= e) { const q = s5((t - e) / 0.1); p = p.map((v, j) => v + (G[j] - v) * q); } }
       pos.set(vis ? p : [0, 0, 0], i * 3); col.set(vis ? c : [0, 0, 0], i * 3); }
     geo.attributes.position.needsUpdate = true; geo.attributes.color.needsUpdate = true;
-    if (k !== kPrev) { const first = kPrev < 0; kPrev = k; if (first) S.highlight(STROKES[k].focus); else S.focus(STROKES[k].focus); strokes.set(String(k)); F.caption(`Stroke ${k + 1} of 4`, STROKES[k].k); say.innerHTML = rich(STROKES[k].t); }
+    const fk = k === 1 && ang >= SPARK - 8 ? "spark" : String(k); if (fk !== fPrev) { const first = fPrev == null; fPrev = fk; const fo = fk === "spark" ? ["plug1", "plug2"] : STROKES[k].focus; curFocus = fo; if (first) S.highlight(fo); else S.focus(fo); }
+    if (k !== kPrev) { kPrev = k; strokes.set(String(k)); F.caption(`Stroke ${k + 1} of 4`, STROKES[k].k); say.innerHTML = rich(STROKES[k].t); }
     sl.set(Math.round(ang), false); labels(cx, pin); S.kick(); }
   function setPlay(on) { playing = on; play.textContent = on ? "❚❚ Pause" : "▶ Play"; play.setAttribute("aria-pressed", String(on)); play.classList.toggle("on", on); F.root.dataset.live = on ? "1" : ""; F.root.dataset.playing = on ? "1" : "0";
     if (on) { last = 0; S.animate(step); } else S.animate(null); }

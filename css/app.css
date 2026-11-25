@@ -990,6 +990,6 @@ html.locked #gate { display: flex; }
 .viz.slfirst.eng4 > .ctrl-live .slider{flex:1 1 auto;grid-template-columns:auto minmax(0,1fr) 46px}
 .viz.slfirst.eng4 > .ctrl-live .slider output{min-width:0}
 .viz.eng4 .chips .chip{padding:0 13px}
-@media (max-width:600px){.viz.eng4 .ctrl-row > .ctrl-lab{display:none}.viz.eng4 .chips{gap:6px;flex-wrap:nowrap}.viz.eng4 .chips .chip{padding:0 10px;font-size:13.5px}}
+@media (max-width:600px){.viz.eng4 .ctrl-row > .ctrl-lab{display:none}.viz.eng4 .ctrl-row > .chips{flex:1 1 100%;width:100%;gap:5px;flex-wrap:nowrap}.viz.eng4 .chips .chip{flex:1 1 auto;justify-content:center;padding:0 4px;font-size:13px}}
 .viz.eng4 .caption .e4-say{pointer-events:auto;margin:10px 0 0;min-height:calc(3 * 1.5em);font-size:16.5px;line-height:1.5;color:var(--ink2);max-width:60ch}
 @media (max-width:600px){.viz.eng4 .caption .e4-say{min-height:calc(4 * 1.5em);font-size:16px}}

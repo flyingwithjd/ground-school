@@ -26,6 +26,7 @@ async function check(label, route, type) {
 await check("fuel", "#/lesson/gl2/fuel", "fuel3d");
 await check("heat", "#/lesson/gl2/heat", "heat3d");
 await check("press", "#/lesson/gl2/press", "press3d");
+await check("four-stroke", "#/lesson/gl2/engine", "engine4");
 await check("pattern", "#/lesson/gl4/legs", "pattern");
 await check("front", "#/lesson/gl7/front", "front");
 await check("aoa", "#/lesson/gl3/lift", "aoa");
