@@ -12,6 +12,7 @@ function wx(x, y, t) {   // made-up field: a low centered at (cx, 30) drifting e
   const c = ceil == null ? 1e9 : ceil, cat = Math.max(c < 500 ? 3 : c < 1000 ? 2 : c <= 3000 ? 1 : 0, vis < 1 ? 3 : vis < 3 ? 2 : vis <= 5 ? 1 : 0);
   return { d, ceil, vis, cov, top, cat, rain: d < 10 ? (d < 5 ? "+RA" : "-RA") : "", cx };
 }
+const mix = (hex, op) => { const n = parseInt(hex.slice(1), 16), c = [(n >> 16) & 255, (n >> 8) & 255, n & 255].map((v) => Math.round(10 + (v - 10) * op)); return `rgb(${c.join(",")})`; };   /* opaque blend over the dark stage, so overlapping runs leave no seams */
 const halo = (t) => { t.setAttribute("stroke", "#0a0a0a"); t.setAttribute("stroke-width", 3); t.setAttribute("paint-order", "stroke"); return t; };
 export function mount(host) {
   let layer = "cat", hr = 6;
@@ -20,11 +21,13 @@ export function mount(host) {
   slider(row(S.F.ctrl), { label: "Forecast", min: 0, max: 18, step: 3, value: hr, fmt: (x) => (x ? `+${x} h` : "now"), oninput: (x) => { hr = x; S.redraw(); } });
   function draw(g, W, H, top) {
     const ph = W < 520, k = Math.min((W - 8) / 100, (H - top - 22) / 60), ox = W / 2 - 50 * k, oy = top + 2, m = (x, y) => [ox + x * k, oy + y * k];
-    const nx = ph ? 20 : 25, ny = ph ? 12 : 15, cw = 100 / nx, chh = 60 / ny;
-    R(g, ox, oy, 100 * k, 60 * k, { stroke: "rgba(242,241,236,.25)", sw: 1 });
-    for (let i = 0; i < nx; i++) for (let j = 0; j < ny; j++) { const x = (i + 0.5) * cw, y = (j + 0.5) * chh, w = wx(x, y, hr); const [a, b] = m(i * cw, j * chh);
-      if (layer === "cat") R(g, a + 0.5, b + 0.5, cw * k - 1, chh * k - 1, { fill: CAT[w.cat][1], op: 0.28 + 0.1 * w.cat });
-      else if (layer === "cld") { const f = { CLR: 0, FEW: 0.12, SCT: 0.25, BKN: 0.45, OVC: 0.65 }[w.cov]; if (f) R(g, a + 0.5, b + 0.5, cw * k - 1, chh * k - 1, { fill: "#F2F1EC", op: f * 0.6 }); } }
+    // fine grid, drawn as horizontal runs of equal value so edges look smooth without thousands of elements
+    const nx = ph ? 60 : 100, ny = ph ? 36 : 60, cw = 100 / nx, chh = 60 / ny;
+    if (layer !== "sfc") for (let j = 0; j < ny; j++) { let run = null;
+      const val = (i) => { const w = wx((i + 0.5) * cw, (j + 0.5) * chh, hr); return layer === "cat" ? w.cat : { CLR: 0, FEW: 1, SCT: 2, BKN: 3, OVC: 4 }[w.cov]; };
+      const flush = (i1) => { if (!run) return; const [a, b] = m(run.i * cw, j * chh), wpx = (i1 - run.i) * cw * k + 0.6, hpx = chh * k + 0.6, v = run.v;
+        if (layer === "cat") R(g, a, b, wpx, hpx, { fill: mix(CAT[v][1], 0.28 + 0.1 * v) }); else if (v) R(g, a, b, wpx, hpx, { fill: mix("#F2F1EC", [0, 0.12, 0.25, 0.45, 0.65][v] * 0.6) }); };
+      for (let i = 0; i <= nx; i++) { const v = i < nx ? val(i) : -1; if (!run || v !== run.v) { flush(i); run = { i, v }; } } }
     // route A → B and the worst condition along it
     const A = [8, 50], B = [92, 14]; let worst = 0, wpt = null; for (let s = 0; s <= 40; s++) { const x = A[0] + (B[0] - A[0]) * s / 40, y = A[1] + (B[1] - A[1]) * s / 40, w = wx(x, y, hr); if (w.cat > worst || !wpt) { if (w.cat >= worst) { worst = w.cat; wpt = [x, y, w]; } } }
     const [a1, b1] = m(...A), [a2, b2] = m(...B); L(g, a1, b1, a2, b2, { stroke: INK, w: 2.4, dash: "8 5" });
