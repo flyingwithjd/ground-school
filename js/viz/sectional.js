@@ -71,7 +71,7 @@ export function mount(host) {
     if (on(62, 38, 60)) { const [a, b] = m(62, 38), rr = Math.max(26, 8 * k), hi = S_("vor"), col = hi ? INK : BLU;
       C(G, a, b, rr, { stroke: col, sw: hi ? 1.8 : 1.1 }); const vr = 6 * Math.PI / 180;   // rose aligned to magnetic north (6°E variation)
       for (let d = 0; d < 360; d += 10) { const t = d * Math.PI / 180 - vr, l = d % 30 ? 4 : 8; L(G, a + Math.sin(t) * rr, b - Math.cos(t) * rr, a + Math.sin(t) * (rr - l), b - Math.cos(t) * (rr - l), { stroke: col, w: 1 }); }
-      L(G, a + Math.sin(-vr) * rr, b - Math.cos(-vr) * rr, a + Math.sin(-vr) * (rr + 8), b - Math.cos(-vr) * (rr + 8), { stroke: col, w: 1.6, arrow: hi ? "w" : undefined });
+      L(G, a + Math.sin(-vr) * rr, b - Math.cos(-vr) * rr, a + Math.sin(-vr) * (rr + 8), b - Math.cos(-vr) * (rr + 8), { stroke: col, w: 1.6, arrow: hi ? "kahw" : undefined });
       P(G, [0, 1, 2, 3, 4, 5].map((i) => { const t = (i / 6) * 2 * Math.PI; return (i ? "L" : "M") + (a + Math.cos(t) * 5) + "," + (b + Math.sin(t) * 5); }).join(" ") + " Z", { stroke: col, w: 1.4 }); C(G, a, b, 1.3, { fill: col });
       if (!ph || tac || hi) { const bx = b + rr + 16; if (bx < H - bot - 2) { const tt = "STONE 112.4 STN", w = tt.length * 6.9 + 10; R(G, a - w / 2, bx - 12, w, 17, { stroke: col, sw: 1.2, fill: "#000" }); T(G, a, bx, tt, { size: 11, anchor: "middle", fill: col, weight: 600 }); } }
       items.push(["vor", 62, 38, 20]); }
