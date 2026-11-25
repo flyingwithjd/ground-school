@@ -10,12 +10,12 @@ export function mount(host) {
   chips(row(S.F.ctrl, "Event"), [["y", "Neither"], ["n", "Accident or crime"]], "y", (v) => { clean = v === "y"; S.redraw(); }, { label: "Accident or criminal offense" });
   chips(row(S.F.ctrl, "Record"), [["y", "Clean 5 years"], ["n", "Prior violation"]], "y", (v) => { prior = v === "y"; S.redraw(); }, { label: "Prior record" });
   function draw(g, W, H, top) {
-    const ph = W < 520, x0 = 16, x1 = W - 16, gates = [[["INADVERTENT"], inad], [["NO ACCIDENT", "OR CRIME"], clean], [["CLEAN", "5 YEARS"], prior], [["FILED IN", "10 DAYS"], days <= 10]];
-    const all = gates.every((x) => x[1]), cy = top + (H - top) * 0.32, n = gates.length, sp = (x1 - x0 - 40) / n;
+    const ph = W < 520, x0 = 16, x1 = W - 16, gates = [[["HONEST", "MISTAKE"], inad], [["NO ACCIDENT", "OR CRIME"], clean], [["CLEAN", "5 YEARS"], prior], [["FILED IN", "10 DAYS"], days <= 10]];
+    const all = gates.every((x) => x[1]), cy = top + (H - top) * 0.32, n = gates.length, sp = (x1 - x0 - 24) / n;
     let broke = gates.findIndex((x) => !x[1]); if (broke < 0) broke = n;
-    L(g, x0, cy, x0 + 20 + sp * Math.min(broke, n) - (broke < n ? sp / 2 : 0), cy, { stroke: ACC, w: 3 });
-    if (broke < n) L(g, x0 + 20 + sp * broke - sp / 2, cy, x1 - 18, cy, { stroke: DIM, w: 2, dash: "4 5" });
-    gates.forEach(([lab, ok], i) => { const x = x0 + 20 + sp * i + sp / 2 - sp / 2 + sp / 2;
+    L(g, x0, cy, broke < n ? x0 + sp * broke + sp / 2 : x1 - 8, cy, { stroke: ACC, w: 3 });
+    if (broke < n) L(g, x0 + sp * broke + sp / 2, cy, x1 - 16, cy, { stroke: DIM, w: 2, dash: "4 5" });
+    gates.forEach(([lab, ok], i) => { const x = x0 + sp * i + sp / 2;
       C(g, x, cy, ph ? 15 : 18, { stroke: ok ? ACC : INK, sw: 2, fill: ok ? ACCF : "#111113" });
       if (ok) P(g, `M${x - 6},${cy} l4,5 l8,-10`, { stroke: ACC, w: 2.4 }); else { P(g, `M${x - 6},${cy - 6} l12,12 M${x + 6},${cy - 6} l-12,12`, { stroke: INK, w: 2.2 }); }
       lab.forEach((t, k) => T(g, x, cy + (ph ? 34 : 40) + k * 15, t, { size: 11, anchor: "middle", fill: ok ? INK : GRAY, mono: false, weight: 600 }));
