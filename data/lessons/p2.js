@@ -6,7 +6,7 @@ export default {
   topics: {
     gl14: { "gl14.calc": "Time, speed, distance and fuel" },
     gl5: { "gl5.wbgraph": "Loading graph and moment envelope", "gl5.tochart": "Graphical takeoff chart" },
-    gl8: { "gl8.fbcalc": "Winds aloft to groundspeed" },
+    gl8: { "gl8.fbcalc": "Winds aloft to groundspeed", "gl8.catgame": "Flight categories" },
     gl10: { "gl10.chart": "Airspace on the sectional chart" },
   },
   questions: {
@@ -41,6 +41,11 @@ export default {
       Q("gl8p-05", "gl8.fbcalc", "fbcalc", "Decode the winds-aloft group \"7832-45\".", ["From 280° at 132 kt, −45 °C", "From 780° at 32 kt, −45 °C", "From 320° at 78 kt, −45 °C", "Light and variable, −45 °C"], "A first pair over 36 means 50 was added to the direction and 100 subtracted from the speed: 78 − 50 = 28 (280°), 32 + 100 = 132 kt.", "PHAK 13"),
       Q("gl8p-06", "gl8.fbcalc", "fbcalc", "Your true course is 090°. The forecast at 9,000 ft is \"2728+03\". At that altitude you will have about", ["A 28 kt tailwind", "A 28 kt headwind", "A 28 kt direct crosswind", "No wind effect at all"], "Wind from 270° blows toward 090°, straight along your course from behind: a tailwind of the full 28 kt.", "PHAK 13"),
       Q("gl8p-07", "gl8.fbcalc", "fbcalc", "The 9,000 ft forecast temperature is +3 °C. Compared with the standard atmosphere, the air there is", ["About 6 °C warmer than standard", "Exactly standard", "About 6 °C colder than standard", "About 12 °C warmer than standard"], "Standard is 15 °C at sea level, about 2 °C cooler per 1,000 ft: 15 − 18 = −3 °C at 9,000 ft. +3 is 6 °C warmer.", "PHAK 13 · PHAK 4"),
+      Q("gl8p-08", "gl8.catgame", "catgame", "METAR: 9SM FEW008 BKN025. The flight category is", ["MVFR", "IFR", "VFR", "LIFR"], "FEW is not a ceiling. The ceiling is BKN025 = 2,500 ft, which is MVFR (1,000 to 3,000 ft). Visibility 9 SM is VFR. The worse one decides.", "AIM 7-1 · 14 CFR 1.1"),
+      Q("gl8p-09", "gl8.catgame", "catgame", "METAR: 2SM BR OVC045. The flight category is", ["IFR", "MVFR", "VFR", "LIFR"], "The 4,500 ft ceiling is VFR, but 2 SM visibility is IFR (1 to below 3 SM). The worse of the two sets the category.", "AIM 7-1"),
+      Q("gl8p-10", "gl8.catgame", "catgame", "A ceiling of 400 ft with 3 SM visibility is", ["LIFR", "IFR", "MVFR", "VFR"], "Below 500 ft is LIFR, whatever the visibility.", "AIM 7-1"),
+      Q("gl8p-11", "gl8.charts", "charts", "On a surface analysis chart, a red line with semicircles marks", ["A warm front", "A cold front", "An occluded front", "A trough"], "Warm fronts are red with semicircles on the side toward which the front is moving. Cold fronts are blue with triangles; occluded fronts are purple with both.", "AWH 25 · PHAK 12"),
+      Q("gl8p-12", "gl8.charts", "charts", "On a surface analysis, isobars are packed close together around a low. That means", ["Strong winds", "Light and variable winds", "Fair weather under sinking air", "Low humidity"], "Isobars are drawn every 4 mb. Close spacing means a steep pressure gradient and strong wind.", "AWH 25 · PHAK 12"),
     ],
     gl10: [
       // GL10 chart: how each airspace class is drawn on a sectional (Chart User's Guide; AIM 3-2)

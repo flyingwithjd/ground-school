@@ -40,7 +40,7 @@ export function mount(host) {
   const arow = row(F.ctrl, "Your call"); const ab = h("div", { class: "chips", role: "group", "aria-label": "flight category" }); arow.append(ab);
   const btns = CATS.map((c) => { const b = h("button", { class: "chip", type: "button" }, c); b.addEventListener("click", () => answer(c)); ab.append(b); return b; });
   const nx = h("button", { class: "chip", type: "button" }, "Next report →"); nx.addEventListener("click", next); ab.append(nx);
-  function next() { answered = false; btns.forEach((b) => { b.classList.remove("on", "ok", "no"); b.disabled = false; });
+  function next() { answered = false; btns.forEach((b) => { b.classList.remove("on", "wrong"); b.disabled = false; });
     const id = pick(IDS), day = 10 + Math.floor(R() * 18), hr = 6 + Math.floor(R() * 12);
     if (mode === "metar") { const st = state(Math.floor(R() * 4)); const t = `METAR ${id} ${day}${String(hr).padStart(2, "0")}53Z ${st.groups.join(" ")} ${pick(["18/12", "22/19", "08/07", "M02/M04", "15/14"])} A${pick(["2992", "3001", "2978", "2965"])}`;
       cur = { st, text: t }; rep.textContent = t; q.textContent = "What is the flight category right now?"; }
@@ -53,7 +53,7 @@ export function mount(host) {
     out.innerHTML = `<p class="dim">Find the lowest broken, overcast or obscured layer, then the visibility. Pick a category above.</p>`;
     F.caption(n ? `${right} of ${n} right` : "New drill", mode === "metar" ? "Name the category" : "Read the forecast"); }
   function answer(c) { if (answered) return; answered = true; n++; const w = why(cur.st), good = CATS[w.cat] === c; if (good) right++;
-    btns.forEach((b) => { b.disabled = true; if (b.textContent === CATS[w.cat]) b.classList.add("on"); });
+    btns.forEach((b) => { b.disabled = true; if (b.textContent === CATS[w.cat]) b.classList.add("on"); else if (b.textContent === c) b.classList.add("wrong"); });
     const rx = new RegExp(`\\b(${cur.st.groups.map((g) => g.replace(/[.*+?^${}()|[\]\\/]/g, "\\$&")).join("|")})\\b`, "g");
     if (mode === "metar") rep.innerHTML = esc(cur.text).replace(rx, (m) => (/^(BKN|OVC|VV)|SM$/.test(m) ? `<b class="acc">${m}</b>` : m));
     out.innerHTML = `<span class="label">${good ? "Right" : "Not quite"}</span><h4>${CATS[w.cat]}</h4><p>${esc(mode === "taf" ? `At ${String(cur.at).padStart(2, "0")}00Z the group in effect is the one that started most recently. ` : "")}${esc(w.txt.charAt(0).toUpperCase() + w.txt.slice(1))}</p>`;

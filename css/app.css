@@ -1043,3 +1043,4 @@ html.locked #gate { display: flex; }
 .wg-rep { font: 500 16px/1.6 var(--mono); word-spacing: .15em; min-height: 3.2em; overflow-wrap: anywhere; }
 .wg-rep b.acc { color: var(--acc); font-weight: 700; }
 .wg-q { font-weight: 600; }
+.wxg .chip.wrong { border-style: dashed; text-decoration: line-through; opacity: .85; }
