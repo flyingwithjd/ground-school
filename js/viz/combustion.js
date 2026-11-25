@@ -105,9 +105,13 @@ export function mount(host) {
   // part labels projected from the model into an SVG over the stage
   const lab = s("svg", { class: "full lab3d", role: "img" }, F.stage); let lg = s("g", {}, lab); lab.dirty = 0;
   function labels() { const W = F.stage.clientWidth, H = F.stage.clientHeight, ph = W < 520, k = fixed ? "normal" : kind; lab.setAttribute("viewBox", `0 0 ${W} ${H}`); lg.remove(); lg = s("g", {}, lab);
-    const at = (p, str, o = {}) => { const q = S.project(p); T(lg, Math.max(6, Math.min(W - 6, q.x + (o.dx || 0))), q.y + (o.dy || 0), str, { size: 11, anchor: o.anchor || "middle", fill: o.fill || GRAY }); };
-    at([-4.25, 1.15, 0], ph ? "intake" : "intake valve", { anchor: "end", dx: -6, dy: 4 }); at([-4.25, -1.15, 0], ph ? "exhaust" : "exhaust valve", { anchor: "end", dx: -6, dy: 4 });
-    at([0.6, BR + 2.6, 0], ph ? "left mag plug" : "spark plug · left magneto", { anchor: "start", dx: 8, dy: 4 }); at([0.6, -BR - 2.6, 0], ph ? "right mag plug" : "spark plug · right magneto", { anchor: "start", dx: 8, dy: 4 });
+    // a dark halo behind every label keeps it readable where it meets an edge line
+    const at = (p, str, o = {}) => { const q = S.project(p); const e = T(lg, Math.max(6, Math.min(W - 6, q.x + (o.dx || 0))), q.y + (o.dy || 0), str, { size: 11, anchor: o.anchor || "middle", fill: o.fill || GRAY }); e.setAttribute("stroke", "#000"); e.setAttribute("stroke-width", "4"); e.setAttribute("paint-order", "stroke"); e.setAttribute("stroke-linejoin", "round"); return e; };
+    // valve labels sit left of the valve springs (the stem ends), plug labels above the top plug and below the bottom one, clear of the fins
+    at([-8.6, 1.15, 0], ph ? "intake" : "intake valve", { anchor: "end", dx: -10, dy: 4 }); at([-8.6, -1.15, 0], ph ? "exhaust" : "exhaust valve", { anchor: "end", dx: -10, dy: 4 });
+    at([PLUGS[0].x, BR + 2.85, 0], ph ? "plug · left mag" : "spark plug · left magneto", { anchor: "start", dx: 12, dy: -19 }); { // bottom label: below the lowest projected fin edge (the fins reach lower on wide screens) and below the plug
+      const yb = Math.max(S.project([PLUGS[1].x, -BR - 2.85, 0]).y + 36, H - 12);   // fins reach lower on wide stages, so sit on the stage floor beside the plug tip
+      at([PLUGS[1].x, -BR - 2.85, 0], ph ? "plug · right mag" : "spark plug · right magneto", { anchor: "start", dx: 12, dy: Math.min(H - 6, yb) - S.project([PLUGS[1].x, -BR - 2.85, 0]).y }); }
     at([crownX(a) + 2.0, 1.25, 0], "piston", { fill: INK }); if (k === "pre") at([PLUGS[1].tip[0] + 0.6, PLUGS[1].tip[1] + 0.3, 0], "hot spot", { anchor: "start", dx: 6, fill: COL.red }); }
   // strip under the stage: the cylinder-pressure trace
   const strip = h("div", { class: "vstrip" }); F.stage.after(strip); const sv = s("svg", { class: "full", role: "img" }, strip); let sg = s("g", {}, sv);
