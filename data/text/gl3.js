@@ -39,5 +39,10 @@ export default {
 <p>Two consequences: on landing, excess speed makes the airplane <strong>float</strong>. On takeoff, the airplane can lift off before it can really climb, then sink back when it leaves ground effect. That is why soft-field technique accelerates in ground effect before climbing.</p>`,
       viz: { type: "groundeffect" },
       kdr: { k: "What ground effect does to induced drag and to the airspeed indication.", d: "Hold the airplane in ground effect to accelerate on a soft-field takeoff.", r: "Lifting off too slowly can leave you unable to climb out of ground effect.", codes: ["PA.IV.C.K4"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Two made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "gl3" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Aerodynamics in practice: the base-to-final turn and turbulence.", d: "Avoid skidding turns; slow to maneuvering speed in turbulence.", r: "Cross-control stalls and overstress.", codes: ["PA.V.A.R5", "PA.VII.B.R5", "PA.VII.A.R4", "PA.I.F.R2"] } },
   ],
 };

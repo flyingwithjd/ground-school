@@ -129,5 +129,10 @@ export default {
       body2: `<p><strong>Electrical problems</strong>: the C172S POH says to conserve battery power for the flaps and, at night, for the landing lights during landing. Keep the flashlight within easy reach. A spatial disorientation episode at night is an emergency: trust the attitude indicator. <span class="src">C172S POH 3 · PHAK 17</span></p>
 <p>The AFH notes that continued flight into adverse weather and poor judgment cause more serious accidents than engine failures. The best night emergency plan is a conservative go/no-go decision. <span class="src">AFH 11</span></p>${CFI}`,
       kdr: { k: "Night engine failure and electrical failure procedures.", d: "Brief a night engine-out plan and how you'd conserve battery power.", r: "Landing in the dark with no plan; draining the battery.", codes: ["PA.IX.B.K1", "PA.IX.C.K1", "PA.XI.A.R2"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Three made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "gl15" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Night decisions: electrical failure, dark approaches and invisible weather.", d: "Handle a night failure and avoid night illusions.", r: "Night illusions and weather you can't see.", codes: ["PA.XI.A.R7", "PA.IX.C.R1", "PA.XI.A.R3", "PA.XI.A.R6", "PA.VIII.A.R1"] } },
   ],
 };

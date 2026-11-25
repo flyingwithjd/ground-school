@@ -39,5 +39,10 @@ export default {
       body2: `<p>Every thunderstorm is a hazard, and you can't see which hazards one holds: turbulence with drafts that can exceed 3,000 fpm, hail, lightning, icing, wind shear, tornadoes, low ceilings and altimeter errors. Circle severe storms by at least 20 NM. A [[squall line]] is the single most intense weather hazard to aircraft. <span class="src">PHAK 12</span></p>
 <p>Expect structural icing whenever the temperature is near 0 °C and visible moisture is present. Clear ice can build very fast between 0 and −15 °C. Flight into known icing conditions is prohibited in the C172S. <span class="src">PHAK 12; POH 2</span></p>`,
       kdr: { k: "Thunderstorm ingredients, life cycle and hazards; icing conditions.", d: "Plan around storms with a 20 NM margin, or wait.", r: "Thinking a gap or a dark area under a storm is safe to fly through.", codes: ["PA.I.C.K3h", "PA.I.C.K3i", "PA.I.C.R1c"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Two made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "gl7" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Weather theory decisions: cold fronts and mountain wave.", d: "Predict the weather a front or ridge will bring.", r: "Fronts and terrain-driven turbulence.", codes: ["PA.I.C.R1", "PA.I.D.R3"] } },
   ],
 };

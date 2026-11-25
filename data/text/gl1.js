@@ -69,5 +69,10 @@ export default {
       <p>The practical test is graded against the <strong>[[Airman Certification Standards]]</strong> (ACS), currently FAA-S-ACS-6C for private pilot airplane. Every task lists what you must <strong>know</strong> (knowledge), how you <strong>manage the risk</strong> (risk management), and what you must <strong>do</strong> (skills). This course tags each section with the matching ACS elements.</p>`,
       viz: { type: "pilotpath", after: "p:nth-of-type(2)" },
       kdr: { k: "Eligibility for student and private certificates, and what the ACS is.", d: "Get your student pilot certificate early, through IACRA with your instructor.", r: "Currency is not proficiency. Meeting minimums does not make you ready.", codes: "PA.I.A.K1, PA.I.A.R1" } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Two made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "gl1" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Airworthiness decisions: inoperative equipment and required documents.", d: "Decide go or no-go from 91.205, 91.213 and the papers on board.", r: "Flying with required equipment inoperative.", codes: ["PA.II.B.R2", "PA.II.A.R2"] } },
   ],
 };

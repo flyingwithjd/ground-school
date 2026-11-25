@@ -57,5 +57,10 @@ export default {
 <p><strong>VFR cruising altitudes</strong> apply in level flight more than 3,000 ft above the surface: on a <em>magnetic course</em> of 0–179°, odd thousands plus 500 (3,500, 5,500); 180–359°, even thousands plus 500 (4,500, 6,500). Memory aid: "East is odd, west is even plus 500." <span class="src">14 CFR 91.159</span></p>
 <p><strong>ATC services for VFR</strong>: radar traffic advisories as workload permits, and <strong>safety alerts</strong> (terrain/obstruction and aircraft conflict) to everyone. Class B provides VFR separation; Class C provides separation from IFR; Class D and E provide none for VFR. You remain responsible for seeing and avoiding, and for your cloud clearance, even when receiving radar service. <span class="src">AIM 3-2-1, 3-2-3, 3-2-4</span></p>`,
       kdr: { k: "Speed limits, transponder/ADS-B rules, VFR cruising altitudes, ATC services.", d: "Pick a legal cruising altitude from the magnetic course.", r: "Relying on ATC for separation in Class D or E.", codes: ["PA.I.E.K1", "PA.I.D.K2", "PA.VI.B.K4"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Three made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "gl10" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Airspace decisions: Class B, Class D and TFRs.", d: "Enter airspace only with the right communication or clearance.", r: "Airspace violations and TFR intercepts.", codes: ["PA.I.D.R3", "PA.VI.A.R1", "PA.III.A.R1", "PA.II.A.R5"] } },
   ],
 };

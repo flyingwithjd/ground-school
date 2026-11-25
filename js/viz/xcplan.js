@@ -2,8 +2,8 @@
 // Bramble Valley, planned step by step: route and altitude, nav log, weight and balance, takeoff performance, weather,
 // airspace and NOTAMs, then a go/no-go call. Each step shows its made-up data and asks one question. Controls sit on
 // top so the growing answer text below never moves them. Not for navigation; use your airplane's POH.
-import { frame, chips, row } from "./base.js?v=d5b31b47a9";
-import { h } from "../core/util.js?v=d5b31b47a9";
+import { frame, chips, row } from "./base.js?v=0ffd46bda8";
+import { h } from "../core/util.js?v=0ffd46bda8";
 const STEPS = [
   { k: "route", n: "Route", t: "1 · Route and altitude",
     d: ["Ashford (KXAF) → Bramble Valley (KXBV)", "True course 072° · 86 NM", "Variation 8° W → magnetic course 080°", "Checkpoints: Long Lake 18 NM · Fenwick 41 NM · BRM VOR 63 NM", "Highest obstacle near the route: 3,900 ft MSL"],

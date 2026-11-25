@@ -65,5 +65,10 @@ export default {
 <p><strong>Engine:</strong> 2,700 RPM maximum; oil pressure 20 PSI minimum, 50–90 PSI normal, 115 PSI maximum; oil temperature 245 °F maximum. Try them on the gauges in the Oil and cooling section. <span class="src">POH 2</span></p>
 <div class="btns mt"><a class="btn arrow" href="#/lesson/vs1">V-speeds: what each one means, on the dial</a></div>`,
       kdr: { k: "V-speeds and markings; load limits; operating limitations.", d: "Recite the limitations from memory and find them in Section 2.", r: "Turbulence above VA or VNO can exceed load limits.", codes: ["PA.I.F.K1", "PA.I.F.R2"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Three made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "gl2" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Systems decisions: carburetor ice, vacuum failure and fuel contamination.", d: "Recognize a system problem and apply the right fix.", r: "Misreading a failing system.", codes: ["PA.I.G.R1", "PA.I.G.R2", "PA.II.A.R2"] } },
   ],
 };

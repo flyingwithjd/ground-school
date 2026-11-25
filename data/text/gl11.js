@@ -78,5 +78,10 @@ export default {
 <p>Currency is the legal minimum. Proficiency, the skill to fly this flight safely today, can take much more.</p>`,
       viz: { type: "currency" },
       kdr: { k: "Recent flight experience and the flight review.", d: "Check your logbook before you carry passengers.", r: "Proficiency versus currency.", codes: ["PA.I.A.K1", "PA.I.A.R1"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Three made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "gl11" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Regulation decisions: currency, cost sharing and flight reviews.", d: "Apply 61.56, 61.57 and 61.113 to real plans.", r: "Currency is not proficiency.", codes: ["PA.I.A.R1", "PA.II.A.R4"] } },
   ],
 };

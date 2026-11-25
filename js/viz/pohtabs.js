@@ -1,7 +1,7 @@
 // The POH's nine sections (PHAK 9; GAMA Specification No. 1 layout): a closed book with tabs. Browse a tab to see what it
 // holds, or switch to Find it and tap the tab where you'd look. Static scene: redraws only on a tap or a resize.
-import { chips } from "./base.js?v=d5b31b47a9";
-import { pxScene, T, R, P, L, C, hit, wrapT, BODY, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=d5b31b47a9";
+import { chips } from "./base.js?v=0ffd46bda8";
+import { pxScene, T, R, P, L, C, hit, wrapT, BODY, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=0ffd46bda8";
 // a small schematic of what each section looks like inside, drawn in the box x,y,w,h
 function glyph(g, i, x, y, w, h) {
   const cx = x + w / 2, cy = y + h / 2, m = Math.min(w, h);

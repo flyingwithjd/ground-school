@@ -1,8 +1,8 @@
 // Wind around a high and a low, Northern Hemisphere, top view (PHAK 12). Aloft, Coriolis balances the pressure force and
 // the wind blows along the isobars: clockwise around a high, counterclockwise around a low. Near the surface, friction slows
 // it, so it crosses the isobars: spiraling out of the high and into the low. Continuous animation, on screen only, 30 fps cap.
-import { chips, row, loop } from "./base.js?v=d5b31b47a9";
-import { pxScene, T, L, C, P, ACC, INK, GRAY } from "./kit.js?v=d5b31b47a9";
+import { chips, row, loop } from "./base.js?v=0ffd46bda8";
+import { pxScene, T, L, C, P, ACC, INK, GRAY } from "./kit.js?v=0ffd46bda8";
 const N = 22;
 let seed = 11; const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
 const PTS = [0, 1].map(() => Array.from({ length: N }, () => ({ a: rnd() * 2 * Math.PI, r: rnd(), w: 0.8 + rnd() * 0.4 })));

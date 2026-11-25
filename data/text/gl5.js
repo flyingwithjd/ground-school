@@ -33,5 +33,10 @@ export default {
       body2: `<p>Tables assume the technique in the POH, a new airplane, and a paved, level, dry runway. Slope, wet grass, soft ground, a tired engine or a late rotation all add distance that the chart does not show. Many instructors teach a personal margin on top of the book number. <span class="src">PHAK 11 · ACS PA.I.F.R3</span></p>
 <p><strong>14 CFR 91.103, preflight action</strong>: before every flight you must become familiar with all available information, including runway lengths at the airports you'll use and takeoff and landing distance data. For a flight not in the vicinity of an airport, that also includes weather reports and forecasts, fuel requirements, alternatives if the flight can't be completed as planned, and known ATC traffic delays. <span class="src">14 CFR 91.103</span></p>`,
       kdr: { k: "Using performance tables and their notes.", d: "Compute takeoff and landing distance for the conditions.", r: "Differences between calculated and actual performance.", codes: ["PA.I.F.S2", "PA.I.F.R3"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Three made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "gl5" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Weight, balance and performance decisions.", d: "Stay within weight and CG; correct performance for altitude, temperature and surface.", r: "Calculated versus actual performance.", codes: ["PA.I.F.R1", "PA.I.F.R2", "PA.I.F.R3", "PA.IV.C.R1"] } },
   ],
 };

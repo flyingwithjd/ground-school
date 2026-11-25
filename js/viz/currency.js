@@ -1,7 +1,7 @@
 // Staying legal after the checkride: the flight review (14 CFR 61.56), passenger currency (61.57(a)) and change of address
 // (61.60) on one timeline. Pick a rule, slide the date and see whether you're current today. Static scene.
-import { slider, chips } from "./base.js?v=d5b31b47a9";
-import { pxScene, T, L, R, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=d5b31b47a9";
+import { slider, chips } from "./base.js?v=0ffd46bda8";
+import { pxScene, T, L, R, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=0ffd46bda8";
 const MO = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
 const DAY = 864e5, fmtD = (d) => `${MO[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
 export function mount(host) {

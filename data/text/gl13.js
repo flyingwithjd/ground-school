@@ -71,5 +71,10 @@ export default {
 <p><strong>Instrument check, in order</strong>: <span class="src">PHAK 8</span></p>
 <ol><li><strong>Preflight</strong>: pitot cover off, pitot and static openings clear.</li><li><strong>Before taxi</strong>: altimeter set, within 75 ft of field elevation; VSI near zero; airspeed zero; compass full and swinging.</li><li><strong>Taxi</strong>: turn coordinator shows correct direction, ball goes the other way; heading indicator and compass change correctly; attitude indicator stays steady with no abnormal sounds; suction in range.</li><li><strong>Takeoff roll</strong>: airspeed comes alive and increases at an appropriate rate.</li></ol>${CFI}`,
       kdr: { k: "OAT gauge; preflight instrument checks.", d: "Run the instrument check from preflight to takeoff.", r: "Discovering a dead airspeed indicator after liftoff.", codes: ["PA.I.G.K1h", "PA.II.A.K3"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Two made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "gl13" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Instrument failure decisions: static and pitot blockages.", d: "Identify the blockage and fly pitch and power.", r: "Trusting a failed instrument.", codes: ["PA.I.G.R1", "PA.I.G.R2"] } },
   ],
 };
