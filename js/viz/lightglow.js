@@ -1,7 +1,7 @@
 // Soft additive halo sprites for nav, beacon, strobe and landing lights (ink-3D).
 // The texture is white; tint with the sprite's color. World-sized so the glow scales with the camera.
 // tight: a smaller, sharper core so a nav light doesn't bloom into a blob or swallow a nearby strobe.
-import { reduced } from "../core/util.js?v=fa1f959704";
+import { reduced } from "../core/util.js?v=d5b31b47a9";
 const TEX = { soft: null, tight: null };
 function glowTex(THREE, tight) {
   const key = tight ? "tight" : "soft"; if (TEX[key]) return TEX[key];

@@ -133,5 +133,10 @@ export default {
 <p><strong>A known trap</strong>: on some systems, switching the navigation source while the autopilot is tracking in NAV mode drops it to wings-level (ROL) until you re-engage NAV. <span class="src">PHAK 2</span></p>
 <p>Keep your stick-and-rudder skills sharp. Automation doesn't replace basic airmanship, and the PHAK says risk rises when pilots believe gadgets make up for skill. <span class="src">PHAK 2</span></p>`,
       kdr: { k: "Automation management; complacency; programming and mode awareness.", d: "Verify programming and call out mode changes.", r: "Complacency and mode confusion.", codes: ["PA.II.B.R1", "PA.II.B.S3"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Three made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "gl16" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Decision making under pressure, fatigue and distraction.", d: "Apply personal minimums and IMSAFE; go around when rushed.", r: "External pressures and hazardous attitudes.", codes: ["PA.I.D.R4", "PA.I.H.R2", "PA.I.D.R1", "PA.I.H.R1", "PA.IV.B.R6", "PA.I.H.R3"] } },
   ],
 };

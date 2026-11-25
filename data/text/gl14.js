@@ -75,5 +75,10 @@ export default {
       body2: `<p>On a real trip, do the same steps with current charts, an official weather briefing, NOTAMs and your airplane's POH, then review the plan with your CFI. Decide your own <strong>personal minimums</strong> before you look at the forecast, so the forecast doesn't talk you into a flight. <span class="src">PHAK 2 · FAA-S-ACS-6C PA.I.D</span></p>
 <p>File a VFR flight plan, get flight following if you can, and keep a <strong>plan B</strong>: an airport you can divert to and the fuel to get there. <span class="src">AIM 5-1-5 · PHAK 16</span></p>`,
       kdr: { k: "Everything 14 CFR 91.103 requires before a cross-country flight.", d: "Plan a complete VFR cross-country: route, altitude, nav log, W&B, performance, weather, airspace, NOTAMs and a go/no-go call.", r: "Pressing on because the plan is finished, when the weather or timing no longer fits it.", codes: ["PA.I.D.K1", "PA.I.D.S1", "PA.I.D.R1", "PA.I.C.R1"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Three made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "gl14" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Navigation decisions: fuel against time, getting lost and losing the GPS.", d: "Update the plan from checkpoints and divert early.", r: "Low fuel and dependence on automation.", codes: ["PA.VI.C.R3", "PA.I.D.R6", "PA.VI.C.R5", "PA.VI.D.R2", "PA.VI.B.R4", "PA.VI.B.R3"] } },
   ],
 };

@@ -1,7 +1,7 @@
 // Winds aloft (FB) to groundspeed: pick the altitude with the best wind for your true course (PHAK 13; AWH).
 // Made-up forecast in the real format, never current weather. Static scene: redraws only on input or resize.
-import { slider, row } from "./base.js?v=fa1f959704";
-import { pxScene, T, L, C, P, R, ACC, INK, GRAY } from "./kit.js?v=fa1f959704";
+import { slider, row } from "./base.js?v=d5b31b47a9";
+import { pxScene, T, L, C, P, R, ACC, INK, GRAY } from "./kit.js?v=d5b31b47a9";
 const FB = [[12000, "2742-03"], [9000, "2728+03"], [6000, "2615+09"], [3000, "9900"]];
 function dec(code) { if (code.startsWith("9900")) return { d: 0, s: 0, t: null, lv: true };
   let d = +code.slice(0, 2) * 10, s = +code.slice(2, 4); if (d > 360) { d -= 500; s += 100; }

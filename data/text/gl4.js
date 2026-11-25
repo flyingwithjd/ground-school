@@ -30,5 +30,10 @@ export default {
 <p>A target that shows no relative motion and stays in one part of the windshield is likely on a collision course; if it grows without moving, take evasive action. Most collisions happen on good-weather days, and aircraft cluster near VORs and around airport surface areas. <span class="src">AIM 8-1-8</span></p>
 <p>Before every turn in the pattern, clear the area in the direction of the turn. Lights on, clear radio calls and a standard pattern all make you easier to find.</p>`,
       kdr: { k: "Scanning technique and high-hazard areas.", d: "Clear before every turn; scan in 10° sectors.", r: "Heads-down time in the pattern: tablets, checklists, radio tuning.", codes: ["PA.III.B.R1", "PA.III.B.R2"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Three made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "gl4" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Airport operations decisions: traffic on final, taxi clearances and wake turbulence.", d: "Choose and explain the safe action at the hold line, on the taxiway and on final.", r: "Runway incursions, expectation bias and wake turbulence.", codes: ["PA.III.B.R1", "PA.IV.A.R7", "PA.II.D.R2", "PA.II.D.R4", "PA.III.B.R3"] } },
   ],
 };

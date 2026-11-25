@@ -32,5 +32,10 @@ export default {
 <p>In-cockpit NEXRAD and datalink weather are strategic tools. The image can be older than you think, and it never replaces a preflight briefing. <span class="src">PHAK 13</span></p>`,
       kdr: { k: "PIREP content; datalink weather limits.", d: "Give a simple PIREP: location, time, altitude, aircraft type, what you saw.", r: "Using datalink radar to thread between cells.", codes: ["PA.I.C.K4", "PA.I.C.R2a"] },
       viz: { type: "metar", opts: { kind: "pirep", kinds: ["pirep"] } } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Three made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "gl8" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Weather decisions: forecasts below your minimums, thunderstorms and fog.", d: "Make and revise a go/no-go or continue/divert decision.", r: "Continued VFR into IMC and old datalink weather.", codes: ["PA.I.C.R1", "PA.VI.C.R3"] } },
   ],
 };

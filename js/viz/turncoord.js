@@ -1,7 +1,7 @@
 // Turn coordinator and ball (PHAK FAA-H-8083-25C ch 8): bank slider sets a right turn at 90 knots; chips choose a
 // coordinated turn, a slip or a skid. The miniature airplane shows rate of turn; the ball shows coordination. Static scene.
-import { slider, chips, row } from "./base.js?v=fa1f959704";
-import { pxScene, T, L, C, P, R, ACC, INK, GRAY } from "./kit.js?v=fa1f959704";
+import { slider, chips, row } from "./base.js?v=d5b31b47a9";
+import { pxScene, T, L, C, P, R, ACC, INK, GRAY } from "./kit.js?v=d5b31b47a9";
 const D = Math.PI / 180, TAS = 90;
 const K = { coord: [1, 0, "Coordinated"], slip: [0.7, 1, "Slip"], skid: [1.3, -1, "Skid"] };
 export function mount(host) {

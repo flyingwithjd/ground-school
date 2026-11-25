@@ -74,5 +74,10 @@ export default {
 <p>As PIC you may deviate from any rule to the extent the emergency requires (91.3(b)); the FAA can ask for a written report afterward. <span class="src">14 CFR 91.3</span></p>
 <p><strong>ELT:</strong> satellites stopped monitoring 121.5 MHz in 2009 and listen only for 406 MHz beacons, which must be registered with NOAA. Test an analog ELT only in the first 5 minutes after the hour. ELTs are inspected every 12 calendar months, and the battery is replaced after 1 cumulative hour of use or at half its useful life. <span class="src">AIM 6-2-4 · 14 CFR 91.207</span></p>`,
       kdr: { k: "ELTs and ATC services to aircraft in distress.", d: "Declare early; Mayday or Pan-Pan, 121.5, 7700.", r: "Reluctance to declare an emergency.", codes: ["PA.IX.B.K5", "PA.IX.B.K6"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Three made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "gl9" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Emergency decisions: engine failure, electrical fire and alternator failure.", d: "Prioritize: fly the airplane, run the checklist, land, then communicate.", r: "Fixation, delay and pressing on after a failure.", codes: ["PA.IX.B.R1", "PA.IX.B.R6", "PA.IX.C.R1", "PA.III.A.R2", "PA.I.G.R2"] } },
   ],
 };

@@ -11,7 +11,9 @@ export default {
       viz: { type: "mnemo", opts: { set: "decide" } },
       kdr: { k: "ADM models.", d: "Use a structured decision process.", r: "Confirmation and expectation bias.", codes: ["PA.I.H.K4", "PA.I.H.R4"] } },
     { id: "sbt", label: "Scenarios", title: "Practice on the ground",
-      body: `<p>Run each scenario in the questions through 3P. Then ask your CFI for one from your own airport: a real runway, real weather, real pressures. Talk it out loud. These scenarios are made-up examples.</p>`,
+      body: `<p>Run each scenario in the questions through 3P. Then ask your CFI for one from your own airport: a real runway, real weather, real pressures. Talk it out loud. These scenarios are made-up examples.</p>
+<p><strong>Scenario cards</strong>, two decisions each, every choice explained:</p>
+<div class="btns mt"><a class="btn arrow" href="#/lesson/gl4/scn">Airport operations</a> <a class="btn arrow" href="#/lesson/gl8/scn">Weather</a> <a class="btn arrow" href="#/lesson/gl9/scn">Emergencies</a> <a class="btn arrow" href="#/lesson/gl14/scn">Navigation</a> <a class="btn arrow" href="#/lesson/gl16/scn">Decision making</a> <a class="btn arrow" href="#/lesson/gl17/scn">Aeromedical</a></div>`,
       kdr: { k: "Scenario-based decisions.", d: "Explain each decision.", r: "External pressures.", codes: ["PA.II.A.R4", "PA.II.B.S4"] } },
   ],
 };

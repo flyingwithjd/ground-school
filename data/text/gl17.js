@@ -131,5 +131,10 @@ export default {
 <li>above <strong>8,000 ft</strong>: at least <strong>24 hours</strong> after any dive.</li></ul>
 <p>These are actual flight altitudes, not cabin altitudes. Symptoms can appear even after you land. If DCS occurs in flight: 100% oxygen if available, emergency descent and land as soon as possible, and get medical evaluation even if the symptoms go away. <span class="src">PHAK 17</span></p>`,
       kdr: { k: "Dissolved nitrogen after scuba diving.", d: "Plan a flight after a dive.", r: "Flying home the same day as a dive trip.", codes: ["PA.I.H.K1l"] } },
+    { id: "scn", label: "Scenarios · ACS", title: "What would you do?",
+      body: `<p>Three made-up situations, each with two decisions. Pick what you would do, then read why. There's often more than one safe answer; the card shows the best one and the reasons. <span class="src">FAA-S-ACS-6C · PHAK 2</span></p>`,
+      viz: { type: "scenario", opts: { set: "gl17" } },
+      body2: `<p>Talk each one through out loud, then ask your CFI to run a version at your own airport, with your airplane's POH numbers.</p>`,
+      kdr: { k: "Aeromedical decisions: medication, alcohol and diving.", d: "Apply 91.17, the AIM and IMSAFE to a real morning.", r: "Legal is not the same as fit to fly.", codes: ["PA.I.H.R1", "PA.I.H.R2"] } },
   ],
 };

@@ -1081,3 +1081,12 @@ html.locked #gate { display: flex; }
 .viz.px.sdis .stage { aspect-ratio: 16 / 6; } .viz.px.hvx .stage { aspect-ratio: 16 / 5.4; min-height: 230px; } .viz.px.vsil .stage { aspect-ratio: 16 / 6; } .viz.px.tcoord .stage { aspect-ratio: 16 / 6.5; }
 @media (max-width: 700px) { .viz.px.sdis .stage { aspect-ratio: 4 / 3.2; } .viz.px.hvx .stage { aspect-ratio: 4 / 3.6; } .viz.px.vsil .stage { aspect-ratio: 4 / 2.9; } .viz.px.tcoord .stage { aspect-ratio: 4 / 3.4; }
   .viz.px.sdis .caption .label, .viz.px.hvx .caption .label, .viz.px.vsil .caption .label, .viz.px.tcoord .caption .label { display: block; min-height: 2lh; } }
+.viz.scen .hv-body { gap: 10px; padding: 14px 14px 16px; }
+.viz.scen .sc-set, .viz.scen .sc-q { margin: 0; font-size: 16px; line-height: 1.5; } .viz.scen .sc-q { font-weight: 700; } .viz.scen .sc-prev { margin: 0; color: var(--ink2); font-size: 14px; }
+.viz.scen .sc-opts { display: flex; flex-direction: column; gap: 8px; }
+.viz.scen .sc-opt { text-align: left; font: 500 15px/1.4 var(--sans); color: var(--ink); background: #111113; border: 1px solid var(--line); border-radius: 10px; padding: 11px 13px; cursor: pointer; }
+.viz.scen .sc-opt:hover:not(:disabled) { border-color: var(--acc); }
+.viz.scen .sc-opt:disabled { cursor: default; } .viz.scen .sc-opt.dim { opacity: .55; } .viz.scen .sc-opt.best { border-color: var(--acc); opacity: 1; }
+.viz.scen .sc-opt.picked { opacity: 1; box-shadow: 0 0 0 2px var(--acc) inset; } .viz.scen .sc-opt.picked.no { box-shadow: 0 0 0 2px #ef4444 inset; border-color: #ef4444; } .viz.scen .sc-opt.picked.ok { box-shadow: 0 0 0 2px #fbbf24 inset; border-color: #fbbf24; }
+.viz.scen .sc-out:empty { display: none; } .viz.scen .sc-out { border-top: 1px solid var(--line); padding-top: 12px; } .viz.scen .sc-out h4 { font: 800 20px/1.2 var(--sans); margin: 0 0 6px; } .viz.scen .sc-out h4.acc { color: var(--acc); }
+.viz.scen .sc-out p { margin: 6px 0; font-size: 15px; line-height: 1.5; } .viz.scen .sc-deb { font-weight: 600; } .viz.scen .sc-next { margin-top: 8px; }
