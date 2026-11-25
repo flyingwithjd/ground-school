@@ -1,7 +1,7 @@
 // See and avoid (AIM 8-1-6; PHAK 17): the view out the windshield split into 10° blocks. Step through the scan; only the
 // block you're looking at is in sharp focus, so a distant airplane shows up only when your scan reaches it. Static scene.
-import { slider, row } from "./base.js?v=4d40905da2";
-import { pxScene, T, L, R, ACC, INK, GRAY, ACCF } from "./kit.js?v=4d40905da2";
+import { slider, row } from "./base.js?v=eb00616c11";
+import { pxScene, T, L, R, ACC, INK, GRAY, ACCF } from "./kit.js?v=eb00616c11";
 const N = 9, TGT = 6;
 export function mount(host) {
   let b = 1;

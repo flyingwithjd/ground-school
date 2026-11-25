@@ -1,7 +1,7 @@
 // Diving, then flying (AIM 8-1-2; PHAK 17): choose the dive type and how high you'll fly, and the bar shows the minimum
 // wait before flight: 12 hours, or 24. Static scene.
-import { chips, row } from "./base.js?v=4d40905da2";
-import { pxScene, T, L, R, ACC, INK, GRAY, ACCF } from "./kit.js?v=4d40905da2";
+import { chips, row } from "./base.js?v=eb00616c11";
+import { pxScene, T, L, R, ACC, INK, GRAY, ACCF } from "./kit.js?v=eb00616c11";
 export function mount(host) {
   let deco = false, high = false;
   const S = pxScene(host, { cls: "dive", corners: { tl: "Wait before flying", tr: "AIM 8-1-2 · PHAK 17" } }, draw);

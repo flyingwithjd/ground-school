@@ -1,16 +1,16 @@
-import { h, esc, pct, fmtDue, toast, download, shuffle } from "../core/util.js?v=4d40905da2";
-import { S, save, exportJSON, importJSON, reset } from "../core/store.js?v=4d40905da2";
-import { get } from "../core/srs.js?v=4d40905da2";
-import { STAGES, MODULES, STAGE_CHECK, SUBJECTS } from "../../data/course.js?v=4d40905da2";
-import { LESSONS, QUESTIONS, TOPICS, ORDER, lessonItems } from "../../data/index.js?v=4d40905da2";
-import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone, blindList, onlyReached } from "../core/progress.js?v=4d40905da2";
-import { session, practiceSet } from "./quiz.js?v=4d40905da2";
-import { nextStep, pagesOf, pageIndex, pageIds, pageStats } from "../core/flow.js?v=4d40905da2";
-import { blindPages, blindLesson } from "./blindlesson.js?v=4d40905da2";
-import { G, rich } from "../core/rich.js?v=4d40905da2";
-import { T5, dayKey } from "../core/today.js?v=4d40905da2";
-import { reachedSet } from "../core/progress.js?v=4d40905da2";
-import { mountViz } from "../viz/index.js?v=4d40905da2";
+import { h, esc, pct, fmtDue, toast, download, shuffle } from "../core/util.js?v=eb00616c11";
+import { S, save, exportJSON, importJSON, reset } from "../core/store.js?v=eb00616c11";
+import { get } from "../core/srs.js?v=eb00616c11";
+import { STAGES, MODULES, STAGE_CHECK, SUBJECTS } from "../../data/course.js?v=eb00616c11";
+import { LESSONS, QUESTIONS, TOPICS, ORDER, lessonItems } from "../../data/index.js?v=eb00616c11";
+import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone, blindList, onlyReached } from "../core/progress.js?v=eb00616c11";
+import { session, practiceSet } from "./quiz.js?v=eb00616c11";
+import { nextStep, pagesOf, pageIndex, pageIds, pageStats } from "../core/flow.js?v=eb00616c11";
+import { blindPages, blindLesson } from "./blindlesson.js?v=eb00616c11";
+import { G, rich } from "../core/rich.js?v=eb00616c11";
+import { T5, dayKey } from "../core/today.js?v=eb00616c11";
+import { reachedSet } from "../core/progress.js?v=eb00616c11";
+import { mountViz } from "../viz/index.js?v=eb00616c11";
 const page = (host) => { const p = h("div", { class: "page" }); host.append(p); return p; };
 const meter = (x, big) => `<div class="meter${big ? " big" : ""}"><i style="width:${Math.round(x * 100)}%"></i></div>`;
 const stageLessons = (s) => [...s.ground, ...s.flight].flatMap((id) => [id, ...((LESSONS[id] && LESSONS[id].includes) || [])]);
@@ -30,6 +30,7 @@ export function home(host) {
   <p>Short lessons, visuals you can play with, and questions that come back right before you would forget them.</p>
   <div class="btns start-btns"><a class="btn pri arrow" id="begin" href="${go}">${started ? (ns0.kind === "cp" ? `Quick check · ${esc(SL.code)}` : `Continue ${esc(SL.code)}`) : "Begin"}</a><a class="btn ghost" href="#/course">Browse the course</a></div>${started ? "" : `<p class="start-first">First up: the airplane itself. Tap a control and watch it move.</p>`}</section>
   <section class="start-about"><span class="label">How it works</span><p>Squawk School is built on the FAA handbooks, the Airman Certification Standards and 14 CFR. Read a lesson, try the visuals, then answer. Every question is scheduled for review and the ones you are losing come back, so one right answer never counts as knowing it. Your review queue and weakest areas show up here once you have answered a few questions.</p></section>`;
+    const hs = p.querySelector(".hero-start"); hs.insertAdjacentHTML("afterend", `<div class="hero172-slot"></div>`); import("./hero172.js?v=eb00616c11").then((m) => m.mountHero172(p.querySelector(".hero172-slot"))).catch(() => {});
     p.append(planCard(true)); p.insertAdjacentHTML("beforeend", foot()); return;
   }
   p.innerHTML = `<section class="hero now-hero"><span class="label">${esc(CS.title)} · ${esc(CS.sub)}</span><h1>What to work on now</h1>${planLine()}</section>`;
@@ -95,7 +96,7 @@ function todayCard() { const q = todayQueue(), n = T5.count(), done = T5.done();
     slot.innerHTML = `<span class="label">Scenario of the day</span><div class="t5-sod-row"><div><b>${esc(d.s.t)}</b><small>${esc(d.lt)} · two decisions</small></div><a class="btn ${ok ? "ghost" : ""} arrow" id="sod-go" href="#/scenario">${ok ? "Done · again" : "Try it"}</a></div>`; });
   return c; }
 // Scenario of the day: one scenario card per day, picked from lessons you've opened (any lesson if none yet). Same pick all day.
-async function scenOfDay() { const { SCEN } = await import("../../data/scenarios.js?v=4d40905da2");
+async function scenOfDay() { const { SCEN } = await import("../../data/scenarios.js?v=eb00616c11");
   const R = reachedSet(), seen = new Set([...R].map((k) => k.split("/")[0]));
   let pool = Object.entries(SCEN).filter(([l]) => seen.has(l)); if (!pool.length) pool = Object.entries(SCEN);
   const all = pool.flatMap(([l, a]) => a.map((s) => ({ l, s }))); if (!all.length) return null;
@@ -206,7 +207,7 @@ export function tools(host) { const p = page(host); const sims = S().sims || [];
   <a class="cell" href="#/lesson/vs1"><span class="label">V-speeds · POH Sec 2</span><h3>What V<sub>FE</sub>, V<sub>NO</sub> and V<sub>Y</sub> mean</h3><p>Every V-speed on the 172S airspeed indicator and the ones that are not on it. Tap a speed to light up its arc or line.</p><span class="go btn arrow">Open</span></a>
   <a class="cell" href="#/glossary"><span class="label">Glossary</span><h3>${Object.keys(G).length} terms</h3><p>Every underlined term in a lesson opens its definition. Browse or search them all here.</p><span class="go btn arrow">Open</span></a>
   <a class="cell" href="#/settings"><span class="label">Progress and settings</span><h3>Your data stays here</h3><p>Progress is saved only in this browser. Export it to a file to move devices or keep a backup.</p><span class="go btn arrow">Open</span></a></div>${foot()}`; }
-export { sim, check } from "./checks.js?v=4d40905da2";
+export { sim, check } from "./checks.js?v=eb00616c11";
 export function glossary(host, focus) { const p = page(host); const keys = Object.keys(G).sort(); const slug = (k) => k.replace(/\s+/g, "-");
   p.innerHTML = `<section class="hero"><span class="label">Glossary</span><h1>Terms, plainly</h1><p>Every underlined term in a lesson opens its definition. Airspeed symbols like V<sub>FE</sub> are explained with the dial in <a href="#/lesson/vs1">V-speeds</a>.</p></section>`;
   const inp = h("input", { type: "search", placeholder: "Search terms", "aria-label": "Search terms" }); p.append(h("div", { class: "field", style: "max-width:28rem" }, inp)); const list = h("div", { class: "mt" }); p.append(list);
@@ -234,4 +235,4 @@ export function about(host) { const p = page(host);
   <p>Citations name the chapter, section or regulation. Procedures are marked to confirm with your instructor and your aircraft's POH, because flight schools and airplanes differ.</p>
   <h4>Software and fonts</h4><ul><li>three.js r181, MIT License</li><li>GSAP 3.14, GreenSock Standard "No Charge" License (vendored, not loaded in this build)</li><li>Inter and IBM Plex Mono, SIL Open Font License 1.1</li></ul><p>License texts are in the LICENSES folder.</p>
   <h4>Not affiliated</h4><p>Squawk School is an independent study aid. Not affiliated with or endorsed by the FAA or Textron Aviation. Cessna and Skyhawk are trademarks of their owner.</p></div>`; }
-export { coverage, presolo } from "./checks.js?v=4d40905da2";
+export { coverage, presolo } from "./checks.js?v=eb00616c11";

@@ -1,7 +1,7 @@
 // The flight-instrument check from preflight to takeoff (PHAK FAA-H-8083-25C ch 8): pick a phase and the instruments to
 // check light up in blue, each with what to look for. Static scene.
-import { chips, row } from "./base.js?v=4d40905da2";
-import { pxScene, T, R, C, ACC, INK, GRAY, ACCF } from "./kit.js?v=4d40905da2";
+import { chips, row } from "./base.js?v=eb00616c11";
+import { pxScene, T, R, C, ACC, INK, GRAY, ACCF } from "./kit.js?v=eb00616c11";
 const INS = [["pitot", "Pitot"], ["asi", "Airspeed"], ["ai", "Attitude"], ["alt", "Altimeter"], ["tc", "Turn coord."], ["hi", "Heading"], ["vsi", "VSI"], ["comp", "Compass"], ["oat", "OAT"]];
 const PH = {
   pre: ["Preflight", { pitot: "cover off, holes clear", oat: "reads about the air temp" }, "Walkaround: pitot cover off, pitot and static openings clear and undamaged."],

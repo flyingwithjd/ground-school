@@ -1,7 +1,7 @@
 // Stress and performance (PHAK FAA-H-8083-25C ch 2, 17): a little stress sharpens you, too much and performance falls
 // off fast. Illustrative curve, not data. Slider sets the stress level. Static scene.
-import { slider, row } from "./base.js?v=4d40905da2";
-import { pxScene, T, L, P, C, ACC, INK, GRAY } from "./kit.js?v=4d40905da2";
+import { slider, row } from "./base.js?v=eb00616c11";
+import { pxScene, T, L, P, C, ACC, INK, GRAY } from "./kit.js?v=eb00616c11";
 const perf = (s) => Math.exp(-((s - 4.5) ** 2) / 8);
 export function mount(host) {
   let st = 2;

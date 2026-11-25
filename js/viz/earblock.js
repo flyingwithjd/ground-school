@@ -1,8 +1,8 @@
 // Ear block (PHAK FAA-H-8083-25C ch 17; AIM 8-1-2): a simple ear cross-section. Climbing, the middle-ear air vents
 // through the Eustachian tube on its own; descending, higher outside pressure pushes the eardrum in and holds the tube
 // shut; the Valsalva maneuver pushes air up the tube to equalize. Static scene.
-import { chips, row } from "./base.js?v=4d40905da2";
-import { pxScene, T, L, P, C, ACC, INK, GRAY } from "./kit.js?v=4d40905da2";
+import { chips, row } from "./base.js?v=eb00616c11";
+import { pxScene, T, L, P, C, ACC, INK, GRAY } from "./kit.js?v=eb00616c11";
 const M = {
   climb: ["Climbing", "Air escapes on its own", "As you climb, outside pressure drops. The higher pressure in the middle ear vents out through the Eustachian tube, usually without you noticing."],
   desc: ["Descending", "Eardrum pushed in, tube held shut", "Outside pressure rises and pushes the eardrum inward. The lower pressure in the middle ear tends to hold the tube closed, so this is the painful direction. Swallow, yawn or tense your throat early and often."],

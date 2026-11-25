@@ -1,9 +1,9 @@
 // Fact cards (GL17): a clean two-column "signs / what to do" card for topics where a drawing adds little. Chips pick the
 // condition. Sources: PHAK FAA-H-8083-25C ch 17; FAA Aeromedical advisories. HTML scene, no animation.
-import { htmlScene } from "./kit.js?v=4d40905da2";
-import { chips } from "./base.js?v=4d40905da2";
-import { h } from "../core/util.js?v=4d40905da2";
-import { autoTerms } from "../core/rich.js?v=4d40905da2";
+import { htmlScene } from "./kit.js?v=eb00616c11";
+import { chips } from "./base.js?v=eb00616c11";
+import { h } from "../core/util.js?v=eb00616c11";
+import { autoTerms } from "../core/rich.js?v=eb00616c11";
 const SETS = {
   mot: { tl: "Queasy or poisoned?", tr: "PHAK 17", items: [
     ["Motion sickness", ["Nausea, general discomfort", "Dizziness, paleness", "Sweating, vomiting"], ["Open the fresh-air vents", "Look outside at a fixed point", "Avoid unnecessary head movement", "No drowsy medications for pilots"], "Conflicting messages from the inner ear, eyes and body. It usually fades within the first few lessons."],

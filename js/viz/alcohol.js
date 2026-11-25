@@ -1,7 +1,7 @@
 // Bottle to throttle (14 CFR 91.17; AIM 8-1-1; PHAK 17): slide the hours since your last drink and see the legal 8-hour
 // floor against the AIM's 12–24 hours. Pick one drink or several. No blood-alcohol numbers are computed. Static scene.
-import { slider, chips, row } from "./base.js?v=4d40905da2";
-import { pxScene, T, L, R, ACC, INK, GRAY, ACCF } from "./kit.js?v=4d40905da2";
+import { slider, chips, row } from "./base.js?v=eb00616c11";
+import { pxScene, T, L, R, ACC, INK, GRAY, ACCF } from "./kit.js?v=eb00616c11";
 export function mount(host) {
   let hrs = 8, many = true;
   const S = pxScene(host, { cls: "alc", corners: { tl: "Hours since the last drink", tr: "14 CFR 91.17 · AIM 8-1-1" } }, draw);

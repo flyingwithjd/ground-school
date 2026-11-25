@@ -1,7 +1,7 @@
 // VSI lag (PHAK FAA-H-8083-25C ch 8): raise the nose into a 500 fpm climb and watch a conventional VSI show the trend at
 // once and settle on the rate after about 6–9 seconds; an IVSI responds almost at once. Illustrative numbers. Static scene.
-import { slider, chips, row } from "./base.js?v=4d40905da2";
-import { pxScene, T, L, C, P, ACC, INK, GRAY } from "./kit.js?v=4d40905da2";
+import { slider, chips, row } from "./base.js?v=eb00616c11";
+import { pxScene, T, L, C, P, ACC, INK, GRAY } from "./kit.js?v=eb00616c11";
 const D = Math.PI / 180, VS = 500, TMAX = 12;
 const real = (t) => VS * (1 - Math.exp(-t / 0.5));
 const ind = (t, tau) => { const a = 0.5, b = tau; return t <= 0 ? 0 : VS * (1 - (b * Math.exp(-t / b) - a * Math.exp(-t / a)) / (b - a)); };

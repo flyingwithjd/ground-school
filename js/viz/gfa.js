@@ -2,8 +2,8 @@
 // east over 18 hours. Pick a layer (flight category, clouds, surface) and slide the forecast hour; your route is checked
 // against the worst conditions along it. Category colors follow the GFA: VFR green, MVFR blue, IFR red, LIFR magenta.
 // Static scene: draws only on change.
-import { slider, chips, row } from "./base.js?v=4d40905da2";
-import { pxScene, T, L, C, P, R, ACC, INK, GRAY } from "./kit.js?v=4d40905da2";
+import { slider, chips, row } from "./base.js?v=eb00616c11";
+import { pxScene, T, L, C, P, R, ACC, INK, GRAY } from "./kit.js?v=eb00616c11";
 const CAT = [["VFR", "#4ADE80"], ["MVFR", "#60A5FA"], ["IFR", "#F87171"], ["LIFR", "#E879F9"]];
 function wx(x, y, t) {   // made-up field: a low centered at (cx, 30) drifting east
   const cx = 22 + 3.4 * t, d = Math.hypot((x - cx) / 1.7, y - 30);

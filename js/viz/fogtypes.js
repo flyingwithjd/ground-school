@@ -1,7 +1,7 @@
 // Fog types, side view (PHAK 12): what makes each one form and what clears it. The process that forms it (cooling, wind,
 // lift) is drawn in blue; the fog is white. Static scene: draws only on change.
-import { chips, row } from "./base.js?v=4d40905da2";
-import { pxScene, T, L, C, P, ACC, INK, GRAY } from "./kit.js?v=4d40905da2";
+import { chips, row } from "./base.js?v=eb00616c11";
+import { pxScene, T, L, C, P, ACC, INK, GRAY } from "./kit.js?v=eb00616c11";
 const FT = {
   rad: ["Radiation fog", "Clear, calm night: the ground cools the air", "On a clear night with little or no wind, the ground radiates its heat away and cools the air touching it to its dew point. The fog pools in low spots. It burns off as the sun warms the ground, and a breeze speeds that up."],
   adv: ["Advection fog", "Moist air blown over a colder surface", "Warm, moist air moves over a colder surface, often onshore along a coast, and is cooled from below. It needs wind, can form day or night and can last for days. Above about 15 kt it tends to lift into low stratus."],
