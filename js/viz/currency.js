@@ -14,6 +14,8 @@ export function mount(host) {
     pax: slider(S.F.ctrl, { label: "3rd-last landing", min: 0, max: 120, step: 1, value: ld, fmt: (v) => v + " days ago", oninput: (v) => { ld = v; S.redraw(); } }),
     addr: slider(S.F.ctrl, { label: "Moved", min: 0, max: 60, step: 1, value: mv, fmt: (v) => v + " days ago", oninput: (v) => { mv = v; S.redraw(); } }),
   };
+  // same label and value widths on all three, so the track never moves when the rule changes
+  for (const k in sl) { const e = sl[k].el; e.querySelector("label").style.minWidth = "9.5em"; e.querySelector("output").style.minWidth = "7.5em"; }
   function show() { for (const k in sl) sl[k].el.style.display = k === mode ? "" : "none"; }
   show();
   function draw(g, W, H, top) {
