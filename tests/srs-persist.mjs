@@ -4,6 +4,10 @@ const { chromium } = require("playwright-core");
 const b = await chromium.launch({ executablePath: "/usr/bin/google-chrome", args: ["--use-gl=angle", "--use-angle=swiftshader", "--enable-unsafe-swiftshader"] });
 const ctx = await b.newContext({ viewport: { width: 1366, height: 1024 } }); const pg = await ctx.newPage(); await pg.addInitScript(() => { try { localStorage.setItem("sqs.access", "1"); } catch (e) {} }); /* entry gate */ 
 const errs = []; pg.on("pageerror", (e) => errs.push(e.message));
+// practice only asks pages the learner has opened, so read GL3's pages first
+const { QUESTIONS, secKey } = await import("../data/index.js");
+const secs = [...new Set(Object.values(QUESTIONS).map(secKey).filter((k) => k && k.startsWith("gl3/")).map((k) => k.slice(4)))];
+for (const sec of secs) { await pg.goto((process.env.BASE || "http://localhost:8765/index.html") + "#/lesson/gl3/" + sec); await pg.waitForTimeout(350); }
 await pg.goto((process.env.BASE || "http://localhost:8765/index.html") + "#/practice/gl3"); await pg.waitForTimeout(1500);
 const startBtn = pg.locator("button", { hasText: /^(Start|Practice ahead)$/ }); if (await startBtn.count()) { await startBtn.first().click(); await pg.waitForTimeout(400); }
 let answered = 0;
