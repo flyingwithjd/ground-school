@@ -35,7 +35,7 @@ const TAGS = {
   G: [["Surface to 1,200 AGL", [GX[0] + 10, Y(600), GZ[1]]], ["Surface to 700 AGL", [APT.E[0] + 4, 0, APT.E[1] + 6]]] };
 const LETTER = { A: [GX[0] + 10, Y(19750), 0], B: [APT.B[0], Y(8000), APT.B[1]], C: [APT.C[0], Y(2600), APT.C[1]], D: [APT.D[0], Y(1300), APT.D[1]], E: [2, Y(13000), 0], G: [-4, Y(600), GZ[1] - 2] };
 export function mount(host) {
-  let sel = "all";
+  let sel = "all"; try { const q = sessionStorage.getItem("air.sel"); if (q && "ABCDEG".includes(q)) sel = q; sessionStorage.removeItem("air.sel"); } catch (e) {}   // a class picked on the chart page
   const AZ = 66;
   const F = frame(host, { cls: "capin as3d", corners: { tl: "Airspace · 3D", tr: "AIM 3-2" } });
   const empty = (THREE) => ({ root: new THREE.Group(), parts: {}, meshes: [], pose() {} });
