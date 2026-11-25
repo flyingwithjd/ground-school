@@ -15,43 +15,46 @@ const IT = {
 };
 export function mount(host) {
   let sel = "B"; try { sessionStorage.setItem("air.sel", sel); } catch (e) {}
-  const S = pxScene(host, { cls: "achart", corners: { tl: "Airspace on a sectional (made up)", tr: "Chart User's Guide" } }, draw);
+  const S = pxScene(host, { cls: "achart", corners: { tl: "Airspace on a chart (made up)", tr: "Chart User's Guide" } }, draw);
   const ch = chips(row(S.F.ctrl), ["B", "C", "D", "E", "G"].map((k) => [k, "Class " + k]), sel, (v) => set(v || sel), { label: "Airspace class" });
   function set(v) { sel = v; ch.set(v); try { sessionStorage.setItem("air.sel", v); } catch (e) {} S.redraw(); }
   function draw(g, W, H, top) {
-    const ph = W < 520, k = Math.min((W - 8) / 100, (H - top - 6) / 58), ox = W / 2 - 50 * k, oy = top + 2;
+    const ph = W < 520, UH = ph ? 82 : 58, k = Math.min((W - 8) / 100, (H - top - 6) / UH), ox = W / 2 - 50 * k, oy = top + 2;
+    // layout in chart units (100 wide): phones get a taller sheet so the Class B shelves have room for their labels
+    const Q = ph ? { B: [36, 31, [9, 17, 25], 33], C: [78, 68, [6, 12]], D: [86, 16, 5.5], E: [33, 70, 4, 8] }
+                 : { B: [26, 29, [7, 13, 19], 27], C: [72, 19, [6, 12]], D: [89, 42, 5.5], E: [54, 41, 4, 8] };
     const m = (x, y) => [ox + x * k, oy + y * k];
     const op = (key) => (sel === key ? 1 : 0.35), bw = (key, w) => (sel === key ? w * 1.9 : w);
     const halo = (e) => { e.setAttribute("stroke", "#000"); e.setAttribute("stroke-width", "4"); e.setAttribute("paint-order", "stroke"); e.setAttribute("stroke-linejoin", "round"); return e; };
-    const lab = (x, y, s, col, key, o = {}) => { const [a, b] = m(x, y); const e = halo(T(g, a, b, s, { size: 11, weight: 600, anchor: "middle", fill: sel === key ? INK : col, ...o })); e.setAttribute("opacity", sel === key ? 1 : 0.55); return e; };
-    const frac = (x, y, c, f, col, key) => { lab(x, y - 1.2, c, col, key); const [a, b] = m(x, y); L(g, a - 9, b, a + 9, b, { stroke: sel === key ? INK : col, w: 1.2, op: sel === key ? 1 : 0.55 }); lab(x, y + 4.2, f, col, key); };
+    const labp = (a, b, s, col, key, o = {}) => { const e = halo(T(g, a, b, s, { size: 11, weight: 600, anchor: "middle", fill: sel === key ? INK : col, ...o })); e.setAttribute("opacity", sel === key ? 1 : 0.55); return e; };
+    const lab = (x, y, s, col, key, o = {}) => { const [a, b] = m(x, y); return labp(a, b, s, col, key, o); };
+    const frac = (x, y, c, f, col, key) => { const [a, b] = m(x, y); labp(a, b - 3, c, col, key); L(g, a - 10, b, a + 10, b, { stroke: sel === key ? INK : col, w: 1.2, op: sel === key ? 1 : 0.55 }); labp(a, b + 12, f, col, key); };
     const apt = (x, y, col, key) => { const [a, b] = m(x, y); C(g, a, b, 6, { stroke: col, sw: 2, op: op(key) }); L(g, a - 3.5, b + 3.5, a + 3.5, b - 3.5, { stroke: col, w: 2.2, op: op(key) }); };
     const ring = (x, y, r, col, key, o = {}) => { const [a, b] = m(x, y); return C(g, a, b, r * k, { stroke: col, sw: bw(key, o.w || 1.5), dash: o.dash, op: op(key) }); };
-    // Mode C veil (30 NM around the Class B primary airport): only its arc on the map
-    ring(26, 30, 27, MAG, "B", { w: 0.8 }); lab(26 + 27 * 0.74, 30 - 27 * 0.62, ph ? "MODE C" : "MODE C 30 NM", MAG, "B", { anchor: "start", dy: -2 });
-    // Class B: three shelves
-    for (const r of [7, 13, 19]) ring(26, 30, r, BLU, "B");
-    apt(26, 30, BLU, "B");
-    const ang = (-140 * Math.PI) / 180;
-    [[4.2, "100", "SFC"], [10, "100", "30"], [16, "100", "60"]].forEach(([r, c, f]) => frac(26 + Math.cos(ang) * r, 30 + Math.sin(ang) * r, c, f, BLU, "B"));
-    lab(26, 30 + 19 + 4.5, "METRO (Class B)", BLU, "B");
+    // Class B with its three shelves, and the 30 NM Mode C veil around it
+    { const [x, y, rs, mc] = Q.B; ring(x, y, mc, MAG, "B", { w: 0.8 }); lab(x + mc * 0.72, y - mc * 0.7, ph ? "MODE C" : "MODE C 30 NM", MAG, "B", { anchor: "start", dy: -2 });
+      rs.forEach((r) => ring(x, y, r, BLU, "B")); apt(x, y, BLU, "B");
+      const ang = Math.PI, mids = [(rs[0] + 2.2) / 2 + 1.4, (rs[0] + rs[1]) / 2, (rs[1] + rs[2]) / 2];
+      [["100", "SFC"], ["100", "30"], ["100", "60"]].forEach(([c, f], i) => { const an = ang + (i - 1) * 0.5; frac(x + Math.cos(an) * mids[i], y + Math.sin(an) * mids[i], c, f, BLU, "B"); });
+      lab(x, y + rs[2] + 4.2, "METRO (B)", BLU, "B"); }
     // Class C
-    ring(72, 20, 6, MAG, "C"); ring(72, 20, 12, MAG, "C"); apt(72, 20, MAG, "C");
-    const a2 = (-40 * Math.PI) / 180; frac(72 + Math.cos(a2) * 3.9 + 0.6, 20 + Math.sin(a2) * 3.9 - 0.4, "40", "SFC", MAG, "C"); frac(72 + Math.cos(a2) * 9.2, 20 + Math.sin(a2) * 9.2, "40", "12", MAG, "C");
-    lab(72, 20 + 12 + 4.5, "BAYPORT (C)", MAG, "C");
+    { const [x, y, rs] = Q.C; rs.forEach((r) => ring(x, y, r, MAG, "C")); apt(x, y, MAG, "C");
+      frac(x, y + (rs[0] + 1.8) / 2 + 0.6, "40", "SFC", MAG, "C"); frac(x, y - (rs[0] + rs[1]) / 2 - 0.6, "40", "12", MAG, "C");
+      lab(x, y + rs[1] + 4.2, "BAYPORT (C)", MAG, "C"); }
     // Class D
-    ring(89, 46, 5.5, BLU, "D", { dash: "7 5" }); apt(89, 46, BLU, "D");
-    { const [a, b] = m(89, 46 - 5.5); const e = halo(T(g, a, b + 4, "[25]", { size: 12, weight: 700, anchor: "middle", fill: sel === "D" ? INK : BLU })); e.setAttribute("opacity", sel === "D" ? 1 : 0.55); }
-    lab(89, 46 + 5.5 + 4.5, "FORT (D)", BLU, "D");
-    // Class E surface area + magenta vignette (700 ft AGL floor inside it)
-    { const [a, b] = m(55, 46); [[10, 0.5], [9.3, 0.3], [8.6, 0.18], [7.9, 0.08]].forEach(([r, o]) => C(g, a, b, r * k, { stroke: MAG, sw: 0.75 * k, op: o * (sel === "E" || sel === "G" ? 1.6 : 0.8) })); }
-    ring(55, 46, 4, MAG, "E", { dash: "6 4" });
-    { const [a, b] = m(55, 46); C(g, a, b, 5, { stroke: MAG, sw: 2, op: op("E") }); }
-    lab(55, 46 + 10 + 3, "ELM (E sfc)", MAG, "E");
-    if (sel === "E") { lab(55 + 7.5, 46 - 9.5, "700 AGL", INK, "E", { anchor: "start" }); lab(4, 6, "1,200 AGL", INK, "E", { anchor: "start" }); }
-    if (sel === "G") { lab(55 + 7.5, 46 - 9.5, "G: SFC–700 AGL", INK, "G", { anchor: ph ? "middle" : "start" }); lab(4, 6, "G: SFC–1,200 AGL", INK, "G", { anchor: "start" }); }
+    { const [x, y, r] = Q.D; ring(x, y, r, BLU, "D", { dash: "7 5" }); apt(x, y, BLU, "D");
+      const [a, b] = m(x, y - r); const e = halo(T(g, a, b - 4, "[25]", { size: 12, weight: 700, anchor: "middle", fill: sel === "D" ? INK : BLU })); e.setAttribute("opacity", sel === "D" ? 1 : 0.55);
+      lab(x, y + r + 4.2, "FORT (D)", BLU, "D"); }
+    // Class E surface area + magenta vignette: Class E from 700 ft AGL inside the shading
+    { const [x, y, r, v] = Q.E, [a, b] = m(x, y), hi = sel === "E" || sel === "G";
+      [[v, 0.45], [v - 0.6, 0.25], [v - 1.2, 0.12]].forEach(([rr, o]) => C(g, a, b, rr * k, { stroke: MAG, sw: 0.6 * k, op: o * (hi ? 1.5 : 0.7) }));
+      ring(x, y, r, MAG, "E", { dash: "6 4" }); C(g, a, b, 5, { stroke: MAG, sw: 2, op: op("E") });
+      lab(x, y + v + 4, "ELM (E)", MAG, "E");
+      const tl = [4, ph ? 4.5 : 6];
+      if (sel === "E") { lab(x + v * 0.75, y - v - 1.5, "700 AGL", INK, "E", { anchor: "start" }); lab(tl[0], tl[1], ph ? "E from 1,200 AGL" : "elsewhere: E from 1,200 AGL", INK, "E", { anchor: "start" }); }
+      if (sel === "G") { lab(x + v * 0.75, y - v - 1.5, "G: SFC–700 AGL", INK, "G", { anchor: "start" }); lab(tl[0], tl[1], ph ? "G: SFC–1,200 AGL" : "elsewhere: G from SFC to 1,200 AGL", INK, "G", { anchor: "start" }); } }
     // taps
-    const taps = [["B", 26, 30, 19], ["C", 72, 20, 12], ["D", 89, 46, 5.5], ["E", 55, 46, 9]];
+    const taps = [["B", Q.B[0], Q.B[1], Q.B[2][2]], ["C", Q.C[0], Q.C[1], 12], ["D", Q.D[0], Q.D[1], Q.D[2]], ["E", Q.E[0], Q.E[1], Q.E[3]]];
     for (const [key, x, y, r] of taps) { const [a, b] = m(x, y); const d = C(g, a, b, Math.max(16, r * k), { fill: "rgba(0,0,0,0)" }); d.style.pointerEvents = "all"; hit(g, d, IT[key][0], () => set(key)); }
     const it = IT[sel];
     S.F.caption(it[1], it[0]);
