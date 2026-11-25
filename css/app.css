@@ -1066,3 +1066,6 @@ html.locked #gate { display: flex; }
 .xcp-data { min-height: calc(5 * 1.55em + 22px); }
 .xcp .wg-q { min-height: 2lh; }
 @media (max-width: 700px) { .xcp-data { min-height: calc(8 * 1.55em + 22px); } }
+.viz.px.fprof .stage { aspect-ratio: 16 / 7.4; }
+@media (max-width: 700px) { .viz.px.fprof .stage { aspect-ratio: 4 / 2.9; } }
+.fp-steps { margin: 4px 0 10px; padding-left: 1.4em; } .fp-steps li { margin: 4px 0; }
