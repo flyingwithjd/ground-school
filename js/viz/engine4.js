@@ -16,9 +16,9 @@ import { T, L, INK, GRAY, DIM } from "./kit.js?v=1e426d64e6";
 const { BR, CR, ROD, PIN, XC, BAR, domeX, PLUGS } = CYL, D = Math.PI / 180;
 const STROKES = [
   { k: "Intake", t: "The [[piston]] moves down with the [[intake valve]] open, drawing the fuel-air [[mixture]] into the [[cylinder]].", focus: ["intake"] },
-  { k: "Compression", t: "Both valves are closed. The piston moves back up and squeezes the mixture, so it gives far more power when it burns.", focus: ["piston"] },
-  { k: "Power", t: "Near the top, the [[spark plugs|spark plug]] fire. The burning gas expands and drives the piston down, turning the [[crankshaft]].", focus: ["plug1", "plug2", "piston"] },
-  { k: "Exhaust", t: "The [[exhaust valve]] opens and the rising piston pushes the burned gas out of the cylinder.", focus: ["exhaust"] },
+  { k: "Compression", t: "Both valves are closed. The [[piston]] moves back up and squeezes the [[mixture]], so it gives far more power when it burns.", focus: ["piston"] },
+  { k: "Power", t: "Near the top, the [[spark plugs|spark plug]] fire. The burning gas expands and drives the [[piston]] down, turning the [[crankshaft]].", focus: ["plug1", "plug2", "piston"] },
+  { k: "Exhaust", t: "The [[exhaust valve]] opens and the rising [[piston]] pushes the burned gas out of the [[cylinder]].", focus: ["exhaust"] },
 ];
 const SPEED = 72, SPARK = 340, N = 72, CG = [5, 0, 0];
 // the model is drawn with its cylinder axis along x (head at x < 0); the stage pitches it upright (head up), so world = (5 + y, 5 - x, z)
@@ -101,7 +101,7 @@ export function mount(host) {
   // a term tapped (or hovered) while it runs: hold the picture so the sentence under the finger does not change
   const hold = (e) => { if (e.target.closest && e.target.closest(".gl") && playing) setPlay(false); };
   say.addEventListener("pointerdown", hold); say.addEventListener("mouseover", hold); say.addEventListener("focusin", hold);
-  F.explain(rich(`<p>Blue dots are the fuel-air [[mixture]]; amber is the burning gas, gray the burned gas. One cycle takes two turns of the [[crankshaft]] (720°), and only the power stroke pushes. Each cylinder has two spark plugs, one fired by each [[magneto|magnetos]]. At 2,400 RPM each cylinder fires 20 times a second; in the 172S's four cylinders each is on a different stroke. Simplified: real engines open and close the valves a little before and after each stroke. <span class="src">PHAK 7</span></p>`));
+  F.explain(rich(`<p>Blue dots are the fuel-air [[mixture]]; amber is the burning gas, gray the burned gas. One [[four-stroke cycle]] takes two turns of the [[crankshaft]] (720°), and only the power stroke pushes. Each cylinder has two [[spark plugs|spark plug]], one fired by each [[magneto|magnetos]]. At 2,400 [[RPM]] each cylinder fires 20 times a second; in the 172S's four cylinders each is on a different stroke. Simplified: real engines open and close the valves a little before and after each stroke. <span class="src">PHAK 7</span></p>`));
   scene(); band(); setPlay(playing);
   return { destroy() { S.animate(null); S.destroy(); F.destroy(); } };
 }
