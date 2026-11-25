@@ -35,7 +35,7 @@ export function mount(host) {
     // Class B with its three shelves, and the 30 NM Mode C veil around it
     { const [x, y, rs, mc] = Q.B; ring(x, y, mc, MAG, "B", { w: 0.8 }); lab(x + mc * 0.72, y - mc * 0.7, ph ? "MODE C" : "MODE C 30 NM", MAG, "B", { anchor: "start", dy: -2 });
       rs.forEach((r) => ring(x, y, r, BLU, "B")); apt(x, y, BLU, "B");
-      const ang = Math.PI, mids = [(rs[0] + 2.2) / 2 + 1.4, (rs[0] + rs[1]) / 2, (rs[1] + rs[2]) / 2];
+      const ang = Math.PI, mids = [(rs[0] + 2.2) / 2, (rs[0] + rs[1]) / 2, (rs[1] + rs[2]) / 2];
       [["100", "SFC"], ["100", "30"], ["100", "60"]].forEach(([c, f], i) => { const an = ang + (i - 1) * 0.5; frac(x + Math.cos(an) * mids[i], y + Math.sin(an) * mids[i], c, f, BLU, "B"); });
       lab(x, y + rs[2] + 4.2, "METRO (B)", BLU, "B"); }
     // Class C

@@ -64,7 +64,7 @@ export function mount(host) {
     ctr(14, 24, "H", "1028", "hi", CB, ms); ctr(50, 22, "L", "996", "lo", WR, m);
     // label for the picked symbol, near it
     const LAB = { cold: [44, 50, ms], warm: [80, 36, m], occl: [54, 26, m], stat: [90, 7, ms], trof: [84, 52, ms], iso: [50, 41, m], chance: [82, 27, m], likely: [34, 47, m] };
-    if (LAB[sel]) { const [x, y, f] = LAB[sel], [a, b] = (f === ms ? ms : m)(x, y); const txt = { cold: "cold front", warm: "warm front", occl: "occluded", stat: "stationary", trof: "trough", iso: "isobar", chance: "chance", likely: "likely", hi: "", lo: "" }[sel]; const tw = txt.length * 6.9, anc = a + 12 + tw < W - 4 ? "start" : "end"; halo(T(g, a + (anc === "end" ? -12 : 12), b + (sel === "stat" ? 16 : -10), txt, { size: 11, weight: 700, fill: INK, anchor: anc })); }
+    if (LAB[sel]) { const [x, y, f] = LAB[sel], [a, b] = (f === ms ? ms : m)(x, y); const txt = { cold: "cold front", warm: "warm front", occl: "occluded", stat: "stationary", trof: "trough", iso: "isobar", chance: "chance", likely: "likely", hi: "", lo: "" }[sel]; const tw = txt.length * 6.9, anc = sel === "cold" ? "end" : a + 12 + tw < W - 4 ? "start" : "end"; /* cold: west of the line, away from its triangles */ halo(T(g, a + (anc === "end" ? -12 : 12), b + (sel === "stat" ? 16 : -10), txt, { size: 11, weight: 700, fill: INK, anchor: anc })); }
     for (const [key, e] of taps) hit(g, e, IT[key][0], () => { sel = key; S.redraw(); });
     halo(T(g, 8, top + 14, mode === "prog" ? (ph ? "forecast +12 h" : "forecast, valid in 12 h: fronts moved east") : (ph ? "observed" : "observed now"), { size: 11, fill: GRAY }));
     const it = IT[sel]; S.F.caption(it[1], it[0]);
