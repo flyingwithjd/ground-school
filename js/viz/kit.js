@@ -55,3 +55,15 @@ export function htmlScene(host, { corners = {}, cls = "", explain = "", caption 
 }
 export const wrap = (a, b) => ((a % b) + b) % b;
 export const fmtTime = (m) => { m = wrap(Math.round(m), 1440); return String(Math.floor(m / 60)).padStart(2, "0") + String(m % 60).padStart(2, "0"); };
+// Word-wrap a string into lines of at most n characters.
+export const wrapT = (str, n) => { const out = []; let line = ""; for (const w of String(str).split(" ")) { if ((line + " " + w).trim().length > n && line.trim()) { out.push(line.trim()); line = w; } else line += " " + w; } if (line.trim()) out.push(line.trim()); return out; };
+// Ink-3D block: a near-black front face with white edges, plus a top and right face drawn in oblique projection (depth d).
+// on = the focused part, drawn in blue. Returns the group so callers can make it tappable.
+export const BODY = "#111113";
+export function block(g, x, y, w, hh, d, { on = false, dim = false } = {}) {
+  const gg = s("g", {}, g), st = on ? ACC : dim ? DIM : INK, dx = d, dy = d * 0.6;
+  P(gg, `M${r1(x)},${r1(y)} l${r1(dx)},${r1(-dy)} h${r1(w)} l${r1(-dx)},${r1(dy)} Z`, { stroke: st, w: 1.4, fill: on ? "rgba(59,130,246,.35)" : "#1A1A1D" });
+  P(gg, `M${r1(x + w)},${r1(y)} l${r1(dx)},${r1(-dy)} v${r1(hh)} l${r1(-dx)},${r1(dy)} Z`, { stroke: st, w: 1.4, fill: on ? "rgba(59,130,246,.22)" : "#0C0C0E" });
+  R(gg, x, y, w, hh, { stroke: st, sw: 1.6, fill: on ? ACCF : BODY });
+  return gg;
+}

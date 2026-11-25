@@ -1,0 +1,64 @@
+// Staying legal after the checkride: the flight review (14 CFR 61.56), passenger currency (61.57(a)) and change of address
+// (61.60) on one timeline. Pick a rule, slide the date and see whether you're current today. Static scene.
+import { slider, chips } from "./base.js?v=bcb0f9d34d";
+import { pxScene, T, L, R, ACC, INK, GRAY, DIM, ACCF, ACCM } from "./kit.js?v=bcb0f9d34d";
+const MO = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"];
+const DAY = 864e5, fmtD = (d) => `${MO[d.getMonth()]} ${d.getDate()}, ${d.getFullYear()}`;
+export function mount(host) {
+  const today = new Date(); today.setHours(12, 0, 0, 0);
+  let mode = "fr", fr = 20, ld = 40, mv = 20;
+  const S = pxScene(host, { cls: "tall", corners: { tl: "Are you current today?", tr: "Today " + fmtD(today) } }, draw);
+  chips(S.F.ctrl, [["fr", "Flight review"], ["pax", "Passengers"], ["addr", "New address"]], mode, (v) => { mode = v; show(); S.redraw(); }, { label: "Rule" });
+  const sl = {
+    fr: slider(S.F.ctrl, { label: "Last flight review", min: 0, max: 30, step: 1, value: fr, fmt: (v) => v + " months ago", oninput: (v) => { fr = v; S.redraw(); } }),
+    pax: slider(S.F.ctrl, { label: "3rd most recent landing", min: 0, max: 120, step: 1, value: ld, fmt: (v) => v + " days ago", oninput: (v) => { ld = v; S.redraw(); } }),
+    addr: slider(S.F.ctrl, { label: "You moved", min: 0, max: 60, step: 1, value: mv, fmt: (v) => v + " days ago", oninput: (v) => { mv = v; S.redraw(); } }),
+  };
+  function show() { for (const k in sl) sl[k].el.style.display = k === mode ? "" : "none"; }
+  show();
+  function draw(g, W, H, top) {
+    const ph = W < 520, x0 = 16, x1 = W - 16;
+    let a0, a1, rows, head, big, ex;
+    if (mode === "fr") {
+      const rv = new Date(today.getFullYear(), today.getMonth() - fr, 15), end = new Date(rv.getFullYear(), rv.getMonth() + 25, 0);
+      a0 = new Date(today.getFullYear(), today.getMonth() - 31, 1); a1 = new Date(today.getFullYear(), today.getMonth() + 25, 0);
+      const ok = today <= end;
+      rows = [{ lab: "ACT AS PILOT IN COMMAND", src: "61.56(c)", s: rv, e: end, on: ok, a: "REVIEW " + MO[rv.getMonth()].toUpperCase() + " " + rv.getFullYear(), b: "THRU " + fmtD(end).toUpperCase() }];
+      head = ok ? "Current: you may act as PIC" : "Not current: get a flight review"; big = ok ? "Good through " + fmtD(end) : "Expired " + fmtD(end);
+      ex = `A flight review lasts to the <b>end of the 24th calendar month</b> after the month you did it, not to the same day. It needs 1 hour of ground and 1 hour of flight training with an authorized instructor, who endorses your logbook. A new certificate or rating checkride, or a WINGS phase, counts instead. <span class="src">14 CFR 61.56</span>`;
+    } else if (mode === "pax") {
+      const ls = new Date(+today - ld * DAY), end = new Date(+ls + 90 * DAY);
+      a0 = new Date(+today - 125 * DAY); a1 = new Date(+today + 95 * DAY);
+      const ok = today <= end;
+      rows = [{ lab: "CARRY PASSENGERS BY DAY", src: "61.57(a)", s: ls, e: end, on: ok, a: "3 T/O + 3 LDG", b: "THRU " + fmtD(end).toUpperCase() }];
+      head = ok ? "Current: you may carry passengers" : "Not current: fly 3 takeoffs and landings first"; big = ok ? `${Math.round((end - today) / DAY)} days left` : "No passengers today";
+      ex = `To carry anyone you need <b>3 takeoffs and 3 landings in the preceding 90 days</b>, as sole manipulator, in the same category and class. Touch-and-goes count in a nosewheel airplane; a tailwheel airplane needs full stops. At night (1 hour after sunset to 1 hour before sunrise) the 3 must be full stops made in that period. To get current again, fly them with no passengers, or with an instructor. <span class="src">14 CFR 61.57(a)–(b)</span>`;
+    } else {
+      const mvd = new Date(+today - mv * DAY), end = new Date(+mvd + 30 * DAY);
+      a0 = new Date(+today - 62 * DAY); a1 = new Date(+today + 32 * DAY);
+      const ok = today <= end;
+      rows = [{ lab: "TOLD THE FAA", src: "61.60", s: mvd, e: a1, on: true, a: "MOVED", b: "" },
+        { lab: "HAVEN'T TOLD THE FAA", src: "61.60", s: mvd, e: end, on: ok, a: "MOVED", b: "DAY 30 · " + fmtD(end).toUpperCase() }];
+      head = ok ? "Notify the FAA within 30 days" : "Grounded until you notify the FAA"; big = ok ? `${Math.round((end - today) / DAY)} days to tell the FAA` : "Can't use your certificate";
+      ex = `After a change of permanent mailing address, you may not use your pilot certificate after 30 days unless you've notified the FAA Airman Certification Branch. The rule says in writing; the FAA also takes it online. <span class="src">14 CFR 61.60</span>`;
+    }
+    const X = (d) => x0 + ((d - a0) / (a1 - a0)) * (x1 - x0), y0 = top + 30, rh = ph ? 92 : 100;
+    rows.forEach((r, i) => { const y = y0 + i * rh, xs = Math.max(x0, X(r.s)), xe = Math.min(x1, X(r.e));
+      T(g, x0, y, r.lab, { size: 11, fill: r.on ? INK : GRAY }); T(g, x1, y, r.src, { size: 11, fill: GRAY, anchor: "end" });
+      R(g, x0, y + 12, x1 - x0, 20, { fill: "rgba(242,241,236,.05)", rx: 3 });
+      R(g, xs, y + 12, Math.max(2, xe - xs), 20, { fill: r.on ? ACC : ACCM, rx: 3 });
+      if (r.e < a1) { L(g, xe, y + 6, xe, y + 38, { stroke: INK, w: 1.5 }); if (xe < x1 - 4) R(g, xe, y + 12, x1 - xe, 20, { stroke: DIM, sw: 1, dash: "3 3", rx: 3 }); }
+      T(g, xs, y + 52, r.a, { size: 11, fill: GRAY, anchor: xs > W * 0.6 ? "end" : "start" });
+      if (r.b) T(g, Math.min(x1, xe), y + 70, r.b, { size: 11, fill: r.on ? INK : GRAY, anchor: xe > W * 0.45 ? "end" : "start" });
+    });
+    // today cursor
+    const xt = X(today), yb = y0 + rows.length * rh;
+    L(g, xt, y0 + 6, xt, yb - 20, { stroke: INK, w: 2 }); T(g, xt, yb - 4, "TODAY", { size: 11, anchor: xt > W * 0.7 ? "end" : "middle", fill: INK, weight: 700 });
+    const ok = mode === "addr" ? rows[1].on : rows[0].on;
+    R(g, x0, yb + 14, x1 - x0, 44, { stroke: ok ? ACC : INK, sw: 1.5, fill: ok ? ACCF : "#111113", rx: 6 });
+    T(g, x0 + 14, yb + 41, head, { size: ph ? 14 : 15, fill: ok ? ACC : INK, weight: 700, mono: false });
+    S.F.caption(mode === "fr" ? "Flight review" : mode === "pax" ? "Passenger currency" : "Change of address", big);
+    S.F.explain(ex + ` Currency is the legal minimum; being proficient for today's flight can take more.`);
+  }
+  return { destroy() { S.F.destroy(); } };
+}
