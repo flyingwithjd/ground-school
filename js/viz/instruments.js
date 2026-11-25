@@ -1,6 +1,6 @@
 // The six basic flight instruments grouped by power source. Fail a source and see what you lose.
-import { frame, chips, svg, ACC, FAINT, FAINT2 } from "./base.js?v=0a2a439800";
-import { s } from "../core/util.js?v=0a2a439800";
+import { frame, chips, svg, ACC, FAINT, FAINT2 } from "./base.js?v=664a4e748f";
+import { s } from "../core/util.js?v=664a4e748f";
 const INST = [
   { k: "asi", name: "Airspeed", src: "ps", t: "Pitot and static pressure. Compares ram pressure with static pressure." },
   { k: "ai", name: "Attitude", src: "vac", t: "Vacuum gyro, rigidity in space. Shows pitch and bank against an artificial horizon." },

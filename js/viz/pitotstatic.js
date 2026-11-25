@@ -1,9 +1,9 @@
 // Pitot-static blockage trainer. Pick a failure, then fly a steady climb or descent and watch which gauges go wrong.
 // Each gauge shows what it SHOULD read under it, and turns blue (with an ✗) when it disagrees with the truth.
 // Pressures use ~1 in. Hg per 1,000 ft (PHAK 8) and q = ½ρV²; magnitudes are illustrative of direction and size.
-import { chips, row, loop } from "./base.js?v=0a2a439800";
-import { clamp, h as el } from "../core/util.js?v=0a2a439800";
-import { pxScene, T, L, P, R, C, ACC, INK, GRAY, tw } from "./kit.js?v=0a2a439800";
+import { chips, row, loop } from "./base.js?v=664a4e748f";
+import { clamp, h as el } from "../core/util.js?v=664a4e748f";
+import { pxScene, T, L, P, R, C, ACC, INK, GRAY, tw } from "./kit.js?v=664a4e748f";
 const CASES = {
   ok: ["Normal", "All three instruments read correctly. Pick a failure to see what changes."],
   pitot: ["Pitot blocked, drain open", "Ram air can't enter and the air in the line leaks out the drain, so the airspeed indicator drops to zero. The altimeter and VSI still work because they use only static pressure."],
