@@ -1,14 +1,16 @@
-import { h, esc, pct, fmtDue, toast, download, shuffle } from "../core/util.js?v=680d64f417";
-import { S, save, exportJSON, importJSON, reset } from "../core/store.js?v=680d64f417";
-import { get } from "../core/srs.js?v=680d64f417";
-import { STAGES, MODULES, STAGE_CHECK, SUBJECTS } from "../../data/course.js?v=680d64f417";
-import { LESSONS, QUESTIONS, TOPICS, ORDER, lessonItems } from "../../data/index.js?v=680d64f417";
-import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone, blindList, onlyReached } from "../core/progress.js?v=680d64f417";
-import { session, practiceSet } from "./quiz.js?v=680d64f417";
-import { nextStep, pagesOf, pageIndex, pageIds, pageStats } from "../core/flow.js?v=680d64f417";
-import { blindPages, blindLesson } from "./blindlesson.js?v=680d64f417";
-import { G, rich } from "../core/rich.js?v=680d64f417";
-import { T5 } from "../core/today.js?v=680d64f417";
+import { h, esc, pct, fmtDue, toast, download, shuffle } from "../core/util.js?v=27c70f9d2b";
+import { S, save, exportJSON, importJSON, reset } from "../core/store.js?v=27c70f9d2b";
+import { get } from "../core/srs.js?v=27c70f9d2b";
+import { STAGES, MODULES, STAGE_CHECK, SUBJECTS } from "../../data/course.js?v=27c70f9d2b";
+import { LESSONS, QUESTIONS, TOPICS, ORDER, lessonItems } from "../../data/index.js?v=27c70f9d2b";
+import { stats, lessonStats, classify, topicList, dueIds, nextDue, nextLesson, weakest, buildQueue, lessonDone, blindList, onlyReached } from "../core/progress.js?v=27c70f9d2b";
+import { session, practiceSet } from "./quiz.js?v=27c70f9d2b";
+import { nextStep, pagesOf, pageIndex, pageIds, pageStats } from "../core/flow.js?v=27c70f9d2b";
+import { blindPages, blindLesson } from "./blindlesson.js?v=27c70f9d2b";
+import { G, rich } from "../core/rich.js?v=27c70f9d2b";
+import { T5, dayKey } from "../core/today.js?v=27c70f9d2b";
+import { reachedSet } from "../core/progress.js?v=27c70f9d2b";
+import { mountViz } from "../viz/index.js?v=27c70f9d2b";
 const page = (host) => { const p = h("div", { class: "page" }); host.append(p); return p; };
 const meter = (x, big) => `<div class="meter${big ? " big" : ""}"><i style="width:${Math.round(x * 100)}%"></i></div>`;
 const stageLessons = (s) => [...s.ground, ...s.flight].flatMap((id) => [id, ...((LESSONS[id] && LESSONS[id].includes) || [])]);
@@ -88,7 +90,22 @@ function todayCard() { const q = todayQueue(), n = T5.count(), done = T5.done();
   <h2>${done ? "Done for today" : n ? `${Math.min(n, T5.GOAL)} of ${T5.GOAL} answered` : "Five questions, about 3 minutes"}</h2>
   <p>${done ? "Nice work. Anything more today is a bonus; the schedule keeps track either way." : "Blind spots and due reviews first, then new questions from pages you've read."}</p>${dots}
   <div class="btns mt">${q.length ? `<a class="btn ${done ? "ghost" : "pri"} arrow" id="today-go" href="#/today">${done ? "Five more" : n ? "Keep going" : "Start Today's 5"}</a>` : ""}</div>`;
+  const slot = h("div", { class: "t5-sod" }); c.append(slot);
+  scenOfDay().then((d) => { if (!d || !slot.isConnected) return; const ok = T5.sodDone();
+    slot.innerHTML = `<span class="label">Scenario of the day</span><div class="t5-sod-row"><div><b>${esc(d.s.t)}</b><small>${esc(d.lt)} · two decisions</small></div><a class="btn ${ok ? "ghost" : ""} arrow" id="sod-go" href="#/scenario">${ok ? "Done · again" : "Try it"}</a></div>`; });
   return c; }
+// Scenario of the day: one scenario card per day, picked from lessons you've opened (any lesson if none yet). Same pick all day.
+async function scenOfDay() { const { SCEN } = await import("../../data/scenarios.js?v=27c70f9d2b");
+  const R = reachedSet(), seen = new Set([...R].map((k) => k.split("/")[0]));
+  let pool = Object.entries(SCEN).filter(([l]) => seen.has(l)); if (!pool.length) pool = Object.entries(SCEN);
+  const all = pool.flatMap(([l, a]) => a.map((s) => ({ l, s }))); if (!all.length) return null;
+  let x = 0; for (const ch of dayKey()) x = (x * 31 + ch.charCodeAt(0)) >>> 0;
+  const d = all[x % all.length]; return { ...d, lt: (LESSONS[d.l] && LESSONS[d.l].title) || d.l }; }
+export async function scenario(host) { const p = page(host); const d = await scenOfDay(); if (!d || !p.isConnected) return;
+  p.innerHTML = `<section class="hero"><span class="label">Scenario of the day</span><h1>${esc(d.s.t)}</h1><p>From <a href="#/lesson/${d.l}/scn">${esc(d.lt)}</a>. A new one each day, from lessons you've opened.</p></section>`;
+  const vh = h("div", { class: "sod-viz" }); p.append(vh);
+  mountViz(vh, { type: "scenario", opts: { set: d.l, only: d.s.id, onDone: () => T5.sodMark() } });
+  const b = h("div", { class: "btns mt" }); b.innerHTML = `<a class="btn ghost arrow" href="#/">Back to Now</a> <a class="btn ghost arrow" href="#/lesson/${d.l}/scn">More scenarios from this lesson</a>`; p.append(b); }
 export function today(host) { const q = todayQueue();
   if (!q.length) { const p = page(host); p.innerHTML = `<section class="hero"><span class="label">Today's 5</span><h1>Nothing to ask yet</h1><p>Read a lesson page first. Today's 5 only asks about pages you've opened.</p><div class="btns mt"><a class="btn pri arrow" href="#/">Back to Now</a></div></section>`; return; }
   return runSession(host, { queue: q, mode: "learn", title: "Today's 5", label: "Today's 5", onAnswer: () => T5.answered(), onExit: () => (location.hash = "#/") }); }
@@ -189,7 +206,7 @@ export function tools(host) { const p = page(host); const sims = S().sims || [];
   <a class="cell" href="#/lesson/vs1"><span class="label">V-speeds · POH Sec 2</span><h3>What V<sub>FE</sub>, V<sub>NO</sub> and V<sub>Y</sub> mean</h3><p>Every V-speed on the 172S airspeed indicator and the ones that are not on it. Tap a speed to light up its arc or line.</p><span class="go btn arrow">Open</span></a>
   <a class="cell" href="#/glossary"><span class="label">Glossary</span><h3>${Object.keys(G).length} terms</h3><p>Every underlined term in a lesson opens its definition. Browse or search them all here.</p><span class="go btn arrow">Open</span></a>
   <a class="cell" href="#/settings"><span class="label">Progress and settings</span><h3>Your data stays here</h3><p>Progress is saved only in this browser. Export it to a file to move devices or keep a backup.</p><span class="go btn arrow">Open</span></a></div>${foot()}`; }
-export { sim, check } from "./checks.js?v=680d64f417";
+export { sim, check } from "./checks.js?v=27c70f9d2b";
 export function glossary(host, focus) { const p = page(host); const keys = Object.keys(G).sort(); const slug = (k) => k.replace(/\s+/g, "-");
   p.innerHTML = `<section class="hero"><span class="label">Glossary</span><h1>Terms, plainly</h1><p>Every underlined term in a lesson opens its definition. Airspeed symbols like V<sub>FE</sub> are explained with the dial in <a href="#/lesson/vs1">V-speeds</a>.</p></section>`;
   const inp = h("input", { type: "search", placeholder: "Search terms", "aria-label": "Search terms" }); p.append(h("div", { class: "field", style: "max-width:28rem" }, inp)); const list = h("div", { class: "mt" }); p.append(list);
@@ -217,4 +234,4 @@ export function about(host) { const p = page(host);
   <p>Citations name the chapter, section or regulation. Procedures are marked to confirm with your instructor and your aircraft's POH, because flight schools and airplanes differ.</p>
   <h4>Software and fonts</h4><ul><li>three.js r181, MIT License</li><li>GSAP 3.14, GreenSock Standard "No Charge" License (vendored, not loaded in this build)</li><li>Inter and IBM Plex Mono, SIL Open Font License 1.1</li></ul><p>License texts are in the LICENSES folder.</p>
   <h4>Not affiliated</h4><p>Squawk School is an independent study aid. Not affiliated with or endorsed by the FAA or Textron Aviation. Cessna and Skyhawk are trademarks of their owner.</p></div>`; }
-export { coverage, presolo } from "./checks.js?v=680d64f417";
+export { coverage, presolo } from "./checks.js?v=27c70f9d2b";

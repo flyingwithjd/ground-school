@@ -1,5 +1,6 @@
 // Today's 5 and the study plan (P1d, Nov 2026). Its own localStorage key, so ppg.v1 (progress) is never touched:
-// sqs.today = { plan: { goal, mins, test }, days: { "YYYY-MM-DD": answered }, off: false }.
+// sqs.today = { plan: { goal, mins, test }, days: { "YYYY-MM-DD": answered }, sod: { "YYYY-MM-DD": 1 }, off: false }.
+// sod marks the days the scenario of the day was finished.
 // The streak is quiet: dots for the last 7 days, one missed day a week is forgiven (a freeze), and no guilt messages.
 const KEY = "sqs.today", GOAL = 5;
 let st = load();
@@ -23,5 +24,7 @@ export const T5 = {
   streak() { let n = 0, miss = [], i = this.done() ? 0 : 1;
     for (; i < 400; i++) { if (this.done(back(i))) { n++; continue; } miss = miss.filter((m) => i - m < 7); if (miss.length) break; miss.push(i); if (!this.done(back(i + 1))) break; }
     return n; },
+  sodDone(d = new Date()) { return !!(st.sod && st.sod[dayKey(d)]); },
+  sodMark() { st.sod = st.sod || {}; st.sod[dayKey()] = 1; const ks = Object.keys(st.sod).sort(); if (ks.length > 60) ks.slice(0, ks.length - 60).forEach((x) => delete st.sod[x]); save(); },
   daysToTest() { const t = st.plan && st.plan.test; if (!t) return null; const [y, m, d] = t.split("-").map(Number); const td = new Date(y, m - 1, d, 12); return Math.round((td - back(0)) / 864e5); },
 };

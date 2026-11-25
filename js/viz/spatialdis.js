@@ -1,7 +1,7 @@
 // Spatial disorientation (PHAK FAA-H-8083-25C ch 17; AIM 8-1-5): what the airplane is really doing beside what your
 // inner ear tells you, for four vestibular illusions, with the wrong reaction and the fix. Static scene.
-import { chips, row } from "./base.js?v=680d64f417";
-import { pxScene, T, L, C, P, ACC, INK, GRAY } from "./kit.js?v=680d64f417";
+import { chips, row } from "./base.js?v=27c70f9d2b";
+import { pxScene, T, L, C, P, ACC, INK, GRAY } from "./kit.js?v=27c70f9d2b";
 const D = Math.PI / 180;
 // view: "rear" (bank) or "side" (pitch). real/felt: angle in degrees (+ = right wing down, or nose up). note: small tag under the panel.
 const IL = {

@@ -1,8 +1,8 @@
 // Takeoff and landing profiles (AFH FAA-H-8083-3C ch 6, 9; ACS PA.IV): a side view, not to scale, of the normal, short-field
 // and soft-field takeoff or landing. Numbered points on the path match the numbered steps under the visual; the focused
 // technique's path is blue. Speeds are named, never numbered: use your airplane's POH. Static scene.
-import { chips, row } from "./base.js?v=680d64f417";
-import { pxScene, T, L, C, P, R, ACC, INK, GRAY } from "./kit.js?v=680d64f417";
+import { chips, row } from "./base.js?v=27c70f9d2b";
+import { pxScene, T, L, C, P, R, ACC, INK, GRAY } from "./kit.js?v=27c70f9d2b";
 const STEPS = {
   "to-normal": ["Normal takeoff", "Line up on the centerline, add full power smoothly, check the engine gauges and airspeed alive, and hold right rudder.", "At the POH rotation speed, raise the nose to the liftoff attitude and let the airplane fly off.", "Pitch for V<sub>Y</sub> and hold it, +10/−5 kt on the test, with wind-drift correction.", "Climb straight ahead to a safe altitude, then follow the departure or pattern."],
   "to-short": ["Short-field takeoff", "Use every foot: start at the very beginning of the runway, flaps as the POH says, hold the brakes, full power, then release.", "Rotate at the POH speed. Don't pull the airplane off early.", "Climb at V<sub>X</sub>, +10/−5 kt, until the obstacle is cleared or you're 50 ft up.", "Then lower the nose to V<sub>Y</sub>, +10/−5 kt, and clean up the flaps as the POH says."],

@@ -11,12 +11,12 @@
 //    tops of the pedals.
 // Coordinates are the model's (x forward, y up, z right; firewall x 3.62 = FS 0, mains x -1.22, track 4.1 ft each side).
 // Exact routing of wires and lines is schematic; locations of the parts follow the POH.
-import { chips } from "./base.js?v=680d64f417";
-import { tags3d } from "./tags3d.js?v=680d64f417";
-import { glowSprite, lightPulse, landingBeam } from "./lightglow.js?v=680d64f417";
-import { buildPitot } from "./pitot3d.js?v=680d64f417";
-import { rich } from "../core/rich.js?v=680d64f417";
-import { h } from "../core/util.js?v=680d64f417";
+import { chips } from "./base.js?v=27c70f9d2b";
+import { tags3d } from "./tags3d.js?v=27c70f9d2b";
+import { glowSprite, lightPulse, landingBeam } from "./lightglow.js?v=27c70f9d2b";
+import { buildPitot } from "./pitot3d.js?v=27c70f9d2b";
+import { rich } from "../core/rich.js?v=27c70f9d2b";
+import { h } from "../core/util.js?v=27c70f9d2b";
 const ACC = 0x3b82f6, XM = -1.22, WZ = -4.1;
 export function systems(S, F, { cowl, animatePose, setPoseNow }) {
   const THREE = S.THREE, G = S.cueGroup, groups = { elec: new THREE.Group(), brk: new THREE.Group(), brkLine: new THREE.Group(), pedals: new THREE.Group() };

@@ -1090,3 +1090,7 @@ html.locked #gate { display: flex; }
 .viz.scen .sc-opt.picked { opacity: 1; box-shadow: 0 0 0 2px var(--acc) inset; } .viz.scen .sc-opt.picked.no { box-shadow: 0 0 0 2px #ef4444 inset; border-color: #ef4444; } .viz.scen .sc-opt.picked.ok { box-shadow: 0 0 0 2px #fbbf24 inset; border-color: #fbbf24; }
 .viz.scen .sc-out:empty { display: none; } .viz.scen .sc-out { border-top: 1px solid var(--line); padding-top: 12px; } .viz.scen .sc-out h4 { font: 800 20px/1.2 var(--sans); margin: 0 0 6px; } .viz.scen .sc-out h4.acc { color: var(--acc); }
 .viz.scen .sc-out p { margin: 6px 0; font-size: 15px; line-height: 1.5; } .viz.scen .sc-deb { font-weight: 600; } .viz.scen .sc-next { margin-top: 8px; }
+.t5-sod:empty { display: none; } .t5-sod { margin-top: 16px; padding-top: 14px; border-top: 1px solid var(--line); }
+.t5-sod-row { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin-top: 8px; flex-wrap: wrap; }
+.t5-sod-row b { display: block; font-size: 17px; } .t5-sod-row small { display: block; color: var(--ink2); font-size: 14px; margin-top: 2px; }
+.viz.scen .ctrl:empty { display: none; } .sod-viz { margin-top: 8px; }
