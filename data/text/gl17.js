@@ -51,6 +51,7 @@ export default {
       body: `<p><strong>Hyperventilation</strong> is an excessive rate and depth of breathing that blows off too much carbon dioxide. It happens to pilots more often than people think, usually from stress or anxiety, and it can even lead to unconsciousness. <span class="src">PHAK 17</span></p>
 <p>Its symptoms (lightheadedness, tingling, visual impairment) look a lot like hypoxia. So if you're using oxygen, <strong>first check the oxygen equipment and flow rate</strong>. <span class="src">PHAK 17</span></p>
 <p><strong>Treatment</strong>: slow the breathing rate, for example by talking aloud, or by breathing into a paper bag. Recovery is usually rapid once breathing returns to normal. <span class="src">PHAK 17</span></p>`,
+      viz: { type: "hypervent" },
       kdr: { k: "Cause, symptoms and treatment of hyperventilation.", d: "Tell hyperventilation from hypoxia and treat it.", r: "Misdiagnosis.", codes: ["PA.I.H.K1b"] } },
 
     { id: "ears", label: "Ears and sinuses · PHAK 17 · AIM 8-1-2", title: "Trapped gas: ears and sinuses",
@@ -71,6 +72,7 @@ export default {
 <li><strong>Inversion</strong>: an abrupt change from climb to level feels like tumbling backward, so you push nose-low.</li>
 <li><strong>Elevator</strong>: an updraft feels like a climb, so you push nose-low; a downdraft does the opposite.</li></ul>
 <p>Your <strong>postural</strong> ("seat of the pants") sense, from skin, joints and muscles, works with your eyes and inner ear. But in uncoordinated turns, climbing turns and turbulence, acceleration forces overpower gravity and it gives false signals too. <span class="src">PHAK 17</span></p>`,
+      viz: { type: "spatialdis" },
       body2: `<p><strong>Coping</strong> (PHAK's list, shortened): understand the illusions and try them in a device; get and understand weather briefings; get instrument training before flying in marginal visibility (less than 3 miles) or without a horizon; don't fly into bad weather, dusk or darkness unless proficient on instruments; use only reliable, fixed outside references; avoid sudden head movements in takeoffs, turns and approaches; be rested and fed, since illness, medication, alcohol, fatigue and mild hypoxia all increase susceptibility; and above all, <strong>trust the instruments</strong>. <span class="src">PHAK 17</span></p>`,
       kdr: { k: "Vestibular illusions and how to cope.", d: "Name the illusion and the correct response.", r: "Continued VFR into IMC; head movements in turns.", codes: ["PA.I.H.K1d", "PA.I.H.R3"] } },
 

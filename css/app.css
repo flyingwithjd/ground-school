@@ -1078,3 +1078,6 @@ html.locked #gate { display: flex; }
 @media (max-width: 700px) { .viz.px.attind .stage { aspect-ratio: 4 / 3.4; } }
 .viz.px.t180 .stage { aspect-ratio: 16 / 8.4; }
 @media (max-width: 700px) { .viz.px.t180 .stage { aspect-ratio: 4 / 3.6; } .viz.px.t180 .caption .label, .viz.px.attind .caption .label { display: block; min-height: 2lh; } }
+.viz.px.sdis .stage { aspect-ratio: 16 / 6; } .viz.px.hvx .stage { aspect-ratio: 16 / 5.4; min-height: 230px; } .viz.px.vsil .stage { aspect-ratio: 16 / 6; } .viz.px.tcoord .stage { aspect-ratio: 16 / 6.5; }
+@media (max-width: 700px) { .viz.px.sdis .stage { aspect-ratio: 4 / 3.2; } .viz.px.hvx .stage { aspect-ratio: 4 / 3.6; } .viz.px.vsil .stage { aspect-ratio: 4 / 2.9; } .viz.px.tcoord .stage { aspect-ratio: 4 / 3.4; }
+  .viz.px.sdis .caption .label, .viz.px.hvx .caption .label, .viz.px.vsil .caption .label, .viz.px.tcoord .caption .label { display: block; min-height: 2lh; } }

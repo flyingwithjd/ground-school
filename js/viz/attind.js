@@ -1,8 +1,8 @@
 // Attitude indicator (PHAK 8; FAA-H-8083-15B Instrument Flying Handbook ch 4–6). drawAI() is shared with other visuals.
 // Modes: "ai" (GL13) pitch and bank sliders with the bank scale read out; "unusual" (FL11) nose-high and nose-low unusual
 // attitudes with the recovery steps in order. Sky blue and ground brown are kept: the color is the information. Static scene.
-import { slider, chips, row } from "./base.js?v=179674840b";
-import { pxScene, T, L, C, P, ACC, INK, GRAY } from "./kit.js?v=179674840b";
+import { slider, chips, row } from "./base.js?v=fa1f959704";
+import { pxScene, T, L, C, P, ACC, INK, GRAY } from "./kit.js?v=fa1f959704";
 const D = Math.PI / 180;
 let uid = 0;
 export function drawAI(g, cx, cy, r, pitch, bank) {
@@ -38,7 +38,7 @@ export function mount(host, opts = {}) {
     const cx = mode === "ai" || ph ? W / 2 : W * 0.3, cy = top + avail / 2 + 4;
     if (mode === "ai") { drawAI(g, cx, cy, r, pitch, bank);
       S.F.caption(bank === 0 && pitch === 0 ? "Wings level, nose on the horizon" : `Pointer on the ${Math.abs(bank)}° mark · ${pitch ? Math.abs(pitch) + "° nose " + (pitch > 0 ? "up" : "down") : "level pitch"}`, bank ? `${Math.abs(bank)}° bank ${bank > 0 ? "right" : "left"}` : pitch ? `${Math.abs(pitch)}° ${pitch > 0 ? "climb" : "descent"} attitude` : "Straight and level");
-      S.F.explain(`The miniature airplane is fixed to the case; the horizon card behind it is held level by a gyro. Bank marks sit at 10°, 20°, 30°, 60° and 90°; the pitch lines are 10° apart here. Read bank from the pointer at the top, not by guessing the horizon's tilt. The AI is the one instrument that shows pitch and bank directly, so it's the center of your scan. <span class="src">PHAK 8 · FAA-H-8083-15B</span>`); return; }
+      S.F.explain(`The miniature airplane is fixed to the case; the horizon card behind it is held level by a gyro. Bank marks sit at 10°, 20°, 30° and 60°; the pitch lines are 10° apart here. Read bank from the pointer at the top, not by guessing the horizon's tilt. The AI is the one instrument that shows pitch and bank directly, so it's the center of your scan. <span class="src">PHAK 8 · FAA-H-8083-15B</span>`); return; }
     const u = UN[un]; drawAI(g, cx, cy, r, u.p, u.b);
     if (!ph) u.steps.forEach((s, i) => { const y = top + 24 + i * 30; C(g, W * 0.56, y - 4, 10, { fill: "#0a0a0a", stroke: i === 0 ? ACC : INK, sw: 1.6 }); T(g, W * 0.56, y, String(i + 1), { size: 11, weight: 700, anchor: "middle" }); T(g, W * 0.56 + 18, y, s, { size: 12, fill: i === 0 ? INK : GRAY }); });
     S.F.caption(`${u.n} and banked · first: ${u.steps[0].toLowerCase()}`, u.n);

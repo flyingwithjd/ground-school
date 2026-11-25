@@ -2,9 +2,9 @@
 // has flown into cloud and turns back the way it came, wings banked no more than 10° as the AFH advises a pilot without
 // instrument training, holding altitude. The slider is time since the turn began; the attitude indicator shows the bank.
 // Rate: 1,091 × tan(bank) ÷ TAS (kt) degrees per second. Static scene.
-import { slider, row } from "./base.js?v=179674840b";
-import { pxScene, T, L, C, P, ACC, INK, GRAY } from "./kit.js?v=179674840b";
-import { drawAI } from "./attind.js?v=179674840b";
+import { slider, row } from "./base.js?v=fa1f959704";
+import { pxScene, T, L, C, P, ACC, INK, GRAY } from "./kit.js?v=fa1f959704";
+import { drawAI } from "./attind.js?v=fa1f959704";
 const D = Math.PI / 180, TAS = 100, BANK = 10, RATE = (1091 * Math.tan(BANK * D)) / TAS, TT = Math.ceil(180 / RATE);
 const halo = (t) => { t.setAttribute("stroke", "#0a0a0a"); t.setAttribute("stroke-width", 3); t.setAttribute("paint-order", "stroke"); return t; };
 

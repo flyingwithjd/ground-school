@@ -11,6 +11,7 @@ export default {
 <li><strong>Groundspeed (GS)</strong>: TAS corrected for wind.</li></ul>
 <p><strong>Markings</strong>: white arc is the flap operating range (bottom V<sub>S0</sub>, top V<sub>FE</sub>); green arc is the normal range (bottom V<sub>S1</sub>, top V<sub>NO</sub>); yellow arc is smooth air only, with caution; red line is V<sub>NE</sub>. Not marked: V<sub>A</sub> (it changes with weight), V<sub>X</sub>, V<sub>Y</sub>, gear speeds. <span class="src">PHAK 8</span></p>
 <div class="btns mt"><a class="btn arrow" href="#/lesson/vs1">V-speeds: what each one means, on the dial</a></div>`,
+      viz: { type: "asi" },
       kdr: { k: "Pitot-static system; types of airspeed; ASI markings.", d: "Convert IAS to CAS to TAS; read the arcs.", r: "Using IAS for navigation or TAS for stall speed.", codes: ["PA.I.G.K1h"] } },
     { id: "alt", label: "Altimeter · PHAK 8 · 14 CFR 91.121", title: "High to low, look out below",
       body: `<p>The altimeter is an aneroid barometer: sealed wafers expand as static pressure drops in a climb. It assumes the standard atmosphere, so it's only right when the setting and temperature match. <span class="src">PHAK 8</span></p>
@@ -22,6 +23,7 @@ export default {
     { id: "vsi", label: "VSI · PHAK 8", title: "Trend first, rate later",
       body: `<p>The VSI compares current static pressure with pressure in its case, which leaks through a <strong>calibrated leak</strong>. It shows <strong>trend</strong> right away (the needle's direction) and a stable <strong>rate</strong> after a lag of about 6–9 seconds. Rough control or turbulence makes the lag longer. An instantaneous VSI (IVSI) uses accelerometers to cut the lag. <span class="src">PHAK 8</span></p>
 <p><strong>Check</strong>: near zero on the ramp and before takeoff. If it sits slightly off zero, use that reading as zero. <span class="src">PHAK 8</span></p>`,
+      viz: { type: "vsilag" },
       kdr: { k: "VSI operation and lag.", d: "Use the VSI for trend; hold attitude while the rate settles.", r: "Chasing the VSI.", codes: ["PA.I.G.K1h"] } },
     { id: "block", label: "Blockages · PHAK 8 · C172S POH", title: "When a hole gets plugged",
       body: `<p>Wrong readings almost always mean a blockage: ice, water, dirt or insects. A blocked pitot affects only the airspeed; a blocked static port affects all three. <span class="src">PHAK 8</span></p>
@@ -42,12 +44,14 @@ export default {
       body: `<p>The <strong>turn coordinator</strong>'s gyro is canted, so it shows <strong>roll rate</strong> first and then <strong>rate of turn</strong>. It doesn't show bank angle or pitch. Lining the miniature airplane's wing up with the mark gives a <strong>standard-rate turn, 3° per second</strong> (360° in 2 minutes). The older turn-and-slip indicator shows rate of turn only. <span class="src">PHAK 8</span></p>
 <p>The <strong>inclinometer</strong> is a ball in a curved, liquid-filled tube. "Step on the ball": press the rudder on the side the ball is deflected. In a <strong>slip</strong> the turn rate is too slow for the bank and the ball falls to the inside. In a <strong>skid</strong> the turn rate is too fast and the ball slides to the outside. <span class="src">PHAK 8</span></p>
 <p><strong>Taxi check</strong>: the turn coordinator shows a turn in the correct direction and the ball moves opposite the turn. The tube is full, with no bubbles. <span class="src">PHAK 8</span></p>`,
+      viz: { type: "turncoord" },
       kdr: { k: "Turn coordinator, turn-and-slip, inclinometer.", d: "Fly a standard-rate turn and keep the ball centered.", r: "Skidding turns at low altitude.", codes: ["PA.I.G.K1h"] } },
     { id: "aihi", label: "Attitude and heading · PHAK 8", title: "AI, HI and AHRS",
       body: `<p>The <strong>attitude indicator</strong>'s gyro spins in the horizontal plane; the horizon bar is tied to it and the airplane rotates around it. It shows pitch and bank immediately. Older units can tumble beyond their limits (some around 100–110° of bank and 60–70° of pitch). <span class="src">PHAK 8</span></p>
 <p>The <strong>heading indicator</strong> spins in a vertical plane. It's easier to read than the compass, and has none of the compass's turning errors, but it <strong>drifts</strong>, from friction-caused precession and because the earth turns (up to about 15° per hour). Check it against the compass about every 15 minutes, in straight-and-level unaccelerated flight. <span class="src">PHAK 8</span></p>
 <p>Glass cockpits use an <strong>AHRS</strong> (attitude and heading reference system): solid-state sensors for attitude that don't tumble, with heading from a <strong>magnetometer</strong>. Slaved heading systems such as an HSI with a flux gate generally need no resetting. <span class="src">PHAK 8</span></p>
 <p><strong>Check</strong>: as the gyros spin up, listen for abnormal sounds. While taxiing, headings change in the correct direction and precession is normal. Precession may be faster at idle while vacuum is low. <span class="src">PHAK 8</span></p>`,
+      viz: { type: "attind", opts: { mode: "ai" } },
       kdr: { k: "Attitude and heading indicators; AHRS.", d: "Align the HI with the compass; check gyro instruments while taxiing.", r: "Navigating on an HI that has drifted.", codes: ["PA.I.G.K1h"] } },
     { id: "compass", label: "Magnetic compass · PHAK 8", title: "Variation, deviation and dip",
       body: `<p>The compass is the one direction instrument that needs no power, and 91.205 requires it. It reads correctly only in <strong>straight, level, unaccelerated</strong> flight. <span class="src">PHAK 8 · 14 CFR 91.205(b)</span></p>
