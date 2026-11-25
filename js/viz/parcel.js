@@ -22,15 +22,15 @@ export function mount(host) {
     const tmin = -20, tmax = 32, X = (tc2) => x0 + ((tc2 - tmin) / (tmax - tmin)) * (x1 - x0), Y = (hh) => y0 - (hh / HMAX) * (y0 - y1);
     // axes
     L(g, x0, y0, x1, y0, { stroke: "rgba(242,241,236,.5)", w: 1 }); L(g, x0, y0, x0, y1, { stroke: "rgba(242,241,236,.5)", w: 1 });
-    for (let hh = 0; hh <= HMAX; hh += 2000) { T(g, x0 - 6, Y(hh) + 4, ph ? hh / 1000 + "k" : hh.toLocaleString(), { size: 11, fill: GRAY, anchor: "end" }); if (hh) L(g, x0, Y(hh), x1, Y(hh), { stroke: "rgba(242,241,236,.07)", w: 1 }); }
-    for (const tt of [-20, -10, 0, 10, 20, 30]) T(g, X(tt), y0 + 15, tt + "°", { size: 11, fill: GRAY, anchor: "middle" });
-    T(g, x0 - 6, y0 + 15, "°C", { size: 11, fill: GRAY, anchor: "end" });
+    for (let hh = 0; hh <= HMAX; hh += 2000) { if (hh) T(g, x0 - 6, Y(hh) + 4, ph ? hh / 1000 + "k" : hh.toLocaleString(), { size: 11, fill: GRAY, anchor: "end" }); if (hh) L(g, x0, Y(hh), x1, Y(hh), { stroke: "rgba(242,241,236,.07)", w: 1 }); }
+    for (const tt of [-20, -10, 0, 10, 20, 30]) T(g, X(tt), y0 + 15, tt + " °C", { size: 11, fill: GRAY, anchor: "middle" });
     // environment (white) and parcel path (blue dashed)
     const te = (hh) => T0 - (env * hh) / 1000, tp = (hh) => T0 - (gp * hh) / 1000;
     L(g, X(te(0)), Y(0), X(te(HMAX)), Y(HMAX), { stroke: INK, w: 2 });
     L(g, X(tp(0)), Y(0), X(tp(HMAX)), Y(HMAX), { stroke: ACC, w: 1.6, dash: "6 4" });
     const hl = HMAX * 0.82, envRight = te(hl) >= tp(hl);
-    T(g, X(te(hl)) + (envRight ? 10 : -10), Y(hl) + 4, ph ? "air" : "air around", { size: 11, fill: INK, anchor: envRight ? "start" : "end" });
+    { const s2 = ph ? "air" : "air around", fits = X(te(hl)) + 10 + s2.length * 7.5 < x1, right = envRight && fits;
+      T(g, X(te(hl)) + (right ? 10 : -10), Y(hl) + (right || envRight ? 4 : 4) + (envRight && !fits ? -14 : 0), s2, { size: 11, fill: INK, anchor: right ? "start" : "end" }); }
     T(g, X(tp(hl)) + (envRight ? -10 : 10), Y(hl) + 4, "parcel", { size: 11, fill: ACC, anchor: envRight ? "end" : "start" });
     // the parcel itself, with its temperature difference
     const px = X(tp(h)), py = Y(h), diff = te(h) - tp(h);
