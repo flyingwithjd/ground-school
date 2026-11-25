@@ -1,0 +1,20 @@
+// FL9 · Steep turns (briefing). Phase 2 flight unit, Stage 2. Sources: AFH FAA-H-8083-3C ch 10; PHAK FAA-H-8083-25C ch 5;
+// ACS FAA-S-ACS-6C PA.V.A; generic POH wording.
+const Q = (id, t, sec, q, c, why, src) => ({ id, t, sec, q, c, a: 0, why, src });
+export default {
+  id: "fl9", code: "FL9", stage: 2, kind: "flight", title: "Steep Turns", short: "45° banked 360° turns: load factor, overbanking, back-pressure, power and the rollout",
+  intro: "A steep turn shows you what bank does to load factor and stall speed, and builds smooth, coordinated control at a high workload.",
+  refs: ["AFH Ch 10", "PHAK Ch 5", "Your airplane's POH", "ACS PA.V.A"],
+  topics: { "fl9.forces": "Load factor in a steep turn", "fl9.fly": "Flying the steep turn", "fl9.risk": "Steep turn hazards" },
+  questions: [
+    Q("fl9-01", "fl9.forces", "forces", "In a level 45° banked turn, the load factor is about", ["1.4 G", "1.0 G", "2.0 G", "1.2 G"], "Load factor = 1 ÷ cos(bank). cos 45° ≈ 0.71, so about 1.41 G.", "PHAK 5"),
+    Q("fl9-02", "fl9.forces", "forces", "In a level 60° banked turn, the stall speed is about", ["41% higher than in level flight", "19% higher than in level flight", "The same as in level flight", "Twice the level-flight stall speed"], "At 60° the load factor is 2 G. Stall speed rises with the square root of load factor: √2 ≈ 1.41.", "PHAK 5"),
+    Q("fl9-03", "fl9.forces", "forces", "Why do you need back-pressure to hold altitude in a steep turn?", ["Lift's vertical part must still equal weight", "The elevator works less at high bank", "The engine loses power in a bank", "To make the turn coordinated"], "Banking tilts the lift. To keep its vertical part equal to weight, total lift (angle of attack) must increase.", "PHAK 5 · AFH 10"),
+    Q("fl9-04", "fl9.fly", "fly", "The ACS standard for a private pilot steep turn is about a 45° bank, held within", ["±5°, altitude ±100 ft, airspeed ±10 kt", "±10°, altitude ±200 ft, airspeed ±15 kt", "±5°, altitude ±50 ft, airspeed ±5 kt", "±15°, altitude ±100 ft, airspeed ±20 kt"], "PA.V.A: roll into a coordinated 360° turn at about 45°, maintain bank ±5°, the entry altitude ±100 ft and airspeed ±10 kt, and roll out on the entry heading ±10°.", "ACS PA.V.A"),
+    Q("fl9-05", "fl9.fly", "fly", "The entry airspeed for a steep turn should be", ["The POH's recommended speed, or no more than VA", "Above VNO, for extra energy", "VX, for the best angle", "Any speed in the white arc"], "PA.V.A.S2: the manufacturer's recommended airspeed or, if none, a speed not exceeding VA, the design maneuvering speed.", "ACS PA.V.A"),
+    Q("fl9-06", "fl9.fly", "fly", "To roll out on the entry heading, start the rollout about", ["Half the bank angle before it (about 20°)", "Exactly on the heading", "90° before the heading", "After passing the heading"], "A common rule of thumb is to lead by about half the bank angle, so roughly 20° before the entry heading for a 45° bank.", "AFH 10"),
+    Q("fl9-07", "fl9.risk", "risk", "What is the overbanking tendency?", ["Bank wants to keep increasing in a steep turn", "The airplane rolls level by itself", "The nose yaws toward the outside", "The airplane climbs during the turn"], "In a steep turn the outside wing travels faster and makes more lift than the inside wing, so the bank tends to increase. Hold a little opposite aileron.", "AFH 10 · PHAK 5"),
+    Q("fl9-08", "fl9.risk", "risk", "Losing altitude in a steep turn, you should first", ["Reduce bank, then raise the nose", "Pull harder on the yoke", "Add bank to tighten the turn", "Push the nose down"], "Pulling harder at high bank mostly tightens the turn and can lead to a spiral. Shallow the bank first, then use back-pressure to climb back.", "AFH 10"),
+    Q("fl9-09", "fl9.risk", "risk", "Before a steep turn, you should", ["Clear the area with clearing turns", "Turn off the transponder", "Lower the flaps fully", "Climb to the service ceiling"], "PA.V.A.S1: clear the area. Look for traffic in both directions; you'll cover a full circle.", "ACS PA.V.A · AFH 10"),
+  ],
+};

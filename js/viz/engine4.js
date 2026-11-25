@@ -5,14 +5,14 @@
 // Valve timing is simplified to one valve per stroke (real engines open and close them a little before and after each
 // stroke). Tapping a stroke, dragging the crank or tapping a term pauses; Play resumes. 30 fps cap; no frames when paused,
 // off screen or in a hidden tab; reduced motion starts paused. Fixed camera (no orbit), so a swipe scrolls the page.
-import { frame, chips, row, slider } from "./base.js?v=d4d14c5a28";
-import { planeStage } from "./planestage.js?v=d4d14c5a28";
-import { fitView } from "./section-models.js?v=d4d14c5a28";
-import { cylModel, crownX, CYL } from "./combustion.js?v=d4d14c5a28";
-import { h, s, reduced } from "../core/util.js?v=d4d14c5a28";
-import { rich } from "../core/rich.js?v=d4d14c5a28";
+import { frame, chips, row, slider } from "./base.js?v=0f2c4d5d6f";
+import { planeStage } from "./planestage.js?v=0f2c4d5d6f";
+import { fitView } from "./section-models.js?v=0f2c4d5d6f";
+import { cylModel, crownX, CYL } from "./combustion.js?v=0f2c4d5d6f";
+import { h, s, reduced } from "../core/util.js?v=0f2c4d5d6f";
+import { rich } from "../core/rich.js?v=0f2c4d5d6f";
 import * as THREE from "three";
-import { T, L, INK, GRAY, DIM } from "./kit.js?v=d4d14c5a28";
+import { T, L, INK, GRAY, DIM } from "./kit.js?v=0f2c4d5d6f";
 const { BR, CR, ROD, PIN, XC, BAR, domeX, PLUGS } = CYL, D = Math.PI / 180;
 const STROKES = [
   { k: "Intake", t: "The [[piston]] moves down with the [[intake valve]] open, drawing the fuel-air [[mixture]] into the [[cylinder]].", focus: ["intake"] },

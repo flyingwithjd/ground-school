@@ -1,7 +1,7 @@
 // Cost sharing for a private pilot (14 CFR 61.113(c); FAA legal interpretations on common purpose and holding out):
 // set who's on board and the shareable cost; see the least you may pay. Static scene: redraws on input or resize.
-import { slider, chips } from "./base.js?v=d4d14c5a28";
-import { pxScene, T, R, C, L, P, wrapT, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=d4d14c5a28";
+import { slider, chips } from "./base.js?v=0f2c4d5d6f";
+import { pxScene, T, R, C, L, P, wrapT, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=0f2c4d5d6f";
 export function mount(host) {
   let n = 3, cost = 270, why = "trip";
   const S = pxScene(host, { corners: { tl: "Splitting a flight's cost", tr: "14 CFR 61.113(c)" } }, draw);

@@ -7,9 +7,9 @@
 // gyroscopic attitude indicator for IFR; 91.205(c)(4): a landing light only if operated for hire; 91.213(d): without an
 // MEL, inoperative equipment not otherwise required must be removed or deactivated and placarded "Inoperative". The placard
 // wording here is an example, not a copy of any airplane's placard.
-import { chips, row } from "./base.js?v=d4d14c5a28";
-import { pxScene, T, R, hit, INK, GRAY, DIM, ACC } from "./kit.js?v=d4d14c5a28";
-import { COL } from "./dial.js?v=d4d14c5a28";
+import { chips, row } from "./base.js?v=0f2c4d5d6f";
+import { pxScene, T, R, hit, INK, GRAY, DIM, ACC } from "./kit.js?v=0f2c4d5d6f";
+import { COL } from "./dial.js?v=0f2c4d5d6f";
 const LINES = [
   ["cat", "NORMAL CATEGORY: NO ACROBATIC", "MANEUVERS, INCLUDING SPINS, APPROVED", "Category limits come from Section 2 of your airplane's POH; the placard repeats the key ones."],
   ["kinds", "KINDS OF OPERATION:", "DAY · NIGHT · VFR · IFR", "What the airplane is approved for. Each kind also needs its required equipment installed and working."],
