@@ -1,8 +1,8 @@
 // Airspace as it looks on a sectional chart (FAA Aeronautical Chart User's Guide; AIM 3-2; PHAK 15). A made-up chart:
 // Class B (solid blue shelves), Class C (solid magenta), Class D (dashed blue), Class E surface area (dashed magenta)
 // with a magenta vignette (Class E from 700 ft AGL), and Class G underneath. Chart colors are kept because the color is
-// the information; the class you pick is drawn bold and the others fade. Picking a class also preselects it in the 3D
-// wedding cake on the overview page. Static scene: draws only on change.
+// the information; the class you pick is drawn bold and the others fade. Its link opens the 3D wedding cake on the
+// overview page with the same class lit. Static scene: draws only on change.
 import { chips, row } from "./base.js?v=4e8c88b40f";
 import { pxScene, T, L, C, P, hit, INK, GRAY } from "./kit.js?v=4e8c88b40f";
 const MAG = "#D946EF", BLU = "#60A5FA";
@@ -14,10 +14,11 @@ const IT = {
   G: ["Class G", "No line: whatever lies under Class E", `<strong>Class G has no line</strong>. It's the airspace under the Class E floor: up to <strong>700 ft AGL</strong> inside the magenta shading, up to <strong>1,200 ft AGL</strong> elsewhere, and up to 14,500 ft MSL beyond a blue vignette. No ATC contact is needed, and the VFR weather minimums are lowest here, especially close to the ground.`, "AIM 3-3 · 14 CFR 91.155"],
 };
 export function mount(host) {
-  let sel = "B"; try { sessionStorage.setItem("air.sel", sel); } catch (e) {}
+  let sel = "B";
+  host.addEventListener("click", (e) => { if (e.target.closest && e.target.closest('a[href*="gl10/overview"]')) try { sessionStorage.setItem("air.sel", sel); } catch (x) {} });   // the 3D cake opens on this class
   const S = pxScene(host, { cls: "achart", corners: { tl: "Airspace on a chart (made up)", tr: "Chart User's Guide" } }, draw);
   const ch = chips(row(S.F.ctrl), ["B", "C", "D", "E", "G"].map((k) => [k, "Class " + k]), sel, (v) => set(v || sel), { label: "Airspace class" });
-  function set(v) { sel = v; ch.set(v); try { sessionStorage.setItem("air.sel", v); } catch (e) {} S.redraw(); }
+  function set(v) { sel = v; ch.set(v); S.redraw(); }
   function draw(g, W, H, top) {
     const ph = W < 520, UH = ph ? 82 : 58, k = Math.min((W - 8) / 100, (H - top - 6) / UH), ox = W / 2 - 50 * k, oy = top + 2;
     // layout in chart units (100 wide): phones get a taller sheet so the Class B shelves have room for their labels
@@ -51,8 +52,8 @@ export function mount(host) {
       ring(x, y, r, MAG, "E", { dash: "6 4" }); C(g, a, b, 5, { stroke: MAG, sw: 2, op: op("E") });
       lab(x, y + v + 4, "ELM (E)", MAG, "E");
       const tl = [4, ph ? 4.5 : 6];
-      if (sel === "E") { lab(x + v * 0.75, y - v - 1.5, "700 AGL", INK, "E", { anchor: "start" }); lab(tl[0], tl[1], ph ? "E from 1,200 AGL" : "elsewhere: E from 1,200 AGL", INK, "E", { anchor: "start" }); }
-      if (sel === "G") { lab(x + v * 0.75, y - v - 1.5, "G: SFC–700 AGL", INK, "G", { anchor: "start" }); lab(tl[0], tl[1], ph ? "G: SFC–1,200 AGL" : "elsewhere: G from SFC to 1,200 AGL", INK, "G", { anchor: "start" }); } }
+      if (sel === "E") { lab(ph ? x + v + 1.5 : x + v * 0.75, ph ? y + 1 : y - v - 1.5, "700 AGL", INK, "E", { anchor: "start" }); lab(tl[0], tl[1], ph ? "E from 1,200 AGL" : "elsewhere: E from 1,200 AGL", INK, "E", { anchor: "start" }); }
+      if (sel === "G") { lab(ph ? x + v + 1.5 : x + v * 0.75, ph ? y + 1 : y - v - 1.5, "G: SFC–700 AGL", INK, "G", { anchor: "start" }); lab(tl[0], tl[1], ph ? "G: SFC–1,200 AGL" : "elsewhere: G from SFC to 1,200 AGL", INK, "G", { anchor: "start" }); } }
     // taps
     const taps = [["B", Q.B[0], Q.B[1], Q.B[2][2]], ["C", Q.C[0], Q.C[1], 12], ["D", Q.D[0], Q.D[1], Q.D[2]], ["E", Q.E[0], Q.E[1], Q.E[3]]];
     for (const [key, x, y, r] of taps) { const [a, b] = m(x, y); const d = C(g, a, b, Math.max(16, r * k), { fill: "rgba(0,0,0,0)" }); d.style.pointerEvents = "all"; hit(g, d, IT[key][0], () => set(key)); }

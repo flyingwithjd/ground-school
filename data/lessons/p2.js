@@ -7,6 +7,7 @@ export default {
     gl14: { "gl14.calc": "Time, speed, distance and fuel" },
     gl5: { "gl5.wbgraph": "Loading graph and moment envelope", "gl5.tochart": "Graphical takeoff chart" },
     gl8: { "gl8.fbcalc": "Winds aloft to groundspeed" },
+    gl10: { "gl10.chart": "Airspace on the sectional chart" },
   },
   questions: {
     gl5: [
@@ -31,6 +32,14 @@ export default {
       Q("gl8p-05", "gl8.fbcalc", "fbcalc", "Decode the winds-aloft group \"7832-45\".", ["From 280° at 132 kt, −45 °C", "From 780° at 32 kt, −45 °C", "From 320° at 78 kt, −45 °C", "Light and variable, −45 °C"], "A first pair over 36 means 50 was added to the direction and 100 subtracted from the speed: 78 − 50 = 28 (280°), 32 + 100 = 132 kt.", "PHAK 13"),
       Q("gl8p-06", "gl8.fbcalc", "fbcalc", "Your true course is 090°. The forecast at 9,000 ft is \"2728+03\". At that altitude you will have about", ["A 28 kt tailwind", "A 28 kt headwind", "A 28 kt direct crosswind", "No wind effect at all"], "Wind from 270° blows toward 090°, straight along your course from behind: a tailwind of the full 28 kt.", "PHAK 13"),
       Q("gl8p-07", "gl8.fbcalc", "fbcalc", "The 9,000 ft forecast temperature is +3 °C. Compared with the standard atmosphere, the air there is", ["About 6 °C warmer than standard", "Exactly standard", "About 6 °C colder than standard", "About 12 °C warmer than standard"], "Standard is 15 °C at sea level, about 2 °C cooler per 1,000 ft: 15 − 18 = −3 °C at 9,000 ft. +3 is 6 °C warmer.", "PHAK 13 · PHAK 4"),
+    ],
+    gl10: [
+      // GL10 chart: how each airspace class is drawn on a sectional (Chart User's Guide; AIM 3-2)
+      Q("gl10p-01", "gl10.chart", "chart", "On a sectional chart, solid magenta lines around an airport mark", ["Class C airspace", "Class B airspace", "Class D airspace", "A Class E surface area"], "Solid magenta is Class C. Solid blue is Class B, dashed blue is Class D, and dashed magenta is a Class E surface area.", "Chart User's Guide · AIM 3-2-4"),
+      Q("gl10p-02", "gl10.chart", "chart", "A Class B shelf is labeled 100 over 30. That shelf runs from", ["3,000 to 10,000 ft MSL", "Surface to 3,000 ft MSL", "3,000 to 10,000 ft AGL", "1,000 to 3,000 ft MSL"], "Class B and C labels give the ceiling over the floor in hundreds of feet MSL: 100/30 is 3,000 to 10,000 ft MSL.", "Chart User's Guide"),
+      Q("gl10p-03", "gl10.chart", "chart", "A dashed blue circle around a towered airport, with [25] beside it, is", ["Class D, surface to 2,500 ft MSL", "Class C, surface to 2,500 ft AGL", "Class E, starting at 2,500 ft AGL", "Class B, floor at 2,500 ft MSL"], "Dashed blue is Class D. The boxed number is its ceiling in hundreds of feet MSL.", "Chart User's Guide · AIM 3-2-5"),
+      Q("gl10p-04", "gl10.chart", "chart", "Inside the shaded magenta vignette around a nontowered airport, Class E airspace begins at", ["700 ft AGL", "The surface", "1,200 ft AGL", "14,500 ft MSL"], "Magenta shading means Class E starts at 700 ft AGL. Where nothing is shaded, it usually starts at 1,200 ft AGL. Below that is Class G.", "Chart User's Guide · AIM 3-2-6"),
+      Q("gl10p-05", "gl10.chart", "chart", "You cruise at 2,500 ft MSL beneath a Class B shelf labeled 100/30. To stay where you are you need", ["No Class B clearance, since you're below the shelf", "A Class B clearance, since you're under it", "Two-way radio contact with the tower", "Nothing at all, even inside the Mode C veil"], "Below the 3,000 ft floor you're outside Class B, so no clearance is needed. Inside the 30 NM Mode C veil you still need a transponder with altitude reporting and ADS-B Out.", "AIM 3-2-3 · 14 CFR 91.215"),
     ],
     gl14: [
       Q("gl14p-01", "gl14.calc", "calc", "How long will 135 NM take at a groundspeed of 90 knots?", ["1 hour 30 minutes", "1 hour 15 minutes", "1 hour 45 minutes", "2 hours 5 minutes"], "Time = distance ÷ groundspeed: 135 ÷ 90 = 1.5 hours, which is 1 hour 30 minutes.", "PHAK 16"),
