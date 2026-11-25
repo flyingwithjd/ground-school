@@ -13,8 +13,8 @@ const IT = {
   lo: ["Low pressure", "L · 996 mb at the center", "Air flows in toward a low, counterclockwise in the Northern Hemisphere, and rises. Rising air cools, so lows bring clouds, precipitation and wind. Fronts usually meet at lows."],
   iso: ["Isobars", "Lines of equal pressure, every 4 mb", "Each line joins points of equal sea-level pressure, drawn every 4 mb (…1000, 1004, 1008…). The closer together they are, the steeper the pressure change and the stronger the wind."],
   trof: ["Trough", "Dashed line: a stretched-out low", "An elongated area of relatively low pressure. Air converges and rises along it, so it often brings clouds and showers, even without a front."],
-  chance: ["Chance of precipitation", "Light shading: a chance (25 to under 55%)", "On a prog chart, light shading marks where precipitation has a chance (25 to under 55%) of occurring at the valid time."],
-  likely: ["Precipitation likely", "Dark shading: likely (55% or more)", "Dark shading marks where precipitation is likely (55% or more) at the valid time. Symbols inside show the type, such as rain or thunderstorms."],
+  chance: ["Chance of precipitation", "Pale shading: a chance (25 to under 55%)", "On a prog chart, light green shading (pale here) marks where precipitation has a chance (25 to under 55%) of occurring at the valid time."],
+  likely: ["Precipitation likely", "Solid shading: likely (55% or more)", "Dark green shading (solid here) marks where precipitation is likely (55% or more) at the valid time. Symbols inside show the type, such as rain or thunderstorms."],
 };
 export function mount(host) {
   let mode = "sfc", sel = "cold";
@@ -31,7 +31,7 @@ export function mount(host) {
     if (mode === "prog") {
       const blob = (cx, cy, rx, ry, rot) => { const pts = []; for (let i = 0; i < 24; i++) { const a = (i / 24) * 2 * Math.PI, w = 1 + 0.12 * Math.sin(3 * a); const x = Math.cos(a) * rx * w, y = Math.sin(a) * ry * w; pts.push([cx + x * Math.cos(rot) - y * Math.sin(rot), cy + x * Math.sin(rot) + y * Math.cos(rot)]); } return pts; };
       const lp = blob(70, 30, 20, 9, 0.2), dp = blob(48, 40, 11, 4.5, -1.1);
-      const e1 = P(g, pathD(lp) + " Z", { fill: GR + (on("chance") ? ".32)" : ".18)"), stroke: on("chance") ? INK : "none", w: 1.2 }); taps.push(["chance", e1]);
+      const e1 = P(g, pathD(lp) + " Z", { fill: GR + (on("chance") ? ".2)" : ".1)"), stroke: on("chance") ? INK : GR + ".6)", w: 1.2, dash: "4 3" }); taps.push(["chance", e1]);
       const e2 = P(g, pathD(dp) + " Z", { fill: GR + (on("likely") ? ".7)" : ".5)"), stroke: on("likely") ? INK : "none", w: 1.2 }); taps.push(["likely", e2]);
       for (const [x, y] of [[46, 41], [50, 38]]) { const [a, b] = m(x, y); T(g, a, b + 4, "•", { size: 14, fill: "#052e16", anchor: "middle", mono: false }); }
     }
@@ -39,7 +39,7 @@ export function mount(host) {
     const ring = (cx, cy, r, sq) => { const pts = []; for (let i = 0; i <= 40; i++) { const a = (i / 40) * 2 * Math.PI; pts.push([cx + Math.cos(a) * r * (1 + 0.1 * Math.sin(2 * a + sq)), cy + Math.sin(a) * r * 0.8]); } return pts; };
     const isoCol = on("iso") ? INK : "rgba(242,241,236,.35)", isoW = on("iso") ? 1.6 : 1;
     [[1000, 7], [1004, 13], [1008, 19]].forEach(([p, r], i) => { const pts = ring(50, 22, r, 0.6); const e = P(g, pathD(pts), { stroke: isoCol, w: isoW }); taps.push(["iso", e]); if (!ph || i === 1) { const [a, b] = m(50 - r * 0.2, 22 - r * 0.8); halo(T(g, a, b + 4, String(p), { size: 11, fill: on("iso") ? INK : GRAY, anchor: "middle" })); } });
-    [[1024, 7], [1020, 13]].forEach(([p, r], i) => { const pts = ring(14, 24, r, 2); const e = P(g, pathD(pts, ms), { stroke: isoCol, w: isoW }); taps.push(["iso", e]); if (!ph || i === 0) { const [a, b] = ms(14, 24 + r * 0.8); halo(T(g, a, b + 4, String(p), { size: 11, fill: on("iso") ? INK : GRAY, anchor: "middle" })); } });
+    [[1024, 7], [1020, 13]].forEach(([p, r], i) => { const pts = ring(14, 24, r, 2); const e = P(g, pathD(pts, ms), { stroke: isoCol, w: isoW }); taps.push(["iso", e]); if (!ph || i === 0) { const [a, b] = ms(14, 24 - r * 0.8); halo(T(g, a, b + 4, String(p), { size: 11, fill: on("iso") ? INK : GRAY, anchor: "middle" })); } });
     // fronts with their symbols
     const front = (pts, kinds, side, key, f = m) => {   // kinds: "tri" | "semi" | "alt"; side: +1 / -1 (left/right of travel along pts)
       const sp = pts.map((p) => f(...p)); const col = key === "cold" ? CB : key === "warm" ? WR : key === "occl" ? OC : null, sw = on(key) ? 4 : 2.6;
@@ -51,7 +51,7 @@ export function mount(host) {
           const kind = kinds === "alt" ? (n % 2 ? "tri" : "semi") : kinds === "both" ? (n % 2 ? "tri" : "semi") : kinds;
           const s2 = kinds === "alt" && kind === "semi" ? -1 : 1, c = kinds === "alt" ? (kind === "tri" ? CB : WR) : col;
           if (kind === "tri") P(g, `M${x - ux * sz},${y - uy * sz} L${x + nx * s2 * sz * 1.3},${y + ny * s2 * sz * 1.3} L${x + ux * sz},${y + uy * sz} Z`, { fill: c, stroke: c, w: 1 });
-          else { const r = sz; P(g, `M${x - ux * r},${y - uy * r} A${r},${r} 0 0,${(side * s2) > 0 ? 1 : 0} ${x + ux * r},${y + uy * r} Z`, { fill: c, stroke: c, w: 1 }); } }
+          else { const r = sz; P(g, `M${x - ux * r},${y - uy * r} A${r},${r} 0 0,${(side * s2) > 0 ? 0 : 1} ${x + ux * r},${y + uy * r} Z`, { fill: c, stroke: c, w: 1 }); } }
         acc = (acc + len) % step; }
       const hitp = P(g, "M" + sp.map((p) => p.join(",")).join(" L"), { stroke: "rgba(0,0,0,0)", w: 22 }); hitp.style.pointerEvents = "stroke"; taps.push([key, hitp]);
     };
@@ -67,7 +67,7 @@ export function mount(host) {
     const LAB = { cold: [44, 50, ms], warm: [80, 36, m], occl: [54, 26, m], stat: [80, 7, ms], trof: [84, 52, ms], iso: [50, 41, m], chance: [74, 22, m], likely: [40, 44, m] };
     if (LAB[sel]) { const [x, y, f] = LAB[sel], [a, b] = (f === ms ? ms : m)(x, y); const txt = IT[sel][0].toLowerCase(); const anc = a > W * 0.6 ? "end" : "start"; halo(T(g, a + (anc === "end" ? -12 : 12), b + (sel === "stat" ? 16 : -10), txt, { size: 11, weight: 700, fill: INK, anchor: anc })); }
     for (const [key, e] of taps) hit(g, e, IT[key][0], () => { sel = key; S.redraw(); });
-    T(g, W - 8, H - 6, mode === "prog" ? "valid in 12 h · fronts moved east" : "observed", { size: 11, fill: GRAY, anchor: "end" });
+    halo(T(g, 8, top + 14, mode === "prog" ? (ph ? "forecast +12 h" : "forecast, valid in 12 h: fronts moved east") : (ph ? "observed" : "observed now"), { size: 11, fill: GRAY }));
     const it = IT[sel]; S.F.caption(it[1], it[0]);
     S.F.explain(`${it[2]} Tap any symbol to read it. This chart is made up, never current weather. <span class="src">AWH 25.2, 27.9 · PHAK 12</span>`);
   }

@@ -1039,4 +1039,4 @@ html.locked #gate { display: flex; }
 /* captions whose first line can wrap on phones: hold two lines so the controls below never move */
 @media (max-width: 700px) { .viz.px.toc .caption .label, .viz.px.parcel .caption .label { display: block; min-height: 2lh; } }
 .viz.px.wxc .stage { aspect-ratio: 16 / 9.8; }
-@media (max-width: 700px) { .viz.px.wxc .stage { aspect-ratio: 4 / 3; } }
+@media (max-width: 700px) { .viz.px.wxc .stage { aspect-ratio: 4 / 3.4; } }
