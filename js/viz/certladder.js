@@ -30,7 +30,7 @@ export function mount(host) {
     facts.forEach(([k, v], i) => { const cx = x0 + (i % cols) * cw, yy = cy + 24 + Math.floor(i / cols) * 40;
       T(g, cx, yy, k, { size: 11, fill: GRAY }); T(g, cx, yy + 18, v, { size: ph ? 13 : 14, fill: INK, weight: 600, mono: false }); });
     const ly = cy + 24 + Math.ceil(4 / cols) * 40 + 6, lines = wrapT(c.lim, ph ? Math.floor((W - 32) / 7.2) : Math.floor((W - 32) / 7.6));
-    lines.slice(0, 4).forEach((t, i) => { if (ly + i * 18 < H - 8) T(g, x0, ly + i * 18, t, { size: 13, fill: GRAY, mono: false }); });
+    if (ly + (lines.length - 1) * 18 < H - 8) lines.forEach((t, i) => T(g, x0, ly + i * 18, t, { size: 13, fill: GRAY, mono: false }));
     S.F.caption(c.name, c.pax === "None" ? "No passengers" : c.pax === "1" ? "One passenger" : c.pay.startsWith("Yes") ? "Can be paid to fly" : "Passengers, never for hire");
     S.F.explain(`<b>${c.name}.</b> ${c.lim} ${c.pay.includes("half") ? "You may share costs with your passenger but must pay at least half." : ""} <span class="src">${c.src}</span>`);
   }
