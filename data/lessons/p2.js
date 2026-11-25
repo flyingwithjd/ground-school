@@ -6,6 +6,7 @@ export default {
   topics: {
     gl14: { "gl14.calc": "Time, speed, distance and fuel" },
     gl5: { "gl5.wbgraph": "Loading graph and moment envelope", "gl5.tochart": "Graphical takeoff chart" },
+    gl8: { "gl8.fbcalc": "Winds aloft to groundspeed" },
   },
   questions: {
     gl5: [
@@ -20,6 +21,16 @@ export default {
       Q("gl5p-08", "gl5.tochart", "tochart", "Same airplane, weight, wind and pressure altitude, but the temperature rises from 10 °C to 30 °C. The chart's takeoff distance", ["Increases, because the density altitude is higher", "Decreases, because warm air helps the engine", "Stays the same, since pressure altitude did not change", "Increases only on a grass runway"], "Higher temperature at the same pressure altitude means higher density altitude: less power, less thrust and a higher true airspeed at lift-off, so a longer run.", "PHAK 11"),
       Q("gl5p-09", "gl5.tochart", "tochart", "A takeoff chart labeled \"total distance over a 50 ft obstacle\" gives", ["The ground roll plus the distance to climb to 50 ft", "Only the ground roll to lift-off", "The runway length you need for landing", "The distance from lift-off to 50 ft only"], "The total distance runs from brake release until the airplane is 50 ft above the runway, so it is always longer than the ground roll alone.", "PHAK 11"),
       Q("gl5p-10", "gl5.tochart", "tochart", "The chart says 1,900 ft to clear 50 ft and the runway is 2,200 ft of dry grass. The best reading is", ["Apply the grass correction and a margin first; it may not fit", "It fits with 300 ft to spare", "The chart already includes grass runways", "Charts are conservative, so you can use less"], "Charts assume a paved, level, dry runway, a new airplane and a skilled pilot. Apply the POH's correction for grass, then add a safety margin before you decide.", "PHAK 11 · AFH 5"),
+    ],
+    gl8: [
+      // GL8 pirep (AIM 7-1-18 format) and fbcalc (PHAK 13)
+      Q("gl8p-01", "gl8.pirep", "pirep", "In a PIREP, \"/FL065\" means the report was made at", ["6,500 ft MSL", "6,500 ft AGL", "Flight level 650", "65 ft above the airport"], "PIREP altitudes are in hundreds of feet MSL: 065 is 6,500 ft.", "AIM 7-1-18"),
+      Q("gl8p-02", "gl8.pirep", "pirep", "A PIREP reads \"/SK BKN035-TOP055\". The cloud tops are at", ["5,500 ft MSL", "3,500 ft MSL", "5,500 ft AGL", "2,000 ft above the base"], "Sky cover gives the base, then the top, in hundreds of feet MSL: broken at 3,500 ft, tops 5,500 ft.", "AIM 7-1-18 · AWH"),
+      Q("gl8p-03", "gl8.pirep", "pirep", "Which of these makes a pilot report urgent (UUA) instead of routine (UA)?", ["Severe turbulence", "Light chop below 3,000 ft", "Haze with 5 SM flight visibility", "Scattered clouds based at 4,000 ft"], "Urgent PIREPs cover hazards such as tornadoes, funnel clouds, severe turbulence or icing, hail, low-level wind shear and volcanic ash.", "AWH"),
+      Q("gl8p-04", "gl8.fbcalc", "fbcalc", "The 12,000 ft forecast is \"2742-03\". It means", ["From 270° true at 42 kt, −3 °C", "From 274° true at 2 kt, −3 °C", "From 027° true at 42 kt, 3 °C", "From 270° magnetic at 42 kt, 3 °C"], "First two digits × 10 = direction (true), next two = speed in knots, then the temperature in °C.", "PHAK 13"),
+      Q("gl8p-05", "gl8.fbcalc", "fbcalc", "Decode the winds-aloft group \"7832-45\".", ["From 280° at 132 kt, −45 °C", "From 780° at 32 kt, −45 °C", "From 320° at 78 kt, −45 °C", "Light and variable, −45 °C"], "A first pair over 36 means 50 was added to the direction and 100 subtracted from the speed: 78 − 50 = 28 (280°), 32 + 100 = 132 kt.", "PHAK 13"),
+      Q("gl8p-06", "gl8.fbcalc", "fbcalc", "Your true course is 090°. The forecast at 9,000 ft is \"2728+03\". At that altitude you will have about", ["A 28 kt tailwind", "A 28 kt headwind", "A 28 kt direct crosswind", "No wind effect at all"], "Wind from 270° blows toward 090°, straight along your course from behind: a tailwind of the full 28 kt.", "PHAK 13"),
+      Q("gl8p-07", "gl8.fbcalc", "fbcalc", "The 9,000 ft forecast temperature is +3 °C. Compared with the standard atmosphere, the air there is", ["About 6 °C warmer than standard", "Exactly standard", "About 6 °C colder than standard", "About 12 °C warmer than standard"], "Standard is 15 °C at sea level, about 2 °C cooler per 1,000 ft: 15 − 18 = −3 °C at 9,000 ft. +3 is 6 °C warmer.", "PHAK 13 · PHAK 4"),
     ],
     gl14: [
       Q("gl14p-01", "gl14.calc", "calc", "How long will 135 NM take at a groundspeed of 90 knots?", ["1 hour 30 minutes", "1 hour 15 minutes", "1 hour 45 minutes", "2 hours 5 minutes"], "Time = distance ÷ groundspeed: 135 ÷ 90 = 1.5 hours, which is 1 hour 30 minutes.", "PHAK 16"),

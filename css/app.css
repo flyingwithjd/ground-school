@@ -1024,3 +1024,5 @@ html.locked #gate { display: flex; }
 .viz.px.wbg .stage { aspect-ratio: 16 / 10; }
 @media (max-width: 700px) { .viz.px.wbg .stage { aspect-ratio: 4 / 3.6; } }
 @media (min-width: 640px) { .viz .phone-only { display: none; } }
+.viz.px.fbc .stage { aspect-ratio: 16 / 8; }
+@media (max-width: 700px) { .viz.px.fbc .stage { aspect-ratio: 4 / 3.8; } }
