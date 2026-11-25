@@ -25,7 +25,9 @@ export default {
 <li><strong>LIFR</strong>: ceiling below 500 ft and/or visibility below 1 SM.</li></ul>`,
       kdr: { k: "Explain what radar, satellite and radiosonde observations show, and the flight categories.", d: "Use IR satellite at night and radar for precipitation; treat MVFR as a caution for a new pilot.", r: "Reading a clear radar picture as clear skies.", codes: ["PA.I.C.K2", "PA.I.C.K2a", "PA.I.C.R2b"] } },
     { id: "charts", at: "obs", label: "Charts · AWH 25, 27 · ACS", title: "The big picture on a chart",
-      body: `<p>The <strong>surface analysis chart</strong> is the classic weather map: isobars (every 4 mb), highs and lows, ridges, troughs, and fronts. Pressure is reduced to sea level; everything else is plotted as observed at the station. It's issued for North America eight times a day, every 3 hours from 00 UTC. <span class="src">AWH 25.2</span></p>
+      body: `<p>The <strong>surface analysis chart</strong> is the classic weather map: isobars (every 4 mb), highs and lows, ridges, troughs, and fronts. Pressure is reduced to sea level; everything else is plotted as observed at the station. It's issued for North America eight times a day, every 3 hours from 00 UTC. <span class="src">AWH 25.2</span></p>`,
+      viz: { type: "wxchart" },
+      body2: `
 <p>The ACS also lists the <strong>Ceiling and Visibility Analysis (CVA)</strong>: a map of current ceiling, visibility and flight category, estimated between reporting stations. Treat it as an overview; confirm with the METARs. <span class="src">FAA-S-ACS-6C PA.I.C.K2b</span></p>
 <p><strong>Short-range surface prog charts</strong> are forecasts: snapshots of expected fronts, pressure systems and precipitation at set valid times over several days. Light shading means a <em>chance</em> (25 to under 55%) and dark shading means <em>likely</em> (55% or more). <span class="src">AWH 27.9</span></p>
 <p>For a VFR flight, also look at the <strong>GFA</strong> (clouds, weather, ceilings and visibility, AIRMETs) and the <strong>convective outlook</strong> before you commit. <span class="src">AWH 3 · FAA-S-ACS-6C PA.I.C.K2</span></p>`,
