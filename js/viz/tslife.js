@@ -42,7 +42,7 @@ export function mount(host) {
     dns.forEach((dx, i) => { for (let k = 0; k < 3; k++) { const y = (st === "ma" ? top + hh * 0.25 : base - hh * 0.25) + ((t * 60 + k * span / 3 + i * 29) % (gy - 16 - (st === "ma" ? top + hh * 0.25 : base - hh * 0.25))); arrowDn(cx + dx * wd, y, INK); } });
     if (st === "ma") { for (const s2 of [-1, 1]) { const x = cx + 37 * wd + s2 * (30 + ((t * 50) % 60)); L(g, x - s2 * 12, gy - 6, x, gy - 6, { stroke: INK, w: 2 }); P(g, `M${x - s2 * 6},${gy - 11} L${x},${gy - 6} L${x - s2 * 6},${gy - 1}`, { stroke: INK, w: 2 }); } T(g, W - 12, gy - 22, "gust front", { size: 11, fill: INK, anchor: "end" }); }
     // legend + stage strip
-    T(g, 12, top + 14, "updraft", { size: 11, fill: ACC }); T(g, 12, top + 28, "downdraft", { size: 11, fill: INK });
+    T(g, W - 12, fz + 20, "updraft", { size: 11, fill: ACC, anchor: "end" }); T(g, W - 12, fz + 34, "downdraft", { size: 11, fill: INK, anchor: "end" });
     ORDER.forEach((k, i) => { const x = W * (0.2 + i * 0.3), on = k === st; T(g, x, gy + (ph ? 22 : 24), ["1 Cumulus", "2 Mature", "3 Dissipating"][i], { size: 11, fill: on ? ACC : GRAY, anchor: "middle", weight: on ? 700 : 500 }); });
     const s = ST[st]; S.F.caption(s[1], s[0]);
     S.F.explain(`${s[2]} Every thunderstorm needs moisture, an unstable lapse rate and a lifting force. Stay at least 20 NM from a severe one, and never fly under it. <span class="src">PHAK 12</span>`);
