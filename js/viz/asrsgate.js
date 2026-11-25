@@ -4,13 +4,13 @@ import { chips, slider, row } from "./base.js?v=bcb0f9d34d";
 import { pxScene, T, L, C, P, wrapT, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=bcb0f9d34d";
 export function mount(host) {
   let inad = true, clean = true, prior = true, days = 3;
-  const S = pxScene(host, { corners: { tl: "NASA ASRS · penalty waiver", tr: "All four must pass" } }, draw);
-  slider(S.F.ctrl, { label: "Report filed after you noticed", min: 0, max: 20, step: 1, value: days, fmt: (v) => (v === 0 ? "Same day" : v + (v === 1 ? " day" : " days")), oninput: (v) => { days = v; S.redraw(); } });
+  const S = pxScene(host, { cls: "short", corners: { tl: "NASA ASRS · waiver", tr: "All four must pass" } }, draw);
+  slider(row(S.F.ctrl), { label: "Filed after", min: 0, max: 20, step: 1, value: days, fmt: (v) => (v === 0 ? "Same day" : v + (v === 1 ? " day" : " days")), oninput: (v) => { days = v; S.redraw(); } });
   chips(row(S.F.ctrl, "Violation"), [["y", "Inadvertent"], ["n", "Deliberate"]], "y", (v) => { inad = v === "y"; S.redraw(); }, { label: "The violation was" });
-  chips(row(S.F.ctrl, "Event"), [["y", "No accident or crime"], ["n", "Accident or crime"]], "y", (v) => { clean = v === "y"; S.redraw(); }, { label: "Accident or criminal offense" });
-  chips(row(S.F.ctrl, "Record"), [["y", "No violation in 5 yr"], ["n", "Violation in last 5 yr"]], "y", (v) => { prior = v === "y"; S.redraw(); }, { label: "Prior record" });
+  chips(row(S.F.ctrl, "Event"), [["y", "Neither"], ["n", "Accident or crime"]], "y", (v) => { clean = v === "y"; S.redraw(); }, { label: "Accident or criminal offense" });
+  chips(row(S.F.ctrl, "Record"), [["y", "Clean 5 years"], ["n", "Prior violation"]], "y", (v) => { prior = v === "y"; S.redraw(); }, { label: "Prior record" });
   function draw(g, W, H, top) {
-    const ph = W < 520, x0 = 16, x1 = W - 16, gates = [["INADVERTENT", inad], ["NO ACCIDENT, NO CRIME", clean], ["NO VIOLATION IN 5 YR", prior], ["FILED IN 10 DAYS", days <= 10]];
+    const ph = W < 520, x0 = 16, x1 = W - 16, gates = [[["INADVERTENT"], inad], [["NO ACCIDENT", "OR CRIME"], clean], [["CLEAN", "5 YEARS"], prior], [["FILED IN", "10 DAYS"], days <= 10]];
     const all = gates.every((x) => x[1]), cy = top + (H - top) * 0.32, n = gates.length, sp = (x1 - x0 - 40) / n;
     let broke = gates.findIndex((x) => !x[1]); if (broke < 0) broke = n;
     L(g, x0, cy, x0 + 20 + sp * Math.min(broke, n) - (broke < n ? sp / 2 : 0), cy, { stroke: ACC, w: 3 });
@@ -18,7 +18,7 @@ export function mount(host) {
     gates.forEach(([lab, ok], i) => { const x = x0 + 20 + sp * i + sp / 2 - sp / 2 + sp / 2;
       C(g, x, cy, ph ? 15 : 18, { stroke: ok ? ACC : INK, sw: 2, fill: ok ? ACCF : "#111113" });
       if (ok) P(g, `M${x - 6},${cy} l4,5 l8,-10`, { stroke: ACC, w: 2.4 }); else { P(g, `M${x - 6},${cy - 6} l12,12 M${x + 6},${cy - 6} l-12,12`, { stroke: INK, w: 2.2 }); }
-      wrapT(lab, ph ? 10 : 14).forEach((t, k) => T(g, x, cy + (ph ? 34 : 40) + k * 15, t, { size: 11, anchor: "middle", fill: ok ? INK : GRAY }));
+      lab.forEach((t, k) => T(g, x, cy + (ph ? 34 : 40) + k * 15, t, { size: 11, anchor: "middle", fill: ok ? INK : GRAY }));
       T(g, x, cy - (ph ? 24 : 28), String(i + 1), { size: 11, anchor: "middle", fill: GRAY });
     });
     // end node

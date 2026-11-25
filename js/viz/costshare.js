@@ -4,14 +4,14 @@ import { slider, chips } from "./base.js?v=bcb0f9d34d";
 import { pxScene, T, R, C, L, P, wrapT, ACC, INK, GRAY, DIM, ACCF } from "./kit.js?v=bcb0f9d34d";
 export function mount(host) {
   let n = 3, cost = 270, why = "trip";
-  const S = pxScene(host, { cls: "tall", corners: { tl: "Splitting a flight's cost", tr: "14 CFR 61.113(c)" } }, draw);
-  slider(S.F.ctrl, { label: "People on board, you included", min: 2, max: 4, step: 1, value: n, fmt: (v) => String(v), oninput: (v) => { n = v; S.redraw(); } });
-  slider(S.F.ctrl, { label: "Fuel, oil, airport fees and rental", min: 100, max: 600, step: 10, value: cost, fmt: (v) => "$" + v, oninput: (v) => { cost = v; S.redraw(); } });
+  const S = pxScene(host, { corners: { tl: "Splitting a flight's cost", tr: "14 CFR 61.113(c)" } }, draw);
+  slider(S.F.ctrl, { label: "On board, with you", min: 2, max: 4, step: 1, value: n, fmt: (v) => String(v), oninput: (v) => { n = v; S.redraw(); } });
+  slider(S.F.ctrl, { label: "Shareable cost", min: 100, max: 600, step: 10, value: cost, fmt: (v) => "$" + v, oninput: (v) => { cost = v; S.redraw(); } });
   chips(S.F.ctrl, [["trip", "Friends, same trip"], ["ad", "Seats advertised online"]], why, (v) => { why = v; S.redraw(); }, { label: "Who's flying with you" });
   function draw(g, W, H, top) {
     const ph = W < 520, x0 = 16, x1 = W - 16, hire = why === "ad", share = Math.ceil((cost / n) * 100) / 100, sh = "$" + (share % 1 ? share.toFixed(2) : share);
     // seats: 2 x 2 cabin from above
-    const cx = W / 2, sy = top + 6, sw = ph ? 70 : 90, shh = ph ? 50 : 60, gx = 14;
+    const cx = W / 2, sy = top + 6, sw = ph ? Math.min(130, (W - 46) / 2) : 120, shh = ph ? 46 : 70, gx = 14;
     const seats = [[cx - sw - gx / 2, sy], [cx + gx / 2, sy], [cx - sw - gx / 2, sy + shh + 12], [cx + gx / 2, sy + shh + 12]];
     seats.forEach(([x, y], i) => { const used = i < n, you = i === 0;
       R(g, x, y, sw, shh, { stroke: !used ? DIM : you && !hire ? ACC : hire ? DIM : INK, sw: 1.5, fill: you && !hire ? ACCF : "#111113", rx: 8, dash: used ? null : "4 4" });
@@ -21,11 +21,11 @@ export function mount(host) {
       else T(g, x + sw / 2, y + shh / 2 + 4, "EMPTY", { size: 11, fill: DIM, anchor: "middle" });
     });
     // the bill as a bar split into equal shares
-    const by = sy + 2 * shh + 12 + 40, bw = x1 - x0;
+    const by = sy + 2 * shh + 12 + (ph ? 34 : 40), bw = x1 - x0;
     T(g, x0, by - 10, `TOTAL $${cost} ÷ ${n} PEOPLE`, { size: 11, fill: GRAY });
     for (let i = 0; i < n; i++) { const x = x0 + (bw / n) * i; R(g, x + 1, by, bw / n - 2, 22, { fill: hire ? "rgba(242,241,236,.05)" : i === 0 ? ACC : "rgba(242,241,236,.12)", stroke: hire ? DIM : "none", rx: 3 });
       T(g, x + bw / n / 2, by + 15, i === 0 ? "YOU" : "PAX", { size: 11, anchor: "middle", fill: hire ? DIM : i === 0 ? "#fff" : GRAY, weight: 600 }); }
-    let y = by + 50;
+    let y = by + (ph ? 44 : 50);
     const msg = hire ? ["Holding out: advertising seats to the public makes it a flight for hire, even split evenly. A private pilot can't do it."]
       : [`You pay at least your pro rata share, ${sh}. You may pay more, never less.`, "Not shareable: your time, or costs beyond fuel, oil, airport fees and rental."];
     msg.forEach((m, k) => wrapT(m, Math.floor((W - 32) / 7.4)).forEach((t) => { T(g, x0, y, t, { size: 14, fill: k ? GRAY : hire ? INK : INK, mono: false, weight: k ? 400 : 600 }); y += 20; }));

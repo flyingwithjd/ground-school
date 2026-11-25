@@ -7,12 +7,12 @@ const DAY = 864e5, fmtD = (d) => `${MO[d.getMonth()]} ${d.getDate()}, ${d.getFul
 export function mount(host) {
   const today = new Date(); today.setHours(12, 0, 0, 0);
   let mode = "fr", fr = 20, ld = 40, mv = 20;
-  const S = pxScene(host, { cls: "tall", corners: { tl: "Are you current today?", tr: "Today " + fmtD(today) } }, draw);
+  const S = pxScene(host, { corners: { tl: "Are you current today?", tr: "Today " + fmtD(today) } }, draw);
   chips(S.F.ctrl, [["fr", "Flight review"], ["pax", "Passengers"], ["addr", "New address"]], mode, (v) => { mode = v; show(); S.redraw(); }, { label: "Rule" });
   const sl = {
-    fr: slider(S.F.ctrl, { label: "Last flight review", min: 0, max: 30, step: 1, value: fr, fmt: (v) => v + " months ago", oninput: (v) => { fr = v; S.redraw(); } }),
-    pax: slider(S.F.ctrl, { label: "3rd most recent landing", min: 0, max: 120, step: 1, value: ld, fmt: (v) => v + " days ago", oninput: (v) => { ld = v; S.redraw(); } }),
-    addr: slider(S.F.ctrl, { label: "You moved", min: 0, max: 60, step: 1, value: mv, fmt: (v) => v + " days ago", oninput: (v) => { mv = v; S.redraw(); } }),
+    fr: slider(S.F.ctrl, { label: "Last review", min: 0, max: 30, step: 1, value: fr, fmt: (v) => v + " months ago", oninput: (v) => { fr = v; S.redraw(); } }),
+    pax: slider(S.F.ctrl, { label: "3rd-last landing", min: 0, max: 120, step: 1, value: ld, fmt: (v) => v + " days ago", oninput: (v) => { ld = v; S.redraw(); } }),
+    addr: slider(S.F.ctrl, { label: "Moved", min: 0, max: 60, step: 1, value: mv, fmt: (v) => v + " days ago", oninput: (v) => { mv = v; S.redraw(); } }),
   };
   function show() { for (const k in sl) sl[k].el.style.display = k === mode ? "" : "none"; }
   show();
@@ -30,7 +30,7 @@ export function mount(host) {
       const ls = new Date(+today - ld * DAY), end = new Date(+ls + 90 * DAY);
       a0 = new Date(+today - 125 * DAY); a1 = new Date(+today + 95 * DAY);
       const ok = today <= end;
-      rows = [{ lab: "CARRY PASSENGERS BY DAY", src: "61.57(a)", s: ls, e: end, on: ok, a: "3 T/O + 3 LDG", b: "THRU " + fmtD(end).toUpperCase() }];
+      rows = [{ lab: "CARRY PASSENGERS BY DAY", src: "61.57(a)", s: ls, e: end, on: ok, a: "3RD-LAST LANDING", b: "THRU " + fmtD(end).toUpperCase() }];
       head = ok ? "Current: you may carry passengers" : "Not current: fly 3 takeoffs and landings first"; big = ok ? `${Math.round((end - today) / DAY)} days left` : "No passengers today";
       ex = `To carry anyone you need <b>3 takeoffs and 3 landings in the preceding 90 days</b>, as sole manipulator, in the same category and class. Touch-and-goes count in a nosewheel airplane; a tailwheel airplane needs full stops. At night (1 hour after sunset to 1 hour before sunrise) the 3 must be full stops made in that period. To get current again, fly them with no passengers, or with an instructor. <span class="src">14 CFR 61.57(a)–(b)</span>`;
     } else {
@@ -42,21 +42,27 @@ export function mount(host) {
       head = ok ? "Notify the FAA within 30 days" : "Grounded until you notify the FAA"; big = ok ? `${Math.round((end - today) / DAY)} days to tell the FAA` : "Can't use your certificate";
       ex = `After a change of permanent mailing address, you may not use your pilot certificate after 30 days unless you've notified the FAA Airman Certification Branch. The rule says in writing; the FAA also takes it online. <span class="src">14 CFR 61.60</span>`;
     }
-    const X = (d) => x0 + ((d - a0) / (a1 - a0)) * (x1 - x0), y0 = top + 30, rh = ph ? 92 : 100;
-    rows.forEach((r, i) => { const y = y0 + i * rh, xs = Math.max(x0, X(r.s)), xe = Math.min(x1, X(r.e));
-      T(g, x0, y, r.lab, { size: 11, fill: r.on ? INK : GRAY }); T(g, x1, y, r.src, { size: 11, fill: GRAY, anchor: "end" });
-      R(g, x0, y + 12, x1 - x0, 20, { fill: "rgba(242,241,236,.05)", rx: 3 });
-      R(g, xs, y + 12, Math.max(2, xe - xs), 20, { fill: r.on ? ACC : ACCM, rx: 3 });
-      if (r.e < a1) { L(g, xe, y + 6, xe, y + 38, { stroke: INK, w: 1.5 }); if (xe < x1 - 4) R(g, xe, y + 12, x1 - xe, 20, { stroke: DIM, sw: 1, dash: "3 3", rx: 3 }); }
-      T(g, xs, y + 52, r.a, { size: 11, fill: GRAY, anchor: xs > W * 0.6 ? "end" : "start" });
-      if (r.b) T(g, Math.min(x1, xe), y + 70, r.b, { size: 11, fill: r.on ? INK : GRAY, anchor: xe > W * 0.45 ? "end" : "start" });
+    const X = (d) => x0 + ((d - a0) / (a1 - a0)) * (x1 - x0), y0 = top + 8, rh = ph ? 118 : 132, bh = ph ? 28 : 38, xt = X(today);
+    rows.forEach((r, i) => { const y = y0 + i * rh, by = y + 34, xs = Math.max(x0, X(r.s)), xe = Math.min(x1, X(r.e));
+      T(g, x0, y + 4, r.lab, { size: 11, fill: r.on ? INK : GRAY }); T(g, x1, y + 4, r.src, { size: 11, fill: GRAY, anchor: "end" });
+      // today marker above the bar
+      T(g, xt, y + 22, "TODAY", { size: 11, anchor: "middle", fill: INK, weight: 700 });
+      R(g, x0, by, x1 - x0, bh, { fill: "rgba(242,241,236,.05)", rx: 3 });
+      R(g, xs, by, Math.max(2, xe - xs), bh, { fill: r.on ? ACC : ACCM, rx: 3 });
+      if (r.e < a1 && xe < x1 - 4) R(g, xe, by, x1 - xe, bh, { stroke: DIM, sw: 1, dash: "3 3", rx: 3 });
+      if (r.e < a1) L(g, xe, by - 4, xe, by + bh + 26, { stroke: INK, w: 1.5 });
+      L(g, xt, y + 26, xt, by + bh + 4, { stroke: INK, w: 2.5 });
+      T(g, xs, by + bh + 18, r.a, { size: 11, fill: GRAY, anchor: xs > W * 0.6 ? "end" : "start" });
+      if (r.b) T(g, xe, by + bh + 40, r.b, { size: ph ? 11 : 12, fill: r.on ? INK : GRAY, weight: 600, anchor: xe > W * 0.5 ? "end" : "start" });
     });
-    // today cursor
-    const xt = X(today), yb = y0 + rows.length * rh;
-    L(g, xt, y0 + 6, xt, yb - 20, { stroke: INK, w: 2 }); T(g, xt, yb - 4, "TODAY", { size: 11, anchor: xt > W * 0.7 ? "end" : "middle", fill: INK, weight: 700 });
+    // axis: years (flight review) or 30-day steps
+    const ya = y0 + rows.length * rh - 6; L(g, x0, ya, x1, ya, { stroke: DIM, w: 1 });
+    if (mode === "fr") { for (let yr = a0.getFullYear() + 1; yr <= a1.getFullYear(); yr++) { const xx = X(new Date(yr, 0, 1)); if (xx > x0 + 14 && xx < x1 - 14) { L(g, xx, ya - 4, xx, ya + 4, { stroke: GRAY, w: 1 }); T(g, xx, ya + 18, String(yr), { size: 11, anchor: "middle", fill: GRAY }); } } }
+    else { const step = mode === "pax" ? 30 : 15; for (let k = -150; k <= 150; k += step) { const xx = X(new Date(+today + k * DAY)); if (xx > x0 + 14 && xx < x1 - 14) { L(g, xx, ya - 4, xx, ya + 4, { stroke: GRAY, w: 1 }); T(g, xx, ya + 18, k === 0 ? "0" : (k > 0 ? "+" : "−") + Math.abs(k) + "d", { size: 11, anchor: "middle", fill: GRAY }); } } }
+    const yb = ya + 32;
     const ok = mode === "addr" ? rows[1].on : rows[0].on;
-    R(g, x0, yb + 14, x1 - x0, 44, { stroke: ok ? ACC : INK, sw: 1.5, fill: ok ? ACCF : "#111113", rx: 6 });
-    T(g, x0 + 14, yb + 41, head, { size: ph ? 14 : 15, fill: ok ? ACC : INK, weight: 700, mono: false });
+    R(g, x0, yb + 2, x1 - x0, 44, { stroke: ok ? ACC : INK, sw: 1.5, fill: ok ? ACCF : "#111113", rx: 6 });
+    T(g, x0 + 14, yb + 29, head, { size: ph ? 14 : 15, fill: ok ? ACC : INK, weight: 700, mono: false });
     S.F.caption(mode === "fr" ? "Flight review" : mode === "pax" ? "Passenger currency" : "Change of address", big);
     S.F.explain(ex + ` Currency is the legal minimum; being proficient for today's flight can take more.`);
   }

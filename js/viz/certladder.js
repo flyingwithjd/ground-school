@@ -11,7 +11,7 @@ const C = [
 ];
 export function mount(host) {
   let sel = 3;
-  const S = pxScene(host, { cls: "tall", corners: { tl: "Pilot certificates", tr: "Tap a step" } }, draw);
+  const S = pxScene(host, { corners: { tl: "Pilot certificates", tr: "Tap a step" } }, draw);
   function draw(g, W, H, top) {
     const ph = W < 520, x0 = 16, d = ph ? 10 : 16, n = C.length, gap = ph ? 4 : 10;
     const bw = (W - 32 - d - gap * (n - 1)) / n, base = top + (H - top) * (ph ? 0.46 : 0.5), step = ((H - top) * (ph ? 0.3 : 0.34)) / n;
@@ -30,9 +30,9 @@ export function mount(host) {
     facts.forEach(([k, v], i) => { const cx = x0 + (i % cols) * cw, yy = cy + 24 + Math.floor(i / cols) * 40;
       T(g, cx, yy, k, { size: 11, fill: GRAY }); T(g, cx, yy + 18, v, { size: ph ? 13 : 14, fill: INK, weight: 600, mono: false }); });
     const ly = cy + 24 + Math.ceil(4 / cols) * 40 + 6, lines = wrapT(c.lim, ph ? Math.floor((W - 32) / 7.2) : Math.floor((W - 32) / 7.6));
-    lines.slice(0, 4).forEach((t, i) => T(g, x0, ly + i * 18, t, { size: 13, fill: GRAY, mono: false }));
+    lines.slice(0, 4).forEach((t, i) => { if (ly + i * 18 < H - 8) T(g, x0, ly + i * 18, t, { size: 13, fill: GRAY, mono: false }); });
     S.F.caption(c.name, c.pax === "None" ? "No passengers" : c.pax === "1" ? "One passenger" : c.pay.startsWith("Yes") ? "Can be paid to fly" : "Passengers, never for hire");
-    S.F.explain(`<b>${c.name}.</b> ${c.lim} ${c.pay.includes("(") ? "Cost sharing: " + c.pay.split("(")[1].replace(")", "") + "." : ""} <span class="src">${c.src}</span>`);
+    S.F.explain(`<b>${c.name}.</b> ${c.lim} ${c.pay.includes("half") ? "You may share costs with your passenger but must pay at least half." : ""} <span class="src">${c.src}</span>`);
   }
   return { destroy() { S.F.destroy(); } };
 }
