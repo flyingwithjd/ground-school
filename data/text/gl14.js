@@ -39,6 +39,8 @@ export default {
 <li><strong>If confused, hold the heading</strong>. Turning away makes it easy to get lost.</li>
 <li><strong>Planning</strong> (91.103): weather, fuel, alternatives, runway lengths and takeoff and landing distances, plus NOTAMs and the Chart Supplement for each airport.</li>
 <li><strong>Charting the course</strong>: draw the line, check airspace, terrain and MEFs along it, choose a cruising altitude (91.159), mark checkpoints, measure distances and fill in a navigation log.</li></ul><span class="src">PHAK 16 · 14 CFR 91.103</span>`,
+      viz: { type: "navlog" },
+      body2: `<p><strong>The navigation log</strong> turns the line on the chart into numbers you can fly: one row per leg, from one checkpoint to the next. Work each row left to right with the winds aloft forecast for your altitude, then add the legs and the fuel reserve. In flight, write down the time at each checkpoint: if you're early or late, your actual groundspeed tells you the wind is different, and you update the times and fuel for the legs ahead. <span class="src">PHAK 16</span></p>`,
       kdr: { k: "Pilotage and dead reckoning; checkpoint and route selection; navigation log.", d: "Prepare a navigation log and fly it.", r: "Relying on a single checkpoint.", codes: ["PA.VI.A.K1", "PA.VI.A.K4a", "PA.VI.A.K4c", "PA.VI.A.S1"] } },
     { id: "fp", label: "VFR flight plan · AIM 5-1-5, 6-2-6 · 14 CFR 91.153", title: "Someone knows to look for you",
       body: `<p>A VFR flight plan isn't required for domestic flights, but it's your search-and-rescue insurance. <span class="src">AIM 5-1-5</span></p>
